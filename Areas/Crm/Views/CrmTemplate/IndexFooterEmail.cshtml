@@ -1,0 +1,283 @@
+@model List<Erp.BackOffice.Areas.Crm.Models.CrmEmailFooterViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = Wording.PageIndex_TemplatePrint;
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "CrmTemplate",
+            ActionName = "IndexFooterEmail",
+            PageTitle = "Danh sách Email Footer",
+            DisplaySearchPanel = false,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+    }
+
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    @section HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+    }
+
+           <style>
+               .small-checkbox {
+                   width: 10px;
+                   height: 10px;
+               }
+
+               .table td:nth-child(3) {
+                   width: 50%;
+               }
+
+               .table td:nth-child(1),
+               .table td:nth-child(2) {
+                   width: 1%;
+               }
+
+               .table {
+                   width: 100%;
+                   border-collapse: collapse;
+               }
+
+               .table th,
+               .table td {
+                   padding: 8px;
+                   text-align: left;
+                   border-bottom: 1px solid #ddd;
+               }
+
+               .table th {
+                   background-color: #f2f2f2;
+                   font-weight: bold;
+               }
+
+               .table tbody tr:hover {
+                   background-color: #f5f5f5;
+               }
+
+               .table tbody tr:nth-child(even) {
+                   background-color: #f2f2f2;
+               }
+
+               .table tbody tr td:last-child {
+                   white-space: nowrap;
+               }
+
+               .table tbody tr td a {
+                   color: #337ab7;
+                   text-decoration: none;
+               }
+
+                   .table tbody tr td a:hover {
+                       text-decoration: underline;
+                   }
+
+               .btn-group {
+                   display: flex;
+                   justify-content: flex-start;
+               }
+
+                   .btn-group .btn {
+                       margin-right: 5px;
+                   }
+
+               .btn-group-minier > .btn, .btn-minier {
+                   padding: 2px 8px;
+                   border-radius: 3px;
+               }
+
+
+               p img {
+                   width: 40px !important;
+                   height: 40px !important;
+                   object-fit: cover;
+                   border-radius: 5px;
+               }
+
+               .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+                   border-right: none;
+               }
+
+               .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+                   vertical-align: middle;
+               }
+
+               td > a {
+                   display: flex;
+                   align-items: center;
+                   gap: 2rem;
+               }
+
+               td > a > p:first-child {
+                   font-weight: 600
+               }
+
+               td > a > p {
+                   margin: .5rem 1rem
+               }
+
+               .table > caption + thead > tr:first-child > td, .table > caption + thead > tr:first-child > th, .table > colgroup + thead > tr:first-child > td, .table > colgroup + thead > tr:first-child > th, .table > thead:first-child > tr:first-child > td, .table > thead:first-child > tr:first-child > th {
+                   border-top: .1rem solid #dbdbdb;
+                   background: #fff !important;
+                   border-bottom: .1rem solid #dbdbdb;
+               }
+
+    </style>
+
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl" title=""></span>
+        </label>
+    }
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+    }
+
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>@BuildCheckAll()</th>
+                <th>STT</th>
+                <th>Nội dung</th>
+                <th>Ngày tạo</th>
+                <th>Ngày cập nhật</th>
+                <th>Hoạt động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int index = 0; index < Model.Count; index++)
+            {
+                var item = Model[index];
+                <tr>
+                    <td>
+                        <label>
+                            <input class="ace class-delete-all" type="checkbox" name="selectedIds" value="@item.Id">
+                            <span class="lbl small-checkbox"></span>
+                        </label>
+                    </td>
+                    <td>@(index + 1)</td>
+                    <td class="logs" style="color: #337ab7;">
+                        <a href="@Url.Action("DetailFooterEmail", "CrmTemplate", new { Id = item.Id })">
+                            @Html.Raw(item.Logs)
+                        </a>
+                    </td>                    <td>@item.CreatedDate</td>
+                    <td>@item.ModifiedDate</td>
+                    <td>
+                        <p>
+                            <a class="btn btn-minier btn-success" href="@Url.Action("EditFooterEmail", "CrmTemplate", new {Id = item.Id})">
+                                <i class="ace-icon fa fa-edit"></i>
+                            </a>
+                            <button value="@item.Id" class="btn btn-minier btn-danger btn-delete-single" data-id="@item.Id">
+                                <i class="ace-icon fa fa-trash"></i>
+                            </button>
+                        </p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="pull-left">
+                <a class="btn btn-info btn-mini" href="@Url.Action("CreateFooterEmail", pageSetting.ModuleName)">
+                    <i class="ace-icon fa fa-plus"></i>
+                </a>
+
+                <button name="DeleteAll" value="DeleteAll" class="btn btn-mini btn-danger" id="btnDeleteMultiple">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+$(document).ready(function () {
+    // Xử lý sự kiện khi nút xóa nhiều mục được nhấn
+    var selectedIds = [];
+
+    $('#btnDeleteMultiple').click(function () {
+        // Lặp qua tất cả các checkbox được chọn và lấy giá trị ID của chúng
+        $('input[name="selectedIds"]:checked').each(function () {
+            selectedIds.push($(this).val());
+        });
+
+        // Log các select đã được chọn ra console
+        console.log(selectedIds);
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DeleteFooterEmail", "CrmTemplate")',
+            data: { selectedIds: selectedIds }, // Sửa đổi thành mảng của chuỗi
+            traditional: true, // Sử dụng traditional để tránh lỗi khi truyền mảng
+            success: function (response) {
+                // Xóa hàng tương ứng sau khi gửi dữ liệu lên server thành công
+                $('input[name="selectedIds"]:checked').closest('tr').remove();
+            },
+            error: function (xhr, status, error) {
+                // Xử lý lỗi nếu cần
+            }
+        });
+    });
+
+    // Xử lý sự kiện khi nút xóa từng mục được nhấn
+    $('.btn-delete-single').click(function () {
+        var id = $(this).data('id');
+        var row = $(this).closest('tr');
+        // Gửi ID của mục đó đến hàm Delete trong controller
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DeleteFooterEmail", "CrmTemplate")',
+            data: { selectedIds: id }, // Sửa đổi thành mảng của chuỗi
+            traditional: true, // Sử dụng traditional để tránh lỗi khi truyền mảng
+            success: function (response) {
+                row.remove();
+            },
+            error: function (xhr, status, error) {
+                // Xử lý lỗi nếu cần
+            }
+        });
+    });
+});
+    </script>

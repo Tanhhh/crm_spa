@@ -1,0 +1,67 @@
+﻿@model Bed
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Staff.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using System.Globalization;
+@using Erp.BackOffice.Staff.Models;
+@using Erp.BackOffice.Filters;
+@using Erp.Domain.Entities;
+@using Erp.Domain.Interfaces;
+@using Erp.Domain.Staff.Entities;
+@using Erp.Domain.Staff.Interfaces;
+@using System;
+@using System.Collections.Generic;
+@using System.Data.Entity.Infrastructure;
+@using System.Linq;
+@using System.Text;
+@using System.Web.Mvc;
+@using Erp.Utilities;
+@using WebMatrix.WebData;
+
+
+@{
+    ViewBag.Title = Wording.PageCreate_Bed;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Room",
+        ActionName = "CreateBed",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    IEnumerable<SelectListItem> floorList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("FloorList", null, "value");
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    @Html.HiddenFor(model => model.Room_Id)
+    @Html.CustomTextboxFor(model => model.Name_Bed, null, null, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.GHI_CHU, null, null, WidthType.span12)
+
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}

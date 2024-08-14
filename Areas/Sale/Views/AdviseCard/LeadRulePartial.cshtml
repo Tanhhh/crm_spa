@@ -1,0 +1,244 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Sale.Controllers
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using Erp.BackOffice.Sale.Models
+@using System.ComponentModel
+@using Erp.Domain.Account.Helper
+@{
+    var lsstatus = ViewBag.lsstatus as IEnumerable<StatusLeadModel>;
+    var Rule = ViewBag.Rule as IEnumerable<RuleModel>;
+    var ruledt = ViewBag.ruledt as IEnumerable<RuleDetailModel>;
+    Layout = "";
+    var tuple = ViewBag.section as Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>;
+
+}
+
+@if (lsstatus != null && lsstatus.Count() > 0)
+{
+    foreach (var item in lsstatus)
+    {
+        <div class="outer col-xs-2 padding-0 col-list" style="margin-left: 10px; display: inline-table;">
+            <div class="ui-state-default" style="width: 200px;">
+                <div class="ticket clearfix" id="@item.Id" style="border-radius:3px;padding:0!important">
+                    <div class="row list-name-config" style=" padding:0px 0px 0px 12px !important;margin-top:10px">
+                        <div class="col-xs-11" style="padding: 0 !important">
+                            <div contenteditable="false" class="name col-xs-12" style="padding: 0 !important">
+                                <b class="list-name" prjitem="@item.Id" style="padding: 0 !important">
+                                    @*<div style="display: inline-block">*@
+                                    <label for="@item.Id" title="@item.Name" style="        border-bottom: 1px solid @item.ColorStatus;
+        cursor: pointer;
+        height: 30px;
+        width: 100%;
+        clip-path: polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%);
+        background-color: @item.ColorStatus;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        color: #fff;
+        padding: 0 !important;
+        display: block;
+        text-align: center;
+        line-height: 30px;
+        padding: 0 10px !important;
+    " class="">@item.Name<input id="@item.Id" hidden type="radio" name="status" value="@item.Id" /></label>
+        @*</div>*@
+    </b>
+</div>
+</div>
+@*<div class="col-xs-2 pull-right">
+        <i class="delete-ticket fa fa-trash-o" id="@item.ProjectItemId" onclick=""></i>
+    </div>*@
+</div>
+<div class="row list-name-config" style=" padding:0px 0px 0px 12px !important">
+    <div class="col-xs-11" style="padding: 0 !important">
+        <div contenteditable="false" class="name col-xs-12" style="padding: 0 !important">
+            <button type="button" onclick="searchPanel(`@item.Name`,@item.Id)" style="background-color: #fff; text-align: center; width: 100%; border: none; outline: none; margin-bottom: 10px;margin-top:10px; padding: 0 !important" class="" data-toggle="modal" data-target=".bs-searchPanel-modal-sm"><i class="fa fa-plus"></i>thêm</button>
+        </div>
+    </div>
+    @*<div class="col-xs-2 pull-right">
+            <i class="delete-ticket fa fa-trash-o" id="@item.ProjectItemId" onclick=""></i>
+        </div>*@
+</div>
+<!-- CARD LIST -->
+<div class="cardslist">
+    <div class="cardsBox droptrue inner" id="100" style="height:9999px;width:100%">
+        @{IEnumerable<RuleModel> ruleModel = Rule.Where(x => x.StatusFrom == item.Id);}
+        <!-- droptrue has items inner and (ui-state-default) -->
+        @if (ruleModel != null && ruleModel.Count() > 0)
+        {
+            foreach (var work in ruleModel)
+            {
+                int finishedTasks = 8;
+                <!--CARD-->
+        <div id="@work.Id" class="card ui-state-default dragtrue">
+            @if (work != null)
+            {
+                <div class="row">
+                    <div class="col-xs-12">
+                        @for (int i = 0; i < 4; i++)
+                        {
+                            <div class="card_label col-xs-4" style="background-color: #FF0600; margin-right: 5px;display:none;"></div>
+                        }
+                    </div>
+                </div>
+            }
+            @{IEnumerable<RuleDetailModel> ruleDetails = ruledt.Where(x => x.RuleId == work.Id); string content = "";}
+            @if (ruleDetails != null && ruleDetails.Count() > 0)
+            {
+
+                foreach (var item1 in ruleDetails)
+                {
+                    LeadSection_FieldModel model = tuple.Item2.Where(x => x.FieldName == item1.FieldName).FirstOrDefault();
+                    string LabelName = model != null ? model.NameLabel : "";
+                    if (LabelName != "")
+                    {
+                        content += LabelName + item1.Logic + item1.ContentRuleName + ',';
+
+                    }
+                    else
+                    {
+                        var properties = typeof(LeadModel).GetProperties();
+                        var prop = properties.Where(x => x.Name == item1.FieldName).FirstOrDefault();
+                        var display = prop != null ? prop.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute : new DisplayNameAttribute();
+                        string displayname = display != null ? display.DisplayName : "";
+                        content += displayname + item1.Logic + item1.ContentRuleName + ',';
+                    }
+                }
+                <div class="card_name col-xs-12" title="@content.Remove(content.Length-1)">
+                    @(content.Remove(content.Length - 1))
+                </div>
+                StatusLeadModel stMo = lsstatus.Where(x => x.Id == ruleDetails.First().StatusTo).FirstOrDefault();
+                string statusTos = stMo != null ? stMo.Name : "";
+                <div class="card_name col-xs-12" style="font-weight:bold">
+                    @(statusTos)
+                </div>
+
+            }
+
+
+            <!--ACTION ICONS -->
+            <div class="icons">
+                <i title='chỉnh sửa' style=" padding: 0 10px;" class="col-xs-1 description glyphicon glyphicon-edit" onclick="searchPanel(`@item.Name`,@item.Id,@work.Id,`@work.StatusTo`,`@work.ContentEmail`,`@work.ContentRule`,`@work.TileEmail`,@work.TypeRuleId)" data-target=".bs-searchPanel-modal-sm" data-toggle="modal"></i>
+                <i title='xóa' style=" padding: 0 10px;" class="col-xs-1 count glyphicon glyphicon-trash" onclick="deleteLeadRule(@work.Id)"></i>
+            </div>
+            <!--ACTION ICONS -->
+
+        </div>
+                <!--CARD-->
+            }
+        }
+    </div>
+</div>
+<!-- CARDS DIV -->
+<!-- ADD a card link -->
+@*<div class="cardsBoxContainer col-xs-12" style="text-align:center;">
+        <a class="addCard new" onclick="OpenPopupCreateWork('Thêm Mới Công Việc',@proId,@item.ProjectItemId, 0)">Tạo công việc</a>
+    </div>*@
+<!-- ADD card link -->
+<!-- FOOTER BUTTONS -->
+<footer style="display: none" class="card_footer col-xs-5 margin_5">
+    <input type="button" class="btn_addCard btn btn-success" value="Add" />
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+</footer>
+<!-- FOOTER BUTTONS -->
+
+</div>
+</div>
+</div>
+
+
+
+}
+}
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+<script>
+    // attach sortable event on cards --  moving Cards && remembering positions
+    function AttachCardSortable() {
+        $(".droptrue").sortable({
+            connectWith: ".inner",
+            revert: true,
+            update: function (event, ui) { // update cards positions
+                debugger
+                var data = [];
+                var $items = $(this).children();
+
+                $items.each(function () { // get all positions and card ids
+                    var RuleId = $(this).attr('id');
+                    var StatusId = $(this).closest(".outer").find('.ticket').attr('id');
+
+                    var row = { 'RuleId': RuleId, 'StatusId': StatusId };
+
+                    data.push(row);
+                });
+                $.ajax({
+                    url: '@Url.Action("updateStatusFrom", "AdviseCard")',
+                    type: "POST",
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(data),
+                    async:false,
+                    dataType:"json",
+                    success: function (data) {
+                       f5leadRuleBody()
+                    }
+                });
+            }
+
+        });
+        $(".dragtrue").draggable({
+            connectToSortable: ".droptrue",
+            helper: "clone",
+            revert: "invalid",
+            scroll: true,
+            scrollSensitivity: 100,
+            scrollSpeed: 100 ,
+            start: function (event, ui) {
+                // Get the ID from the draggable item
+                itemId = $(this).attr('id');
+            },
+            stop: function (event, ui) {
+                // Assign the ID to the clone
+                ui.helper.attr('id', itemId);
+            }
+        });
+    }
+
+    AttachCardSortable();
+
+
+    // moving Tickets && remembering ticket positions
+    @*function AttachTicketSortable() {
+        $(".ui-state").sortable({
+            connectWith: ".outer",
+            update: function (event, ui) {
+                debugger
+                var data = [];
+                var $items = $(this).children();
+                var Projectid = $("#ProjectId").val();
+
+                $items.each(function () { // get all positions and ticket ids
+
+                    var index = $(this).index() + 1;
+                    var ProjectItemId = $(this).find('.ticket').attr('id');
+                    var row = { 'ProjectItemId': ProjectItemId, 'PositionNo': index, 'ProjectId': Projectid,'Type': true };
+
+                    data.push(row);
+                });
+
+                $.ajax({
+                    url: '@Url.Action("updatePositionNo", "WProject", new { area = "Cms" })',
+                    type: "POST",
+                    contentType: 'application/json; charset=utf-8',
+                    data: JSON.stringify(data)
+                });
+
+            },
+            cancel: 'textarea,[contenteditable=true]'
+
+        });
+    }
+
+    AttachTicketSortable();*@
+</script>

@@ -1,0 +1,49 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_Get_Sale_SchedulingHistoryViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Ngày tạo</th>
+                <th class="text-center">Mã khách hàng</th>
+                <th class="text-center">Tên khách hàng</th>
+                <th class="text-center">Mã phiếu</th>
+                <th class="text-center">Mã sản phẩm</th>
+                <th class="text-center">Tên sản phẩm</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+                <td class="text-right">@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                <td class="text-right">@item.CustomerCode</td>
+                <td class="text-right">@item.CustomerName</td>
+                <td class="text-right">@item.Code</td>
+                <td class="text-right">@item.ProductCode</td>
+                <td class="text-right">@item.ProductName</td>
+            </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td class="text-right"></td>
+                <td class="text-right"></td>
+                <td class="text-right"></td>
+                <td class="text-right"></td>
+                <td class="text-right"></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>

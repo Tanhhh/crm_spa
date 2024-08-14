@@ -1,0 +1,56 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model LogPromotionViewModel
+
+<input class="commission_id" type="hidden" id="LogCommission_@(Model.count)__Id" name="LogCommission[@(Model.count)].Id" value="@Model.Id" />
+<input class="commission_name" type="hidden" id="LogCommission_@(Model.count)__Name" name="LogCommission[@(Model.count)].Name" value="@Model.Name" />
+<input class="commission_product_invoice_code" type="hidden" id="LogCommission_@(Model.count)__ProductInvoiceCode" name="LogCommission[@(Model.count)].ProductInvoiceCode" value="@Model.ProductInvoiceCode" />
+<input class="commission_product_id" type="hidden" id="LogCommission_@(Model.count)__ProductId" name="LogCommission[@(Model.count)].ProductId" value="@Model.ProductId" />
+<input class="commission_commission_cus_code" type="hidden" id="LogCommission_@(Model.count)__CommissionCusCode" name="LogCommission[@(Model.count)].CommissionCusCode" value="@Model.CommissionCusCode" />
+<input class="commission_CommissionCusId" type="hidden" id="LogCommission_@(Model.count)__CommissionCusId" name="LogCommission[@(Model.count)].CommissionCusId" value="@Model.CommissionCusId" />
+<input class="commission_target_id" type="hidden" id="LogCommission_@(Model.count)__TargetID" name="LogCommission[@(Model.count)].TargetID" value="@Model.TargetID" />
+<input class="commission_target_module" type="hidden" id="LogCommission_@(Model.count)__TargetModule" name="LogCommission[@(Model.count)].TargetModule" value="@Model.TargetModule" />
+<input class="commission_type" type="hidden" id="LogCommission_@(Model.count)__Type" name="LogCommission[@(Model.count)].Type" value="@Model.Type" />
+<input class="commission_customer_id" type="hidden" id="LogCommission_@(Model.count)__CustomerId" name="LogCommission[@(Model.count)].CustomerId" value="@Model.CustomerId" />
+<input class="commission_branch_id" type="hidden" id="LogCommission_@(Model.count)__BranchId" name="LogCommission[@(Model.count)].BranchId" value="@Model.BranchId" />
+<input class="commission_commission_value" type="hidden" id="LogCommission_@(Model.count)__CommissionValue" name="LogCommission[@(Model.count)].CommissionValue" value="@Model.CommissionValue" />
+<input class="commission_code" type="hidden" id="LogCommission_@(Model.count)__Code" name="LogCommission[@(Model.count)].Code" value="@Model.Code" />
+<input class="commission_ismoney" type="hidden" id="LogCommission_@(Model.count)__IsMoney" name="LogCommission[@(Model.count)].IsMoney" value="@Model.IsMoney" />
+<input class="commission_gift_product_id" type="hidden" id="LogCommission_@(Model.count)__GiftProductId" name="LogCommission[@(Model.count)].GiftProductId" value="@Model.GiftProductId" />
+<input class="commission_donate_pro_ser" type="hidden" id="LogCommission_@(Model.count)__DonateProOrSerId" name="LogCommission[@(Model.count)].DonateProOrSerId" value="@Model.DonateProOrSerId" />
+<input class="commission_product_quantity" type="hidden" id="LogCommission_@(Model.count)__ProductQuantity" name="LogCommission[@(Model.count)].ProductQuantity" value="@Model.ProductQuantity" />
+<input class="commission_product_symbol_quantity" type="hidden" id="LogCommission_@(Model.count)__ProductSymbolQuantity" name="LogCommission[@(Model.count)].ProductSymbolQuantity" value="@Model.ProductSymbolQuantity" />
+<input class="commission_start_symbol" type="hidden" id="LogCommission_@(Model.count)__StartSymbol" name="LogCommission[@(Model.count)].StartSymbol" value="@Model.StartSymbol" />
+<input class="commission_end_symbol" type="hidden" id="LogCommission_@(Model.count)__EndSymbol" name="LogCommission[@(Model.count)].EndSymbol" value="@Model.EndSymbol" />
+<input class="commission_end_amount" type="hidden" id="LogCommission_@(Model.count)__EndAmount" name="LogCommission[@(Model.count)].EndAmount" value="@Model.EndAmount" />
+<input class="commission_start_amount" type="hidden" id="LogCommission_@(Model.count)__StartAmount" name="LogCommission[@(Model.count)].StartAmount" value="@Model.StartAmount" />
+<input class="commission_category" type="hidden" id="LogCommission_@(Model.count)__Category" name="LogCommission[@(Model.count)].Category" value="@Model.Category" />
+<p>
+    @if (Model.Type == "product_donate")
+    { 
+    <span><i class="fa fa-gift red"></i> Mua <b class="red">@Model.ProductName @Model.ProductSymbolQuantity @Model.ProductQuantity </b> được tặng <b class="red">@Model.GiftProductName</b></span>
+    }
+    @if (Model.Type == "product_discount")
+    {
+        <span><i class="fa fa-gift red"></i> Mua <b class="red">@Model.ProductName @Model.ProductSymbolQuantity @Model.ProductQuantity</b> được giảm giá  <b class="red">@Model.CommissionValue.ToCurrencyStr(null) @(Model.IsMoney.Value == true ? "VNĐ" : "%")</b></span>
+    }
+    @if (Model.Type == "invoice_donate")
+    {
+        <span><i class="fa fa-gift red"></i> Hóa đơn từ  <b class="red"> @Model.StartAmount.ToCurrencyStr(null) @Model.StartSymbol</b> đến <b class="red">@Model.EndSymbol @Model.EndAmount.ToCurrencyStr(null)</b> được tặng <b class="red">@Model.GiftProductName</b></span>
+    }
+    @if (Model.Type == "invoice_discount")
+    {
+        <span><i class="fa fa-gift red"></i> Hóa đơn từ  <b class="red"> @Model.StartAmount.ToCurrencyStr(null) @Model.StartSymbol</b> đến <b class="red">@Model.EndSymbol @Model.EndAmount.ToCurrencyStr(null)</b> được giảm giá  <b class="red">@Model.CommissionValue.ToCurrencyStr(null) @(Model.IsMoney.Value == true ? "VNĐ" : "%")</b></span>
+    }
+    @if (Model.Type == "invoice_discountdif")
+    {
+        <span><i class="fa fa-gift red"></i> @Model.Name  được giảm giá  <b class="red">@Model.CommissionValue.ToCurrencyStr(null) @(Model.IsMoney.Value == true ? "VNĐ" : "%")</b></span>
+    }
+    <label style="margin-right:30px !important">
+        <input id="LogCommission_@(Model.count)__CheckSave" name="LogCommission[@(Model.count)].CheckSave" value="@(Model.CheckSave.HasValue ? "True" : "False")" type="checkbox" class="ace commission_check_save" />
+        <span class="lbl"></span>
+    </label>
+</p>

@@ -1,0 +1,424 @@
+﻿@using Erp.BackOffice.Sale.Controllers
+@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@model Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+
+@{
+    var tuple = Model as Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>;
+    var category = ViewBag.category as Erp.Domain.Interfaces.ICategoryRepository;
+    var user = ViewBag.user as Erp.Domain.Repositories.UserRepository;
+    Layout = null;
+    int kv = 9;
+    var lsstatus = ViewBag.lsstatus as IEnumerable<StatusLeadModel>;
+    var ldcusview = ViewBag.ldcusview;
+
+}
+
+
+    <style>
+        h4 {
+            color: #333 !important;
+            text-transform: uppercase;
+            padding-bottom: 1.5rem !important;
+        }
+
+        section h4 {
+            font-weight: bold;
+            color: #337ab7 !important;
+        }
+
+        br {
+            display: none;
+        }
+
+        label {
+            color: #333 !important;
+        }
+
+        input {
+            border-radius: 3px !important;
+        }
+
+        .checked {
+            display: inline !important;
+        }
+
+        input.select2-search__field {
+            border: none !important;
+        }
+
+
+        li.select2-results__option.select2-results__message {
+            background: #fff;
+        }
+
+        br {
+            display: none;
+        }
+
+    input#UserIdZalo,
+    input#CountForBrand {
+        display: none;
+    }
+
+        input#IsCancel {
+            border: 1px solid;
+            margin: 5px 5px 6px 8px !important;
+            width: 15px;
+            height: 14px;
+        }
+
+
+@* ----------- *@
+        .date-range-container {
+            display: flex;
+            align-items: center;
+        }
+
+        input.width-34 {
+            width: 13.5rem;
+            height: 3rem;
+            border-radius: 3px !important;
+        }
+
+        label.custom-class.width-100 {
+            font-weight: bolder;
+            font-size: 13px;
+        }
+
+        .content {
+            background: #eef3f7;
+            width: 100% !important;
+            padding: 15px;
+        }
+
+        #searchPanelContent {
+            height: 525px !important;
+        }
+    </style>
+
+<!-- Mục lục -->
+    <div id="muc-luc">
+        <h6 style="text-align:center">CÁC BỘ LỌC</h6>
+        <ul>
+@foreach (var item in tuple.Item1)
+{
+    <li>
+    <a href="#section@(item.Id)">@(item.Name)</a>
+    </li>
+}
+        </ul>
+    </div>
+    <div class="content">
+        <section style="margin-left: 10px; padding: 5px; border-radius: 3px; margin-bottom: 20px; " id="section1">
+@{
+    IEnumerable<Erp.Domain.Entities.User> users = user.GetAllUsers();
+    List<SelectListItem> lstcus = new List<SelectListItem>();
+    foreach (var item2 in users)
+    {
+        SelectListItem selectListItem = new SelectListItem() { Text = item2.FullName, Value = item2.Id.ToString() };
+        lstcus.Add(selectListItem);
+    }
+}
+
+
+            <div class="wrapper-border" style=" border: .1rem dashed #dbdbdb; border-radius: 1rem; padding:2rem 1.5rem;">
+@Html.Label("Người chịu trách nhiệm", new { style = "margin-right:10px" })
+                <input class="width-100" hidden type='text' value='AssignedUserId' name='keyValues[@(kv-2)].Key'>
+                <select class="js-example-basic-multiple" multiple="multiple" name='keyValues[@(kv-2)].ValueArr'>
+@foreach (var item2 in lstcus)
+{
+    <option value="@item2.Value">@item2.Text</option>
+}
+                </select>
+                <br>
+@Html.Label("Trạng thái Lead", new { style = "margin-right:10px" })
+                <input class="width-100" hidden type='text' value='StatusId' name='keyValues[@(kv-1)].Key'>
+                <select class="js-example-basic-multiple" multiple="multiple" name='keyValues[@(kv-1)].ValueArr'>
+@foreach (var itemsst in lsstatus)
+{
+    <option value="@itemsst.Id">@itemsst.Name</option>
+}
+                </select>
+                <br>
+@Html.Label("Hoạt động trong ngày", new { style = "margin-right:10px; display: block;" })
+                <input class="width-100" hidden type='text' value='Activities' name='keyValues[@(kv-3)].Key'>
+                <select style="width: 100%; border-radius: 5px; margin-bottom: 10px; border: 1px solid #999" name='keyValues[@(kv-3)].Value'>
+                    <option value="">--Trống--</option>
+                    <option value="1">Có hoạt động trong ngày</option>
+                    <option value="0">Không có hoạt động trong ngày</option>
+                </select>
+                <br>
+@Html.Label("Ngày tạo", new { style = "margin-right:10px; display: block;" })
+                <input class="width-100" hidden type='text' value='CreatedBy' name='keyValues[@(kv-9)].Key'>
+                <select id="CreatedBy" style="width: 100%; border-radius: 5px; margin-bottom: 12px; border: 1px solid #999" name='keyValues[@(kv-9)].Value'>
+                    <option value="">--Trống--</option>
+                    <option value="0">Ngày hôm qua</option>
+                    <option value="1">Ngày hôm nay</option>
+                    <option value="2">Tuần này</option>
+                </select>
+                <br />
+                <div class="date-range-container">
+                    <label style='margin-bottom: 10px; width: 7rem' class=' CreatedBy'>Từ ngày</label><input hidden class='width-34' type='text' value='CreatedByFrom' name='keyValues[@(kv-5)].Key'>
+                    <input class='width-34 CreatedBy' type='datetime-local' name='keyValues[@(kv-5)].Value'>
+                    <label style='margin-right: 10px; margin-bottom: 10px; width: 7rem' class=' CreatedBy'>Đến ngày</label><input hidden class='width-34' type='text' value='CreatedByTo' name='keyValues[@(kv-4)].Key'>
+                    <input class='width-34 CreatedBy' type='datetime-local' name='keyValues[@(kv-4)].Value'>
+                </div>
+                
+                <br />
+@Html.Label("Ngày sửa", new { style = "margin-right:10px; display: block;" })
+                <input class="width-100" hidden type='text' value='ModifiedBy' name='keyValues[@(kv-8)].Key'>
+                <select id="ModifiedBy" style="width: 100%; border-radius: 5px; margin-bottom: 12px; border: 1px solid #999" name='keyValues[@(kv-8)].Value'>
+                    <option value="">--Trống--</option>
+                    <option value="0">Ngày hôm qua</option>
+                    <option value="1">Ngày hôm nay</option>
+                    <option value="2">Tuần này</option>
+                </select>
+                <br />
+                <div class="date-range-container">
+                    <label style='margin-bottom: 10px; width: 7rem' class=' ModifiedBy'>Từ ngày</label><input hidden class='width-34' type='text' value='ModifiedByFrom' name='keyValues[@(kv-7)].Key'>
+                    <input class='width-34 ModifiedBy' type='datetime-local' name='keyValues[@(kv-7)].Value'>
+                    <label style='margin-right: 10px; margin-bottom: 10px; width: 7rem' class='ModifiedBy'>Đến ngày</label><input hidden class='width-34' type='text' value='ModifiedByTo' name='keyValues[@(kv-6)].Key'>
+                    <input class='width-34 ModifiedBy' type='datetime-local' name='keyValues[@(kv-6)].Value'>
+                </div>
+            </div>
+    </section>
+<script>
+    $(function(){
+        $('#ModifiedBy,#CreatedBy').change(function () {
+        debugger
+    if($(this).is('#CreatedBy') && $(this).val()==''){
+$('.CreatedBy').attr('hidden',false)
+}else if( $(this).is('#ModifiedBy')&& $(this).val()==''){
+$('.ModifiedBy').attr('hidden',false)
+}else if($(this).is('#CreatedBy')){
+$('.CreatedBy').attr('hidden',true)
+
+}else if($(this).is('#ModifiedBy')){
+$('.ModifiedBy').attr('hidden',true)
+
+}
+})
+})
+</script>
+@foreach (var item in tuple.Item1)
+{
+    <section style="margin-left:10px;padding:5px;border-radius:3px; margin-top: 5px" id="section@(item.Id)">
+    <h4 style="color: #337ab7; font-weight: bold;">@item.Name</h4>
+
+    @if (item.isDefault == 1)
+    {
+        var properties = typeof(LeadModel).GetProperties();
+        int outchk;
+        string[] dont = new string[] { "IsDeleted", "CreatedDate", "CreatedUserId", "ModifiedDate", "ModifiedUserId", "AssignedUserId", "StatusId" };
+        var prop = properties.Where(x => !x.Name.StartsWith("F") && !int.TryParse(x.Name.Remove(0, 1).ToString(), out outchk) && x.Name != "Id" && !dont.Contains(x.Name));
+        foreach (var item1 in prop)
+        {
+            var display = item1.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;
+            string displayname = (ldcusview == -1  && item1.Name == "LeadName") ? "Tên cơ hội" : display != null ? display.DisplayName : "";
+            string[] categorydefault = new string[] { "Source", "TypeData", "Topic" };
+            string[] listdefault = new string[] { "ReceptionStaffId" };
+            string[] checkdefault = new string[] { "IsCancel" };
+            string[] required = new string[] { "LeadName", "Name" };
+            if (categorydefault.Contains(item1.Name))
+            {
+                var content = category.GetCategoryByCode(item1.Name).FirstOrDefault();
+                <br>
+                @Html.Label(displayname, new { style = "margin-right:10px" })
+                @* @Html.TextBox(item1.Name, content != null ? content.Value : "")*@
+                @Html.TextBox(item1.Name, content != null ? content.Value : "", new { style = "width: 100%;", placeholder = "Nhập nội dung..." })
+
+            }
+            else if (checkdefault.Contains(item1.Name))
+            {
+                <div style="display: flex; align-items: center">
+                @Html.Label(displayname, new { style = "margin-right:10px" })
+                @Html.RadioButton(item1.Name, "", true, new { style = "display:none" })
+
+                <div class="border-wrapper" style="border: .1rem solid #dbdbdb; border-radius: 5rem;">
+                @Html.RadioButton(item1.Name, "0", false)
+                @Html.Label("Không hủy", new { style = "margin-right:10px", @class = "checked" })
+
+                @Html.RadioButton(item1.Name, "1", false)
+                @Html.Label("Hủy", new { style = "margin-right:10px", @class = "checked" })
+                </div>
+
+                </div>
+            }
+            else if (listdefault.Contains(item1.Name))
+            {
+                <br>
+                @Html.Label(displayname, new { style = "margin-right:10px" })
+                <input class="width-100" hidden type='text' value='@item1.Name' name='keyValues[@kv].Key'>
+                <select class="js-example-basic-multiple" multiple="multiple" name='keyValues[@(kv++)].ValueArr'>
+                @foreach (var item2 in lstcus)
+                {
+                    <option value="@item2.Value">@item2.Text</option>
+                }
+                </select>
+            }
+            else if (item1.PropertyType == typeof(String))
+            {
+                <br>
+                @Html.Label(displayname, new { style = "margin-right:10px" })
+                @* @Html.TextBox(item1.Name);*@
+                @Html.TextBox(item1.Name, null, new { style = "width: 100%;", placeholder = "Nhập nội dung..." })
+
+
+            }
+            else
+            {
+                <br>
+                <label style="margin-right:10px">@displayname</label>
+                <input class="width-100" type="number" name="@item1.Name" />
+            }
+        }
+
+    }
+
+    @{
+        var itemField = tuple.Item2.Where(x => x.LeadSectionId == item.Id);
+        string inputele = "";
+    }
+    @foreach (var item1 in itemField)
+    {
+        // Kiểm tra xem trường hợp hiện tại có phải là "Bool" hay không
+        bool isBool = item1.TypeField == "Bool";
+
+        inputele += "</br></br><label class=' custom-class" + (isBool ? "" : " width-100") + "' style='margin-right:10px'>" + item1.NameLabel + ":" + "</label>";
+
+
+
+        switch (item1.TypeField)
+        {
+            case "Number":
+
+                inputele += Html.Raw("<input class='width-100' type='number' name='" + item1.FieldName + "'/>");
+                break;
+            case "Datetime":
+            case "Date":
+
+                inputele += Html.Raw("<div class='date-range-container'>" +
+                "<label style='margin-right:10px' class='block'>Từ ngày</label><input class='width-34' hidden type='text' value='" + item1.FieldName + ",Start' name='keyValues[" + kv + "].Key'>" +
+                "<input class='width-34' type='datetime-local' name='keyValues[" + (kv++) + "].Value'>" +
+                "<label style='margin-right:10px' class='block'>Đến ngày</label><input class='width-34' hidden type='text' value='" + item1.FieldName + ",End' name='keyValues[" + kv + "].Key'>" +
+                "<input class='width-34' type='datetime-local' name='keyValues[" + (kv++) + "].Value'></div>");
+                break;
+            case "String":
+
+                inputele += Html.Raw("<input class='width-100' type='text' name='" + item1.FieldName + "'/>");
+                break;
+            case "Bool":
+
+                inputele += Html.Raw("<input type='hidden' name='" + item1.FieldName + "' value='' /><input type='checkbox' onclick=\"this.previousSibling.value = this.checked ? '1' : '0'\"/>");
+                break;
+        }
+        if (item1.TypeField == "List")
+        {
+            var itemList = category.GetListCategoryByCode(item1.CodeList);
+            string optionele = "";
+            foreach (var item2 in itemList)
+            {
+                optionele += "<option value='" + item2.Value + "'>" + item2.Name + "</option>";
+            }
+            inputele += "<input hidden type='text' value='" + item1.FieldName + "' name='keyValues[" + kv + "].Key'><select class='js-example-basic-multiple' multiple='multiple' name='keyValues[" + (kv++) + "].ValueArr'>" + optionele + "</select>";
+        }
+    }
+    @Html.Raw(inputele)
+    </section>
+}
+    </div>
+
+    <script>
+    $(document).ready(function () {
+    $('.js-example-basic-multiple').select2({ dropdownParent: $("#searchPanelContent") });
+    $('#SearchLeadForm').on('change', 'input,select', function () {
+    debugger
+    if (![null, ''].includes($(this).val()) && $(this).prev().val() != '0' && $('#searchInputForm').find(`button[name="del_${$(this).attr('name')}"]`).length <= 0) {
+    $('#searchInputForm').append(`<span >${($(this).prev().text() == '' ? $(this).prev().prev().text() : $(this).prev().text() == 'Không hủy' ? $(this).prev().prev().prev().prev().text() : $(this).prev().text())}<button type='button' style='border:none;outline:none' name='del_${$(this).attr('name')}' onclick="DeleteFilter('${$(this).attr('name')}',this)">x</button></span>`)
+    }
+    else if ([null, ''].includes($(this).val()) || $(this).prev().val() == '0') {
+    $($(`button[name="del_${$(this).attr('name')}"]`).previousSibling).remove()
+    $($(`button[name="del_${$(this).attr('name')}"]`).parent()).remove()
+    $(`button[name="del_${$(this).attr('name')}"]`).remove()
+
+    }
+    });
+    });
+    function DeleteFilter(name, elem) {
+    var ele = $('#searchPanelContent').find(`select[name="${name}"],input[name="${name}"]`)
+    $.each(ele, function () {
+    $(this).val('')
+    $(this).change()
+    })
+    $(elem.previousSibling).remove()
+    $($(elem).parent()).remove()
+    $(elem).remove()
+    $('#btnSearchLead').trigger('click')
+    }
+
+
+    /*
+    $(document).ready(function () {
+    $('#muc-luc a').on('click', function (e) {
+    e.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
+    var targetId = $(this).attr('href'); // Lấy ID của phần tử đích từ href của liên kết
+    var targetOffset = $(targetId).offset().top; // Lấy vị trí đích từ ID
+    $('html, body').animate({
+    scrollTop: targetOffset // Di chuyển trang đến vị trí đích
+    }, 500); // Thời gian di chuyển, ở đây là 500 miliseconds (0.5 giây)
+    });
+    });
+
+    $(document).ready(function () {
+    $('.js-example-basic-multiple').select2({ dropdownParent: $("#searchPanelContent") });
+    }); */
+    </script>
+    <script>
+    /*  $(document).ready(function () {
+    $('#muc-luc a').on('click', function (e) {
+    e.preventDefault();
+    var targetId = $(this).attr('href');
+    var targetOffset = $(targetId).offset().top;
+    $('html, body').animate({
+    scrollTop: targetOffset
+    }, 500);
+    });
+    $('.js-example-basic-multiple').select2({ dropdownParent: $("#searchPanelContent") });
+    });*/
+    /*   $(document).ready(function () {
+    $('#muc-luc a').on('click', function (e) {
+    e.preventDefault(); // Ngăn chặn hành động mặc định của liên kết
+    var targetId = $(this).attr('href'); // Lấy ID của phần tử đích từ href của liên kết
+    var targetOffset = $(targetId).offset().top; // Lấy vị trí đích từ ID
+    $('html, body').animate({
+    scrollTop: targetOffset // Di chuyển trang đến vị trí đích
+    console.log(targetOffset);
+    }, 500); // Thời gian di chuyển, ở đây là 500 miliseconds (0.5 giây)
+    });
+    });
+
+    $(document).ready(function () {
+    $('.js-example-basic-multiple').select2({ dropdownParent: $("#searchPanelContent") });
+    }); */
+    function DeleteFilter(name, elem) {
+    debugger
+    var ele = $('#searchPanelContent').find(`select[name="${name}"],input[name="${name}"]`)
+
+    $.each(ele, function () {
+    if (!$(this).is('[type=radio]')) {
+    $(this).val('')
+    $(this).change()
+    }
+
+    })
+    $(`input[name="${name}"][type=radio][value='']`).prop('checked', true)
+    $(elem.previousSibling).remove()
+    $($(elem).parent()).remove()
+    $(elem).remove()
+    $('#btnSearchLead').trigger('click')
+    }
+    </script>

@@ -1,0 +1,48 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+@model Erp.BackOffice.Sale.Models.CommisionInvoiceViewModel
+
+<tr data-id="@(Model.Index)">
+    <td class="orderNo">
+        @(Model.OrderNo + 1)
+    </td>
+    <td>
+        @Html.TextBox("InvoicedetailList[" + Model.Index + "].Name", Model.Name, new { style = "width:250px; text-align:left", placeholder = "", @class = "text", autocomplete = "off" })
+
+
+        @*@Html.TextBox("InvoicedetailList[" + Model.Index + "].StartAmount", Model.StartAmount, new { style = "width:100px; text-align:right", placeholder = "Min", @class = "numberinput2", autocomplete = "off" })
+        <select name="InvoicedetailList[@(Model.Index)].StartSymbol" id="InvoicedetailList_@(Model.Index)__StartSymbol" style="width:50px;float: none!important;padding: 0px;margin-top: -1px;background: #F89406;color: white;margin-left: -5px;">
+            @foreach (var item in Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("SymbolDKMin", Model.StartSymbol, null))
+            {
+                <option @(item.Value == Model.StartSymbol ? "selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <span><i class="fa fa-exchange"></i></span>
+        <select name="InvoicedetailList[@(Model.Index)].EndSymbol" id="InvoicedetailList_@(Model.Index)__EndSymbol" style="width:50px;float: none!important;padding: 0px;margin-top: -1px;background: #F89406;color: white;margin-right: -5px;">
+            @foreach (var item in Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("SymbolDKMin", Model.EndSymbol, null))
+            {
+                <option @(item.Value == Model.EndSymbol ? "selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        @Html.TextBox("InvoicedetailList[" + Model.Index + "].EndAmount", Model.EndAmount, new { style = "width:100px; text-align:right;", placeholder = "Max", @class = "numberinput2", autocomplete = "off" })*@
+    </td>
+    <td>
+        @Html.Hidden("InvoicedetailList[" + Model.Index + "].Id", Model.Id)
+        @Html.Hidden("InvoicedetailList[" + Model.Index + "].Type", "discountdif")
+        @Html.TextBox("InvoicedetailList[" + Model.Index + "].CommissionValue", Model.CommissionValue, new { style = "width:85px; text-align:right; ", @class = "input-price numberinput2", autocomplete = "off" })
+        @Html.TextBox("InvoicedetailList[" + Model.Index + "].CommissionValueText", (Model.IsMoney != null && Model.IsMoney == true ? "VNĐ" : "%"), new { style = "width:40px; text-align:center", @readonly = "readonly" })
+    </td>
+    <td>
+        <label>
+            <input class="invoice_detail_item_check ace" type="checkbox" name="InvoicedetailList[@(Model.Index)].IsMoney" data-index="@(Model.Index)" id="InvoicedetailList_@(Model.Index)__IsMoney" value="@(Model.IsMoney != null && Model.IsMoney == true ? "true" : "false")" @(Model.IsMoney != null && Model.IsMoney == true ? "checked=\"checked\"" : "") />
+            <span class="lbl"></span>
+        </label>
+    </td>
+    <td class="text-center">
+        <a class="btn-delete-item">
+            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+        </a>
+    </td>
+</tr>

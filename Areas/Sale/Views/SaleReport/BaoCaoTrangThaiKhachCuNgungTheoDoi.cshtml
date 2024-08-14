@@ -1,0 +1,224 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Account.Models;
+@using System.Globalization;
+@model  List<CustomerViewModel>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+    @{
+        ViewBag.Title = "Trạng thái khách hàng cũ ngừng theo dõi";
+        if (Request["IsPopup"] == "true")
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            if (Request["IsPopup"] == "null")
+            {
+                Layout = null;
+            }
+            else
+            {
+                Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+            }
+        }
+        bool IsDisplaySearchPanel = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? false : true;
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "BaoCaoTrangThaiKhachCuNgungTheoDoi",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = IsDisplaySearchPanel,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int index = 1;
+        //decimal sum = 0;
+        Calendar calendar = CultureInfo.InvariantCulture.Calendar;
+        //var weekdefault = calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        //string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        //string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        //string week = Request["week"] != null ? Request["week"] : weekdefault.ToString();
+        //string branchId = Request["branchId"] != null ? Request["branchId"] : "";
+        //if (Request["branchId"] == null)
+        //{
+        //    if (!Erp.BackOffice.Filters.SecurityFilter.IsAdmin())
+        //    {
+        //        branchId = Erp.BackOffice.Helpers.Common.CurrentUser.BranchId.Value.ToString();
+        //    }
+        //}
+        //ViewData["branchId"] = branchId;
+
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        // Cộng thêm 1 tháng và trừ đi một ngày.
+        DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+        var aa = Request["ManagerStaffId"];
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+    <p>
+        @Html.TextBox("txtSearch", Request["txtSearch"], new { @class = "", autocomplete = "off", placeholder = "Mã Hoặc Tên KH..." })
+        <select style="width:250px; float:left" id="ManagerStaffId" name="ManagerStaffId">
+            <option value="">- Nhân viên QL -</option>
+            @foreach (var item in SelectListHelper.GetSelectList_FullUserNameKD(null, null))
+            {
+                <option @(Request["ManagerStaffId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <span class="input-daterange input-group" style="z-index:1002">
+            @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : "", new { autocomplete = "off", placeholder = "Từ ngày" })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : "", new { autocomplete = "off", placeholder = "Đến ngày" })
+        </span>
+
+    </p>
+        
+    }
+    <div class="table-responsive" id="BaoCaoTrangThaiNgungtheoDoi" style="margin-bottom:40px">
+        <table id="cTable" class="table table-bordered">
+            <thead>
+                @*<tr class="">
+                        <th class="" colspan="11" style="text-align:center"><h4>BÁO CÁO DOANH SỐ TỪ @startDate ĐẾN @endDate</h4></th>
+                    </tr>*@
+                <tr>
+                    <th style="width:40px;text-align:center">STT</th>
+                    <th style="min-width:100px;text-align:center">Họ tên </th>
+                    <th style="min-width:100px;text-align:center">Mã khách hàng</th>
+                    <th style="min-width:100px;text-align:center">Số điện thoại</th>
+                    <th style="min-width:100px;text-align:center">Người quản lý</th>
+                    <th style="min-width:100px;text-align:center">Địa chỉ</th>
+                    <th style="text-align:center">Email</th>
+                    <th style="text-align:center">Ngày tạo</th>
+                    <th style="text-align:center">Thời gian ngừng theo dõi</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count() > 0)
+                {
+                    foreach (var item in Model)
+                    {
+
+                        <tr class="@(index%2==0?"alert-warning":"")">
+                            <td>@(index++)</td>
+                            <td> <a href="@Url.Action("Detail", "Customer" , new { area="Account" ,Id = item.Id})">@item.CompanyName</a></td>
+                            <td>@item.Code</td>
+                            @if (!string.IsNullOrEmpty(item.Phone))
+                            {
+                                <td>@item.Phone</td>
+                            }
+                            else
+                            {
+                                <td>@item.Mobile</td>
+                            }
+                            <td>@item.ManagerStaffName</td>
+                            <td>@item.Address</td>
+                            <td>@item.Email</td>
+                            <td>@item.CreatedDate</td>
+                            <td>@item.ModifiedIsLock</td>
+
+                        </tr>
+
+
+
+
+                    }
+                }
+
+
+            </tbody>
+            <thead>
+                <tr>
+                    <td colspan="7" style="text-align:right"><b>Tổng:</b></td>
+                    <td style="text-align:right"><b>@Model.Count()</b></td>
+                    @*<td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalAmount), null))</b></td>
+
+                        <td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.PaidAmount), null))</b></td>*@
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="ExportTrangThaiNgungTheoDoiKH()">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    }
+    @section Scripts {
+        <script>
+            $(function () {
+                $("#quarter").val(currentQuarter);
+
+                var single = "month";
+
+                $("#single1").change(function () {
+                    if ($(this).val() == 'month') {
+                        $("#month").show();
+                        $("#week").hide();
+                        $("#quarter").hide();
+                        single = "month";
+                    }
+                });
+
+                $("#single2").change(function () {
+                    if ($(this).val() == 'quarter') {
+                        $("#month").hide();
+                        $("#week").hide();
+                        $("#quarter").show();
+                        single = "quarter";
+                    }
+                });
+                $("#single3").change(function () {
+                    if ($(this).val() == 'week') {
+                        $("#month").hide();
+                        $("#quarter").hide();
+                        $("#week").show();
+                        single = "week";
+                    }
+                });
+            });
+
+            $(function () {
+                sum = 0;
+
+            });
+
+           
+            $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+
+            });
+            //$('[name="search"]').click(function () {
+            //    startDate = $('#startDate').val();
+            //    endDate = $('#endDate').val();
+            //    if (startDate == '' || endDate == '') {
+            //        alertPopup("Lỗi", "Vui lòng chọn ngày để tìm kiếm !", "warning");
+            //        return false;
+            //    }
+            //    else {
+            //        return true;
+            //    }
+            // });
+
+            function ExportTrangThaiNgungTheoDoiKH() {
+                var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+                var txtSearch = $('#txtSearch').val();
+                var ManagerStaffId = $('#ManagerStaffId').val();
+
+                OpenPopup('/SaleReport/ExportTrangThaiKhachCuNgungTheoDoi?startDate=' + startDate + '&endDate=' + endDate + '&txtSearch=' + txtSearch + '&ManagerStaffId=' + ManagerStaffId + '&IsPopup=true', '', 0, 900);
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 200000);
+                HideLoading();
+            }
+        </script>
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    }

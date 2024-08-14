@@ -1,0 +1,246 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model LogReceiptViewModel
+
+@{
+    if (Model.Id > 0)
+    {
+        ViewBag.Title = "Cập nhật nộp tiền";
+    }
+    else
+    {
+        ViewBag.Title = Wording.PageCreate_LogReceipt;
+    }
+
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "LogReceipt",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+}
+<style type="text/css">
+    .has_error {
+        border: 1px #f2a696 solid !important;
+        color: #D68273;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+        /* padding-left: 7px; */
+        /* font-size: 13px; */
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 42px;
+    }
+
+        .itemdiv > .body > .name {
+            color: black;
+        }
+</style>
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    @Html.HiddenFor(model => model.AssignedUserId)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.HiddenFor(model => model.Status)
+    @Html.HiddenFor(model => model.BranchId)
+    <div class="row">
+        <div class="col-sm-7 ">
+            <div class="product-search-box clearfix " style="margin-bottom:10px">
+                <a class="btn btn-mini btn-primary" onclick="OpenPopup('/Receipt/IndexThemphieuthu?noptienId=@Model.Id&IsPopup=true', 'Tìm kiếm dữ liệu', 800, 600)">
+                    <i class="ace-icon fa fa-search"></i> Thêm phiếu thu
+                </a>
+            </div>
+            <table class="table table-bordered grid-table bottom-5">
+                <thead>
+
+                    <tr>
+                        <th class="grid-header" width="50">STT</th>
+                        <th class="grid-header" width="100">Mã phiếu thu</th>
+                        <th class="grid-header" width="150">Người nộp</th>
+                        <th class="grid-header" >Lý do</th>
+                        <th class="grid-header" width="100">Số tiền</th>
+                        <th class="grid-header" width="20"></th>
+                    </tr>
+                </thead>
+                <tbody class="detailList">
+                    <tr role="0" hidden>
+                        <td class="text-center">
+                            1
+                        </td>
+                        <td>
+                            <input class="item_id" type="hidden" id="DetailList_0__Id" name="DetailList[0].Id" value="0" />
+                            <input class="item_log_receipt_id" type="hidden" id="DetailList_0__LogReceiptId" name="DetailList[0].LogReceiptId" value="0" />
+                            <span class="item_code"></span>
+                        </td>
+                        <td>
+                            <span class="item_customer_name"></span>
+                        </td>
+                        <td>
+                            <span class="item_note"></span>
+                        </td>
+                        <td align="right"><span class="item_amount" align="right"></span></td>
+                        <td class="text-center">
+                            <a class="btn-delete-item">
+                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    @if (Model.DetailList.Any())
+                    {
+                    for (int i = 0; i < Model.DetailList.Count(); i++)
+                {
+
+                    <tr role="@(i+1)">
+                        <td class="text-center">
+                            @(i + 1)
+                        </td>
+                        <td>
+                            <input class="item_id" type="hidden" id="DetailList_@(i + 1)__Id" name="DetailList[@(i + 1)].Id" value="@Model.DetailList[i].Id" />
+                            <input class="item_log_receipt_id" type="hidden" id="DetailList_@(i + 1)__LogReceiptId" name="DetailList[@(i + 1)].LogReceiptId" value="@Model.DetailList[i].LogReceiptId" />
+                            <span class="item_code">@Model.DetailList[i].Code</span>
+                        </td>
+                        <td>
+                            <span class="item_customer_name">@Model.DetailList[i].CompanyName</span>
+                        </td>
+                        <td>
+                            <span class="item_note">@Model.DetailList[i].Name</span>
+                        </td>
+                        <td align="right"><span class="item_amount" align="right">@Model.DetailList[i].Amount.ToCurrencyStr(null)</span></td>
+                        <td class="text-center">
+                            <a class="btn-delete-item">
+                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="red"><span id="status"></span></td>
+                        <td class="detailList_Amount" align="right" style="font-weight:bold"></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title"><i class="fa fa-info-circle"></i> Tổng quan</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @if(Model.Id>0)
+                        { 
+                        @Html.CustomTextboxFor(model => model.Code, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" } })
+                        }
+                        @Html.DateTimePicker(model => model.DateReceipt, "dd/MM/yyyy H:mm", "00/00/0000 00:00:00", true, false)
+                        @Html.CustomTextboxFor(model => model.TotalAmount, null, null, WidthType.span12, false, new Dictionary<string, object> { { "class", "text-right" }, { "readonly", "readonly" } })
+                        @Html.CustomTextAreaFor(model => model.Note, Wording.Note, WidthType.span12, true, null, "hide", "full-w")
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+@section Scripts {
+
+    <script src="/Scripts/combojax.js?=vs1.01211"></script>
+
+    <script type="text/javascript">
+        var $tr_template = $('.detailList tr:first-child');
+        $(document).ready(function () {
+            LoadNumberInput();
+            calcTotalAmount();
+            $('#Save').click(function () {
+                $('#TotalAmount').val(removeComma($('#TotalAmount').val()));
+                ShowLoading();
+                ClearFormatBeforeSubmit($("#SaleOrder"));
+                $("#SaleOrder").submit();
+            });
+            $('.detailList').on('click', '.btn-delete-item', function () {
+                $(this).closest('tr').remove();
+                $('.detailList tr').each(function (index, tr) {
+                    $(tr).attr('role', index);
+                    $(tr).find('td:first-child').text(index);
+                    $(tr).find('.item_log_receipt_id').attr('name', 'DetailList[' + index + '].LogReceiptId').attr('id', 'DetailList_' + index + '__LogReceiptId');
+                    $(tr).find('.item_id').attr('name', 'DetailList[' + index + '].Id').attr('id', 'DetailList_' + index + '__Id');
+                });
+                calcTotalAmount();
+                $('#TotalAmount').val(removeComma($('#TotalAmount').val()));
+                $("#SaleOrder").submit();
+            });
+        });
+        function selectItemReceipt(id, code, customername, name, amount) {
+            var len = $('.detailList tr').length;
+            var tr_new = $tr_template.clone()[0].outerHTML;
+            tr_new = tr_new.replace(/\[0\]/g, "[" + len + "]");
+            tr_new = tr_new.replace(/\_0\__/g, "_" + len + "__");
+            var $tr_new = $(tr_new);
+            $tr_new.attr('role', len);
+            $tr_new.find('td:first-child').text(len);
+            $tr_new.find('.item_log_receipt_id').val(0);
+            $tr_new.find('.item_id').val(id);
+            $tr_new.find('.item_code').text(code);
+            $tr_new.find('.item_customer_name').text(customername);
+            $tr_new.find('.item_note').text(name);
+            $tr_new.find('.item_amount').text(numeral(amount).format('0,0'));
+            $('.detailList').append($tr_new);
+            var $tr_after_append = $('tr[role="' + len + '"]');
+            $tr_after_append.removeAttr("hidden", "hidden");
+            calcTotalAmount();
+            ClosePopup();
+        }
+        function calcTotalAmount() {
+            var total = 0;
+            var selector = '.detailList tr';
+            $(selector).each(function (index, elem) {
+                if ($(elem).find('.item_amount').text() != '') { // la số thì mới tính
+                    total += parseFloat(removeComma($(elem).find('.item_amount').text()));
+                    $(".detailList_Amount").text(numeral(total).format('0,0'));
+                }
+
+            });
+            $('#mask-TotalAmount').val(numeral(total).format('0,0'));
+            $('#TotalAmount').val(numeral(total).format('0,0'));
+           
+        };
+    </script>
+@Html.ScriptBottom_ValidationMvc()
+@Html.ScriptBottom_DatePicker("dd/mm/yyyy")
+@Html.ScriptBottom_ChosenStyle()
+}

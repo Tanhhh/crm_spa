@@ -1,0 +1,655 @@
+﻿<error errorId="727c89e6-a0c6-4e4c-8888-d059e0eeca63" application="/LM/W3SVC/2/ROOT" host="DESKTOP-H6FQOND" type="System.NullReferenceException" message="Object reference not set to an instance of an object." source="Erp.BackOffice" detail="System.NullReferenceException: Object reference not set to an instance of an object.&#xD;&#xA;   at Erp.BackOffice.Crm.Controllers.CRM_KH_BANHANGController.Create(CRM_KH_BANHANGViewModel model) in D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Areas\Crm\Controllers\CRM_KH_BANHANGController.cs:line 427&#xD;&#xA;   at lambda_method(Closure , ControllerBase , Object[] )&#xD;&#xA;   at System.Web.Mvc.ActionMethodDispatcher.Execute(ControllerBase controller, Object[] parameters)&#xD;&#xA;   at System.Web.Mvc.ReflectedActionDescriptor.Execute(ControllerContext controllerContext, IDictionary`2 parameters)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionMethod(ControllerContext controllerContext, ActionDescriptor actionDescriptor, IDictionary`2 parameters)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass42.&lt;BeginInvokeSynchronousActionMethod&gt;b__41()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass8`1.&lt;BeginSynchronous&gt;b__7(IAsyncResult _)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethod(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass37.&lt;&gt;c__DisplayClass39.&lt;BeginInvokeActionMethodWithFilters&gt;b__33()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass37.&lt;BeginInvokeActionMethodWithFilters&gt;b__36(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethodWithFilters(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;&gt;c__DisplayClass2a.&lt;BeginInvokeAction&gt;b__20()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;BeginInvokeAction&gt;b__22(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeAction(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.&lt;&gt;c__DisplayClass1d.&lt;BeginExecuteCore&gt;b__18(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.System.Web.Mvc.Async.IAsyncController.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.&lt;&gt;c__DisplayClass8.&lt;BeginProcessRequest&gt;b__3(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.System.Web.IHttpAsyncHandler.EndProcessRequest(IAsyncResult result)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="adminq1" time="2019-07-30T02:00:42.4789990Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_CONTENT_LENGTH:6458&#xD;&#xA;HTTP_CONTENT_TYPE:application/x-www-form-urlencoded&#xD;&#xA;HTTP_ACCEPT:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:en-US,en;q=0.5&#xD;&#xA;HTTP_COOKIE:_ga=GA1.1.174067613.1563788129; _fbp=fb.0.1563850201706.449722836; _hjid=24ab1a2c-99a5-431b-bdc7-e6449aba677e; ASP.NET_SessionId=m4vgpdzndbmt0q4mzklnewph; __RequestVerificationToken=UhTE-4K3bXn3rpGu232ng1Sj7uaNabLBknRX2u7URnaTrW_vsoroyL-Xy7Sm_wAjYZMNh6znaakW-H24WcDI0nA9ypShgThpvAgZly8OL9A1; BO=2942E1515880E094539768EA88F0D588A74F327BD4A0AB713DAC2E21FD4A543C7A98CE376C7FCBF150872467C07E1C950290E70BC3AF5EFCA110FE5C5E2BC16C5E9B0B546D7519DA3B98020666D4DB74DD95066E90894EA675198D11217BFDCE&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/CRM_KH_BANHANG/Create/2460?month=7&amp;year=2019&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0&#xD;&#xA;HTTP_UPGRADE_INSECURE_REQUESTS:1&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Connection: keep-alive&#xD;&#xA;Content-Length: 6458&#xD;&#xA;Content-Type: application/x-www-form-urlencoded&#xD;&#xA;Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&#xD;&#xA;Accept-Encoding: gzip, deflate&#xD;&#xA;Accept-Language: en-US,en;q=0.5&#xD;&#xA;Cookie: _ga=GA1.1.174067613.1563788129; _fbp=fb.0.1563850201706.449722836; _hjid=24ab1a2c-99a5-431b-bdc7-e6449aba677e; ASP.NET_SessionId=m4vgpdzndbmt0q4mzklnewph; __RequestVerificationToken=UhTE-4K3bXn3rpGu232ng1Sj7uaNabLBknRX2u7URnaTrW_vsoroyL-Xy7Sm_wAjYZMNh6znaakW-H24WcDI0nA9ypShgThpvAgZly8OL9A1; BO=2942E1515880E094539768EA88F0D588A74F327BD4A0AB713DAC2E21FD4A543C7A98CE376C7FCBF150872467C07E1C950290E70BC3AF5EFCA110FE5C5E2BC16C5E9B0B546D7519DA3B98020666D4DB74DD95066E90894EA675198D11217BFDCE&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/CRM_KH_BANHANG/Create/2460?month=7&amp;year=2019&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0&#xD;&#xA;Upgrade-Insecure-Requests: 1&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="6458" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="application/x-www-form-urlencoded" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/CRM_KH_BANHANG/Create/2460" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\CRM_KH_BANHANG\Create\2460" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="2704" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="POST" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/CRM_KH_BANHANG/Create/2460" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/CRM_KH_BANHANG/Create/2460" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_CONTENT_LENGTH">
+      <value string="6458" />
+    </item>
+    <item name="HTTP_CONTENT_TYPE">
+      <value string="application/x-www-form-urlencoded" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="en-US,en;q=0.5" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="_ga=GA1.1.174067613.1563788129; _fbp=fb.0.1563850201706.449722836; _hjid=24ab1a2c-99a5-431b-bdc7-e6449aba677e; ASP.NET_SessionId=m4vgpdzndbmt0q4mzklnewph; __RequestVerificationToken=UhTE-4K3bXn3rpGu232ng1Sj7uaNabLBknRX2u7URnaTrW_vsoroyL-Xy7Sm_wAjYZMNh6znaakW-H24WcDI0nA9ypShgThpvAgZly8OL9A1; BO=2942E1515880E094539768EA88F0D588A74F327BD4A0AB713DAC2E21FD4A543C7A98CE376C7FCBF150872467C07E1C950290E70BC3AF5EFCA110FE5C5E2BC16C5E9B0B546D7519DA3B98020666D4DB74DD95066E90894EA675198D11217BFDCE" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/CRM_KH_BANHANG/Create/2460?month=7&amp;year=2019" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0" />
+    </item>
+    <item name="HTTP_UPGRADE_INSECURE_REQUESTS">
+      <value string="1" />
+    </item>
+  </serverVariables>
+  <form>
+    <item name="__RequestVerificationToken">
+      <value string="UyLXzUS-IF_dgw-rOEN1EDK3ntU68OlxMt8O3KId0eqzKzY0B2IJ-ljoAV1FTs0t00kG-bj4Sp2RofXsb0PDUE21EL9PoMzb_F_OHQPHINM1" />
+    </item>
+    <item name="IsPopup">
+      <value string="" />
+    </item>
+    <item name="KH_BANHANG_ID">
+      <value string="121" />
+      <value string="121" />
+      <value string="121" />
+      <value string="121" />
+      <value string="121" />
+    </item>
+    <item name="NGUOILAP_ID">
+      <value string="2460" />
+      <value string="2460" />
+      <value string="2460" />
+      <value string="2460" />
+      <value string="2460" />
+    </item>
+    <item name="FullName">
+      <value string="" />
+      <value string="adminQ1 adminQ1" />
+      <value string="adminQ1 adminQ1" />
+      <value string="adminQ1 adminQ1" />
+      <value string="adminQ1 adminQ1" />
+    </item>
+    <item name="CountForBrand">
+      <value string="ANNAYAKE" />
+      <value string="ORLANE PARIS" />
+      <value string="LEONOR GREYL" />
+      <value string="DICHVU" />
+      <value string="CONGNGHECAO" />
+    </item>
+    <item name="TARGET_BRAND">
+      <value string="100000000" />
+    </item>
+    <item name="TotalAmount">
+      <value string="19500000" />
+    </item>
+    <item name="DATKH">
+      <value string="19.5" />
+    </item>
+    <item name="GHICHU_ANNAYAKE">
+      <value string="" />
+    </item>
+    <item name="DATTHUCTE">
+      <value string="8" />
+    </item>
+    <item name="CRM_KH_BANHANGList[14].KH_BANHANG_CTIET_ID">
+      <value string="1289" />
+    </item>
+    <item name="CRM_KH_BANHANGList[14].KHACHHANG_ID">
+      <value string="469616" />
+    </item>
+    <item name="CRM_KH_BANHANGList[14].Code">
+      <value string="KH8000018" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[14].Phone">
+      <value string="098336622" />
+    </item>
+    <item name="CRM_KH_BANHANGList[14].TYLE_THANHCONG">
+      <value string="60" />
+    </item>
+    <item name="CRM_KH_BANHANGList[14].TYLE_THANHCONG_REVIEW">
+      <value string="10" />
+    </item>
+    <item name="CRM_KH_BANHANGList[15].KH_BANHANG_CTIET_ID">
+      <value string="1290" />
+    </item>
+    <item name="CRM_KH_BANHANGList[15].KHACHHANG_ID">
+      <value string="469618" />
+    </item>
+    <item name="CRM_KH_BANHANGList[15].Code">
+      <value string="KH8000020" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[15].Phone">
+      <value string="098890098" />
+    </item>
+    <item name="CRM_KH_BANHANGList[15].TYLE_THANHCONG">
+      <value string="70" />
+    </item>
+    <item name="CRM_KH_BANHANGList[15].TYLE_THANHCONG_REVIEW">
+      <value string="20" />
+    </item>
+    <item name="ORLANEPARIS">
+      <value string="200000000" />
+    </item>
+    <item name="TotalAmount2">
+      <value string="0" />
+    </item>
+    <item name="DAT2">
+      <value string="0,0" />
+    </item>
+    <item name="GHICHU_ORLANEPARIS">
+      <value string="" />
+    </item>
+    <item name="DATTHUCTE2">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[0].KH_BANHANG_CTIET_ID">
+      <value string="1267" />
+    </item>
+    <item name="CRM_KH_BANHANGList[0].KHACHHANG_ID">
+      <value string="409970" />
+    </item>
+    <item name="CRM_KH_BANHANGList[0].Code">
+      <value string="12823" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[0].Phone">
+      <value string="0903735050" />
+    </item>
+    <item name="CRM_KH_BANHANGList[0].TYLE_THANHCONG">
+      <value string="50" />
+    </item>
+    <item name="CRM_KH_BANHANGList[0].TYLE_THANHCONG_REVIEW">
+      <value string="70" />
+    </item>
+    <item name="CRM_KH_BANHANGList[1].KH_BANHANG_CTIET_ID">
+      <value string="1268" />
+    </item>
+    <item name="CRM_KH_BANHANGList[1].KHACHHANG_ID">
+      <value string="469645" />
+    </item>
+    <item name="CRM_KH_BANHANGList[1].Code">
+      <value string="KH8000047" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[1].Phone">
+      <value string="0916825935" />
+    </item>
+    <item name="CRM_KH_BANHANGList[1].TYLE_THANHCONG">
+      <value string="60" />
+    </item>
+    <item name="CRM_KH_BANHANGList[1].TYLE_THANHCONG_REVIEW">
+      <value string="80" />
+    </item>
+    <item name="LEONORGREYL">
+      <value string="20000000" />
+    </item>
+    <item name="TotalAmount3">
+      <value string="0" />
+    </item>
+    <item name="DAT3">
+      <value string="0,0" />
+    </item>
+    <item name="GHICHU_LEONORGREYL">
+      <value string="" />
+    </item>
+    <item name="DATTHUCTE3">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[2].KH_BANHANG_CTIET_ID">
+      <value string="1277" />
+    </item>
+    <item name="CRM_KH_BANHANGList[2].KHACHHANG_ID">
+      <value string="469615" />
+    </item>
+    <item name="CRM_KH_BANHANGList[2].Code">
+      <value string="KH8000017" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[2].Phone">
+      <value string="444444444" />
+    </item>
+    <item name="CRM_KH_BANHANGList[2].TYLE_THANHCONG">
+      <value string="10" />
+    </item>
+    <item name="CRM_KH_BANHANGList[2].TYLE_THANHCONG_REVIEW">
+      <value string="30" />
+    </item>
+    <item name="CRM_KH_BANHANGList[3].KH_BANHANG_CTIET_ID">
+      <value string="1278" />
+    </item>
+    <item name="CRM_KH_BANHANGList[3].KHACHHANG_ID">
+      <value string="469645" />
+    </item>
+    <item name="CRM_KH_BANHANGList[3].Code">
+      <value string="KH8000047" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[3].Phone">
+      <value string="0916825935" />
+    </item>
+    <item name="CRM_KH_BANHANGList[3].TYLE_THANHCONG">
+      <value string="20" />
+    </item>
+    <item name="CRM_KH_BANHANGList[3].TYLE_THANHCONG_REVIEW">
+      <value string="40" />
+    </item>
+    <item name="CRM_KH_BANHANGList[4].KH_BANHANG_CTIET_ID">
+      <value string="1279" />
+    </item>
+    <item name="CRM_KH_BANHANGList[4].KHACHHANG_ID">
+      <value string="469644" />
+    </item>
+    <item name="CRM_KH_BANHANGList[4].Code">
+      <value string="KH8000046" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[4].Phone">
+      <value string="0987656543" />
+    </item>
+    <item name="CRM_KH_BANHANGList[4].TYLE_THANHCONG">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[4].TYLE_THANHCONG_REVIEW">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[5].KH_BANHANG_CTIET_ID">
+      <value string="1280" />
+    </item>
+    <item name="CRM_KH_BANHANGList[5].KHACHHANG_ID">
+      <value string="409970" />
+    </item>
+    <item name="CRM_KH_BANHANGList[5].Code">
+      <value string="12823" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[5].Phone">
+      <value string="0903735050" />
+    </item>
+    <item name="CRM_KH_BANHANGList[5].TYLE_THANHCONG">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[5].TYLE_THANHCONG_REVIEW">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[6].KH_BANHANG_CTIET_ID">
+      <value string="1281" />
+    </item>
+    <item name="CRM_KH_BANHANGList[6].KHACHHANG_ID">
+      <value string="433772" />
+    </item>
+    <item name="CRM_KH_BANHANGList[6].Code">
+      <value string="433772" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[6].Phone">
+      <value string="0987607799" />
+    </item>
+    <item name="CRM_KH_BANHANGList[6].TYLE_THANHCONG">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[6].TYLE_THANHCONG_REVIEW">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[7].KH_BANHANG_CTIET_ID">
+      <value string="1282" />
+    </item>
+    <item name="CRM_KH_BANHANGList[7].KHACHHANG_ID">
+      <value string="417821" />
+    </item>
+    <item name="CRM_KH_BANHANGList[7].Code">
+      <value string="417821" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[7].Phone">
+      <value string="0979879303" />
+    </item>
+    <item name="CRM_KH_BANHANGList[7].TYLE_THANHCONG">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[7].TYLE_THANHCONG_REVIEW">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[8].KH_BANHANG_CTIET_ID">
+      <value string="1283" />
+    </item>
+    <item name="CRM_KH_BANHANGList[8].KHACHHANG_ID">
+      <value string="410884" />
+    </item>
+    <item name="CRM_KH_BANHANGList[8].Code">
+      <value string="13937" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[8].Phone">
+      <value string="0902775307" />
+    </item>
+    <item name="CRM_KH_BANHANGList[8].TYLE_THANHCONG">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[8].TYLE_THANHCONG_REVIEW">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[9].KH_BANHANG_CTIET_ID">
+      <value string="1284" />
+    </item>
+    <item name="CRM_KH_BANHANGList[9].KHACHHANG_ID">
+      <value string="469616" />
+    </item>
+    <item name="CRM_KH_BANHANGList[9].Code">
+      <value string="KH8000018" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[9].Phone">
+      <value string="098336622" />
+    </item>
+    <item name="CRM_KH_BANHANGList[9].TYLE_THANHCONG">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[9].TYLE_THANHCONG_REVIEW">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[10].KH_BANHANG_CTIET_ID">
+      <value string="1285" />
+    </item>
+    <item name="CRM_KH_BANHANGList[10].KHACHHANG_ID">
+      <value string="469642" />
+    </item>
+    <item name="CRM_KH_BANHANGList[10].Code">
+      <value string="KH8000044" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[10].Phone">
+      <value string="09015" />
+    </item>
+    <item name="CRM_KH_BANHANGList[10].TYLE_THANHCONG">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[10].TYLE_THANHCONG_REVIEW">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[11].KH_BANHANG_CTIET_ID">
+      <value string="1286" />
+    </item>
+    <item name="CRM_KH_BANHANGList[11].KHACHHANG_ID">
+      <value string="469643" />
+    </item>
+    <item name="CRM_KH_BANHANGList[11].Code">
+      <value string="KH8000045" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[11].Phone">
+      <value string="09016" />
+    </item>
+    <item name="CRM_KH_BANHANGList[11].TYLE_THANHCONG">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[11].TYLE_THANHCONG_REVIEW">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[12].KH_BANHANG_CTIET_ID">
+      <value string="1287" />
+    </item>
+    <item name="CRM_KH_BANHANGList[12].KHACHHANG_ID">
+      <value string="469618" />
+    </item>
+    <item name="CRM_KH_BANHANGList[12].Code">
+      <value string="KH8000020" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[12].Phone">
+      <value string="098890098" />
+    </item>
+    <item name="CRM_KH_BANHANGList[12].TYLE_THANHCONG">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[12].TYLE_THANHCONG_REVIEW">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[13].KH_BANHANG_CTIET_ID">
+      <value string="1288" />
+    </item>
+    <item name="CRM_KH_BANHANGList[13].KHACHHANG_ID">
+      <value string="469620" />
+    </item>
+    <item name="CRM_KH_BANHANGList[13].Code">
+      <value string="KH8000022" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[13].Phone">
+      <value string="001" />
+    </item>
+    <item name="CRM_KH_BANHANGList[13].TYLE_THANHCONG">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[13].TYLE_THANHCONG_REVIEW">
+      <value string="0" />
+    </item>
+    <item name="DV">
+      <value string="250000000" />
+    </item>
+    <item name="TotalAmountDV">
+      <value string="0" />
+    </item>
+    <item name="DATDV">
+      <value string="0,0" />
+    </item>
+    <item name="GHICHU_CNC">
+      <value string="" />
+      <value string="" />
+    </item>
+    <item name="DATTHUCTEDV">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[18].KH_BANHANG_CTIET_ID">
+      <value string="1293" />
+    </item>
+    <item name="CRM_KH_BANHANGList[18].KHACHHANG_ID">
+      <value string="469618" />
+    </item>
+    <item name="CRM_KH_BANHANGList[18].Code">
+      <value string="KH8000020" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[18].Phone">
+      <value string="098890098" />
+    </item>
+    <item name="CRM_KH_BANHANGList[18].TYLE_THANHCONG">
+      <value string="20" />
+    </item>
+    <item name="CRM_KH_BANHANGList[18].TYLE_THANHCONG_REVIEW">
+      <value string="40" />
+    </item>
+    <item name="CRM_KH_BANHANGList[19].KH_BANHANG_CTIET_ID">
+      <value string="1294" />
+    </item>
+    <item name="CRM_KH_BANHANGList[19].KHACHHANG_ID">
+      <value string="469643" />
+    </item>
+    <item name="CRM_KH_BANHANGList[19].Code">
+      <value string="KH8000045" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[19].Phone">
+      <value string="09016" />
+    </item>
+    <item name="CRM_KH_BANHANGList[19].TYLE_THANHCONG">
+      <value string="30" />
+    </item>
+    <item name="CRM_KH_BANHANGList[19].TYLE_THANHCONG_REVIEW">
+      <value string="50" />
+    </item>
+    <item name="CNC">
+      <value string="400000000" />
+    </item>
+    <item name="TotalAmountCNC">
+      <value string="0" />
+    </item>
+    <item name="DATCNC">
+      <value string="0" />
+    </item>
+    <item name="DATTHUCTECNC">
+      <value string="0" />
+    </item>
+    <item name="CRM_KH_BANHANGList[16].KH_BANHANG_CTIET_ID">
+      <value string="1291" />
+    </item>
+    <item name="CRM_KH_BANHANGList[16].KHACHHANG_ID">
+      <value string="469618" />
+    </item>
+    <item name="CRM_KH_BANHANGList[16].Code">
+      <value string="KH8000020" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[16].Phone">
+      <value string="098890098" />
+    </item>
+    <item name="CRM_KH_BANHANGList[16].TYLE_THANHCONG">
+      <value string="30" />
+    </item>
+    <item name="CRM_KH_BANHANGList[16].TYLE_THANHCONG_REVIEW">
+      <value string="50" />
+    </item>
+    <item name="CRM_KH_BANHANGList[17].KH_BANHANG_CTIET_ID">
+      <value string="1292" />
+    </item>
+    <item name="CRM_KH_BANHANGList[17].KHACHHANG_ID">
+      <value string="469620" />
+    </item>
+    <item name="CRM_KH_BANHANGList[17].Code">
+      <value string="KH8000022" />
+    </item>
+    <item name="CRM_KH_BANHANGList_[17].Phone">
+      <value string="001" />
+    </item>
+    <item name="CRM_KH_BANHANGList[17].TYLE_THANHCONG">
+      <value string="40" />
+    </item>
+    <item name="CRM_KH_BANHANGList[17].TYLE_THANHCONG_REVIEW">
+      <value string="60" />
+    </item>
+  </form>
+  <cookies>
+    <item name="_ga">
+      <value string="GA1.1.174067613.1563788129" />
+    </item>
+    <item name="_fbp">
+      <value string="fb.0.1563850201706.449722836" />
+    </item>
+    <item name="_hjid">
+      <value string="24ab1a2c-99a5-431b-bdc7-e6449aba677e" />
+    </item>
+    <item name="ASP.NET_SessionId">
+      <value string="m4vgpdzndbmt0q4mzklnewph" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="UhTE-4K3bXn3rpGu232ng1Sj7uaNabLBknRX2u7URnaTrW_vsoroyL-Xy7Sm_wAjYZMNh6znaakW-H24WcDI0nA9ypShgThpvAgZly8OL9A1" />
+    </item>
+    <item name="BO">
+      <value string="2942E1515880E094539768EA88F0D588A74F327BD4A0AB713DAC2E21FD4A543C7A98CE376C7FCBF150872467C07E1C950290E70BC3AF5EFCA110FE5C5E2BC16C5E9B0B546D7519DA3B98020666D4DB74DD95066E90894EA675198D11217BFDCE" />
+    </item>
+  </cookies>
+</error>

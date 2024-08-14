@@ -1,0 +1,47 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@model CategoryViewModel
+
+@{
+    Layout = null;
+}
+
+<table class="table table-responsive table-bordered">
+    <thead>
+        <tr>
+            <td style="width:10%"></td>
+            <td style="width:45%">Chi tiết</td>
+            <td style="width:45%">Ghi chú</td>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.ListQuestion.Count(); i++)
+        {
+            <tr>
+                <td>
+                @(Model.ListQuestion[i].Name)
+                    <label style="margin-right:30px !important">
+                        <input name="QuestionId_@Model.ListQuestion[i].Id" type="checkbox" value="@Model.ListQuestion[i].Id" class="ace check_all" />
+                        <span class="lbl"></span>
+                    </label>
+                </td>
+                <td>
+                    @Html.Raw(Model.ListQuestion[i].Content.Replace("\n","<br>"))
+                </td>
+                <td>
+                    @foreach (var answer in Model.ListQuestion[i].DetailList)
+                    {
+                        <label style="margin-right:30px !important">
+                            <input name="TargetId_@(Model.ListQuestion[i].Id)_@answer.Id" type="checkbox" class="ace" data-target-module="Answer" data-question-id="@Model.ListQuestion[i].Id" data-target-id="@answer.Id" value="@answer.Id" />
+                            <span class="lbl"> @answer.Content</span>
+                        </label>
+                    }
+                </td>
+               
+            </tr>
+        }
+
+    </tbody>
+</table>

@@ -1,0 +1,216 @@
+﻿@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+
+@model CRM_KH_GIOITHIEUViewModel
+@{
+    ViewBag.Title = "Thông tin chung";
+
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+    var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "KH_GIOITHIEU",
+        ActionName = "Create",
+        PageTitle = "",
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    string TRANGTHAIGIOITHIEU = Request["TRANGTHAI_GIOITHIEU"] != null ? Request["TRANGTHAI_GIOITHIEU"] : "";
+    int index = 0;
+    IEnumerable<CategoryViewModel> LOAIGIOITHIEU = (IEnumerable<CategoryViewModel>)ViewBag.LOAIGIOITHIEU;
+    IEnumerable<CRM_KH_GIOITHIEUViewModel> KH_GIOITHIEU = (IEnumerable<CRM_KH_GIOITHIEUViewModel>)ViewBag.KH_GIOITHIEU;
+}
+
+<style>
+    .input-group-addon {
+        padding: 6px 12px !important;
+        border-width: 1px !important;
+    }
+    .row label {
+        font-weight: bold !important;
+        color: #2d3b87;
+    }
+    .row input, .row select {
+        border: 1px solid #3f51b559;
+    }
+
+</style>
+
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    if (Model != null)
+    {
+        @Html.TextBox("KH_GIOITHIEU_ID", Request["KH_GIOITHIEU_ID"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng", hidden = "hidden" })
+        @Html.TextBox("CreatedUserId", Request["CreatedUserId"], new { @class = "", autocomplete = "off", hidden = "hidden" })
+        @Html.TextBox("CreatedDate", Request["CreatedDate"], new { @class = "", autocomplete = "off", hidden = "hidden" })
+        @Html.TextBox("IsDeleted", Request["IsDeleted"], new { @class = "", autocomplete = "off", hidden = "hidden" })
+        @Html.TextBox("KHACHHANG_ID", Request["KHACHHANG_ID"], new { @class = "", autocomplete = "off", hidden = "hidden" })
+        @Html.TextBox("CustomerName", Request["CustomerName"], new { @class = "", autocomplete = "off", hidden = "hidden" })
+    }
+    <div class="tabbable" style="margin-bottom:50px;">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab" style="height: 30px; font-weight: bold;">
+            <li>Tạo mới thông tin giới thiệu</li>
+        </ul>
+
+        <div class="tab-content clear-fix">
+            <div id="tab1" class="tab-pane active" style="margin-left:20px">
+                <div class="row">
+                    <p>
+
+                        <div>
+                            <label style="float:left;padding-left:14px">Khách hàng</label>
+                            <div class="input-group" style="width:200px;float:left;padding-left:4px">
+                                <input data-val="true" data-val-number="The field Khách hàng must be a number." id="CustomerId" name="CustomerId" type="hidden" value="">
+                                <input style="width:170px" data-val="true" data-val-required="Bắt buộc nhập" id="CustomerId_DisplayText" name="CustomerId_DisplayText" type="text" value="">        <span class="input-group-addon customerid" onclick="OpenPopup('/Customer/IndexSearch?IsPopup=true&amp;module_list=&amp;jsCallback=selectItem_CustomerId', 'Tìm kiếm dữ liệu', 800, 600)" style="cursor:pointer">
+                                    <i class="ace-icon fa fa-search"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                    </p>
+                    <p>
+                        <label style="padding-left: 120px;">Mã khách hàng</label>
+                        @Html.TextBox("CustomerCode", Request["CustomerCode"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng", style = "width:120px" })
+                        <label style="padding-left: 133px;">Số ĐT</label>
+                        @Html.TextBox("Phone", Request["Phone"], new { @class = "", autocomplete = "off", placeholder = "Số điện thoại...", style = "width:100px" })
+                        <label style="padding-left:23px">Người lập</label>
+                        <input type="text" value="@ViewBag.Username" placeholder="Người lập" , style="width:106px" readonly="readonly" />
+                    </p>
+                    <p>
+                        <label>Loại giới thiệu</label>
+                        @Html.DropDownList("LOAI_GIOITHIEU", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("LOAIGIOITHIEU", Request["LOAI_GIOITHIEU"], "-Rỗng-"), new { style = "width:207px" })
+                        <label style="padding-left: 85px;">Tỷ lệ thành công (%)</label>
+                        @Html.TextBox("TYLE_THANHCONG", Request["TYLE_THANHCONG"], new { @class = " ", autocomplete = "off", placeholder = "Tỷ lệ thành công", style = "width:120px" })
+                        @Html.ValidationMessageFor(m => m.TYLE_THANHCONG, "", new { @class = "text-danger" })
+                        <label style="padding-left: 70px;">Trạng thái xử lý</label>
+                        @Html.DropDownList("TRANGTHAI_GIOITHIEU", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("TRANGTHAIGIOITHIEU", Request["TRANGTHAI_GIOITHIEU"], "-Rỗng-"), new { style = "width:300px" })
+                    </p>
+
+                    <p>
+
+                        @Html.TextAreaFor(m => m.NOIDUNG, new { rows = "10", cols = "150", @class = "form-control", @maxlength = "10000", placeholder = "Nội dung", style = "width:1120px" })
+                        @Html.ValidationMessageFor(m => m.NOIDUNG, "", new { @class = "text-danger" })
+                    </p>
+
+                </div>
+            </div>
+            @if (KH_GIOITHIEU != null)
+            {
+                <div id="listOrderDetail" class="table-responsive top-10 ">
+                    <table class="table table-bordered grid-table bottom-5">
+                        <thead>
+                            <tr>
+                                <th class="grid-header" width="30">STT</th>
+                                <th class="grid-header">Ngày cập nhật</th>
+                                <th class="grid-header">Người cập nhật</th>
+                                <th class="grid-header">Loại giới thiệu</th>
+                                <th class="grid-header" width="200px">Nội dung giới thiệu</th>
+                                <th class="grid-header">Tỷ lệ thành công</th>
+                                <th class="grid-header">Trạng thái sử lý</th>
+                            </tr>
+                        </thead>
+                        <tbody class="detailList">
+                            @foreach (var i in KH_GIOITHIEU)
+                            {
+                                <tr>
+                                    <td>@(index += 1)</td>
+                                    <td>@i.ModifiedDate</td>
+                                    <td>@ViewBag.UserName</td>
+                                    <td>@i.LOAI_GIOITHIEU</td>
+                                    <td>@i.NOIDUNG</td>
+                                    <td>@i.TYLE_THANHCONG</td>
+                                    <td>@i.TRANGTHAI_GIOITHIEU</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                        </tfoot>
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button id="save" class="btn btn-mini btn-primary"   name="Submit" value="Save"  >
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script src="/Scripts/combojax.js?=vs1.01211"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#CustomerId").val($("#KHACHHANG_ID").val());
+            $("#CustomerId_DisplayText").val($("#CustomerName").val());
+        });
+
+        $("#save").click(function () {
+            ShowLoading();
+
+            var CustomerId = $("#CustomerId").val();
+            var messagge = "";
+
+            var success_rate = $("#TYLE_THANHCONG").val();
+
+            if (success_rate < 0 || success_rate > 100) {
+                messagge += ("Tỉ lệ thành công từ 0 đến 100! ");
+            }
+            if (CustomerId == '') {
+                messagge += "Chưa chọn khách hàng<br>";
+            }
+            if (messagge != '') {
+                alertPopup('Lỗi!', messagge, 'error');
+                HideLoading();
+                return false;
+
+            }
+            else {
+                ClearFormatBeforeSubmit($("#SaleOrder"));
+                $("#SaleOrder").submit();
+            }
+        });
+                //function Check() {
+                    
+                //}
+
+                function ClosePopupAndDoSomethings(optionSelect) {
+                    ClosePopup(false);
+                    $("#CustomerId").val($(optionSelect).val()).triggerHandler('change');
+                    $("#CustomerId_DisplayText").val($(optionSelect).text()).triggerHandler('change');
+                }
+                function selectItem_CustomerId(id, name, pluspoint, code, phone) {
+                    $("#CustomerId").val(id).trigger('change');
+                    $("#CustomerId_DisplayText").val(name).trigger('change');
+                    $("#CustomerId_DisplayText").focus().blur();
+                    ClosePopup();
+                    $('#CustomerCode').val(code);
+                    $('#CustomerId').val(id);
+                    $('#Phone').val(phone)
+                }
+            
+                
+    </script>
+}

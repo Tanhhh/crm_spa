@@ -1,0 +1,355 @@
+﻿@*@model List<TongHopDealViewModel>*@
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Areas.Cms.Models
+@using GridMvc.Html
+
+
+@{
+    ViewBag.Title = "Theo dõi deal của nhân viên";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CRM_KH_BANHANG",
+        ActionName = "TongHopDealNhanVien",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    var index = 1;
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    var nguoilap = ViewBag.NguoiLap;
+    List<Crm_LevelViewModel> Level = (List<Crm_LevelViewModel>)ViewBag.Level;
+    IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;    //IEnumerable<SelectListItem> Origin = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin", null, "value");
+    int month = DateTime.Now.Month;
+    int year = DateTime.Now.Year;
+    List<TongHopDealViewModel> Anna = (List<TongHopDealViewModel>)ViewBag.Anna;
+    List<TongHopDealViewModel> Orlane = (List<TongHopDealViewModel>)ViewBag.Orlane;
+    List<TongHopDealViewModel> Leo = (List<TongHopDealViewModel>)ViewBag.Leo;
+    var TongAnna = Anna.Where(x => x.Name != "L1" && x.Name != "L6").Sum(x => x.Total);
+    var TongLeo = Leo.Where(x => x.Name != "L1" && x.Name != "L6").Sum(x => x.Total);
+    var TongOrlane = Orlane.Where(x => x.Name != "L1" && x.Name != "L6").Sum(x => x.Total);
+    //Tong L1
+    var TongL1Anna = Anna.Where(x => x.Name == "L1").Sum(x => x.Total);
+    var TongL1Leo = Leo.Where(x => x.Name == "L1").Sum(x => x.Total) ;
+    var TongL1Orlane =Orlane.Where(x => x.Name == "L1").Sum(x => x.Total);
+    //Tong L6
+    var thucteL6 = (KHCDS_KHBH_ViewModel)ViewBag.ThucTeKHBH;
+    var TongL6Anna = thucteL6.ANALYKE; //Anna.Where(x => x.Name == "L6").Sum(x => x.Total) ;
+    var TongL6Leo = thucteL6.LeoNor; //Leo.Where(x => x.Name == "L6").Sum(x => x.Total) ;
+    var TongL6Orlane = thucteL6.OrLane; //Orlane.Where(x => x.Name == "L6").Sum(x => x.Total);
+
+    //% L1
+            var L1Anna = Math.Round(((float)Anna.Where(x => x.Name == "L1").Sum(x => x.Total) / (float)Anna.Sum(x => x.Total)) * 100);
+    var L1Leo = Math.Round(((float)Leo.Where(x => x.Name == "L1").Sum(x => x.Total) / (float)Leo.Sum(x => x.Total)) * 100);
+    var L1Orlane = Math.Round(((float)Orlane.Where(x => x.Name == "L1").Sum(x => x.Total) / (float)Orlane.Sum(x => x.Total)) * 100);
+    //% L6 
+    var L6Anna = Math.Round(((float)Anna.Where(x => x.Name == "L6").Sum(x => x.Total) / (float)Anna.Sum(x => x.Total)) * 100);
+    var L6Leo = Math.Round(((float)Leo.Where(x => x.Name == "L6").Sum(x => x.Total) / (float)Leo.Sum(x => x.Total)) * 100);
+    var L6Orlane = Math.Round(((float)Orlane.Where(x => x.Name == "L6").Sum(x => x.Total) / (float)Orlane.Sum(x => x.Total)) * 100);
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+
+
+@helper GridColumnName(string name, int id, int month, int year)
+{
+
+
+//CRM_KH_BANHANG_DEMO/Create/14791?month=10&year=2020
+name = string.IsNullOrEmpty(name) ? "No Title" : name;
+    <a target="_blank" href="@Url.Action("Create", "CRM_KH_BANHANG" , new { Id= id,month = month, year = year })">@name</a>
+}
+
+@helper GridColumnCategoryValue(object value)
+{
+var attr = Common.GetCategoryByValueOrId("value", value);
+    <span>@(attr != null ? attr.Name : "")</span>
+}
+
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <label>Người quản lý</label>
+    <select id="NguoiLap" name="NguoiLap" style="width:200px">
+        <option value="0">-Người quản lý</option>
+        @foreach (var item in user.OrderBy(x => x.FullName))
+                    {
+                <option value="@item.Id" @(nguoilap == item.Id ? "selected" : "") data-selected="0">@item.FullName</option>
+            }
+    </select>
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+        <p>
+            <label>Tháng</label>
+            <select id="month" name="month">
+                @for (int i = 1; i <= 12; i++)
+                {
+                    <option @(Month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+                }
+            </select>
+            <label>Năm</label>
+            <select id="year" name="year">
+                @for (int i = 2016; i <= (DateTime.Now.Year + 1) + 1; i++)
+                {
+                    <option @(Year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+                }
+            </select>
+
+        </p>
+
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+
+<div class="table-responsive" id="cTable">
+    <table id="dslv" class="table table-bordered">
+        <thead>
+            <tr><td colspan="4">DOANH SỐ THEO LEVEL</td></tr>
+            <tr>
+                <th></th>
+                <th>ORLANE PARIS</th>
+                <th>ANNAYAKE</th>
+                <th>LEONOR GREYL</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Level)
+            {
+                if (item.Name != "L1" && item.Name != "L6")
+                {
+                    var o = Orlane.Where(x => x.Name == item.Name).FirstOrDefault();
+                    var a = Anna.Where(x => x.Name == item.Name).FirstOrDefault();
+                    var l = Leo.Where(x => x.Name == item.Name).FirstOrDefault();
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>
+                            @CommonSatic.ToCurrencyStr(o.Total,null)
+                        </td>
+                        <td>
+                            @CommonSatic.ToCurrencyStr(a.Total,null)
+                        </td>
+                        <td>
+                            @CommonSatic.ToCurrencyStr(l.Total,null)
+                        </td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td>Tổng</td>
+                <td>@CommonSatic.ToCurrencyStr(Orlane.Where(x=> x.Name != "L1" && x.Name != "L6").Sum(x=> x.Total), null)</td>
+                <td>@CommonSatic.ToCurrencyStr(Anna.Where(x => x.Name != "L1" && x.Name != "L6").Sum(x => x.Total), null)</td>
+                <td>@CommonSatic.ToCurrencyStr(Leo.Where(x => x.Name != "L1" && x.Name != "L6").Sum(x => x.Total), null)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr><td colspan="4">% DOANH SỐ THEO LEVEL</td></tr>
+            <tr>
+                <th></th>
+                <th>ORLANE PARIS</th>
+                <th>ANNAYAKE</th>
+                <th>LEONOR GREYL</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Level)
+            {
+                if (item.Name != "L1" && item.Name != "L6")
+                {
+                    var o = Orlane.Where(x => x.Name == item.Name).FirstOrDefault();
+                    var a = Anna.Where(x => x.Name == item.Name).FirstOrDefault();
+                    var l = Leo.Where(x => x.Name == item.Name).FirstOrDefault();
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>
+                            @(Math.Round(((float)o.Total / (float)TongOrlane)*100)) %
+                        </td>
+                        <td>
+                            @(Math.Round(((float)a.Total / (float)TongAnna)*100)) %
+                        </td>
+                        <td>
+                            @(Math.Round(((float)l.Total / (float)TongLeo)*100)) %
+                        </td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td>Tổng</td>
+                <td>@(Math.Round(((float)TongOrlane / (float)TongOrlane) * 100)) %</td>
+                <td>@(Math.Round(((float)TongAnna / (float)TongAnna) * 100)) %</td>
+                <td>@(Math.Round(((float)TongLeo / (float)TongLeo) * 100)) %</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr><td colspan="4">TỶ LỆ THÀNH CÔNG VÀ LOẠI DEAL CỦA KẾ HOẠCH</td></tr>
+            <tr>
+                <th></th>
+                <th>ORLANE PARIS</th>
+                <th>ANNAYAKE</th>
+                <th>LEONOR GREYL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>-1</td>
+                <td>@L1Orlane %</td>
+                <td>@L1Anna %</td>
+                <td>@L1Leo %</td>
+            </tr>
+            <tr>
+                <td>100</td>
+                <td>@L6Orlane %</td>
+                <td>@L6Anna %</td>
+                <td>@L6Leo %</td>
+            </tr>
+        </tbody>
+        </table>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr><td colspan="4">DOANH SỐ DEAL THÀNH CÔNG VÀ DS DEAL LOẠI</td></tr>
+            <tr>
+                <th></th>
+                <th>ORLANE PARIS</th>
+                <th>ANNAYAKE</th>
+                <th>LEONOR GREYL</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>-1</td>
+                <td>@CommonSatic.ToCurrencyStr(TongL1Orlane,null) </td>
+                <td>@CommonSatic.ToCurrencyStr(TongL1Anna,null) </td>
+                <td>@CommonSatic.ToCurrencyStr(TongL1Leo,null) </td>
+            </tr>
+            <tr>
+                <td>100</td>
+                <td>@CommonSatic.ToCurrencyStr(TongL6Orlane,null) </td>
+                <td>@CommonSatic.ToCurrencyStr(TongL6Anna,null) </td>
+                <td>@CommonSatic.ToCurrencyStr(TongL6Leo ,null)</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="tableToExcel('cTable', 'TheoDoiKeHoachBanHang')">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        var tableToExcel = (function () {
+            var uri = 'data:application/vnd.ms-excel;base64,'
+                , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+
+            return function (table, name) {
+                if (!table.nodeType) table = document.getElementById(table)
+                var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+                window.location.href = uri + base64(format(template, ctx))
+            }
+        })()
+
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    // $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+        $('.grid-header').mouseover(function () {
+            $('.grid-header')[0].title = "Chọn tất cả";
+        });
+
+        $('.class-delete-all').on('click', function () {
+            if ($('.class-delete-all:checked').length == $('.class-delete-all').length) {
+                $('#checkAll').prop('checked', true);
+            } else {
+                $('#checkAll').prop('checked', false);
+            }
+        });
+    </script>
+}

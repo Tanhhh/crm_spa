@@ -1,0 +1,168 @@
+﻿@{
+    Layout = null;
+}
+
+<div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseEmailModal"></div>
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close btnCloseEmailModal" aria-hidden="true">×</button>
+            <h5 class="modal-title">Soạn Email</h5>
+        </div>
+        <div class="modal-body">
+            <form>
+                <div class="container-fluid">
+
+                    <div class="row">
+                        <div class="col-lg-9 ">
+                            <div class="mb-3">
+                                <label for="emailSender" class="form-label">Người gửi</label>
+                                <input type="email" class="form-control" id="emailSender">
+                            </div>
+                            <div class="mb-3">
+                                <label for="emailReceiver" class="form-label">Người nhận</label>
+                                <input type="email" class="form-control" id="emailReceiver">
+                            </div>
+                            <div class="mb-3">
+                                <label for="emailTitle" class="form-label">Tiêu đề</label>
+                                <input type="text" class="form-control" id="emailTitle">
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="mb-3">
+                                <label for="emailTemplate" class="form-label">Chọn Template</label>
+                                <select class="form-select" id="emailTemplate" style="height:34px;">
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-lg-12">
+                            <textarea id="emailInput" class="ckeditor"></textarea>
+                        </div>
+                    </div>
+                    <div id="validateDiv" class="row text-danger" style="display:none;">
+
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer text-center">
+            <button class="btn btn-primary" style="margin-right:0%;" type="button" id="btnSend">Gửi</button>
+        </div>
+    </div>
+</div>
+
+
+<script src="/Scripts/ckeditor/ckeditor.js"></script>
+<script>
+    $(document).ready(function () {
+        // Configure CKEditor with custom toolbar for email composition
+        CKEDITOR.replace('emailInput', {
+            toolbar: [
+                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                { name: 'styles', items: ['Format', 'FontSize'] },
+                { name: 'colors', items: ['TextColor', 'BGColor'] },
+                { name: 'paragraph', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                { name: 'links', items: ['Link', 'Unlink'] },
+                { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] }
+            ],
+            // Remove unwanted plugins
+            removePlugins: 'elementspath',
+            // Set default CKEditor height
+            /*height: 200,*/
+        });
+    });
+</script>
+<script>
+//
+        var leadEmail = @Html.Raw(Json.Encode(ViewBag.leadEmail)); // Serialize the lead object to JSON
+        var emailTemplate = @Html.Raw(Json.Encode(ViewBag.emailTemplate));
+        var emailSender = @Html.Raw(Json.Encode(ViewBag.emailSender));
+
+        $(document).ready(function () {
+        $('#emailSender').val(emailSender);
+        $('#emailReceiver').val(leadEmail);
+        $('#emailTemplate').append($('<option>').val(JSON.stringify({'TileEmail':'','ContentEmail':''})).text('Chọn tiêu đề')).attr('selected');
+        emailTemplate.forEach(x => {
+        $('#emailTemplate').append($('<option>').val(JSON.stringify(x)).text(x.TileEmail)); // Đổ Email Template Data vào option của select
+        });
+
+
+        $('.btnCloseEmailModal').click(CloseEmailModal);
+
+        $('body').on('hidden.bs.modal', function () {
+        // This function is for handling the problem of disabling the scrolling bar when any modal is closed.
+        // It checks if there is any modal still open, and if so, adds back the 'modal-open' class to the body of the document.
+        if ($('.modal.in').length > 0) {
+        $('body').addClass('modal-open');
+        }
+        });
+
+        $('#emailTemplate').on('change', function () {
+        var selectedValue = JSON.parse($('#emailTemplate').val());
+        CKEDITOR.instances['emailInput'].setData(selectedValue.ContentEmail);
+
+        $('#emailTitle').val(selectedValue.TileEmail);
+
+
+        });
+        });
+
+
+        function CloseEmailModal() {
+        $("#EmailModal").modal("hide");
+        }
+
+
+</script>
+<script>
+        //Handle Sending Email
+        $(document).ready(function () {
+        $('#btnSend').click(() => {
+        SendEmailRequest();
+        })
+        });
+
+
+
+
+        function SendEmailRequest() { //
+        var emailFrom = $('#emailSender').val();
+        var emailSentTo = $('#emailReceiver').val();
+        var subject = $('#emailTitle').val();
+        var message = CKEDITOR.instances['emailInput'].getData();;
+        $.ajax({
+        type: "POST",
+        url: '@Url.Action("SendEmail", "AdviseCard")',
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify({
+        model: {
+        Sender: emailFrom, // Wrap model values with quotes
+        Receiver: emailSentTo,
+        Title: subject,
+        Body: message,
+        }
+        }),
+        dataType: "json",
+        success: function (response) {
+        //  console.log(response);
+        if (response.success) {
+        $('#validateDiv').empty();//
+        $('#validateDiv').hide();
+        $("#EmailModal").modal("hide");
+         toastr.success('Gửi Email thành công!');
+        }//
+        else {
+        console.log(response.errors);
+            $('#validateDiv').show();
+            $('#validateDiv').empty();
+        response.errors.forEach(element => {
+        $('#validateDiv').append(`<h6>${element}</h6>`);
+        });
+
+        }
+        }
+        });
+        }
+</script>

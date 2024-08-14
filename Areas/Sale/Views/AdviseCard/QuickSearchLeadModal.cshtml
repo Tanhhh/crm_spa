@@ -1,0 +1,2477 @@
+﻿@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+@model SectionCusModel
+
+
+@{
+    var tuple = Model.Tuple as Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>;
+    var category = ViewBag.category as Erp.Domain.Interfaces.ICategoryRepository;
+    var user = ViewBag.user as Erp.Domain.Repositories.UserRepository;
+    var lead = ViewBag.lead as LeadModel;
+    var isPartial = ViewBag.isPartial;
+    var errorMessageSendSMS = ViewBag.errorMessageSendSMS;
+    Layout = null;
+}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+    .form-label {
+        font-weight: bold;
+        font-size: 14px;
+        color: #3F51B5;
+    }
+
+    .cke_top .cke_contents, .cke_bottom {
+        display: block;
+        overflow: hidden;
+        height: auto !important;
+    }
+
+    [id^="cke_"] {
+        height: auto !important;
+    }
+
+
+    .wrapper {
+        display: flex;
+        align-items: center;
+        margin-top: 1.5rem;
+    }
+
+        .wrapper .border-checked {
+            border: .1rem solid #dbdbdb;
+            border-radius: 5rem;
+            align-items: center;
+            padding: 2px 0 0 0;
+        }
+
+            .wrapper .border-checked input {
+                width: 1.2rem !important;
+                vertical-align: top;
+                margin-left: 10px !important;
+            }
+
+
+    .thao-tac {
+        background-color: aqua
+    }
+
+    section h4 {
+        margin-bottom: -20px !important;
+        font-weight: bold;
+    }
+
+    #btnSendCmt-QuickSearch {
+        margin-right: 30px !important;
+        background: #eef3f7;
+    }
+
+        #btnSendCmt-QuickSearch:hover {
+            background: #03a9f478;
+        }
+
+    #saveLeadForm-QuickSearch::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    #saveLeadForm-QuickSearch::-webkit-scrollbar-thumb {
+        background-color: #0460b3; /* Màu nền của thanh trượt */
+        border-radius: 10px; /* Độ cong của góc */
+    }
+
+    #LeadLogsShow-QuickSearch > div:first-child {
+        margin-top: 20px !important;
+    }
+
+    #LeadLogsMeetingShow-QuickSearch > div:first-child {
+        margin-top: 15px !important;
+    }
+
+    #StatusHeader-QuickSearch {
+        white-space: nowrap;
+        padding: 0 16px;
+    }
+
+    .modal-backdrop.in {
+        display: none;
+    }
+
+
+    .btn-edit {
+        background: unset !important;
+        border: unset;
+        color: #9E9E9E !important;
+        margin-top: 10px;
+        font-size: 20px;
+    }
+
+        .btn-edit:hover {
+            color: black !important;
+        }
+
+    .modal-body input {
+        width: 100%;
+    }
+
+        .modal-body input[type=checkbox], .modal-body input[type=radio] {
+            width: 4%;
+            vertical-align: top;
+            margin-left: 20px;
+        }
+
+    .modal-body .form-check-input-confirm {
+        width: 10% !important;
+        vertical-align: top;
+        margin-left: 0px !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+        height: 33px !important;
+        border-radius: unset !important;
+    }
+
+    .close-meetingModal-QuickSearch {
+        font-weight: bolder;
+        border: 0px;
+        /* height: 39px; */
+        font-size: 30px;
+        color: #ac2626;
+    }
+
+    .customerid, input[name=CustomerId_DisplayText] {
+        display: none;
+    }
+</style>
+<style>
+
+    .body-content {
+        height: 85vh !important;
+    }
+
+    .loading {
+        cursor: progress;
+    }
+
+
+
+    .modal-body input, .select2-container {
+        margin-bottom: 10px !important;
+    }
+
+    .table-hover > tbody > tr:hover, .table > tbody > tr.active > td, .table > tbody > tr.active > th, .table > tbody > tr > td.active, .table > tbody > tr > th.active, .table > tfoot > tr.active > td, .table > tfoot > tr.active > th, .table > tfoot > tr > td.active, .table > tfoot > tr > th.active, .table > thead > tr.active > td, .table > thead > tr.active > th, .table > thead > tr > td.active, .table > thead > tr > th.active {
+        background-color: #eaf4fd !important;
+    }
+
+
+    .btn-default2, #btnCloseAdd-QuickSearch, #QuickEditLeadDisable, #btnLeadDelete {
+        border: 2px solid #b7bbd2;
+        background-color: #b7bbd2 !important;
+        color: #fff !important;
+        font-weight: bold;
+        border-radius: 3px;
+    }
+
+        .btn-default2:hover, #btnCloseAdd-QuickSearch:hover, #QuickEditLeadDisable:hover, #btnLeadDelete:hover {
+            opacity: 0.8;
+        }
+
+    .btn-primary2, #saveLeadModal-QuickSearch, #QuickEditLead, #QuickEditLeadEnable {
+        border: 2px solid #3F51B5;
+        background-color: #3f51b5 !important;
+        color: #ffffff !important;
+        font-weight: bold;
+        border-radius: 3px;
+        padding: 5px 20px !important;
+    }
+
+    #btnLeadOpenPpAssign {
+        /*   border: 2px solid #48D1CC;
+        background-color: #20B2AA !important;*/
+        /*    color: #3f51b5 !important;
+        font-weight: bold;*/
+        border-radius: 3px;
+        padding: 5px 12px !important;
+    }
+
+    #btnLeadexitoption {
+        border: 2px solid #FF6347;
+        background-color: #FF0000 !important;
+        color: #ffffff !important;
+        font-weight: bold;
+        border-radius: 3px;
+        padding: 5px 20px !important;
+    }
+
+        .btn-primary2:hover, #saveLeadModal-QuickSearch:hover, #QuickEditLead:hover, #QuickEditLeadEnable:hover, #btnLeadOpenPpAssign:hover, #btnLeadexitoption:hover {
+            opacity: 0.8;
+        }
+
+    #SubLeadLogsShow-QuickSearch {
+        margin-top: 10px !important;
+    }
+
+    .modal-body section {
+        border: unset !important;
+    }
+
+    section h4 {
+        margin-bottom: -10px !important;
+        font-weight: bold;
+    }
+
+    #addNewContent {
+        padding-left: 0px !important;
+    }
+
+    #LeadLogsShow-QuickSearch > div:first-child {
+        margin-top: 20px !important;
+    }
+
+    .modal-header, #StatusHeader-QuickSearch, #select2parent-QuickSearch {
+        background: #7ea3c321
+    }
+
+    .modal-body section {
+        margin-bottom: 20px;
+        background: #fff;
+        padding: 15px 30px !important;
+    }
+
+    #myDiv-QuickSearch .btn-header-cmt:hover {
+        background-color: #60c9f8 !important;
+        color: #fff !important;
+    }
+
+    #submyDiv-QuickSearch {
+        height: 5px;
+        background-color: #f1f1f1 !important;
+        position: absolute;
+        z-index: 1;
+        margin-left: 10px;
+        margin-top: -10px;
+    }
+
+    .btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus {
+        outline: unset !important;
+    }
+
+    #myDiv-QuickSearch {
+        background: #fff;
+        padding: 10px 10px 0 0;
+    }
+
+        #myDiv-QuickSearch .active {
+            border-bottom: 4px solid blue !important;
+            background-color: #fff !important;
+            color: blue !important;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+    .btn-header-cmt {
+        border-top: unset;
+        border-left: unset;
+        border-right: unset;
+        margin: 0 !important;
+        background-color: #fff !important;
+        border-color: #fff !important;
+        color: #000 !important;
+        width: 10%;
+    }
+
+    .bg-info {
+        background-color: #03a9f4a1;
+    }
+
+    #StatusHeader-QuickSearch label:hover {
+        background-color: #64da69cc !important;
+        transform-origin: left;
+        width: fit-content !important;
+        clip-path: polygon(0% 0%, 100% 0%, 100% 50%, 100% 100%, 0 100%) !important;
+        box-shadow: inset 200px 0em 0 0 #64da6954;
+        font-weight: bold;
+        border-radius: 5px;
+    }
+
+    #StatusHeader-QuickSearch label {
+        width: 5% !important;
+        /* background-color: #03a9f4a1 !important;*/
+        padding: 5px;
+        transition: all 1s;
+        text-transform: uppercase;
+        border-radius: 5px;
+        margin-left: -4px;
+    }
+
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+        border-right: unset;
+    }
+
+    #muc-luc li:hover {
+        background: #12e4ff;
+    }
+
+    #muc-luc ul {
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 100%;
+        margin: 0 !important;
+    }
+
+    #muc-luc li {
+        padding: 5px 0;
+        border-bottom: 1px solid #0000002b;
+        margin: 0 !important;
+        padding-left: 10px;
+    }
+
+    #searchInputForm span {
+        height: 86% !important;
+        background: #12e4ff;
+        display: inline-table;
+        border-radius: 3px;
+        margin: 0 2px;
+        padding-left: 5px;
+    }
+
+    #searchInputForm button {
+        height: 100%
+    }
+
+    #searchInputForm {
+        display: flex;
+        align-items: center;
+    }
+
+    #SearchLeadForm {
+        box-shadow: 0px 0px 15px #000;
+    }
+
+    .width-34 {
+        width: 34%;
+    }
+
+    section label {
+        color: #3F51B5;
+    }
+
+    .custom-class {
+        color: #3f4d9d;
+        vertical-align: middle;
+    }
+
+    .modal-open .modal {
+        overflow-y: unset;
+    }
+
+    #muc-luc {
+        border-right: 1px solid #337ab7;
+        width: 35%;
+    }
+
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .content {
+        width: 80%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    #searchPanelContent {
+        display: flex;
+        height: 540px;
+        overflow: hidden;
+        padding-right: 0px;
+        padding-left: 0px;
+    }
+
+    #btnAdd-QuickSearch {
+        position: sticky;
+        bottom: 0% !important;
+    }
+
+    .select2-container .select2-selection--multiple .select2-selection__rendered {
+        display: block !important;
+    }
+
+    @@media (max-width : 1480px) {
+        #modal-search {
+            left: 75px !important;
+            width: 50% !important;
+        }
+
+        .content {
+            width: 90%;
+        }
+    }
+
+    @@media (max-width : 1440px) {
+        #modal-search {
+            left: 18px !important;
+            width: 44% !important;
+        }
+    }
+
+
+    @@media (max-width : 1440px) {
+        #modal-search {
+            left: 120px !important;
+            width: 44% !important;
+        }
+
+        .content {
+            width: 65%;
+        }
+
+        .width-34 {
+            width: 80%;
+            margin-bottom: 10px;
+        }
+    }
+
+    #searchPanelContent input {
+        border: 1px solid;
+        margin-right: 10px;
+    }
+
+    .modal-backdrop.in {
+        display: none;
+    }
+
+    .table > thead:first-child > tr:first-child > th {
+        background: #fff;
+        color: #152cad !important;
+    }
+
+    .btn-success, .btn-success.focus, .btn-success:focus {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        border-color: #fff !important;
+        border: 0px solid !important;
+    }
+
+    .btn-search, .btn-setting {
+        display: inline-block;
+        float: left;
+        width: 33px;
+        height: 24px;
+        cursor: pointer;
+        background: url('/assets/img/btn_title_right.gif') no-repeat;
+        margin: 0px;
+        margin-left: -33px;
+    }
+
+    .btn-search {
+        background-position: -1px -24px;
+    }
+
+        .btn-search:hover {
+            background-position: -35px -24px;
+        }
+
+    .btn-setting:hover {
+        background-position: -34px 0px;
+    }
+
+    .tag-container {
+        display: inline-block;
+        /*            border: 1px solid #ccc;*/
+        padding: 5px;
+    }
+
+        .tag-container span {
+            background-color: #f0f0f0;
+            padding: 3px 5px;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+
+    #btnSearchLead, #btnCloseSearch, #saveLeadModal-QuickSearch, #btnCloseAdd-QuickSearch {
+        margin: 0;
+        border-radius: 3px;
+        padding: 3px 20px;
+    }
+
+    #saveLeadModal-QuickSearch {
+        margin-left: 20px;
+        padding: 3px 25px !important;
+    }
+
+    #searchPanelContent span {
+        background-color: unset;
+        /* width:200px;*/
+    }
+
+    .select2-results__option[aria-selected] {
+        background: #fff;
+    }
+
+    /*thanh*/
+    .nav-item {
+        align-self: center !important;
+    }
+
+        .nav-item .active {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+    .nav-link {
+        padding: 5px 15px !important;
+        color: white !important;
+    }
+
+        .nav-item:hover,
+        .nav-link:hover {
+            background-color: #629B58 !important;
+            border-radius: 4px;
+        }
+</style>
+<div class="modal-dialog modal-sm" style="@(lead != null ? "width:100%" : " width: 40%; box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);z-index:9999;")" role="document" id="ModalContainer-QuickSearch">
+    <div style="height: 100%;@(isPartial==1?"":" box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);")" class="modal-content">
+
+
+        <!-- Modal header -->
+        <div @(isPartial == 1 ? "hidden" : "") style="height:8%" class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true" id="btnCloseModal-QuickSearch" style="position: absolute; top: 9px !important; right: 17px !important; font-size: 24px !important; padding: 0 11px !important; background: #e1e1e1 !important; border: none !important; color: #999 !important; ">×</button>
+            <h3 style="color: #3F51B5; text-transform: uppercase; margin-left: 10px;" class="modal-title">@(lead != null ? @ViewBag.lead.LeadName : "Thêm mới")</h3>
+        </div>
+        <div @(isPartial == 1 ? "hidden" : "") style="height:8%" id="StatusHeader-QuickSearch">
+
+        </div>
+        <div style="display: flex; height: 84%;" id="select2parent-QuickSearch">
+            <form @(isPartial == 1 ? "hidden" : "") id="saveLeadForm-QuickSearch" action="/AdviseCard/SaveNewLead" style="overflow-y:scroll;height:550px;width:35%" method="post" @(lead != null ? "style=width:50%" : "style=width:100%")>
+                <input hidden id="IdLead-QuickSearch" name="Id" value="@lead.Id" />
+                <input hidden id="isPartial" value="@isPartial" />
+                <!-- Modal body -->
+                <div class="modal-body">
+
+                    @foreach (var item in tuple.Item1)
+                    {
+                        <section style="padding:15px;border-radius:3px; margin-top: 5px">
+                            @if (lead != null)
+                            {
+                                <button @(isPartial == 2 ? "hidden" : "") class="btn-edit float-right" type="button" name="editsection">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <div id="personInCharge-QuickSearch" style="display:flex;align-items:center;">
+
+                                </div>
+                            }
+                            <h4 style="color: #337ab7; margin-bottom: -10px !important; font-weight: bold;">@item.Name</h4>
+                            @if (item.isDefault == 1)
+                            {
+                                var properties = typeof(LeadModel).GetProperties();
+                                int outchk;
+                                string[] dont = new string[] { "IsDeleted", "CreatedDate", "CreatedUserId", "ModifiedDate", "ModifiedUserId", "AssignedUserId", "StatusId" };
+                                var prop = properties.Where(x => !x.Name.StartsWith("F") && !int.TryParse(x.Name.Remove(0, 1).ToString(), out outchk) && x.Name != "Id" && !dont.Contains(x.Name));
+                                foreach (var item1 in prop)
+                                {
+                                    var display = item1.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;
+                                    string displayname = display != null ? display.DisplayName : "";
+                                    string[] categorydefault = new string[] { "Source", "TypeData", "Topic" };
+                                    string[] listdefault = new string[] { "ReceptionStaffId" };
+                                    string[] checkdefault = new string[] { "IsCancel" };
+                                    string[] required = new string[] { "LeadName" };
+                                    if (categorydefault.Contains(item1.Name))
+                                    {
+                                        var content = category.GetCategoryByCode(item1.Name).FirstOrDefault();
+                                        <br>
+                                        @Html.Label(displayname, new { style = "margin-right:10px" })
+                                        @Html.TextBox(item1.Name, lead != null && item1.GetValue(lead) != null ? item1.GetValue(lead).ToString() : content != null ? content.Value : "", lead != null ? new { @class = "abc", @readonly = "disabled" } : (object)"")
+                                    }
+                                    else if (checkdefault.Contains(item1.Name))
+                                    {
+                                        <br />
+                                        <div class="wrapper">
+                                            <div class="title">
+                                                @Html.Label(displayname, new { style = "margin-right:10px" })
+                                                <input name='@item1.Name' hidden value="@(lead != null && item1.GetValue(lead) != null ? item1.GetValue(lead).ToString():"")" />
+                                                @Html.RadioButton(item1.Name, "", lead == null || (lead != null && item1.GetValue(lead) == null) ? true : false, new { style = "display:none" })
+                                            </div>
+
+                                            <div class="border-checked">
+                                                @Html.RadioButton(item1.Name, "0", lead != null && item1.GetValue(lead) != null && (item1.GetValue(lead).ToString() == "0") ? true : false, lead != null ? new { disabled = "disabled" } : (object)"")
+                                                @Html.Label("Không hủy", new { style = "margin-right:10px" })
+                                                @Html.RadioButton(item1.Name, "1", lead != null && item1.GetValue(lead) != null && item1.GetValue(lead).ToString() == "1" ? true : false, lead != null ? new { disabled = "disabled" } : (object)"")
+                                                @Html.Label("Hủy", new { style = "margin-right:10px" })
+                                            </div>
+                                        </div>
+                                    }
+                                    else if (listdefault.Contains(item1.Name))
+                                    {
+
+
+
+                                        IEnumerable<Erp.Domain.Entities.User>
+                                            users = user.GetAllUsers();
+                                        List<SelectListItem>
+                                            lstcus = new List<SelectListItem>
+                                                ();
+                                        foreach (var item2 in users)
+                                        {
+                                            SelectListItem selectListItem = new SelectListItem() { Text = item2.FullName, Value = item2.Id.ToString() };
+                                            lstcus.Add(selectListItem);
+                                        }
+                                        <br>
+                                        @Html.Label(displayname, new { style = "margin-right:10px" })
+                                        <input name='@item1.Name' hidden value="@(lead != null && item1.GetValue(lead) != null?item1.GetValue(lead).ToString():"")" />
+                                        <select @(lead != null ? "disabled" : "") class="js-example-basic-single" name='@item1.Name'>
+                                            <option @( lead != null && item1.GetValue(lead) != null ? "" : "selected") value=''>---Chọn---</option>
+                                            @foreach (var item2 in lstcus)
+                                            {
+                                                if (lead != null && item1.GetValue(lead) != null && item2.Value == item1.GetValue(lead).ToString())
+                                                {
+                                                    <option selected value="@item2.Value">@item2.Text</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@item2.Value">@item2.Text</option>
+                                                }
+                                            }
+                                        </select>
+                                    }
+                                    else if (item1.PropertyType == typeof(String))
+                                    {
+                                        <br>
+                                        @Html.Label(displayname, new { style = "margin-right:10px" })
+                                        if (required.Contains(item1.Name))
+                                        {<input value='@( lead != null && item1.GetValue(lead) != null ? item1.GetValue(lead).ToString() : "")' name="@item1.Name" required @(lead != null ? "readonly" : "") style="width: 100%; border: 0.5px solid #0000002b; height: 33px;" /> }
+                                        else
+                                        {
+                                            @Html.TextBox(item1.Name, lead != null && item1.GetValue(lead) != null ? item1.GetValue(lead).ToString() : "", lead != null ? new { @readonly = "readonly" } : (object)"");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <br>
+                                        <label style="margin-right:10px">@displayname</label>
+                                        <input type="number" value='@( lead != null && item1.GetValue(lead) != null ? item1.GetValue(lead).ToString() : "")' name="@item1.Name" @(lead != null ? "readonly" : "") style="width:100%;" />
+                                    }
+                                }
+
+                            }
+                            @{ var itemField = tuple.Item2.Where(x => x.LeadSectionId == item.Id);
+                                string inputele = "";
+                            }
+                            @foreach (var item1 in itemField)
+                            {
+                                inputele += "</br><label style='margin-right:10px'>" + item1.NameLabel + "</label>";
+                                switch (item1.TypeField)
+                                {
+                                    case "Number":
+                                        inputele += Html.Raw("<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' maxlength='12' value='" + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") + "' type='number' " + (lead != null ? "readonly" : "") + " name='" + item1.FieldName + "'/>");
+                                        break;
+                                    case "Date":
+                                        inputele += Html.Raw("<input value='" + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") + "' type='date' " + (lead != null ? "readonly" : "") + " name='" + item1.FieldName + "'/>");
+                                        break;
+                                    case "Datetime":
+                                        inputele += Html.Raw("<input value='" + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") + "' type='datetime-local' " + (lead != null ? "readonly" : "") + " name='" + item1.FieldName + "'/>");
+                                        break;
+                                    case "String":
+                                        inputele += Html.Raw("<input value='" + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") + "' type='text' " + (lead != null ? "readonly" : "") + " name='" + item1.FieldName + "'/>");
+                                        break;
+                                    case "Bool":
+                                        inputele += Html.Raw("<input value='" + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") + "' type='hidden' name='" + item1.FieldName + "' value='' /><input type='checkbox' " + (lead != null ? "disabled" : "") + " onclick=\"this.previousSibling.value = this.checked ? '1' : '0';this.checked?SaveLeadLogSMS(this.previousSibling.value,this.previousSibling.getAttribute('name')):''\"/>");
+                                        break;
+
+                                }
+                                if (item1.TypeField == "List")
+                                {
+                                    var itemList = category.GetListCategoryByCode(item1.CodeList);
+                                    string optionele = "";
+                                    string valuee = "";
+                                    foreach (var item2 in itemList)
+                                    {
+                                        if (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null && item2.Value == typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString())
+                                        {
+                                            optionele += "<option selected value='" + item2.Value + "'>" + item2.Name + "</option>";
+                                            valuee = item2.Value;
+                                        }
+                                        else
+                                        {
+                                            optionele += "<option value='" + item2.Value + "'>" + item2.Name + "</option>";
+
+                                        }
+                                    }
+                                    inputele += "<input value='" + valuee + "' hidden name='" + item1.FieldName + "'/><select class='js-example-basic-single' " + (lead != null ? "disabled" : "") + " name='" + item1.FieldName + "'> <option " + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? "" : "selected") + " value =''>---Chọn---</option>" + optionele + "</select>";
+                                }
+                            }
+                            @Html.Raw(inputele)
+                        </section>
+                    }
+                    <!-- Your content goes here -->
+                </div>
+                <!-- Modal footer -->
+                <div id="btnAdd-QuickSearch" class="modal-footer" style="position:sticky;bottom:0%;width:100%">
+                    <button type="button" id="btnCloseAdd-QuickSearch" class="btn btn-default2" data-dismiss="modal">Đóng</button>
+                    <button type="button" id="saveLeadModal-QuickSearch" class="btn btn-primary2">Lưu</button>
+                </div>
+            </form>
+            @if (lead != null)
+            {
+                <div style="@(isPartial==1?"width:100%;":"width: 65%;")padding-top: 14px;">
+                    <div id="myDiv-QuickSearch" style="margin: 5px; width: 100%; margin-left: 10px;">
+                        <button type="button" class="btn btn-header-cmt active">Comment</button>
+                        <button type="button" class="btn btn-header-cmt" id="btnShowPhoneCallModal-QuickSearch">Call</button>
+                        <button type="button" class="btn btn-header-cmt" id="btnShowEmailModal-QuickSearch">E-mail</button>
+                        <button type="button" class="btn btn-header-cmt" onclick="openModalSendSMSQuickSearch()">SMS</button>
+                        <button type="button" class="btn btn-header-cmt" id="createMeetingButton-QuickSearch">Meeting</button>
+                        <button type="button" class="btn btn-header-cmt" id="createTaskButton-QuickSearch">Task</button>
+                        <button type="button" class="btn btn-header-cmt" id="createCallToButton-QuickSearch">Gọi đi</button>
+                        <button type="button" class="btn btn-header-cmt" id="createHistoryCallToButton-QuickSearch">Call logs</button>
+                        <button type="button" id="btnShowZNSModal-QuickSearch" class="btn btn-header-cmt">Zalo ZNS</button>
+                    </div>
+                    <div id="submyDiv-QuickSearch" style="width:100%;"></div>
+                    <div style=" display: inline-block; margin: 5px; width: 100%; margin-top: -11px;">
+                        <textarea style="display: block; width: 100%; margin: 5px;height: 40px;padding-top: 10px;" id="LeadCmt-QuickSearch" placeholder="Leave a comment" onkeypress="handleKeyPressQuickSearch(event)"></textarea>
+                        <button id="btnSendCmt-QuickSearch" onclick="SendCmtQuickSearch()" type="button" title="Gửi" style=" width: 70px; height: 30px; float: right;  border: #03a9f4a3; border-radius: 3px; position: absolute; right: 15px; @(isPartial==1?"top: 65px;":isPartial==2?"top: 145px;":"top: 167px;")"><i class="fa fa-send-o" style=" color: blue;"></i></button>
+
+                    </div>
+                    <div id="LeadLogsMeetingShow-QuickSearch" style="overflow-y: scroll; height: auto; overflow-x: hidden; ">
+                        <div id="SubLeadLogsShow-QuickSearch" style="margin-top:10px !important">
+
+
+                        </div>
+
+                    </div>
+                    <div id="LeadLogsShow-QuickSearch" style="overflow-y:scroll;height:423px;overflow-x:hidden; padding-top: 7px;font-size:13px;line-height:1.5;">
+                        <div style="margin: 0 0 6rem 0">
+
+                            @*@Html.Action("LeadLogsView", new { Id = lead.Id, isPartial=isPartial })*@
+                        </div>
+
+                    </div>
+                </div>
+
+            }
+        </div>
+
+    </div>
+</div>
+
+
+@*tạo lịch họp*@
+<div id="meetingModal-QuickSearch" class="modal fade" role="dialog">
+    <div style="box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);" class="modal-dialog modal-lg">
+        @*Modal content*@
+        <div class="modal-content">
+            <div class="modal-header modal-meeting" style="float:right">
+
+                <button type="button" class="close close-meetingModal-QuickSearch">&times;</button>
+            </div>
+            <div class="modal-body">
+                @*Div to hold meeting content loaded via AJAX*@
+                <div id="meetingContent-QuickSearch">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    debugger
+    // Lấy tất cả các nút trong phần tử có id "myDiv-QuickSearch"
+    var buttons = document.getElementById("myDiv-QuickSearch").getElementsByClassName("btn-header-cmt");
+    // Lặp qua từng nút và thêm sự kiện click
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", function () {
+            // Loại bỏ lớp "active" từ tất cả các nút
+            for (var j = 0; j < buttons.length; j++) {
+                buttons[j].classList.remove("active");
+            }
+            // Thêm lớp "active" cho nút được click
+            this.classList.add("active");
+        });
+    }
+
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<style>
+    #cke_110_contents {
+        height: 238px !important;
+    }
+
+    .modal-body input, .select2-container {
+        margin-bottom: 0px !important;
+    }
+
+    .close {
+        margin-left: auto;
+    }
+
+    /*.select2-dropdown .select2-search {
+
+        }*/
+
+    #body-sms-select-QuickSearch {
+        margin-bottom: 10px;
+    }
+
+        #body-sms-select-QuickSearch label {
+            font-weight: bold;
+        }
+
+        #body-sms-select-QuickSearch select {
+            min-width: 350px;
+            width: 380px;
+            max-width: 500px;
+        }
+
+    .modal-body-sms {
+        padding-bottom: 45px !important;
+        padding: 15px;
+    }
+
+        .modal-body-sms textarea {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            min-height: 160px;
+            height: auto;
+            /*   margin: 5px;*/
+            color: black;
+        }
+    /*
+                .modal-body-sms button {
+                    width: 50px;
+                    height: 30px;
+                    margin: 5px;
+                    float: right;
+                }*/
+
+    #information-send-QuickSearch {
+        align-self: flex-start;
+        font-size: 14px;
+    }
+</style>
+<div class="fade modal" id="modalSendSMS-QuickSearch" tabindex="-1" role="dialog" aria-labelledby="modalConLabel-QuickSearch" aria-hidden="true" style="z-index: 9999">
+    <div style=" box-shadow: 0 883px 0px 1000px rgba(0,0,0,0.5); top: calc(50% - 230px); " class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="modalConLabel-QuickSearch">Gửi SMS</h5>
+                    <button type="button" class="close" onclick="closeModalSendSMSQuickSearch()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div style="margin: 20px 15px 0; ">
+                <span id="information-send-QuickSearch" value-name="@ViewBag.lead.Name" value-phone="@ViewBag.lead.Mobile" value-id="@ViewBag.lead.Id">Tên: @ViewBag.lead.Name <br> Điện thoại: @ViewBag.lead.Mobile</span>
+            </div>
+            <div class="modal-body modal-body-sms">
+                <div id="body-sms-select-QuickSearch">
+                    <label style=" color: #2038bd;">Chọn mẫu SMS :</label>
+                    <select id="listSMS-QuickSearch" name="listSMS-QuickSearch">
+                        <option value="0">All</option>
+                    </select>
+                </div>
+                <textarea id="idContentSMS-QuickSearch"></textarea>
+                <button id="sendSMSButton-QuickSearch" onclick="SendSMSModalQuickSearch()"><i class="fa fa-send-o" id="icon-sendsms"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade EmailModal-QuickSearch" id="EmailModal-QuickSearch" role="dialog">
+    @*<div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseEmailModal"></div>*@
+    <div class="modal-dialog modal-lg" style="box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);">
+        <div class="modal-content">
+            <div style="font-weight: bold; text-align: center;" class="modal-header">
+                <button type="button" class="close btnCloseEmailModal" aria-hidden="true">×</button>
+                <h5 style="font-weight:bold" bold class="modal-title">Soạn Email</h5>
+            </div>
+            <div style="height:510px" class="modal-body">
+                <form style="height:100%">
+                    <div class="container-fluid">
+
+                        <div class="row">
+                            <div class="col-lg-9 ">
+                                <div class="mb-3">
+                                    <label for="emailSender-QuickSearch" class="form-label">Người gửi</label>
+                                    <input type="email" class="form-control" id="emailSender-QuickSearch">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="emailReceiver-QuickSearch" class="form-label">Người nhận</label>
+                                    <input type="email" class="form-control" id="emailReceiver-QuickSearch">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="emailTitle-QuickSearch" class="form-label">Tiêu đề</label>
+                                    <input type="text" class="form-control" id="emailTitle-QuickSearch">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    <label for="emailTemplate-QuickSearch" class="form-label">Chọn Template</label>
+                                    <select class="form-select" id="emailTemplate-QuickSearch" style="height:34px;"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-lg-12">
+                                <textarea id="emailInput-QuickSearch" class="ckeditor"></textarea>
+                            </div>
+                        </div>
+                        <div id="validateDiv-QuickSearch" class="row text-danger" style="display:none;">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer text-center">
+                <button class="btn btn-primary2" style="margin-right:0%;" type="button" id="btnSend-QuickSearch">Gửi</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="fade modal" id="modalPhoneCall-QuickSearch" tabindex="-1" role="dialog" aria-labelledby="modalConLabel-QuickSearch" aria-hidden="true" style="z-index: 1120">
+    <div style="top: calc(50% - 180px);box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);" class="modal-dialog thao-tac" role="document">
+        <div class="modal-content thao-tac-content">
+            <div class="modal-header thao-tac-header">
+                <div>
+                    <h5 class="modal-title" id="modalConLabel-QuickSearch">Gọi điện thoại</h5>
+                    <button type="button" class="close btnHidePhoneCallModal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div style="display:flex">
+                <div style="width: 60%; padding: 20px; border-right: 1px solid; margin: 10px;" class="caller-info">
+                    <div class="caller-info-header">
+                        <div id="information-send-phonecall-QuickSearch" value-name="@ViewBag.lead.Name" value-id="@ViewBag.lead.Id">Tên: @ViewBag.lead.Name</div>
+                        @*                            @if (ViewBag.lead != null)
+                            {
+                                <div>Lead Email: @ViewBag.lead.Email</div>
+                            }*@
+                        <div id="dausocloudfoneValue-QuickSearch" value-DauSoCloudFone="@ViewBag.DauSoCloudFone"> Số nhánh: @(ViewBag.DauSoCloudFone != null ? ViewBag.DauSoCloudFone : "Không có")</div>
+                    </div>
+                    <div class="caller-info-body">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+
+                            <span id="phoneValue-QuickSearch" value-phone="@ViewBag.lead.Mobile">Sđt: @ViewBag.lead.Mobile</span>
+
+                            <button type="button" id="btnPhoneCall-QuickSearch"><i class="fa fa-phone" id="icon-phonecall"></i>Gọi điện</button>
+                        </div>
+                        <input type="hidden" id="txterrorMessageSendSMS-QuickSearch" name="txterrorMessageSendSMS-QuickSearch" value="@errorMessageSendSMS">
+                    </div>
+                </div>
+                <div style="width:40%" class="modal-body">
+                    <div style="text-align: center;margin-bottom:5px;">Quét QR Code để gọi</div>
+                    <div id="qrcode-QuickSearch" style="margin: auto; width: 210px; border: 20px solid #00000024; padding: 20px; border-radius: 5px; "></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade znszaloModal" id="modalSendZNS-QuickSearch" tabindex="-1" role="dialog" aria-labelledby="modalConLabel-QuickSearch" aria-hidden="true" style="z-index: 9999;">
+    <div class="modal-dialog" role="document" style="margin: 15rem auto; box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalConLabel-QuickSearch">Gửi ZNS</h3>
+                <button type="button" class="close closeZNSModal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div style="margin: 20px 15px 0; ">
+                <span id="information-send-zns-QuickSearch" style="color:red;" value-name="@ViewBag.lead.Name" value-phone="@ViewBag.lead.Mobile" value-id="@ViewBag.lead.Id">Tên: @ViewBag.lead.Name <br> Điện thoại: @ViewBag.lead.Mobile</span>
+            </div>
+            <div class="modal-body modal-body-zns">
+                <div id="body-zns-select-QuickSearch">
+                    <label for="listZNSZalo-QuickSearch" style=" color: #2038bd;">Chọn mẫu ZNS :</label>
+                    <select id="listZNSZalo-QuickSearch" name="listZNS" class="form-control">
+                        <option value="0">All</option>
+                        <!-- Populate options dynamically from database or other source -->
+                    </select>
+                </div>
+                <textarea id="idContentZNS-QuickSearch" class="form-control" placeholder="Nội dung ZNS" readonly></textarea>
+                <button type="button" id="sendZNSButton-QuickSearch" class="btn btn-primary mt-3" style=""><i class="fa fa-send-o" id="icon-sendzns-QuickSearch"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="top: 83px; z-index: 9999" class="modal fade bs-determine-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div id="modal-determine-QuickSearch" class="modal-dialog modal-sm" style="left: 50px; right: 0%; position: absolute; width: 50%; top: -31px; " role="document">
+        <div class="modal-content">
+            <!-- Modal header -->
+            <div class="modal-header">
+                <button onclick="closeNewModal('.bs-determine-modal-sm')" type="button" class="close" aria-hidden="true">×</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body" style="display:flex">
+
+                <button class="bg-primary" onclick="KmChangeTo()">Tạo khách hàng</button>
+                <button class="bg-warning" onclick="f5StatusLead(-2)">Chưa mua</button>
+
+            </div>
+            <!-- Modal footer -->
+        </div>
+    </div>
+</div>
+<div style="top: 83px; z-index: 9999" class="modal fade bs-changeto-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div id="modal-changeto-QuickSearch" class="modal-dialog modal-sm" style="left: 50px; right: 0%; position: absolute; top: -31px; " role="document">
+        <div class="modal-content">
+            <!-- Modal header -->
+            <div style="display:none" class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body" style="display:flex; flex-direction:column">
+                <div>
+                    <input type="radio" value="new" class="radio radio-inline" checked name="khoption" /> Khách hàng mới
+                    <input type="radio" value="old" class="radio radio-inline" style="margin:4px 0 0 !important" name="khoption" /> Khách hàng cũ
+                </div>
+                @Html.ModulePopupFor(m => m.CustomerId, "Customer", Model.CustomerName, false, true, addClassForLabelField: "customerid")
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-primary" onclick="redirectCSKH()">Chọn</button>
+                <button type="button" class="btn btn-default" onclick="closeNewModal('.bs-changeto-modal-sm')">Hủy</button>
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<style>
+
+    /* css để đảm bảo các option trong dropdown menu xuống dòng khi cần thiết */
+    #listZNSZalo-QuickSearch option {
+        white-space: normal;
+    }
+
+    /* các style khác bạn đã định nghĩa */
+    #body-zns-select-QuickSearch {
+        margin-bottom: 10px;
+    }
+
+        #body-zns-select-QuickSearch label {
+            font-weight: bold;
+        }
+
+        #body-zns-select-QuickSearch select {
+            min-width: 350px;
+            width: 380px;
+            max-width: 500px;
+        }
+
+    .modal-body-zns {
+        padding-bottom: 45px;
+    }
+
+        .modal-body-zns textarea {
+            display: block;
+            width: 560px;
+            min-height: 160px;
+            height: auto;
+            margin: 5px;
+            color: black;
+        }
+
+        .modal-body-zns button#sendZNSButton-QuickSearch {
+            width: 80px;
+            float: right;
+            line-height: 1;
+            margin-right: 30px;
+        }
+
+    #information-send-QuickSearch {
+        align-self: flex-start;
+        color: red;
+    }
+</style>
+<script>
+    function LoadLeadLogsQuickSearch() {
+        debugger
+        $.ajax({
+            url: '/AdviseCard/LeadLogsView?id=' + ('@isPartial' == 1 ? $('#Id').val() : $('#IdLead-QuickSearch').val()) + '&isPartial=' + '@isPartial',
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                $('#LeadLogsShow-QuickSearch').html(data)
+            }
+        })
+    }
+    function LoadLeadMeetingLogs() {
+        debugger
+        $.ajax({
+            url: '/AdviseCard/LeadLogsMeetingView?LeadId=' + ('@isPartial' == 1 ? $('#Id').val() : $('#IdLead-QuickSearch').val()) + '&isPartial=' + '@isPartial',
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                $('#LeadLogsMeetingShow-QuickSearch').html(data)
+            }
+        })
+    }
+                    function redirectCSKH() {
+                    debugger
+                    let choose = $('input[name=khoption]:checked').val()
+                        let CustomerId = $('input[name=CustomerId]').val()
+                        let e = event.target.parentElement.parentElement.parentElement.parentElement
+                        if (choose == "new") {
+                        window.open("/Customer/CreateNT?LeadId=" + $('#saveLeadForm-QuickSearch input[name=Id]').val(), '_blank');
+
+                    }else{
+                        window.open("/Customer/Detail?Id=" + CustomerId + "&LeadId=" + $('#saveLeadForm-QuickSearch input[name=Id]').val(), '_blank');
+                        }
+                        closeNewModal(e)
+                    }
+
+                    function closeNewModal(a) {
+                    $(a).modal('hide')
+                    }
+                    function KmChangeTo() {
+                    debugger
+                    f5StatusLead(-3)
+                    $('.bs-determine-modal-sm').modal('hide')
+                    $('.bs-changeto-modal-sm').modal()
+                    }
+                    function SaveLeadLogSMS(valuee, name){
+                    $.ajax({
+                    url:'/AdviseCard/SaveLeadLogSMS',
+                    method:"post",
+                    data:{id:'@(lead != null ? lead.Id.ToString() : "")', val:valuee,name:name},
+                    dataType:"json",
+                    success: function(data){
+                    if(data==1){
+                    }else{
+                    toastr.warning('Xảy ra lỗi: '+data)
+                    }
+                    }
+                    })
+                    }
+                    // In your Javascript (external .js resource or <script> tag)
+                    $(document).ready(function () {
+                    debugger
+                        $('.js-example-basic-single').select2({ dropdownParent: $("#select2parent-QuickSearch") });
+                        debugger
+                    @(lead != null ? "f5StatusLead(" + (lead.StatusId.ToString() != "" ? lead.StatusId.ToString() : "-1") + ")" : "")
+                        LoadLeadLogsQuickSearch()
+                        LoadLeadMeetingLogs()
+                        $('input[name=khoption]').change(function () {
+                        debugger
+                            if ($('input[name=khoption]:checked').val() == "old") {
+                            $('.customerid, input[name=CustomerId_DisplayText]').css('display', 'table-cell')
+                        } else {
+                            $('.customerid, input[name=CustomerId_DisplayText]').css('display', 'none')
+                        }
+})
+                    $('#saveLeadModal-QuickSearch').click(function () {
+                    debugger
+                    var formData = new FormData($('#saveLeadForm-QuickSearch')[0]);
+                        ShowLoading();
+
+                        $.ajax({
+                    type: "POST",
+                    url: $('#saveLeadForm-QuickSearch')[0].action,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: "html",
+                    success: function (data, textStatus, jqXHR) {
+                    if(data==0){
+                    toastr.warning('Lưu không thành công! (Đề nghị hủy)')
+                    } else {
+                    toastr.success('Lưu thành công!')
+                        HideLoading();
+                    let cookiepg = getCookieLeadIndex('ListOrKanbanId');
+                    if (cookiepg == 0) {
+                    //$("#btnCloseAdd-QuickSearch").click();
+                    $('#LeadTbl').html(data)
+                    f5StatusLead(-1)
+                    } else {
+                    $("#btnCloseAdd-QuickSearch").click();
+                    callKanban();
+                    }
+                    }
+
+
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                    toastr.warning('Xảy ra lỗi!')
+                            },
+                            complete: function () {
+                                HideLoading();
+                            }
+                    })
+                    })
+                    /*             $('button[name=editsection]').click(function () {
+                    debugger
+                    let ele=  $(this).parent().find('input,select')
+                    $.each(ele,function(idx,item){
+                    $(item).attr('disabled',false)
+                    $(item).attr('readonly',false)
+
+                    })
+                    })*/
+
+
+
+                    $('button[name=editsection]').click(function () {
+                    let ele = $(this).parent().find('input:not([type="hidden"]), select');
+
+                    // Lặp qua từng phần tử và chuyển đổi giữa thuộc tính disabled và readonly
+                    ele.each(function (idx, item) {
+                    if ($(item).is(':disabled') || $(item).is('[readonly]')) {
+                    $(item).removeAttr('disabled');
+                    $(item).removeAttr('readonly');
+                    } else {
+                    $(item).attr('disabled', true);
+                    $(item).attr('readonly', true);
+                    }
+                    });
+                    });
+
+
+
+                    let radisel=$('#saveLeadForm-QuickSearch').find('input[type=radio],select')
+                    $.each(radisel,function(index,item){
+                    $(this).on('change',function(){
+                    $(`input[name=${$(this).attr('name')}][type=text]`).val(`${$(this).val()}`)
+
+                    })
+                    })
+                    })
+                    function f5StatusLead(StatusId){
+                    $.ajax({
+                    type: "POST",
+                    url: "/AdviseCard/UpdateStatusLead?Id=" +  @(lead != null ? lead.Id.ToString() : "") + "&Status=" + StatusId,
+                    dataType: "html",
+                        success: function (data, textStatus, jqXHR) {
+                        debugger
+                    $('#StatusHeader-QuickSearch').html(data)
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                    },
+                    })
+                    }
+                    function SendCmtQuickSearch() {
+                    $.ajax({
+                    url:"/AdviseCard/SendCmtLead",
+                    method:"post",
+                        data: { message: $('#LeadCmt-QuickSearch').val(), id: '@isPartial' == '1' ? $('#Id').val() : $('#IdLead-QuickSearch').val(), isPartial:'@isPartial'},
+                    dataType:"json",
+                    success: function(data){
+                    if(data==1){
+                    //toastr.success('Gửi bình luận thành công!')
+                    // Đặt lại giá trị của input về rỗng
+                    $('#LeadCmt-QuickSearch').val('');
+                    }else{
+                    //toastr.warning('Gửi bình luận thất bại!')
+                    }
+                    }
+                    })
+                    }
+
+    function openModalSendSMSQuickSearch() {
+                        debugger
+                        var showSMSErrorMessage = $('#txterrorMessageSendSMS-QuickSearch').val();
+                        var sendSMSButton = document.getElementById('sendSMSButton-QuickSearch');
+                    if(showSMSErrorMessage != ""){
+                    toastr.warning('Chưa cài đặt thông số gửi tin nhắn, Vui lòng cài đặt!', 'Thông báo');
+                    } else{
+                    $.ajax({
+                        url: "/AdviseCard/GetSMSList?typeLead=true",
+                    type: "GET",
+                    data: { id: '@(lead != null ? lead.Id.ToString() : "")' },
+                    dataType: 'json',
+                    success: function (data) {
+                    if (data != null) {
+                    //show modal
+                       // $('#modalSendSMS-QuickSearch').modal('show');
+                        $('#modalSendSMS-QuickSearch').removeClass("fade");
+                        $('#modalSendSMS-QuickSearch').addClass("show");
+                        $('.modal-dialog').css({
+                            'position': 'static'
+                        });
+                    // Xử lý dữ liệu trả về từ Controller
+                    populateDropdownQuickSearch(data);
+
+                    //check sdt
+                    var spanElement = document.getElementById('information-send-QuickSearch');
+                    var Phone ='@isPartial' == '1' ? $('#tab2 input[name=Phone]').val(): spanElement.getAttribute('value-phone');
+                    if (!isValidPhoneNumberQuickSearch(Phone)) {
+                    document.getElementById('icon-sendsms').style.color = 'black';
+                    sendSMSButton.disabled = true;
+                    toastr.warning('Số điện thoại không hợp lệ! Xin vui lòng thay đổi', 'Thông báo');
+                    } else {
+                    //@*toastr.success('Số điện thoại hợp lệ!');*@
+                    }
+                    // hiển thị nội dung trên textarea
+                    showContentQuickSearch();
+                    } else {
+                    toastr.warning('Chưa cài đặt thông số gửi tin nhắn, Vui lòng cài đặt!', 'Thông báo');
+                    }
+                    },
+                    error: function (xhr, status, error) {
+                    toastr.warning('Mở modal Send SMS thất bại!', 'Thông báo');
+                    @* alert("Lỗi: " + error);*@
+                    }
+                    });
+                    document.getElementById('icon-sendsms').style.color = 'blue';
+                    sendSMSButton.disabled = false;
+                    }
+                    }
+                    //đóng modal
+                    function closeModalSendSMSQuickSearch() {
+                    $('#modalSendSMS-QuickSearch').removeClass('show');
+                    }
+                    function showContentQuickSearch() {
+                    // Lấy nội dung (text) của tùy chọn đầu tiên từ dropdown
+                    var firstOptionText = $('#listSMS-QuickSearch option:first').text();
+                    // Gán nội dung đầu tiên vào textarea
+                    $('#idContentSMS-QuickSearch').val(firstOptionText);
+                    }
+                    function populateDropdownQuickSearch(data) {
+                        var dropdown = $('#listSMS-QuickSearch');
+                        var leadName = $('#saveLeadForm-QuickSearch input[name=LeadName]').val();
+                        var mobile = $('#saveLeadForm-QuickSearch input[name=Mobile]').val();
+                        $('#information-send-QuickSearch').attr('value-name', leadName);
+                        $('#information-send-QuickSearch').attr('value-phone', mobile);
+                        $('#information-send-QuickSearch').text('Tên: ' + leadName + ' Điện thoại: ' + mobile);
+                    dropdown.empty(); // Xóa tất cả các option cũ
+                    // Thêm option mới từ dữ liệu lấy được từ Controller
+                    $.each(data, function (index, item) {
+                    dropdown.append($('<option></option>').val(item.Id).text(item.ContentRule));
+                    });
+                    }
+                    $(document).ready(function () {
+                    // sử dụng select2
+                    $('#listSMS-QuickSearch').select2();
+                    // gán content select vào textarea
+                    $('#listSMS-QuickSearch').on('select2:select', function (e) {
+                    var selectedOption = e.params.data;
+                    var contentSMS = selectedOption.text;
+                    if (contentSMS) {
+                    document.getElementById('idContentSMS-QuickSearch').value = contentSMS;
+                    sendSMSButton.disabled = false;
+                    document.getElementById('icon-sendsms').style.color = 'blue';
+                    }
+                    });
+
+                    var sendSMSButton = document.getElementById('sendSMSButton-QuickSearch');
+                    var idContentSMS = document.getElementById('idContentSMS-QuickSearch');
+
+                    // Lắng nghe sự kiện input trong trường idContentSMS-QuickSearch
+                    idContentSMS.addEventListener('input', function () {
+                    var contenSMS = idContentSMS;
+
+                    // Kiểm tra xem có nội dung hay không
+                    if (contenSMS) {
+                    // Nếu không có nội dung, kích hoạt lại nút và khôi phục màu sắc ban đầu
+                    sendSMSButton.disabled = false;
+                    document.getElementById('icon-sendsms').style.color = 'blue';
+                    } else {
+                    // Nếu có nội dung, vô hiệu hóa nút và thay đổi màu sắc
+                    sendSMSButton.disabled = true;
+                    document.getElementById('icon-sendsms').style.color = 'black';
+                    }
+                    });
+                    });
+                    function SendSMSModalQuickSearch() {
+                    var sendSMSButton = document.getElementById('sendSMSButton-QuickSearch');
+                    var contenSMS = document.getElementById('idContentSMS-QuickSearch').value;
+                    // Kiểm tra xem nút đã được bấm trước đó hay chưa
+                    if (!sendSMSButton.disabled) {
+                    debugger;
+                    // Vô hiệu hóa nút sau khi đã nhấp vào
+                    sendSMSButton.disabled = true;
+                    document.getElementById('icon-sendsms').style.color = 'black';
+                    // Kiểm tra xem có nội dung hay không
+                    if (contenSMS) {
+                    var spanElement = document.getElementById('information-send-QuickSearch');
+                    var Id = spanElement.getAttribute('value-id');
+                    var Name = spanElement.getAttribute('value-name');
+                    var Phone ='@isPartial' == '1' ? $('#tab2 input[name=Phone]').val(): spanElement.getAttribute('value-phone');
+                    //check sdt 0, 84, +84 đều hợp lệ
+                    if (isValidPhoneNumberQuickSearch(Phone)) {
+                    //Gọi Api SendSMS
+                    var Status = 0; // kết quả sendMSM : 1 - thành công , 0 - thất bại
+                    $.ajax({
+                    url: "/AdviseCard/SendApiSMS",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                    contentSMS: contenSMS,
+                    phone: Phone
+                    },
+                    success: function (rs) {
+                    if (rs.Success) {
+                    var codeResult = rs.CodeResult;
+                    if (codeResult === "100") {
+                    // Request thành công
+                    Status = 1;
+                    //Create LeadLogs
+                        CreateLeadLogsQuickSearch(Id, contenSMS, Status, Phone, codeResult);
+                    toastr.success('Gửi SMS thành công!', 'Thông báo');
+                    } else {
+                    // Request thất bại
+                    Status = 0;
+                    //Create LeadLogs
+                        CreateLeadLogsQuickSearch(Id, contenSMS, Status, Phone, codeResult);
+                    if (codeResult === "99") {
+                    // Lỗi không xác định, thử lại sau
+                    toastr.warning('Lỗi không xác định, thử lại sau!', 'Gửi SMS thất bại!');
+                    } else if (codeResult === "101") {
+                    // Đăng nhập thất bại
+                    toastr.warning('Đăng nhập thất bại!', 'Gửi SMS thất bại!');
+                    } else if (codeResult === "102") {
+                    // Tài khoản đã bị khóa
+                    toastr.warning('Tài khoản đã bị khóa!', 'Gửi SMS thất bại!');
+                    } else if (codeResult === "103") {
+                    // Số dư tài khoản không đủ để gửi tin
+                    toastr.warning('Số dư tài khoản không đủ để gửi tin!', 'Gửi SMS thất bại!');
+                    } else if (codeResult === "104") {
+                    // Mã Brandname không đúng
+                    toastr.warning('Mã Brandname không đúng!', 'Gửi SMS thất bại!');
+                    } else if (codeResult === "118") {
+                    // Loại tin nhắn không hợp lệ
+                    toastr.warning('Loại tin nhắn không hợp lệ!', 'Gửi SMS thất bại!');
+                    } else {
+                    // Trường hợp khác
+                    toastr.warning('Gửi SMS thất bại!', 'Thông báo');
+                    }
+                    }
+                    } else {
+                    toastr.warning('Lỗi không xác định, thử lại sau!', 'Gửi SMS thất bại!');
+                    }
+                    },
+                    error: function (xhr, status, error) {
+                    // Xử lý lỗi và hiển thị thông báo lỗi
+                    toastr.warning('Gửi SMS thất bại!', 'Thông báo');
+                    }
+                    });
+
+                    } else {
+                    toastr.warning('Số điện thoại không hợp lệ! Xin vui lòng thay đổi', 'Thông báo');
+                    }
+                    } else {
+                    toastr.warning('Không có nội dung!', 'Thông báo');
+                    }
+                    }
+                    }
+    function CreateLeadLogsQuickSearch(Id, contenSMS, Status, Phone, codeResult){
+                    $.ajax({
+                    url: "/AdviseCard/CreateSMSLeadLogs",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                    Id: '@isPartial' == '1' ? $('#Id').val() : $('#IdLead-QuickSearch').val(), isPartial:'@isPartial',
+                    Content: contenSMS,
+                    Status: Status,
+                        Mobile: Phone,
+                        codeResult: codeResult
+                    },
+                    success: function (rs) {
+                    if(Status == 1){
+                    closeModalSendSMSQuickSearch();
+                    }
+                    },
+                    error: function (xhr, status, error) {
+
+                    }
+                    });
+                    }
+                    function isValidPhoneNumberQuickSearch(phoneNumber) {
+                    const patternVN = /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/;
+                    const pattern = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+                    if (!phoneNumber) {
+                    return false;
+                    } else if (patternVN.test(phoneNumber)) {
+                    return true;
+                    } else if (pattern.test(phoneNumber)) {
+                    return true;
+                    } else {
+                    return false;
+                    }
+                    }
+</script>
+
+<script>
+                    var showEmailErrorMessage = @Html.Raw(Json.Encode(ViewBag.errorMessageEmail)); // Define leadData here
+                    var showPhoneCallErrorMessage = @Html.Raw(Json.Encode(ViewBag.errorMessagePhoneCall));
+                    var lead = @Html.Raw(Json.Encode(ViewBag.lead));
+                    $(document).ready(function () {
+                        debugger
+                        $('#btnShowEmailModal-QuickSearch').click(ShowEmailModalQuickSearch);
+
+                    //
+                    });
+
+                    function ShowEmailModalQuickSearch() {
+                    if (showEmailErrorMessage !== null) {
+                    toastr.warning(showEmailErrorMessage);
+                    }
+
+                    if (showEmailErrorMessage === null) {
+                    $.ajax({
+                        url: "/AdviseCard/ShowEmailModal?typeLead=true",
+                    type: "GET",
+                    data: { id: '@(lead != null ? lead.Id.ToString() : "")' },
+                    dataType: 'json',
+                    success: function (data) {
+                    if (data != null) {
+                    // Xử lý dữ liệu trả về từ Controller
+                    populateDropdownEmailQuickSearch(data);
+                    $('#emailTitle-QuickSearch').val("");
+                    CKEDITOR.instances['emailInput-QuickSearch'].setData("");
+                    $('#emailTemplate-QuickSearch').val(JSON.stringify({ 'TileEmail': '', 'ContentEmail': '' }));
+                       // $("#EmailModal-QuickSearch").addClass("show");
+                        $('#EmailModal-QuickSearch').removeClass("fade");
+                        $('#EmailModal-QuickSearch').addClass("show");
+                        $('.modal-dialog').css({
+                            'position': 'static'
+                        });
+                    }
+                    }
+                    });
+                    }
+                    }
+                    //
+                    function populateDropdownEmailQuickSearch(data) {
+
+                    $('#emailSender-QuickSearch').val(data.EmailSender);
+                        $('#emailReceiver-QuickSearch').val($('#saveLeadForm-QuickSearch input[name=Email]').val());
+                    $('#emailTemplate-QuickSearch').empty();
+                    $('#emailTemplate-QuickSearch').append($('<option>').val(JSON.stringify({ 'TileEmail': '', 'ContentEmail': '' })).text('Chọn tiêu đề')).attr('selected');
+                    data.EmailTemplate.forEach(x => {
+                    $('#emailTemplate-QuickSearch').append($('<option>').val(JSON.stringify(x)).text(x.TileEmail)); // Đổ Email Template Data vào option của select
+                    });
+
+                    }
+                    //
+</script>
+<script src="/Scripts/ckeditor/ckeditor.js"></script>
+<script>
+    $(document).ready(function () {
+        // Configure CKEditor with custom toolbar for email composition
+        var editor = CKEDITOR.instances["emailInput-QuickSearch"];
+        if (editor) {
+            editor.destroy(true);
+        }
+        CKEDITOR.replace('emailInput-QuickSearch', {
+            toolbar: [
+                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                { name: 'styles', items: ['Format', 'FontSize'] },
+                { name: 'colors', items: ['TextColor', 'BGColor'] },
+                { name: 'paragraph', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                { name: 'links', items: ['Link', 'Unlink'] },
+                { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] }
+            ],
+            // Remove unwanted plugins
+            removePlugins: 'elementspath',
+            // Set default CKEditor height
+            height: 300,
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('.btnCloseEmailModal').click(CloseEmailModalQuickSearch);
+
+        $('body').on('hidden.bs.modal', function () {
+            // This function is for handling the problem of disabling the scrolling bar when any modal is closed.
+            // It checks if there is any modal still open, and if so, adds back the 'modal-open' class to the body of the document.
+            if ($('.modal.in').length > 0) {
+                $('body').addClass('modal-open');
+            }
+        });
+
+        $('#emailTemplate-QuickSearch').on('change', function () {
+            var selectedValue = JSON.parse($('#emailTemplate-QuickSearch').val());
+            CKEDITOR.instances['emailInput-QuickSearch'].setData(selectedValue.ContentEmail);
+
+            $('#emailTitle-QuickSearch').val(selectedValue.TileEmail);
+        });
+    });
+
+    function CloseEmailModalQuickSearch() {
+        $("#EmailModal-QuickSearch").removeClass("show");
+    }
+</script>
+<script>
+                    //Handle Sending Email
+                    $(document).ready(function () {
+                    $('#btnSend-QuickSearch').click(() => {
+                    SendEmailRequestQuickSearch();
+                    })
+                    });
+
+                    function SendEmailRequestQuickSearch() { //
+                    var emailFrom = $('#emailSender-QuickSearch').val();
+                    var emailSentTo = $('#emailReceiver-QuickSearch').val();
+                    var subject = $('#emailTitle-QuickSearch').val();
+                    var message = CKEDITOR.instances['emailInput-QuickSearch'].getData();;
+                    $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SendEmail", "AdviseCard")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                    model: {
+                    Sender: emailFrom, // Wrap model values with quotes
+                    Receiver: emailSentTo,
+                    Title: subject,
+                    Body: message,
+                    },
+                        Id: '@isPartial' == '1' ? $('#Id').val() : $('#IdLead-QuickSearch').val(), isPartial:'@isPartial'
+                    }),
+                    dataType: "json",
+                    success: function (response) {
+                    if (response.success) {
+                    $('#validateDiv-QuickSearch').empty();//
+                    $('#validateDiv-QuickSearch').hide();
+                    $("#EmailModal-QuickSearch").removeClass("show");
+                    toastr.success('Gửi Email thành công!');
+                    }
+                    else {
+                    $('#validateDiv-QuickSearch').show();
+                    $('#validateDiv-QuickSearch').empty();
+                    response.errors.forEach(element => {
+                    $('#validateDiv-QuickSearch').append(`<h6>${element}</h6>`);
+                    });
+
+                    }
+                    }
+                    });
+                    }
+</script>
+<script>
+    //
+    //show phone call modal
+    //show modal
+    var $btnShowPhoneCallModal = $('#btnShowPhoneCallModal-QuickSearch');
+    $btnShowPhoneCallModal.click(() => {
+        if (showPhoneCallErrorMessage === null) {
+            openModalPhoneCallQuickSearch();
+        }
+        if (showPhoneCallErrorMessage !== null) {
+            toastr.warning(showPhoneCallErrorMessage);
+        }
+    });
+
+
+
+
+    var $btnHidePhoneCallModal = $('.btnHidePhoneCallModal');
+    $btnHidePhoneCallModal.click(closeModalPhoneCallQuickSearch);
+
+    function openModalPhoneCallQuickSearch() {
+        var Phone = '@isPartial' == '1' ? $('#tab2 input[name=Phone]').val() : $('#saveLeadForm-QuickSearch input[name=Mobile]').val(); // Truy cập giá trị số điện thoại từ phần tử có id là 'phoneValue-QuickSearch'
+var DauSoCloudFone = $('#dausocloudfoneValue-QuickSearch').attr('value-DauSoCloudFone');
+$('#phoneValue-QuickSearch').attr('value-phone', Phone);
+        $('#information-send-phonecall-QuickSearch').attr('value-name', $('#saveLeadForm-QuickSearch input[name=Name]').val());
+        $('#phoneValue-QuickSearch').text(`Sđt: ${Phone}`);
+        $('#information-send-phonecall-QuickSearch').text('Tên: ' + $('#saveLeadForm-QuickSearch input[name=Name]').val());
+        $('#qrcode-QuickSearch').empty();
+        var qrcode = new QRCode(document.getElementById("qrcode-QuickSearch"), { text: '@isPartial' == '1' ? $('#tab2 input[name=Phone]').val() : $('#saveLeadForm-QuickSearch input[name=Mobile]').val(), width: 128, height: 128, });
+        if (!isValidPhoneNumberQuickSearch(Phone)) {
+            $('#icon-phonecall').css('color', 'black');
+            $('#btnPhoneCall-QuickSearch').prop('disabled', true);
+            toastr.warning('Số điện thoại không hợp lệ vui lòng kiểm tra!');
+        } else if (!isValidDauSoCloudFoneQuickSearch(DauSoCloudFone)) {
+            $('#icon-phonecall').css('color', 'black');
+            $('#btnPhoneCall-QuickSearch').prop('disabled', true);
+            toastr.warning('Chưa có số nhánh, vui lòng kiểm tra!');
+        } else {
+            $('#icon-phonecall').css('color', 'blue');
+            $('#btnPhoneCall-QuickSearch').prop('disabled', false);
+            $('#modalPhoneCall-QuickSearch').removeClass('fade');
+            $('#modalPhoneCall-QuickSearch').addClass('show');
+            $('.modal-dialog').css({
+                'position': 'static'
+            });
+
+        }
+    }
+
+    //đóng modal
+    function closeModalPhoneCallQuickSearch() {
+        $('#modalPhoneCall-QuickSearch').removeClass('show');
+    }
+    function isValidDauSoCloudFoneQuickSearch(DauSoCloudFone) {
+        console.log(DauSoCloudFone);
+        if (!DauSoCloudFone) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+</script>
+<script src="~/Scripts/qrcode.min.js"></script>
+<script>
+                    //Phone Call Request
+                    $(document).ready(function () {
+
+                    var $btnPhoneCall = $('#btnPhoneCall-QuickSearch');
+                    $btnPhoneCall.click(PhoneCallRequestQuickSearch);
+                    });
+
+    function PhoneCallRequestQuickSearch() {
+                        debugger
+                        var spanElement = document.getElementById('information-send-phonecall-QuickSearch');
+        var Id = '@isPartial' == '1' ? document.getElementById('Id').value : document.getElementById('IdLead-QuickSearch').value;
+                    var Name = spanElement.getAttribute('value-name');
+                    var Phone = spanElement.getAttribute('value-phone');
+                    var DauSoCloudFone = spanElement.getAttribute('value-DauSoCloudFone');
+                    $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SendApiPhoneCall", "AdviseCard")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                    Ext: DauSoCloudFone,
+                    PhoneName: Name,
+                    PhoneNumber: Phone,
+                        Id: Id,
+                    isPartial:'@isPartial'
+                    }),
+                    dataType: "json",
+                    success: function (response) {
+                    if (response.Success) {
+                    $("#modalPhoneCall-QuickSearch").removeClass("show");
+                    toastr.success('Hệ thống đang tiến hành gọi điện thoại, vui lòng đợi trong giây lát!');
+                    } else {
+                    $("#modalPhoneCall-QuickSearch").removeClass("show");
+                    toastr.warning(response.ErrorMessage);
+                    }
+                    },
+                    });
+                    }
+</script>
+
+@*Của LeadMeeting*@
+<script>
+
+                    $(document).ready(function() {
+                    var timePicker = $("#timePicker");
+
+                    // Kiểm tra nếu giá trị của trường giờ không được thiết lập (null hoặc rỗng)
+                    if (!timePicker.val()) {
+                    // Thiết lập giá trị mặc định là 08:00
+                    timePicker.val("08:00");
+                    }
+
+                    // Thêm sự kiện click cho nút tạo LeadMeeting
+                    $('#createMeetingButton-QuickSearch').click(function() {
+                    // Gửi yêu cầu AJAX để tải view Index từ controller LeadMeeting
+                    var leadId = @(lead != null && lead.Id != null ? lead.Id.ToString() : "null");
+                    $.ajax({
+                    url: '/LeadMeeting/Index',
+                    type: 'GET',
+                    data: {
+                    leadId: leadId,
+                    },
+                    success: function(data) {
+                    // Thay thế nội dung của modal-content bằng nội dung mới
+                    $('#meetingContent-QuickSearch').html(data);
+                    $('#meetingModal-QuickSearch').removeClass("fade");
+                    $('#meetingModal-QuickSearch').addClass("show");
+                    $('.modal-dialog').css({
+                    'position': 'static'
+                    });
+                    },
+                    error: function(error) {
+                    console.log(error);
+                    // Xử lý lỗi nếu có
+                    }
+                    });
+                    });
+
+                    // Thêm sự kiện click cho nút đóng modal
+                    $('.close-meetingModal-QuickSearch').click(function() {
+                    // Ẩn modal
+                    $('#meetingModal-QuickSearch').removeClass("show");
+                    // Đặt lại kiểu dáng của modal-dialog
+                    $('.modal-dialog').css({
+                    'position': 'relative'
+                    });
+                    });
+
+                    $('#meetingModal-QuickSearch').click(function (event) {
+                    if ($(event.target).is('#meetingModal-QuickSearch')) {
+                    // Ẩn modal nếu người dùng nhấp ra bên ngoài nội dung modal
+                    $('#meetingModal-QuickSearch').modal('hide');
+                    }
+                    });
+                    });
+
+
+
+
+                    function handleKeyPressQuickSearch(event) {
+                    if (event.keyCode === 13) {
+                    // Kiểm tra xem phím nhấn là phím Enter (keyCode = 13)
+                    SendCmtQuickSearch(); // Gọi hàm SendCmtQuickSearch() để gửi bình luận
+                    event.preventDefault(); // Ngăn chặn sự kiện mặc định của phím Enter
+                    }
+                    }
+</script>
+@*Của LeadMeetingCall*@
+<script>
+                    $(document).ready(function() {
+                    var timePicker = $("#timePicker");
+
+                    // Kiểm tra nếu giá trị của trường giờ không được thiết lập (null hoặc rỗng)
+                    if (!timePicker.val()) {
+                    // Thiết lập giá trị mặc định là 08:00
+                    timePicker.val("08:00");
+                    }
+
+                    // Thêm sự kiện click cho nút tạo LeadMeeting
+                    $('#createCallToButton-QuickSearch').click(function() {
+                    // Gửi yêu cầu AJAX để tải view Index từ controller LeadMeeting
+                    var leadId = @(lead != null && lead.Id != null ? lead.Id.ToString() : "null");
+                    $.ajax({
+                    url: '/LeadMeeting/CallToView',
+                    type: 'GET',
+                    data: {
+                    leadId: leadId,
+                    },
+                    success: function(data) {
+                    // Thay thế nội dung của modal-content bằng nội dung mới
+                    $('#meetingContent-QuickSearch').html(data);
+                    $('#meetingModal-QuickSearch').removeClass("fade");
+                    $('#meetingModal-QuickSearch').addClass("show");
+                    $('.modal-dialog').css({
+                    'position': 'static'
+                    });
+                    },
+                    error: function(error) {
+                    console.log(error);
+                    // Xử lý lỗi nếu có
+                    }
+                    });
+                    });
+
+                    // Thêm sự kiện click cho nút đóng modal
+                    $('.close-meetingModal-QuickSearch').click(function() {
+                    // Ẩn modal
+                    $('#meetingModal-QuickSearch').removeClass("show");
+                    // Đặt lại kiểu dáng của modal-dialog
+                    $('.modal-dialog').css({
+                    'position': 'relative'
+                    });
+                    });
+
+                    $('#meetingModal-QuickSearch').click(function (event) {
+                    if ($(event.target).is('#meetingModal-QuickSearch')) {
+                    // Ẩn modal nếu người dùng nhấp ra bên ngoài nội dung modal
+                    $('#meetingModal-QuickSearch').modal('hide');
+                    }
+                    });
+                    });
+
+
+</script>
+
+@*Của LeadMeetingTask*@
+<script>
+                    $(document).ready(function() {
+                    var timePicker = $("#timePicker");
+
+                    // Kiểm tra nếu giá trị của trường giờ không được thiết lập (null hoặc rỗng)
+                    if (!timePicker.val()) {
+                    // Thiết lập giá trị mặc định là 08:00
+                    timePicker.val("08:00");
+                    }
+
+                    // Thêm sự kiện click cho nút tạo LeadMeeting
+                    $('#createTaskButton-QuickSearch').click(function() {
+                    // Gửi yêu cầu AJAX để tải view Index từ controller LeadMeeting
+                    var leadId = @(lead != null && lead.Id != null ? lead.Id.ToString() : "null");
+                    $.ajax({
+                    url: '/LeadMeeting/TaskView',
+                    type: 'GET',
+                    data: {
+                    leadId: leadId,
+                    },
+                    success: function(data) {
+                    // Thay thế nội dung của modal-content bằng nội dung mới
+                    $('#meetingContent-QuickSearch').html(data);
+                    $('#meetingModal-QuickSearch').removeClass("fade");
+                    $('#meetingModal-QuickSearch').addClass("show");
+                    $('.modal-dialog').css({
+                    'position': 'static'
+                    });
+                    },
+                    error: function(error) {
+                    console.log(error);
+                    // Xử lý lỗi nếu có
+                    }
+                    });
+                    });
+
+                    // Thêm sự kiện click cho nút đóng modal
+                    $('.close-meetingModal-QuickSearch').click(function() {
+                    // Ẩn modal
+                    $('#meetingModal-QuickSearch').removeClass("show");
+                    // Đặt lại kiểu dáng của modal-dialog
+                    $('.modal-dialog').css({
+                    'position': 'relative'
+                    });
+                    });
+
+                    $('#meetingModal-QuickSearch').click(function (event) {
+                    if ($(event.target).is('#meetingModal-QuickSearch')) {
+                    // Ẩn modal nếu người dùng nhấp ra bên ngoài nội dung modal
+                    $('#meetingModal-QuickSearch').modal('hide');
+                    }
+                    });
+                    });
+
+
+</script>
+
+@*Của HisotyCall*@
+<script>
+                    $('#createHistoryCallToButton-QuickSearch').click(function() {
+                    // Gửi yêu cầu AJAX để tải view Index từ controller LeadMeeting
+                    var leadId = @(lead != null && lead.Id != null ? lead.Id.ToString() : "null");
+                    $.ajax({
+                    url: '/LeadMeeting/HistoryCallView',
+                    type: 'GET',
+                    data: {
+                    leadId: leadId
+                    },
+                    success: function(data) {
+                    // Thay thế nội dung của modal-content bằng nội dung mới
+                    $('#meetingContent-QuickSearch').html(data);
+                    $('#meetingModal-QuickSearch').removeClass("fade");
+                    $('#meetingModal-QuickSearch').addClass("show");
+                    $('.modal-dialog').css({
+                    'position': 'static'
+                    });
+                    },
+                    error: function(error) {
+                    console.log(error);
+                    // Xử lý lỗi nếu có
+                    }
+                    });
+                    });
+
+                    // Thêm sự kiện click cho nút đóng modal
+                    $('.close-meetingModal-QuickSearch').click(function() {
+                    // Ẩn modal
+                    $('#meetingModal-QuickSearch').removeClass("show");
+                    // Đặt lại kiểu dáng của modal-dialog
+                    $('.modal-dialog').css({
+                    'position': 'relative'
+                    });
+                    });
+
+                    $('#meetingModal-QuickSearch').click(function (event) {
+                    if ($(event.target).is('#meetingModal-QuickSearch')) {
+                    // Ẩn modal nếu người dùng nhấp ra bên ngoài nội dung modal
+                    $('#meetingModal-QuickSearch').modal('hide');
+                    }
+                    });
+
+
+</script>
+<script>
+                    var personInCharge = @Html.Raw(Json.Encode(ViewBag.personInCharge));
+                    $(document).ready(function () {
+
+                    $('#personInCharge-QuickSearch').append(formatPersonInChargeQuickSearch(personInCharge));
+                    });
+                    function formatPersonInChargeQuickSearch(user) {
+                    var imageHtml;
+                    var userName;
+                    if (!user) {
+                    imageHtml = '<img src="https://img.icons8.com/bubbles/50/000000/user.png" alt="Default Image" class="round-icon default-icon" style="width: 30px; height: 30px;" />';
+                    userName = '<h5>' + 'admin' + '</h5>';
+                    }
+                    if (user) {
+                    var validprofileImage = user.ProfileImage;
+                    var profileImage = "/Uploads/User/" + user.ProfileImage;
+
+                    imageHtml = (validprofileImage && personInCharge)
+                    ? '<img src="' + profileImage + '" alt="Profile Image" class="round-icon" style="width: 30px; height: 30px; border-radius: 40px;" />'
+                    : '<img src="https://img.icons8.com/bubbles/50/000000/user.png" alt="Default Image" class="round-icon default-icon" style="width: 30px; height: 30px;" />';
+                    userName = '<h5>' + user.UserName + '</h5>';
+
+                    }
+                    return $(`${imageHtml} ${userName}`);
+                    }
+</script>
+<script>
+                    var template_data = {};
+                    var toastrDisplayed = false;
+
+                    $(document).ready(function() {
+                    // Function to open modal
+                    function openModalSendZNSQuickSearch() {
+                    $('#modalSendZNS-QuickSearch').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                    });
+                        // Hiển thị modal
+                        $('#modalSendZNS-QuickSearch').removeClass('fade');
+                        $('#modalSendZNS-QuickSearch').addClass('show');
+                        $('.modal-dialog').css({
+                            'position': 'static'
+                        });
+
+                    resetErrorDisplayQuickSearch();
+
+
+                    // Gọi AJAX để lấy danh sách ZNS từ controller
+                    $.ajax({
+                    url: '/AdviseCard/GetZNSList?typeLead=true+',
+                    type: 'GET',
+                    data: {
+                    id: '@(lead != null ? lead.Id.ToString() : "")'
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+
+                    // Hiển thị dropdown dù có lỗi
+                    populateDropdownQuickSearch(response.data);
+                    // Sử dụng Select2 cho dropdown
+                        $('#listZNSZalo-QuickSearch').val($('#listZNSZalo-QuickSearch option:first').val()).trigger('change');
+
+                        $('#listZNSZalo-QuickSearch').select2();
+                    //$('#listZNSZalo-QuickSearch').on('change', function() {
+                    showContentQuickSearch();
+                    },
+
+                    error: function(xhr, status, error) {
+                    console.error('Error fetching ZNS list:', error);
+                    }
+                    });
+                    }
+
+                    // Function to close modal
+                    function closeModalSendZNSQuickSearch() {
+                    // Ẩn modal
+                    $('#modalSendZNS-QuickSearch').removeClass('show');
+                    clearToastr();
+
+                    }
+                    function clearToastr() {
+                    toastr.clear();
+                    }
+                    function showContentQuickSearch() {
+                    // Lấy nội dung (text) của tùy chọn đầu tiên từ dropdown
+                    var selectedOption = $('#listZNSZalo-QuickSearch option:selected').text();
+
+                    // Gán nội dung đầu tiên vào textarea
+                    $('#idContentZNS-QuickSearch').val(selectedOption);
+                    }
+                    function populateDropdownQuickSearch(data) {
+                        var dropdown = $('#listZNSZalo-QuickSearch');
+                        var Name = $('#saveLeadForm-QuickSearch input[name=Name]').val();
+                        var mobile = $('#saveLeadForm-QuickSearch input[name=Mobile]').val();
+                        $('#information-send-zns-QuickSearch').attr('value-name', Name);
+                        $('#information-send-zns-QuickSearch').attr('value-phone', mobile);
+                        $('#information-send-zns-QuickSearch').text('Tên: ' + Name + ' Điện thoại: ' + mobile);
+                    dropdown.empty();
+
+                    // Thêm option mới từ dữ liệu lấy được từ Controller
+                    $.each(data, function(index, item) {
+                    var option = $('<option></option>').val(item.ZNSId).text(item.ContentRule).attr('data-znsid', item.ZNSId).attr('data-id', item.Id);
+
+                    // Kiểm tra nếu có lỗi với option hiện tại thì hiển thị tooltip
+                    if (item.error) {
+                    option.prop('title', item.error);
+                    option.addClass('error-option');
+                    }
+                    option.data('realvalues', item.realValue);
+
+
+                    dropdown.append(option);
+                    });
+
+
+                    $('#listZNSZalo-QuickSearch').off('change').on('change', function () {
+                    var selectedOption = $('#listZNSZalo-QuickSearch option:selected');
+                    var contentRule = selectedOption.text();
+                    var znsId = selectedOption.data('znsid');
+                    var Id = selectedOption.data('id');
+                    var realValue = selectedOption.data('realvalue');
+                    console.log('Real Value:', realValue);
+
+                    updateZNSTemplateQuickSearch(Id);
+                    console.log(Id);
+
+                    // Xóa điều kiện hiển thị thông báo trước đó
+                    resetErrorDisplayQuickSearch();
+
+                    // Kiểm tra xem option có lỗi không
+                    if (selectedOption.hasClass('error-option')) {
+                    if (!toastrDisplayed) {
+                    toastrDisplayed = true;
+                    toastr.warning(selectedOption.prop('title'));
+                    }
+                    $('#idContentZNS-QuickSearch').val(contentRule);
+                    } else {
+                    $('#idContentZNS-QuickSearch').val(contentRule);
+                    }
+                    console.log(znsId);
+                    });
+                    }
+
+                    function resetErrorDisplayQuickSearch() {
+                    // Xóa điều kiện hiển thị thông báo trước đó
+                    $('#listZNSZalo-QuickSearch option').each(function () {
+                    $(this).removeData('error-displayed');
+                    });
+                    toastrDisplayed = false;
+                    }
+                    function updateZNSTemplateQuickSearch(id) {
+                    $.ajax({
+                    url: '/AdviseCard/GetZNSTemplate',
+                    type: 'GET',
+                    data: {
+                    id: id
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                    var fieldZnsList = response.fieldZnsList;
+
+                    // Hiển thị danh sách trường fieldZns
+                    console.log('FieldZns List:', fieldZnsList);
+
+                    // Lấy realValues từ option đầu tiên được chọn
+                    var selectedOption = $('#listZNSZalo-QuickSearch option:selected');
+                    var realValues = selectedOption.data('realvalues');
+
+                    // Extract data and format time
+                    extractDataAndFormatTimeQuickSearch(fieldZnsList, realValues);
+                    },
+                    error: function(xhr, status, error) {
+                    console.error('Error fetching ZNS template:', error);
+                    }
+                    });
+                    }
+                    $('#sendZNSButton-QuickSearch').click(function() {
+                    // Kiểm tra nội dung trong text area
+                    var contentZNS = $('#idContentZNS-QuickSearch').val();
+                    if (contentZNS.trim() === '') {
+                    // Nếu không có thông tin nào trong text area
+                    toastr.error('Vui lòng chọn mẫu ZNS');
+                    } else if (isPlaceholderEmptyQuickSearch(contentZNS)) {
+                    // Nếu có {} trống thì hiển thị thông báo lỗi
+                    toastr.warning('Vui lòng nhập đầy đủ thông tin');
+                    } else {
+                    // Lấy giá trị ZNSZalo của option được chọn trong dropdown
+                    var selectedZNSId = $('#listZNSZalo-QuickSearch option:selected').data('znsid');
+
+
+                    console.log(selectedZNSId);
+                        var IdLead = $('#information-send-zns-QuickSearch').attr('value-id');
+
+                    // Lấy số điện thoại từ span
+                        var Phone = '@isPartial' == '1' ? $('#tab2 input[name=Phone]').val(): $('#information-send-zns-QuickSearch').attr('value-phone');
+                    var convertedPhone = convertPhoneNumberQuickSearch(Phone);
+                        var contentZNS = $('#idContentZNS-QuickSearch').val();
+
+                    console.log(convertedPhone);
+                    console.log(template_data);
+
+                    $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("SendZNS", "AdviseCard")',
+                    data: JSON.stringify({
+                    phoneNumber: convertedPhone,
+                    templateId: selectedZNSId,
+                    templateData: template_data
+                    }),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                        success: function (response) {
+                                debugger
+                            if (response.error === 0) {
+                                toastr.success("Gửi thành công");
+                                createZNSLeadLogs(IdLead, contentZNS, 1, Phone,'');
+
+                                closeModalSendZNSQuickSearch();
+                            } else {
+                                console.log(response.error)
+                                if (response.error === 1) {
+                                    toastr.error(response.message);
+                                }
+                                else {
+                                    handleErrorResponseQuickSearch(response.error);
+                                }
+                            }
+
+                    },
+                    error: function(xhr, status, error) {
+                    // Xử lý lỗi khi gửi request
+                    toastr.error("Mẫu ZNS không hợp lệ");
+                    }
+                    });
+                        }
+                    });
+                        function createZNSLeadLogs(Id, Content, Status, Mobile, errorCode) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/AdviseCard/CreateZNSLeadLogs',
+                                data: JSON.stringify({
+                                    Id: '@isPartial'=='1'?$('#Id').val():Id,
+                                    Content: Content,
+                                    Status: Status,
+                                    Mobile: Mobile,
+                                    isPartial: '@isPartial',
+                                    CampaignId: 0,
+                                    ErrorCode: errorCode
+                                }),
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                success: function (response) {
+                                    if (response.success) {
+                                        // Xử lý thành công (nếu cần)
+                                        console.log('CreateZNSLeadLogs success');
+                                    } else {
+                                        // Xử lý khi có lỗi (nếu cần)
+                                        console.error('CreateZNSLeadLogs error');
+                                    }
+                                },
+                                error: function (xhr, status, error) {
+                                    // Xử lý khi gặp lỗi request
+                                    console.error('Error sending CreateZNSLeadLogs request:', error);
+
+                                }
+                            });
+                        }
+                        function handleErrorResponseQuickSearch(errorCode) {
+                            var IdLead = $('#information-send-zns-QuickSearch').attr('value-id');
+                            var Phone = $('#information-send-zns-QuickSearch').attr('value-phone');
+                            var contentZNS = $('#idContentZNS-QuickSearch').val();
+
+                            var errorMessage = '';
+                            var status = 0;
+
+                            switch (errorCode) {
+                                case -147:
+                                    errorMessage = 'Mẫu ZNS đã vượt giới hạn gửi trong ngày';
+                                    break;
+                                case -144:
+                                    errorMessage = 'OA đã vượt giới hạn gửi ZNS trong ngày';
+                                    break;
+                                case -138:
+                                    errorMessage = 'Ứng dụng gửi ZNS chưa có quyền sử dụng tính năng này, vui lòng kết nối để xin cấp quyền';
+                                    break;
+                                case -133:
+                                    errorMessage = 'Mẫu ZNS không thể gửi vào lúc (10PM-6AM)';
+                                    break;
+                                    break;
+                                case -131:
+                                    errorMessage = 'Mẫu ZNS chưa được phê duyệt';
+                                    break;
+                                case -124:
+                                    errorMessage = 'Hết hạn phiên kết nối Zalo OA, vui lòng kết nối lại';
+                                    break;
+                                case -119:
+                                    errorMessage = 'Tài khoản không thể nhận ZNS';
+                                    break;
+                                case -118:
+                                    errorMessage = 'Tài khoản Zalo không tồn tại hoặc đã bị vô hiệu hoá';
+                                    break;
+                                case -117:
+                                    errorMessage = 'ZNS ID không hợp lệ, vui lòng kiểm tra giá trị trong cơ sở dữ liệu';
+                                    break;
+                                case -115:
+                                    errorMessage = 'Tài khoản ZNS Cloud không đủ số dư để gửi mẫu';
+                                    break;
+                                case -114:
+                                    errorMessage = 'Người dùng không nhận được ZNS vì các lý do: Trạng thái tài khoản, Tùy chọn nhận ZNS, Sử dụng Zalo phiên bản cũ, hoặc các lỗi nội bộ khác';
+                                    break;
+                                case -112:
+                                    errorMessage = 'Nội dung mẫu ZNS không hợp lệ, không thể gửi';
+                                    break;
+                                case -110:
+                                    errorMessage = 'Phiên bản Zalo app không được hỗ trợ. Người dùng cần cập nhật phiên bản mới nhất';
+                                    break;
+                                case -108:
+                                    errorMessage = 'Số điện thoại của người dùng không hợp lệ';
+                                    break;
+                                default:
+                                    errorMessage = 'Mẫu ZNS không hợp lệ';
+                                    break;
+                            }
+
+                            toastr.error(errorMessage);
+                            createZNSLeadLogs(IdLead, contentZNS, status, Phone, errorCode);
+                        }
+
+
+                    function extractDataAndFormatTimeQuickSearch(fieldZnsList, dataString) {
+                    // Tạo một mảng từ chuỗi dữ liệu
+                    var dataArray = dataString.split(',');
+
+                    // Tạo một đối tượng JSON trống
+                    var extractedData = {};
+
+                    // Lặp qua từng trường fieldZns và gán giá trị tương ứng từ mảng dữ liệu
+                    var fieldZns = fieldZnsList.split(',');
+                    for (var i = 0; i < fieldZns.length; i++) {
+                    extractedData[fieldZns[i]] = dataArray[i];
+                    }
+
+                    // Tìm trường có giá trị giống định dạng ngày tháng
+                    var timeFieldName = findDateTimeFieldQuickSearch(extractedData);
+
+                    // Chuyển đổi định dạng thời gian nếu trường thời gian được phát hiện
+                    if (timeFieldName) {
+                    var dateTime = extractedData[timeFieldName];
+                    var formattedDateTime = formatDateTimeQuickSearch(dateTime);
+                    extractedData[timeFieldName] = formattedDateTime;
+                    }
+                    template_data = extractedData;
+
+                    // In ra đối tượng JSON đã trích xuất
+                    console.log(extractedData);
+                    }
+
+                    function formatDateTimeQuickSearch(dateTime) {
+                    if (!(dateTime instanceof Date)) {
+                    dateTime = new Date(dateTime);
+                    }
+
+                    if (isNaN(dateTime.getTime())) {
+                    return null; // Trả về null nếu không thể chuyển đổi thành ngày tháng
+                    }
+
+                    var hours = dateTime.getHours();
+                    var minutes = dateTime.getMinutes();
+                    var day = dateTime.getDate();
+                    var month = dateTime.getMonth() + 1;
+                    var year = dateTime.getFullYear();
+
+                    // Chuyển đổi giờ và phút thành chuỗi có dạng hh:mm
+                    var timeString = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+
+                    // Chuyển đổi ngày và tháng thành chuỗi có dạng dd/MM/yyyy
+                    var dateString = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year;
+
+                    // Trả về chuỗi kết quả
+                    return timeString + ' ' + dateString;
+                    }
+
+
+                    // Hàm kiểm tra xem trường nào trong đối tượng chứa giá trị có dạng ngày tháng
+                    function findDateTimeFieldQuickSearch(dataObject) {
+                    for (var key in dataObject) {
+                    if (isDateTimeQuickSearch(dataObject[key])) {
+                    return key;
+                    }
+                    }
+                    return null;
+                    }
+
+                    // Hàm kiểm tra xem một chuỗi có định dạng ngày tháng hợp lệ không
+                    function isDateTimeQuickSearch(value) {
+                    var regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+                    return regex.test(value);
+                    }
+                    function convertPhoneNumberQuickSearch(phone) {
+                    // Kiểm tra xem số điện thoại đã có đầu số 84 (Việt Nam) chưa
+                    if (phone.startsWith("0")) {
+                    // Nếu chưa có, thêm đầu số 84 vào trước số điện thoại
+                    return "84" + phone.slice(1);
+                    } else {
+                    // Nếu đã có đầu số 84, không cần thay đổi
+                    return phone;
+                    }
+                    }
+
+                    // Bind click event to closeZNSModal
+                    $('.closeZNSModal').click(function() {
+                    closeModalSendZNSQuickSearch(); // Gọi hàm đóng modal
+                    });
+
+                    $('#btnShowZNSModal-QuickSearch').click(function () {
+                    var spanElement = document.getElementById('information-send-zns-QuickSearch');
+
+                    var Phone ='@isPartial' == '1' ? $('#tab2 input[name=Phone]').val(): spanElement.getAttribute('value-phone');
+                    if (Phone) {
+                    openModalSendZNSQuickSearch();
+                    } else {
+                    toastr.error('Không có số điện thoại.');
+                    }
+                    });
+
+                    // Function to check if there are any empty placeholders {}
+                    function isPlaceholderEmptyQuickSearch(content) {
+                    var regex = /{[^{}]*}/g;
+                    var placeholders = content.match(regex);
+                    if (placeholders) {
+                    for (var i = 0; i < placeholders.length; i++) {
+                    if (placeholders[i] === '{}') {
+                    return true; // Found an empty placeholder
+                    }
+                    }
+                    }
+                    return false; // No empty placeholders found
+                    }
+                    });
+
+
+</script>
+<script src="~/Scripts/jquery.signalR-2.4.3.min.js" type="text/javascript"></script>
+<script src="~/signalr/hubs"></script>
+<script type="text/javascript">
+    var hub = $.connection.erpHub;
+    hub.client.f5LeadLogs = function (id) {
+        debugger
+        if (id == $('#IdLead-QuickSearch').val()) {
+            $.ajax({
+                url: '/AdviseCard/LeadLogsView?id=' + id,
+                method: "get",
+                dataType: "html",
+                success: function (data) {
+                    $('#LeadLogsShow-QuickSearch').html(data)
+                }
+            })
+
+        }
+    };
+    hub.client.LeadLogsMeeting = function (LeadId) {
+        debugger
+        if (LeadId == $('#IdLead-QuickSearch').val()) {
+            $.ajax({
+                url: '/AdviseCard/LeadLogsMeetingView?LeadId=' + LeadId,
+                method: "get",
+                dataType: "html",
+                success: function (data) {
+                    $('#LeadLogsMeetingShow-QuickSearch').html(data);
+                }
+            })
+
+        }
+    };
+    $.connection.hub.start();
+    $.connection.hub.disconnected(function () {
+        debugger
+        console.log('Connection lost, attempting to reconnect.');
+        setTimeout(function () {
+            debugger
+            $.connection.hub.start();
+        }, 5000); // Retry connection after 5 seconds
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $('#btnCloseAdd-QuickSearch').click(function () {
+            $('#ContentQuickLeadSearch').modal('hide');
+        })
+        $('#btnCloseModal-QuickSearch').click(function () {
+            $('#ContentQuickLeadSearch').modal('hide');
+        })
+        
+    })
+</script>

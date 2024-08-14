@@ -1,0 +1,191 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+
+@{
+
+    ViewBag.Title = "Zalo Official Account";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout _NoSideBar.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Answer",
+        ActionName = "Callback",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+}
+
+<div class="container">
+    <h2>Zalo Official Account</h2>
+
+    <div class="form-container">
+        @if (ViewBag.AccessToken != null)
+        {
+            <div class="avatar-info-container">
+                <div class="avatar-container">
+                    <img class="avatar" src="@ViewBag.OAInfo.Avatar" />
+                </div>
+                <div class="info-container">
+                    <p class="name">@ViewBag.OAInfo.Name</p>
+                    <p class="id">ID: @ViewBag.OAInfo.ZaloOAId</p>
+                </div>
+                <div class="status-container">
+                    <p class="status" style="font-weight:bold">
+                        Đang kết nối<span class="logged-in" style="margin-left:5px; font-size: 15px;">●</span>
+
+                    </p>
+
+                    <form id="disconnectForm" action="/Answer/Disconnect" method="post">
+                        <button type="button" id="disconnectButton" class="disconnect-btn" onclick="disconnectWithZaloOA()">Ngừng kết nối</button>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <script>
+                     // Kiểm tra xem ViewBag.ErrorMessage có giá trị không
+            var errorMessage = 'Zalo OA chưa đăng ký gói dịch vụ OA';
+            if (errorMessage) {
+                // Hiển thị cửa sổ thông báo
+                alert(errorMessage);
+                // Chuyển hướng sau khi người dùng nhấn OK trong thông báo
+                window.location.href = '@Url.Action("IndexZaloOA", "Answer")';
+                }
+
+
+            </script>
+        }
+    </div>
+
+    <div class="home-button">
+        <div class="reply-container">
+            <a href="~/Home/DashboardSale" class="btn btn-primary">Trở về trang chủ</a>
+        </div>
+    </div>
+</div>
+
+<style>
+  
+    h2 {
+        color: darkblue;
+        text-align: center;
+        font-size: 35px;
+        font-weight: bold;
+        margin-bottom: 40px;
+    }
+
+    .container {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 70vh;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        border-radius: 20px; 
+        padding: 20px;
+        background-color: rgba(169, 169, 169, 0.1);
+        width: 50%;
+    }
+
+    .form-container {
+        margin-bottom: 20px;
+    }
+
+    .avatar-info-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-radius: 10px;
+        padding: 20px;
+        width: 500px;
+        height: 150px;
+        background-color: rgba(169, 169, 169, 0.2);
+    }
+
+    .avatar-container {
+        position: relative;
+    }
+
+    .avatar {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        margin-right: 20px;
+    }
+
+    .info-container {
+        flex: 1;
+    }
+
+    .name {
+        margin: 0;
+        font-weight: 600;
+        font-size: 18px;
+    }
+
+    .id {
+        margin: 0;
+        font-size: 16px;
+        color: #666;
+    }
+
+    .status-container {
+        text-align: right;
+    }
+
+    .status {
+        margin: 0;
+        font-size: 16px;
+        color: #00FF00;
+        margin-bottom: 5px;
+    }
+
+    .online-icon {
+        color: #00ff21;
+        margin-left: 5px;
+    }
+
+    .disconnect-btn {
+        background-color: #ff4d4d;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+        .disconnect-btn:hover {
+            background-color: #ff3333;
+        }
+
+    .home-button {
+        margin-top: 20px;
+    }
+
+    .reply-container {
+        padding: 10px;
+    }
+
+</style>
+
+<script>
+
+    function disconnectWithZaloOA() {
+        if (confirm("Bạn có chắc chắn muốn ngừng kết nối không?")) {
+            document.getElementById('disconnectForm').submit();
+        }
+    }
+</script>

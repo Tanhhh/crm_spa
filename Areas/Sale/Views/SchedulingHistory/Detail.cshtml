@@ -1,0 +1,441 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model SchedulingHistoryViewModel
+
+@{
+    ViewBag.Title = Wording.PageDetail_SchedulingHistory;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SchedulingHistory",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+
+}
+<style>
+    .tools {
+        left: auto !important;
+        display: block !important;
+    }
+
+    .itemdiv.dialogdiv > .body > .text {
+        min-height: 40px !important;
+    }
+
+    .itemdiv .tools .btn {
+        border-radius: 0px !important;
+    }
+</style>
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@helper GridColumnStatusName(string status)
+{
+switch (status)
+{
+    case "pending":
+            <span class="label label-info" id="status_room">@Wording.pending</span>
+        break;
+    case "complete":
+            <span class="label-success label" id="status_room">@Wording.Status_Completed</span>
+        break;
+    case "expired":
+            <span class="label-danger label" id="status_room">@Wording.expired</span>
+        break;
+    case "inprogress":
+            <span class="label-warning label" id="status_room">@Wording.inprogresss</span>
+        break;
+}
+}
+@helper GridColumnStatusEquipment(string status)
+{
+switch (status)
+{
+    case "pending":
+            <span class="label label-info label-sm">@Wording.Unconfimred</span>
+        break;
+    case "accept":
+            <span class="label-success label label-sm">@Wording.accept</span>
+        break;
+    case "cancel":
+            <span class="label-default label label-sm">@Wording.Cancel</span>
+        break;
+    case "refure":
+            <span class="label-danger label label-sm">@Wording.StatusSalaryAdvance_Refure</span>
+        break;
+}
+}
+@helper GridColumnStatusUserName(string status)
+{
+switch (status)
+{
+    case "pending":
+            <span class="label label-info label-sm item_status">@Wording.Unconfimred</span>
+        break;
+    case "accept":
+            <span class="label-success label label-sm item_status">@Wording.accept</span>
+        break;
+    case "cancel":
+            <span class="label-default label label-sm item_status">@Wording.Cancel</span>
+        break;
+    case "refure":
+            <span class="label-danger label label-sm item_status">@Wording.StatusSalaryAdvance_Refure</span>
+        break;
+}
+}
+@helper GridColumnCategoryValue(string value, string code)
+{
+var attr = Erp.BackOffice.Helpers.Common.GetCategoryByValueCodeOrId("value", value, code);
+    <span>@(attr != null ? attr.Name : "")</span>
+}
+<div id="SHDetail" class="row">
+    <div class="col-sm-7">
+        <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+            <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                <div class="widget-header widget-header-small">
+                    <div class="widget-toolbar no-border pull-left">
+                        <ul class="nav nav-tabs" id="myTab">
+
+                            <li class="active">
+                                <a data-toggle="tab" href="#discount" aria-expanded="true"><i class="fa fa-users"></i> Danh sách nhân viên thực hiện</a>
+                            </li>
+                            <li class="">
+                                <a data-toggle="tab" href="#donate" aria-expanded="false"><i class="fa fa-cubes"></i> Danh sách thiết bị thực hiện</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main padding-6">
+                        <div class="tab-content">
+                            <div id="discount" class="tab-pane active table-responsive clearfix">
+                                @if (Model.StaffMadeList.Any())
+                                {
+                                    <div class="dialogs ace-scroll">
+                                        @foreach (var item in Model.StaffMadeList)
+                                        {
+                                            <div class="itemdiv staff_made_@(item.Id) dialogdiv">
+                                                <div class="user">
+                                                    <div class="ace-thumbnails">
+                                                        <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(item.ProfileImage, "User", "user"))" title="@item.FullName" data-rel="colorbox" class="cboxElement">
+                                                            <img id="myImg" alt="@item.FullName" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(item.ProfileImage, "User", "user"))">
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="body">
+                                                    <div class="time">
+                                                        <i class="ace-icon fa fa-clock-o"></i>
+                                                        <span class="green">@item.ModifiedDate.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                                    </div>
+
+                                                    <div class="name">
+                                                        <b class="red">@item.UserCode - @item.FullName</b>
+                                                        @GridColumnStatusUserName(item.Status)
+                                                    </div>
+                                                    <div class="text item_note">
+                                                        @item.Note
+                                                    </div>
+
+                                                    <div class="tools">
+                                                        @if (item.Status == "pending")
+                                                        {
+                                                            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Approval", "SchedulingHistory", "Sale"))
+                                                            {
+                                                                <a onclick="IsActive(@item.Id)" class="btn btn-minier btn-success">
+                                                                    <i class="icon-only ace-icon fa fa-check-square-o"></i> Xác nhận
+                                                                </a>
+                                                            }
+                                                            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Cancel", "SchedulingHistory", "Sale"))
+                                                            {
+                                                                <a onclick="OpenPopup('@Url.Action("Cancel", "SchedulingHistory", new { Id = item.Id, IsPopup = true })', '', 400,400)" class="btn btn-minier btn-danger">
+                                                                    <i class="icon-only ace-icon fa fa-remove"></i> Hủy
+                                                                </a>
+                                                            }
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+
+                                    <div class="alert alert-danger">
+                                        <p><i class="ace-icon fa fa-warning red"></i> Hiện tại chưa có nhân viên ở ca hiện tại</p>
+                                    </div>
+
+                                }
+                            </div>
+                            <div id="donate" class="tab-pane">
+                                <table class="table table-bordered table-responsive grid-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="grid-header" style="width:5%">STT</th>
+                                            <th class="grid-header" style="width:100px">Trạng thái</th>
+                                            <th class="grid-header">Mã trang thiết bị</th>
+                                            <th class="grid-header">Tên trang thiết bị</th>
+                                            <th class="grid-header">Nhóm thiết bị</th>
+                                            <th class="grid-header" style="width:100px">Ngày đăng ký</th>
+                                            <th class="grid-header">Ghi chú</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (int i = 0; i < Model.EquipmentList.Count; i++)
+                                        {
+                                            <tr>
+                                                <td>@(i + 1)</td>
+                                                <td>@GridColumnStatusEquipment(Model.EquipmentList[i].Status)</td>
+                                                <td>@Model.EquipmentList[i].StaffEquipmentCode</td>
+                                                <td>@Model.EquipmentList[i].StaffEquipmentName</td>
+                                                <td>@GridColumnCategoryValue(Model.EquipmentList[i].EquimentGroup, "EquimentGroup")</td>
+                                                <td>@(Model.EquipmentList[i].InspectionDate.HasValue ? Model.EquipmentList[i].InspectionDate.Value.ToString("dd/MM/yyyy") : "")</td>
+                                                <td>@Model.EquipmentList[i].Note</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-5">
+        <div class="row" style="text-align:center">
+            <div class="col-xs-12">
+                <div class="widget-box">
+                    <div class="widget-body">
+                        <div class="widget-main" style="background: #f7f7f7;">
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="ace-thumbnails clearfix">
+                                        <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.CustomerImage, "Customer", "user"))" title="@Model.CustomerName" data-rel="colorbox" class="cboxElement">
+                                            <img alt="@Model.CustomerName" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.CustomerImage, "Customer", "user"))" style="width:130px;height:130px;border-radius:100%;border:1px solid #ccc" />
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-sm-7">
+                                    <div style="color:#337ab7;border-bottom:3px solid" class="top-20"><h3><b>@Model.CustomerName</b></h3></div>
+                                    <div style="color:#337ab7">@Model.CustomerCode</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 top-5">
+                <div class="widget-box">
+                    <div class="widget-header">
+                        <h5 class="widget-title bigger lighter">
+                            <i class="ace-icon fa fa-user"></i> Thông tin chi tiết
+                        </h5>
+
+                        <div class="widget-toolbar">
+                            <a href="#" data-action="collapse">
+                                <i class="ace-icon fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main">
+                            <div class="detail-view">
+                                <div class="row control-group">
+                                    @Html.DetailViewItemFor2(model => model.Code, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItem(GridColumnStatusName(Model.Status), "Status", Wording.Status, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemFor2(model => model.InquiryCardCode, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemFor2(model => model.RoomName, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemFor2(model => model.Name_Bed, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemFor2(model => model.ProductCode, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemFor2(model => model.ProductName, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemFor2(model => model.TotalMinute, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemDateTimeFor(model => model.ExpectedWorkDay, true, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemDateTimeFor(model => model.ExpectedEndDate, true, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemDateTimeFor(model => model.WorkDay, true, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemDateTimeFor(model => model.EndDate, true, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                                <div class="row control-group">
+                                    @Html.DetailViewItemFor2(model => model.Note, null, null, "col-xs-4", "col-xs-8")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p></p>
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title"><i class="fa fa-cubes"></i> Nhóm trang thiết bị sử dụng</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main clearfix">
+                    <div class="col-sm-12">
+                        @foreach (var item in Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("EquimentGroup", null, null).Where(x => ("," + Model.EquimentGroup + ",").Contains("," + x.Value + ",") == true).ToList())
+                        {
+                            <a class="label label-info" style="margin-bottom:3px!important;margin-right:0px!important">@item.Text</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Edit", pageSetting.ModuleName, "Sale"))
+    {
+        if (Model.Status != "complete")
+        {
+            <a class="btn btn-mini btn-primary" href="@Url.Action("Edit", pageSetting.ModuleName, new { Id = Model.Id, IsPopup = true })">
+                <i class="ace-icon fa fa-edit"></i>
+                @Wording.Edit
+            </a>
+        }
+    }
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("EditNoti", pageSetting.ModuleName, "Sale"))
+    {
+        <a class="btn btn-sm btn-primary btn-white" onclick="Noti(@Model.Id);">
+            <i class="ace-icon fa fa-send"></i>
+            Gửi thông báo
+        </a>
+    }
+    <a class="btn btn-sm btn-primary btn-white" onclick="loadtrang(@Model.Id);">
+        <i class="ace-icon fa fa-refresh"></i>
+        Refresh
+    </a>
+
+}
+<script>
+    function loadtrang() {
+        location.reload();
+    }
+</script>
+@section Scripts {
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js" type="text/javascript"></script>
+    @*<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>*@
+
+    <script src="~/signalr/hubs"></script>
+    <script type="text/javascript">
+        $(function () {
+            var erpHub = $.connection.erpHub;
+
+            erpHub.client.ChangeStatusStaffMade = function (StaffMadeId, Status, Note) {
+                console.log(StaffMadeId);
+                console.log(Status);
+                console.log(Note);
+                $(".staff_made_" + StaffMadeId).find('.item_note').text(Note);
+                if (Status == "accept") {
+                    $(".staff_made_" + StaffMadeId).find('.item_status').text(Status).removeClass("label-info").addClass("label-success").text("Chấp nhận");
+                }
+                else {
+                    $(".staff_made_" + StaffMadeId).find('.item_status').text(Status).removeClass("label-info").addClass("label-danger").text("Từ chối");
+                }
+                $(".staff_made_" + StaffMadeId).find('.tools').closest('div').remove();
+                alert("success", "Gửi thông báo thành công");
+            };
+
+            //Start the connection.
+            $.connection.hub.start().done(function () {
+            });
+
+
+        });
+    </script>
+
+    <script type="text/javascript">
+        function IsActive(id) {
+
+            ShowLoading();
+
+            $.post("@Url.Action("Approval", "SchedulingHistory", new { area = "Sale" })", { id: id })
+        .done(function (data) {
+            location.reload();
+            HideLoading();
+        });
+        }
+
+        //function IsActive2(id) {
+
+        //    //ShowLoading();
+        //    $.ajax({
+        //        type: "POST",
+        //        url: "/SchedulingHistory/Approval",
+        //        data: { id: id },
+        //        contentType: "application/json; charset=utf-8",
+        //        dataType: "json",
+        //        success: function (response) {
+        //            alert(response);
+        //        },
+        //        failure: function (response) {
+        //            alert(response.responseText);
+        //        },
+        //        error: function (response) {
+        //            alert(response.responseText);
+        //        }
+        //    });
+
+        //location.reload();
+        //HideLoading();
+
+        //}
+
+
+        function Noti(id) {
+            ShowLoading();
+            $.post("@Url.Action("EditNoti", "SchedulingHistory", new { area = "Sale" })", { id: id })
+        .done(function (data) {
+            //debugger
+            if (data == 1) {
+                alert("Gửi thông báo thành công !!!");
+            } else {
+                alert("Gửi thông báo không thành công !");
+            }
+           
+            HideLoading();
+        });
+        }
+    </script>
+}

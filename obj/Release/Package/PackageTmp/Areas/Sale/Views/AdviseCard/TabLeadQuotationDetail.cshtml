@@ -1,0 +1,1234 @@
+﻿@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Filters;
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.Crm.Models;
+@{
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.categoryOr;
+    IEnumerable<CategoryViewModel> statusls = (IEnumerable<CategoryViewModel>)ViewBag.categorySt;
+    var datamodel = ViewBag.DataModel as LeadQuotationPopupEdit;
+    var datasele = ViewBag.DataSel as IEnumerable<CrmTemplateFileViewModel>;
+    var user = ViewBag.user as Erp.Domain.Repositories.UserRepository;
+    IEnumerable<Erp.Domain.Entities.User> users = user.GetAllUsers();
+    List<SelectListItem> lstcus = new List<SelectListItem>();
+    foreach (var item2 in users)
+    {
+        SelectListItem selectListItem = new SelectListItem() { Text = item2.FullName, Value = item2.Id.ToString() };
+        lstcus.Add(selectListItem);
+    }
+    var i = 0;
+    decimal totalt = 0;
+    decimal totalsl = 0;
+    decimal thanh_tien = 0;
+    var isPartial = 0;
+}
+<link href="/assets/css/combojax.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+    .form-group > label {
+        min-width: 170px;
+    }
+
+    .form-group {
+        display: flex;
+        margin-right: 40px;
+    }
+
+        .form-group input {
+            border-radius: 4px !important;
+            padding: 5px 8px 5px 16px !important;
+        }
+
+    .input-group {
+        display: contents;
+    }
+
+        .input-group input {
+            border-bottom-right-radius: 0 !important;
+            border-top-right-radius: 0 !important;
+            padding: 5px 8px 5px 16px !important;
+        }
+
+        .input-group span {
+            border: 1px solid #D5D5D5;
+            padding: 5px 8px 5px;
+            font-size: 14px;
+            font-family: inherit;
+            border-left: 0px;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+    .table > tbody > tr > td, .table > tfoot > tr > td, .table > thead > tr > th {
+        border-right: unset !important;
+        border-left: unset !important;
+        align-content: center;
+    }
+
+    .table > thead > tr > th {
+        border-top: 1px solid #ddd !important;
+    }
+
+    #lqdetailIn,
+    #btnShowEmailModal,
+    #idadditemproductlead {
+        padding: 3px 14px;
+        background: none;
+        border-radius: 4px;
+        margin: 0px 15px;
+    }
+
+        #lqdetailIn:hover,
+        #btnShowEmailModal:hover,
+        #idadditemproductlead:hover {
+            color: #3F51B5;
+            border: 1px solid #3F51B5;
+        }
+
+    .input-group-append .dropdown-menu-right {
+        left: auto;
+        right: 0;
+    }
+
+    .file-item {
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        max-width: 300px;
+        overflow: hidden;
+    }
+
+        .file-item a {
+            text-decoration: none;
+        }
+
+
+        .file-item a {
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #007bff;
+            cursor: pointer;
+        }
+
+        .file-item .file-size {
+            margin-left: 10px;
+            font-size: 12px;
+            color: #000;
+        }
+
+        .file-item button {
+            margin-left: 5px;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+            .file-item button:hover {
+                cursor: pointer;
+            }
+</style>
+<div style="margin: 0px 50px;">
+    <div>
+        <div style="display: flex; align-items: center; justify-content: flex-end;margin-top:8px ">
+            <label style="font-weight:bold">In báo giá</label>
+            <select data-val="true" class="form-control" id="iFileName" name="iFileName" style="margin-left: 20px; height: 30px; width: 180px">
+                @if (datasele != null)
+                {
+                    foreach (var item in datasele)
+                    {
+                        <option value="@item.FileName">@item.FileName</option>
+                    }
+                }
+            </select>
+            <button id="lqdetailIn" style="height: 28px;">
+                IN
+            </button>
+            <button id="btnShowEmailModal" style="height: 28px;">
+                Gửi Email
+            </button>
+        </div>
+        <div>
+            <h4 style="margin-bottom: 30px; font-weight: bold;">Thông tin chi tiết</h4>
+        </div>
+        <div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Số báo giá</label>
+                        <input id="lqtid" type="hidden" value="@datamodel.Id" />
+                        <input id="lqtEmail" type="hidden" value="@datamodel.Email" />
+                        <input class="form-control" id="lqtCode" value="@datamodel.Code" readonly placeholder="Mã tự sinh" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Ngày báo giá</label>
+                        <input class="form-control" id="lqtCreateDate" value="@datamodel.CreatedDate.ToString("yyyy-MM-dd")" placeholder="Ngày báo giá" type="date" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Hiệu lực đến ngày</label>
+                        <input class="form-control" id="lqttUntilDate" value="@datamodel.UntilDateValue.ToString("yyyy-MM-dd")" placeholder="Hiệu lực đến ngày" type="date" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Tình trạng</label>
+                        <div class="input-group">
+                            <select class="form-control" id="lqtStatus">
+                                @if (statusls != null)
+                                {
+                                    foreach (var item in statusls)
+                                    {
+                                        <option value="@item.Name" @(datamodel.Status == @item.Name ? "selected" : "")>@item.Name</option>
+                                    }
+                                }
+                            </select>
+                            <span class="input-group-text"><i class="fa fa-signal"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Khách hàng</label>
+                        <div class="input-group">
+                            <input type="text" id="lqtLeadName" class="form-control" placeholder="Khách hàng" value="@(datamodel.LeadName!=null ? datamodel.LeadName : "")">
+                            <span class="input-group-text"><i class="fa fa-user"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Mã số thuế</label>
+                        <input class="form-control" id="lqtTaxcode" placeholder="Mã số thuế" type="text" value="@(datamodel.TaxCode!=null ? datamodel.TaxCode : "")" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Địa chỉ</label>
+                        <div class="input-group">
+                            <input class="form-control" id="lqtAddress" placeholder="Địa chỉ" type="text" value="@(datamodel.Address!=null ? datamodel.Address : "")" />
+                            <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Liên hệ</label>
+                        <div class="input-group">
+                            <select class="form-control" id="lqtReceptionStaffId">
+                                @foreach (var item2 in lstcus)
+                                {
+                                    <option value="@item2.Value" @(datamodel.ReceptionStaffId == int.Parse(item2.Value) ? "selected" : "")>@item2.Text</option>
+                                }
+                            </select>
+                            <span class="input-group-text"><i class="fa fa-book"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div>
+            <h4 style="margin-bottom: 30px; margin-top:40px; font-weight: bold;">Thông tin hàng hóa</h4>
+        </div>
+        <div>
+            <div id="listOrderDetail" class="table-responsive " style="border-radius: 4px;">
+                <table class="table" id="productleadtable">
+                    <thead>
+                        <tr>
+                            <th class="grid-header" width="4%">STT</th>
+                            <th class="grid-header" width="27%">Tên SP/DV</th>
+                            <th class="grid-header" width="10%">Nhãn hàng</th>
+                            <th class="grid-header" width="9%">SL</th>
+                            <th class="grid-header" width="9%">Đơn giá</th>
+                            <th class="grid-header" width="9%">Thành tiền</th>
+                            <th class="grid-header" width="20%">Ghi chú</th>
+                            <th class="grid-header" width="4%">Tặng</th>
+                            <th class="grid-header" width="6%">Chỉnh sửa</th>
+                            <th class="grid-header" width="2%">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody class="productInvoiceList">
+                        <tr role="0" id="0" hidden>
+                            <td class="text-center pilstt">
+                                1
+                            </td>
+                            <td>
+                                <input class="item_product_id" type="hidden" id="InvoiceList_0__ProductId" name="InvoiceList[0].ProductId" value="0" />
+                                <span class="item_product_name"></span>
+                            </td>
+                            <td>
+                                <span class="item_product_origin"></span>
+                            </td>
+                            <td>
+                                <input type="hidden" name="InvoiceList[0].Unit" id="InvoiceList_0__Unit" value="" class="item_unit" />
+                                <input class="item_quantity numberinput2 text-right" type="text" id="InvoiceList_0__Quantity" name="InvoiceList[0].Quantity" value="0" style="width:100%" />
+                                <span class="txt item_quantity_txt" hidden></span>
+                            </td>
+                            <td>
+                                <span class="item_price numberinput2 text-right" type="text" id="InvoiceList_0__Price" name="InvoiceList[0].Price" style="width:100%"></span>
+                            </td>
+                            <td id="InvoiceList_0__Total"><span class="item_total"></span></td>
+                            <td>
+                                <input class="item_note valid_null" type="text" id="InvoiceList_0__Note" name="InvoiceList[0].Note" value="" style="width: 100%; text-align: end;" />
+                                <span class="txt item_note_txt" hidden></span>
+                            </td>
+                            <td class="text-center" style="align-content: center;">
+                                <div class="clearfix">
+                                    <label style="margin-top:5px">
+
+                                        <input id="InvoiceList_0__is_TANG" name="InvoiceList[0].is_TANG" type="checkbox" class="item_is_TANG" value="1">
+                                        <span class="lbl">
+                                        </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="text-center" style="align-content: center;">
+                                <input type="checkbox" class="checkbox_edit" checked="checked" />
+                            </td>
+                            <td class="text-center" style="align-content: center;">
+                                <a class="btn-delete-item">
+                                    <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                </a>
+                            </td>
+                            <td style="display:none">
+                                <input class="hidden_price numberinput2 text-right" type="text" id="hidden_0__Price" name="hidden[0].Price" value="" style="width:100%" />
+                            </td>
+
+                            <td style="display:none" align="right" id="hidden_0__Total"><span class="hidden_total" align="right"></span></td>
+                        </tr>
+                        @if (datamodel.LeadProductLQ != null)
+                        {
+                            foreach (var leadProduct in datamodel.LeadProductLQ)
+                            {
+                                if (leadProduct.is_TANG == false)
+                                {
+                                    thanh_tien = leadProduct.Price * leadProduct.Quantity;
+                                    totalt = totalt + thanh_tien;
+                                }
+                                totalsl = totalsl + leadProduct.Quantity;
+                                <tr role="0" id="@(i+1)">
+
+                                    <td class="text-center">
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        <input class="item_id" type="hidden" id="InvoiceList_@(i+1)__Id" name="InvoiceList[@(i+1)].Id" value="@leadProduct.Id" />
+                                        <input class="item_product_id" type="hidden" id="InvoiceList_@(i+1)__ProductId" name="InvoiceList[@(i+1)].ProductId" value="@leadProduct.ProductId" />
+                                        <span class="item_product_name">@(leadProduct.Name ?? "")</span>
+                                    </td>
+                                    <td>
+                                        <input class="item_product_origin" type="hidden" id="InvoiceList_@(i+1)__Origin" name="InvoiceList[@(i+1)].Origin" value="@leadProduct.Origin" />
+                                        <span class="item_product_origin">@(leadProduct.Origin ?? "")</span>
+                                    </td>
+                                    <td>
+                                        <input class="item_quantity numberinput2 text-right" type="text" id="InvoiceList_@(i+1)__Quantity" name="InvoiceList[@(i+1)].Quantity" value="@leadProduct.Quantity" style="width: 100%;" hidden />
+                                        <span class="txt item_quantity_txt">@leadProduct.Quantity</span>
+                                    </td>
+                                    <td>
+                                        <span class="item_price numberinput2 text-right" id="InvoiceList_@(i+1)__Price" name="InvoiceList[@(i+1)].Price">@FormatNumber.FormatNumberv(leadProduct.Price)</span>
+                                    </td>
+                                    <td id="InvoiceList_@(i+1)__Total"><span class="item_total" id="item_@(i+1)__Total">@FormatNumber.FormatNumberv(thanh_tien)</span></td>
+                                    <td>
+                                        <input class="item_note" type="text" id="InvoiceList_@(i+1)__Note" name="InvoiceList[@(i+1)].Note" value="@leadProduct.Note" style="width:100%;" hidden />
+                                        <span class="txt item_note_txt">@leadProduct.Note</span>
+                                    </td>
+                                    <td class="text-center" style="align-content: center;">
+                                        @if (leadProduct.is_TANG == true)
+                                        {
+                                            <div class="clearfix">
+                                                <label style="margin-top:5px">
+                                                    <input id="InvoiceList_@(i + 1)__is_TANG" name="InvoiceList[@(i + 1)].is_TANG" type="checkbox" class="item_is_TANG" value="@leadProduct.is_TANG" checked="checked" disabled>
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="clearfix">
+                                                <label style="margin-top:5px">
+                                                    <input id="InvoiceList_@(i + 1)__is_TANG" name="InvoiceList[@(i + 1)].is_TANG" type="checkbox" class="item_is_TANG" value="@leadProduct.is_TANG" disabled>
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="text-center" style="align-content: center;">
+                                        <input type="checkbox" class="checkbox_edit" />
+                                    </td>
+                                    <td class="text-center" style="align-content: center;">
+                                        <a class="btn-delete-item" id="deleteajax">
+                                            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                        </a>
+                                    </td>
+                                    <td style="display:none">
+                                        <input class="hidden_price numberinput2 text-right" type="text" id="hidden_@(i+1)__Price" name="hidden[@(i+1)].Price" value="@leadProduct.Price" style="width:100%" />
+                                    </td>
+                                    <td style="display:none" align="right" id="hidden_@(i+1)__Total"><span class="hidden_total" align="right">@FormatNumber.FormatNumberv(thanh_tien)</span></td>
+                                    <td style="display:none">
+                                        @(i++)
+                                    </td>
+                                </tr>
+                            }
+                        }
+
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="red"><span id="status" style="margin-left: 60px;">Tổng cộng</span></td>
+                            <td class="productInvoiceList_SL" style="font-weight:bold">@totalsl</td>
+                            <td></td>
+                            <td class="productInvoiceList_Amount" style="font-weight:bold">@(FormatNumber.FormatNumberv(totalt != 0 ? totalt : 0))</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div style="padding-top: 20px; width: 100%; padding-bottom: 60px; display: flex; ">
+            <div>
+                <button style="" id="idadditemproductlead">Chọn hàng hóa</button>
+            </div>
+
+            <div style="margin-left: auto;" id="saveLeadQuotationPP">
+                <button type="button" class="btn btn-primary2" style="padding: 2px 25px !important;">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="chooseProductModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:800px">
+            <div class="modal-header modal-meeting" style="padding: 0px 4px !important; display: flex; ">
+                <p style="margin: 0; font-weight: bold; padding: 2px 8px; color: #438EB9 ">Chọn hàng hóa</p>
+                <button type="button" class="close close-chooseProductModal" style="font-size: 24px !important; color: #3F51B5; margin-left: auto; }">&times;</button>
+            </div>
+            <div class="modal-body" style="height: 400px; overflow-y: auto;">
+                <div style="height:60px">
+                    <div class="check">
+                        <label style="font-weight:bold">Nhãn hàng: </label>
+                        <select style=" text-align-last: center; width: 200px; height: 30px;" class="item_origin" id="item_origin">
+                            <option value="">Chọn nhãn hàng </option>
+                            @if (origin != null)
+                            {
+                                foreach (var item in origin)
+                                {
+                                    <option value="@item.Value">@item.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <input type="text" class="test" id="test" hidden />
+                <div id="chooseProduct" style="margin: -1rem 0 0 8rem; ">
+                    <div class="product-search-box clearfix " style="margin-bottom:10px">
+                        <span class="label label-warning" style=" padding: 10px 6px; float: left; height: 34px; margin-left: 0px;">[F4]</span>
+                        <div id="product_search_control">
+                            <span class="ctl">
+                                @Html.TextBox("Product", "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "off", style = "width:600px;", disabled = "true" })
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade emailModal" id="EmailModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 9999;">
+    <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 0; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseEmailModal"></div>
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div style="font-weight: bold; text-align: center;" class="modal-header">
+                <button type="button" class="close btnCloseEmailModal" aria-hidden="true">×</button>
+                <h5 style="font-weight:bold" bold class="modal-title">Soạn Email</h5>
+            </div>
+            <div style="max-height: 800px" class="modal-body">
+                <form style="height:100%">
+                    <div class="container-fluid">
+
+                        <div class="row">
+                            <div class="col-lg-9 ">
+                                <div class="mb-3">
+                                    <label for="emailSender" class="form-label">Người gửi</label>
+                                    <input type="email" class="form-control" id="emailSender">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="emailReceiver" class="form-label">Người nhận <span style="font-size: 12px; color: #3F51B5;"> * Lưu ý: Dùng dấu ; để gửi từ 2 người trở lên (abc@gmail.com; dcf@gmail.com)</span></label>
+                                    <input type="email" class="form-control" id="emailReceiver">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="emailTitle" class="form-label">Tiêu đề</label>
+                                    <input type="text" class="form-control" id="emailTitle">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    <label for="emailTemplate" class="form-label">Chọn Template</label>
+                                    <select class="form-select" id="emailTemplate" style="height:34px;"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-lg-12">
+                                <textarea id="emailInput" class="ckeditor"></textarea>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="mb-file">
+                                <label for="formFileSm" class="form-label" style="font-weight:bold;margin-left:15px">Chọn file</label>
+                                <input class="form-control form-control-sm" id="formFileSm" type="file" style="margin-left:20px;width:50%; height: 34px !important" multiple>
+                            </div>
+                        </div>
+
+                        <div id="fileList" class="row" style="margin-top: 10px; display: none;">
+                            <div class="col-lg-12" style="display: flex; flex-wrap: wrap;" id="fileContainer"></div>
+                        </div>
+
+                        <div id="validateDiv" class="row text-danger" style="display:none;"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer text-center">
+                <button class="btn btn-primary2" style="margin-right:0%;" type="button" id="btnSend">Gửi</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/Scripts/combojax.js?=vs1.01211"></script>
+<script src="~/Scripts/tabLeadProduct.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    var table = document.getElementById("productleadtable");
+
+    // Gắn sự kiện click vào bảng
+    table.addEventListener('click', function (e) {
+        if ($(e.target).is('.checkbox_edit')) {
+            var currentRow = $(e.target).closest('tr');
+            if ($(e.target).prop('checked')) {
+                currentRow.find('.item_quantity').prop('hidden', false);
+                currentRow.find('.item_note').prop('hidden', false);
+                currentRow.find('.item_is_TANG').attr('disabled', false);
+                currentRow.find('.txt').prop('hidden', true);
+            } else {
+                currentRow.find('.item_quantity').prop('hidden', true);
+                currentRow.find('.item_note').prop('hidden', true);
+                currentRow.find('.item_is_TANG').attr('disabled', true);
+                currentRow.find('.txt').prop('hidden', false);
+            }
+        }
+    });
+
+    $('#idadditemproductlead').on('click', function () {
+        $('#chooseProductModal').removeClass("fade");
+        $('#chooseProductModal').addClass("show");
+        $('.modal-dialog').css({
+            'position': 'static'
+        });
+    });
+    $('.close-chooseProductModal').click(function () {
+        $('#chooseProductModal').removeClass("show");
+        $('.modal-dialog').css({
+            'position': 'relative'
+        });
+    });
+    var idLead = @ViewBag.LeadId;
+    var quotationItems = [];
+    var invoiceqtItemsEdit = [];
+    var invoiceqtItemsAdd = [];
+    var quotation = [];
+    $('#saveLeadQuotationPP').click(function () {
+        debugger;
+        var untilDate = $('#lqttUntilDate').val();
+        var createDate = $('#lqtCreateDate').val();
+        if (!untilDate) {
+            toastr.warning('Chưa nhập "Hiệu lực đến ngày" !')
+            return;
+        } else {
+            if (untilDate < createDate) {
+                toastr.warning('"Hiệu lực đến ngày" không được nhỏ hơn "Ngày báo giá" !');
+                $('#lqttUntilDate').val('');
+                return;
+            } else {
+                var id = $('#lqtid').val();
+                var code = $('#lqtCode').val();
+                var createDate = $('#lqtCreateDate').val();
+                var status = $('#lqtStatus').val();
+                var leadName = $('#lqtLeadName').val();
+                var taxCode = $('#lqtTaxcode').val();
+                var address = $('#lqtAddress').val();
+                var receptionStaffId = $('#lqtReceptionStaffId').val();
+                var totalAmount = $('.productInvoiceList_Amount').text();
+                $('.productInvoiceList tr').each(function () {
+                    if ($(this).attr('id') !== '0' && $(this).attr('role') !== '0') {
+                        var item = {
+                            LeadId: idLead,
+                            ProductId: $(this).find('.item_product_id').val(),
+                            Quantity: $(this).find('.item_quantity').val(),
+                            Price: $(this).find('.item_price').text(),
+                            TotalAmount: $(this).find('.item_total').text(),
+                            Note: $(this).find('.item_note').val(),
+                            IsTang: $(this).find('.item_is_TANG').is(':checked'),
+                        };
+                        invoiceqtItemsAdd.push(item);
+                    }
+                    if ($(this).attr('id') !== '0' && $(this).attr('role') == '0') {
+                        var item = {
+                            Id: $(this).find('.item_id').val(),
+                            ProductId: $(this).find('.item_product_id').val(),
+                            Quantity: $(this).find('.item_quantity').val(),
+                            Price: $(this).find('.item_price').text(),
+                            TotalAmount: $(this).find('.item_total').text(),
+                            Note: $(this).find('.item_note').val(),
+                            IsTang: $(this).find('.item_is_TANG').is(':checked'),
+                        };
+                        invoiceqtItemsEdit.push(item);
+                    }
+                });
+                var quotationdetail = {
+                    Id: id,
+                    LeadId: idLead,
+                    Code: code,
+                    CreateDate: createDate,
+                    UntilDateValue: untilDate,
+                    Status: status,
+                    LeadName: leadName,
+                    TaxCode: taxCode,
+                    Address: address,
+                    ReceptionStaffId: receptionStaffId,
+                    TotalAmount: totalAmount,
+                    LeadProductLQ: invoiceqtItemsEdit
+                }
+                var quotationfinal = {
+                    data: quotationdetail,
+                    LeadProductNewLQ: invoiceqtItemsAdd
+                }
+                $.ajax({
+                    url: '/AdviseCard/EditLeadQuotationDetail',
+                    type: 'POST',
+                    data: JSON.stringify(quotationfinal),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result.success) {
+                            window.parent.postMessage('reloadTabLeadQuotation', '*');
+                            window.parent.ClosePopup();
+                            console.log('Thành công');
+                        } else {
+                            console.log('Thất bại');
+                        }
+
+                    },
+                    error: function (xhr, status, error) {
+                        // Xử lý lỗi
+                    }
+                });
+            }
+        }
+    });
+    $('#lqdetailIn').on('click', function () {
+        window.parent.postMessage('showloadding', '*');
+        var codequo = $('#lqtCode').val();
+        var fileName = $('#iFileName').val();
+        checkFileExists(fileName, function (isValid) {
+            if (isValid) {
+                $.ajax({
+                    url: '/CrmTemplateFile/PrintFileInTL',
+                    type: "GET",
+                    data: { fileName: fileName, codeQuo: codequo },
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data != null) {
+                            $.ajax({
+                                url: '/CrmTemplateFile/UpdateLeadLogDownloadFile',
+                                type: "POST",
+                                data: { leadId: idLead },
+                                success: function (rs) { }
+                            });
+                            var url = '/CrmTemplateFile/DownloadFileXLSX?fileNames=' + data.fileName;
+                            window.parent.postMessage({
+                                type: 'downloadFileIn',
+                                data: url,
+                                fileName: data.fileName
+                            }, '*');
+                        }
+                    },
+                    complete: function () {
+                        window.parent.postMessage('hiddenloadding', '*');
+                    }
+                });
+            } else {
+                window.parent.postMessage('hiddenloadding', '*');
+                toastr.warning('File mẫu ' + fileName + 'không tồn tại trong hệ thống!');
+                return;
+            }
+        });
+    });
+    function checkFileExists(fileName, callback) {
+        $.ajax({
+            url: '/CrmTemplateFile/CheckFileExists',
+            type: 'POST',
+            data: { fileName: fileName },
+            success: function (rs) {
+                debugger;
+                callback(rs.Success);
+            }
+        });
+    }
+</script>
+
+<script>
+    var selectedFiles = [];
+    document.getElementById('formFileSm').addEventListener('change', function (event) {
+        var files = event.target.files;
+        var fileContainer = document.getElementById('fileContainer');
+
+        // Bắt đầu tải file đầu tiên
+        uploadFile(0, files, fileContainer);
+    });
+
+    function uploadFile(index, files, fileContainer) {
+        debugger;
+        if (index >= files.length) {
+            // Khi đã tải xong tất cả các file
+            document.getElementById('fileList').style.display = 'block';
+        return;
+        }
+
+        var file = files[index];
+        var fileName = file.name;
+        var fullPath = file.webkitRelativePath || file.name;
+        var fullPath1 = URL.createObjectURL(file);
+        console.log("File path:", fullPath);
+        console.log("File path 1:", fullPath1);
+
+
+        if (!fileName.endsWith('.exe')) {
+            selectedFiles.push(file);
+
+            var fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.style.marginRight = '10px';
+            fileItem.style.marginBottom = '10px';
+            fileItem.style.padding = '5px';
+            fileItem.style.border = '1px solid #ccc';
+            fileItem.style.display = 'flex';
+            fileItem.style.alignItems = 'center';
+
+            var fileNameElement = document.createElement('a');
+            fileNameElement.textContent = shortenFileName(file.name);
+            fileNameElement.href = URL.createObjectURL(file); // Sử dụng URL.createObjectURL để tạo đường dẫn tạm thời cho file
+            fileNameElement.setAttribute('download', file.name); // Thiết lập thuộc tính download để tải file
+            fileNameElement.style.flexGrow = '1';
+            fileNameElement.style.overflow = 'hidden';
+            fileNameElement.style.textOverflow = 'ellipsis';
+            fileNameElement.style.whiteSpace = 'nowrap';
+            fileNameElement.style.color = '#007bff';
+            fileNameElement.title = file.name;
+
+            var fileSizeElement = document.createElement('span');
+            fileSizeElement.textContent = '(' + formatBytes(file.size) + ')';
+            fileSizeElement.className = 'file-size';
+            fileSizeElement.style.marginLeft = '10px';
+            fileSizeElement.style.fontSize = '12px';
+            fileSizeElement.style.color = '#000';
+
+            var progressBar = document.createElement('progress');
+            progressBar.value = 0;
+            progressBar.max = 100;
+            progressBar.style.flexGrow = '1';
+            progressBar.style.marginLeft = '10px';
+            progressBar.style.height = '10px';
+            progressBar.style.display = 'block';
+
+            var removeButton = document.createElement('button');
+            removeButton.textContent = 'X';
+            removeButton.style.marginLeft = '5px';
+            removeButton.addEventListener('click', createRemoveHandler(fileItem, file));
+            removeButton.style.cursor = 'pointer'; // Thay đổi con trỏ chuột khi rê đến nút xóa
+
+            fileItem.appendChild(fileNameElement);
+            fileItem.appendChild(fileSizeElement);
+            fileItem.appendChild(progressBar);
+            fileItem.appendChild(removeButton);
+            fileContainer.appendChild(fileItem);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', URL.createObjectURL(file), true);
+            xhr.responseType = 'blob';
+
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    progressBar.style.display = 'none';
+                    // Sau khi tải xong file hiện tại, tiến hành tải file tiếp theo
+                    uploadFile(index + 1, files, fileContainer);
+                    }
+                };
+
+            xhr.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    var percent = (e.loaded / e.total) * 100;
+                    progressBar.value = percent;
+                    }
+                };
+            xhr.send();
+        } else {
+            toastr.warning('Vui lòng không chọn các file cài đặt (ví dụ: file exe).');
+            // Bỏ qua file này và tiến hành tải file tiếp theo
+            uploadFile(index + 1, files, fileContainer);
+        }
+    }
+
+    function createRemoveHandler(itemToRemove, fileToRemove) {
+        return function () {
+            itemToRemove.remove();
+        var index = selectedFiles.indexOf(fileToRemove);
+        if (index !== -1) {
+            selectedFiles.splice(index, 1);
+            }
+        };
+    }
+
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    function shortenFileName(fileName, maxLength = 25) {
+        if (fileName.length > maxLength) {
+            return fileName.substring(0, maxLength - 3) + '...';
+        }
+        return fileName;
+    }
+        // Hàm để xóa danh sách các tệp đã chọn
+    function resetSelectedFiles() {
+            selectedFiles = [];
+        // Xóa tất cả các phần tử con trong #fileContainer
+        var fileContainer = document.getElementById('fileContainer');
+        while (fileContainer.firstChild) {
+            fileContainer.removeChild(fileContainer.firstChild);
+        }
+    }
+
+
+    var showEmailErrorMessage = @Html.Raw(Json.Encode(ViewBag.errorMessageEmail)); // Define leadData here
+    var showPhoneCallErrorMessage = @Html.Raw(Json.Encode(ViewBag.errorMessagePhoneCall));
+    var lead = @Html.Raw(Json.Encode(ViewBag.lead));
+    $(document).ready(function () {
+        $('#btnShowEmailModal').click(ShowEmailModal);
+    });
+
+    function ShowEmailModal() {
+        if (showEmailErrorMessage !== null) {
+            toastr.warning(showEmailErrorMessage);
+        }
+
+        if (showEmailErrorMessage === null) {
+            window.parent.postMessage('showloadding', '*');
+            var codequo = $('#lqtCode').val();
+            var fileName = $('#iFileName').val();
+            checkFileExists(fileName, function (isValid) {
+                if (isValid) {
+                    $.ajax({
+                        url: "/AdviseCard/ShowEmailModal?typeLead="+'@(isPartial == 1 ? "false" : "true")',
+                        type: "GET",
+                        data: { id: '@(datamodel != null ? datamodel.LeadId.ToString() : "")'},
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data != null) {
+                                populateDropdownEmail(data);
+                                $('#emailTitle').val("");
+                                    CKEDITOR.instances['emailInput'].setData("");
+                                $('#emailTemplate').val(JSON.stringify({ 'TileEmail': '', 'ContentEmail': '' }));
+                                $("#EmailModal").modal("show");
+                            }
+                        }
+                    });
+                    getFileFromController(fileName, codequo);
+                    
+                } else {
+                    window.parent.postMessage('hiddenloadding', '*');
+                    toastr.warning('File mẫu ' + fileName + 'không tồn tại trong hệ thống!');
+                    return;
+                }
+            });
+        }
+    }
+    function getFileFromController(fileName, codequo) {
+        debugger;
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/CrmTemplateFile/ConvertPDF?fileName=' + fileName + '&codequo=' + codequo, true);
+        xhr.responseType = 'json'; // Đặt kiểu dữ liệu trả về là json
+
+        xhr.onload = function () {
+            debugger;
+            if (this.status === 200) {
+                var response = this.response;
+                var fileData = response.FileData;
+                var fileName = response.FileName;
+
+                var fileBlob = new Blob([new Uint8Array(fileData)], { type: 'application/pdf' });
+
+                var fileURL = URL.createObjectURL(fileBlob);
+
+                var file = new File([fileBlob], fileName);
+                var files = [file];
+
+                var fileContainer = document.getElementById('fileContainer');
+                uploadFile(0, files, fileContainer);
+
+                window.parent.postMessage('hiddenloadding', '*');
+            }
+        };
+
+        xhr.send();
+    }
+    function populateDropdownEmail(data) {
+        $('#emailSender').val(data.EmailSender);
+        $('#emailReceiver').val('@(datamodel.Email != null ? datamodel.Email.ToString() : "")');
+        $('#emailTemplate').empty();
+        $('#emailTemplate').append($('<option>').val(JSON.stringify({ 'TileEmail': '', 'ContentEmail': '' })).text('Chọn tiêu đề')).attr('selected');
+        data.EmailTemplate.forEach(x => {
+            $('#emailTemplate').append($('<option>').val(JSON.stringify(x)).text(x.TileEmail)); // Đổ Email Template Data vào option của select
+        });
+    }
+</script>
+<script src="~/Scripts/ckfinder/ckfinder.js"></script>
+<script src="/Scripts/ckeditor/ckeditor.js"></script>
+<script>
+    $(document).ready(function () {
+        // Configure CKEditor with custom toolbar for email composition
+        var editor = CKEDITOR.instances.emailInput;
+        if (editor) {
+            editor.destroy(true);
+        }
+        CKEDITOR.replace('emailInput', {
+            toolbar: [
+                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                { name: 'styles', items: ['Format', 'FontSize'] },
+                { name: 'colors', items: ['TextColor', 'BGColor'] },
+                { name: 'paragraph', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                { name: 'links', items: ['Link', 'Unlink'] },
+                { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] }
+            ],
+            // Remove unwanted plugins
+            removePlugins: 'elementspath',
+            // Set default CKEditor height
+            height: 100,
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+
+        $('.btnCloseEmailModal').click(CloseEmailModal);
+
+        $('body').on('hidden.bs.modal', function () {
+            // This function is for handling the problem of disabling the scrolling bar when any modal is closed.
+            // It checks if there is any modal still open, and if so, adds back the 'modal-open' class to the body of the document.
+            if ($('.modal.in').length > 0) {
+                $('body').addClass('modal-open');
+            }
+        });
+
+        $('#emailTemplate').on('change', function () {
+            var selectedValue = JSON.parse($('#emailTemplate').val());
+            CKEDITOR.instances['emailInput'].setData(selectedValue.ContentEmail);
+            $('#emailTitle').val(selectedValue.TileEmail);
+        });
+    });
+
+    function CloseEmailModal() {
+        $("#EmailModal").modal("hide");
+    }
+</script>
+<script src="~/Scripts/emailValidation.js"></script>
+<script type="text/javascript">
+    //Handle Sending Email
+    $(document).ready(function () {
+        $('#btnSend').click(() => {
+            SendEmailRequest();
+        })
+    });
+
+
+    function SendEmailRequest() {
+    var emailFrom = $('#emailSender').val();
+    var emailSentTo = $('#emailReceiver').val();
+
+    var subject = $('#emailTitle').val();
+    var message = CKEDITOR.instances['emailInput'].getData();
+                       var selectedFileNames = [];
+
+                       for (var i = 0; i < selectedFiles.length; i++) {
+                           selectedFileNames.push(selectedFiles[i].name);
+                       }
+
+                       console.log(selectedFiles);
+                       if (selectedFileNames.length > 0) {
+
+                           sendFilesAndEmailData(emailFrom, emailSentTo, subject, message, selectedFiles);
+
+                       } else {
+
+                           SendEmail(emailFrom, emailSentTo, subject, message);
+
+                       }
+}
+    function validateAndFormatEmails(emails) {
+        var emailArray = emails.split(';');
+        var formattedEmails = [];
+        var uniqueEmails = new Set();
+        var errorMessage = '';
+
+        for (var i = 0; i < emailArray.length; i++) {
+            var email = emailArray[i].trim();
+
+            if (!emailPattern.test(email)) {
+                errorMessage += "Định dạng email không hợp lệ: " + email + "<br>";
+            }
+
+            if (uniqueEmails.has(email)) {
+                errorMessage += "Địa chỉ email trùng lặp: " + email + "<br>";
+            }
+
+            uniqueEmails.add(email);
+            formattedEmails.push(email);
+        }
+
+        if (errorMessage !== '') {
+            return { errorMessage: errorMessage }; // Trả về một đối tượng chứa thông tin lỗi
+        }
+
+        if (formattedEmails.length === 1) {
+            return { formattedEmails: formattedEmails[0] };
+        }
+
+        return { formattedEmails: formattedEmails.join(';') };
+    }
+
+    function SendEmail(emailFrom, emailSentTo, subject, message)
+ {
+    // Kiểm tra và định dạng email trước khi gửi
+    var validationResult = validateAndFormatEmails(emailSentTo);
+
+    // Kiểm tra nếu có thông báo lỗi
+    if (validationResult.errorMessage != null) {
+        toastr.error(validationResult.errorMessage);
+        return;
+    }
+
+    // Kiểm tra xem formattedEmails có tồn tại hay không
+    if (validationResult.formattedEmails) {
+        var emailsArray = validationResult.formattedEmails.split(';');
+        var successCount = 0;
+
+        for (var i = 0; i < emailsArray.length; i++) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SendEmail", "AdviseCard")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    model: {
+                        Sender: emailFrom,
+                        Receiver: emailsArray[i],
+                        Title: subject,
+                        Body: message,
+                    },
+                    Id: '@isPartial' == '1' ? $('#Id').val() : $('#IdLead').val(),
+                    isPartial: '@isPartial'
+                }),
+                dataType: "json",
+                success: function (response) {
+                    handleResponsemuti(response);
+
+                    successCount++; // Tăng biến đếm nếu email được gửi thành công
+                    // Kiểm tra nếu đã gửi thành công tất cả các email
+                    if (successCount === emailsArray.length && emailFrom != '' && subject != '' && message != '') {
+                        toastr.success("Gửi thành công");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                    toastr.error("Error sending email: " + error); // Thay đổi ở đây
+                }
+            });
+        }
+    } else {
+        console.error("Formatted emails not found in validationResult");
+    }
+}
+    async function sendFilesAndEmailData(emailFrom, emailSentTo, subject, message, files) {
+        debugger
+        var formData = new FormData();
+
+        if (!emailFrom || !emailSentTo || !subject || !message) {
+            toastr.warning("Vui lòng điền đầy đủ thông tin");
+            return;
+        }
+
+        formData.append('model.Sender', emailFrom);
+        formData.append('model.Title', subject);
+        var encodedMessage = encodeURIComponent(message);
+        formData.append('model.Body', encodedMessage);
+        formData.append('Id', @(datamodel != null ? datamodel.LeadId.ToString() : ""));
+        formData.append('isPartial', 0);
+
+        var totalFileSizeMB = 0; // Biến để lưu tổng dung lượng các tệp
+
+        // Tính tổng dung lượng của tất cả các tệp
+        for (var i = 0; i < files.length; i++) {
+            totalFileSizeMB += files[i].size / (1024 * 1024); // Chuyển đổi dung lượng sang MB
+        }
+
+        // Kiểm tra xem tổng dung lượng có vượt quá 50MB không
+        if (totalFileSizeMB > 50) {
+            toastr.error("Tổng dung lượng tệp vượt quá dung lượng tối đa cho phép (50MB)");
+            return;
+        }
+
+        // Thêm tất cả các tệp vào FormData
+        for (var i = 0; i < files.length; i++) {
+            formData.append("files" + i, files[i]);
+        }
+
+        var validationResult = validateAndFormatEmails(emailSentTo);
+
+        if (validationResult.errorMessage != null) {
+            toastr.error(validationResult.errorMessage);
+            return;
+        }
+
+        if (validationResult.formattedEmails) {
+            var emailsArray = validationResult.formattedEmails.split(';');
+            var emailCount = emailsArray.length;
+            var successCount = 0;
+
+            // Hiển thị biểu tượng loading trước khi bắt đầu gửi email
+            ShowLoading();
+
+            // Chuyển đổi để sử dụng async/await trong vòng lặp
+            for (var j = 0; j < emailCount; j++) {
+                var formDataClone = new FormData();
+                formDataClone.append('model.Sender', emailFrom);
+                formDataClone.append('model.Title', subject);
+                formDataClone.append('model.Body', encodedMessage);
+                formDataClone.append('Id', @(datamodel != null ? datamodel.LeadId.ToString() : ""));
+                formDataClone.append('isPartial', 0);
+                formDataClone.append('model.Receiver', emailsArray[j]);
+
+                // Thêm tất cả các tệp vào FormData
+                for (var k = 0; k < files.length; k++) {
+                    formDataClone.append("files" + k, files[k]);
+                }
+
+                // Bao bọc xhr gọi trong một Promise để có thể sử dụng await
+                await new Promise((resolve, reject) => {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/AdviseCard/SendEmailWithFiles', true);
+                    xhr.onload = function () {
+                        if (xhr.status === 200) {
+                            console.log('Email and files sent successfully');
+                            successCount++;
+                            if (successCount === emailCount) {
+                                toastr.success("Gửi Email thành công");
+                                $("#EmailModal").modal("hide");
+                            }
+                            resolve();
+                        } else {
+                            console.error('An error occurred:', xhr.responseText);
+                            toastr.error('An error occurred while sending email and files');
+                            reject();
+                        }
+                    };
+                    xhr.onerror = function () {
+                        console.error('Network error');
+                        reject();
+                    };
+                    xhr.send(formDataClone);
+                });
+            }
+
+            // Sau khi gửi email xong, ẩn biểu tượng loading
+            HideLoading();
+        }
+    }
+
+    function ShowLoading() {
+        $('#modalLoadingWait').modal('show');
+    }
+
+    function HideLoading() {
+        $('#modalLoadingWait').modal('hide');
+    }
+
+
+
+
+    function handleResponsemuti(response) {
+        if (response.success) {
+            $('#validateDiv').empty();
+            $('#validateDiv').hide();
+            $("#EmailModal").modal("hide");
+        } else {
+            $('#validateDiv').show();
+            $('#validateDiv').empty();
+            if (response.errors && response.errors.length > 0) {
+                response.errors.forEach(element => {
+                    $('#validateDiv').append(`<h6>${element}</h6>`);
+                });
+            } else {
+                console.error("Errors not found in response");
+            }
+        }
+    }
+    function handleResponse(response) {
+        if (response.success) {
+            $('#validateDiv').empty();
+            $('#validateDiv').hide();
+            $("#EmailModal").modal("hide");
+            toastr.success('Gửi Email thành công!');
+        } else {
+            $('#validateDiv').show();
+            $('#validateDiv').empty();
+            if (response.errors && response.errors.length > 0) {
+                response.errors.forEach(element => {
+                    $('#validateDiv').append(`<h6>${element}</h6>`);
+                });
+            } else {
+                console.error("Errors not found in response");
+            }
+        }
+    }
+</script>

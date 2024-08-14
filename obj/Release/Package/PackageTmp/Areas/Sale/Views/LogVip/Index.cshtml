@@ -1,0 +1,236 @@
+@model IEnumerable<LogVipViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = Wording.PageIndex_LogVip;
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "LogVip",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    string status = Request["status"];
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+@helper GridColumnCommand(int Id)
+{
+if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("ChangeStatus", "LogVip", "Sale"))
+{
+        <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+            <p>
+                @*<button onclick="Status(@id)" data-params="@year" type="submit" class="btn btn-mini btn-primary">
+                        DUYỆT
+                    </button>*@
+                <button name="ChangeStatus" value="ChangeStatus" onclick="location.href='@Url.Action("ChangeStatus", "LogVip",new { id=Id})';return false;" type="submit" class="btn btn-mini btn-primary">
+                    Duyệt
+                </button>
+            </p>
+        </div>
+}
+}
+
+@helper GridColumnTotalAmount(decimal amount)
+{
+    @amount.ToString("#,##0") <sup>vnđ</sup>
+}
+
+@helper GridColumnCustomerName(string customerName, int id)
+{
+    <a href="@Url.Action("Edit", "LogVip", new { Id = id })">@customerName</a>
+}
+@helper GridColumnCustomerId(int? customerId, int id)
+{
+//<a href="@Url.Action("Edit", "LogVip", new { Id = id })">@customerName</a>
+}
+
+
+
+
+@helper GridColumnStatus(string status, int id)
+{
+    <a href="@Url.Action("Edit", "LogVip", new { Id = id })">@status</a>
+}
+
+
+@helper GridColumnCategoryValue(object value)
+{
+var attr = Common.GetCategoryByValueOrId("value", value);
+    <span>@(attr != null ? attr.Name : "")</span>
+}
+
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    @*@Html.TextBox("Code", Request["Code"], new { placeholder = "Mã khách hàng" });*@
+
+    @Html.TextBox("CustomerInfo", Request["CustomerInfo"], new { placeholder = "Mã hoặc Tên khách hàng" });
+    @Html.TextBox("year", Request["year"], new { placeholder = "Năm xếp hạng" });
+    <select style="text-align-last:center;width:125px" class="status" id="status" name="status">
+        <option value="">-Trạng thái-</option>
+        <option @(status == "1" ? "Selected" : "") value="1">Đang sử dụng</option>
+        <option  @(status == "2" ? "Selected" : "") value="2">Đã sử dụng</option>
+    </select>
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+            {
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+            {
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@if (!isPopup)
+            {
+    using (Html.BeginForm("Delete", "LogVip", FormMethod.Post))
+    {
+        @Html.Grid(Model).Columns(columns =>
+       {
+           //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+           columns.Add(u => u.CustomerCode).Titled(Wording.CustomerId).Sortable(true).Sanitized(false).Encoded(false).SetWidth(20);//.RenderValueAs(u => GridColumnCustomerId(u.CustomerId, u.Id));
+
+           columns.Add(u => u.CustomerName).Titled(Wording.CustomerName).Sortable(true).Sanitized(false).Encoded(false).SetWidth(50).RenderValueAs(u => GridColumnCustomerName(u.CustomerName, u.Id));
+           //columns.Add(u => u.CustomerName).Titled(Wording.CustomerName).RenderValueAs(u => u.CustomerName);
+           columns.Add(u => u.Year).Titled("Năm xếp hạng").Sortable(true).Sanitized(false).Encoded(false).SetWidth(10);
+
+           columns.Add(u => u.LoyaltyPointName).Titled(Wording.LoyaltyPointId).Sortable(true).Sanitized(false).Encoded(false).SetWidth(50);
+           columns.Add(u => u.ApprovedUserName).Titled(Wording.ApprovedUserId).Sortable(false).Sanitized(false).Encoded(false).SetWidth(50);
+           columns.Add(u => u.ApprovedDate).Titled(Wording.ApprovedDate).Format("{0:dd/MM/yyyy}").Sortable(false).Sanitized(false).Encoded(false).SetWidth(100);
+           columns.Add(u => u.TotalAmount).Titled(Wording.TotalAmount).RenderValueAs(u => GridColumnTotalAmount(u.TotalAmount.Value)).Sortable(false).Sanitized(false).Encoded(false).SetWidth(100);
+           columns.Add(u => u.Status).Titled(Wording.Status).Sortable(false).Sanitized(false).Encoded(false).SetWidth(100).RenderValueAs(u => GridColumnStatus(u.Status, u.Id));
+           columns.Add(u => u.is_approved).Titled("Trạng thái duyệt").Sanitized(false).Encoded(false).RenderValueAs(n => (n.is_approved ? "<span style=\"color:green\"><b>Đã duyệt</b></span>" : "<span style=\"color:red\"><b>Chưa duyệt</b></span>")).SetWidth(30).Sortable(true);
+       }).WithPaging(10)
+
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            <a class="btn btn-primary btn-mini" href="@Url.Action("Create", pageSetting.ModuleName)">
+                <i class="ace-icon fa fa-plus"></i>
+                @Wording.CreateNew
+            </a>
+            <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint()">
+                <i class="ace-icon fa fa-file-excel-o"></i>
+                Xuất excel
+            </button>
+            <a class="btn btn-primary btn-mini" href="@Url.Action("Search", pageSetting.ModuleName)">
+                <i class="ace-icon fa fa-plus"></i>
+                Tìm kiếm xếp hạng
+            </a>
+
+        }
+    }
+}
+
+
+@section Scripts
+{
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        };
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        });
+
+        @*function Status(id) {
+                    var data = $(this).data('params').split('|');
+                    $.ajax({
+                            url : "@Url.Action("ChangeStatus", "LogVip")",
+                            type : "post",
+                            data : {
+                                id: id,
+                                customerID: data[1],
+                                status: data[2],
+                                year: data[3]
+                            },
+                            success: function () {
+                                location.reload();
+                            }
+                    });
+                };*@
+
+        function GetPrint() {
+            //var Code = $('#Code').val();
+            //var TEN = $('#TEN').val();
+            var CustomerInfo = $('#CustomerInfo').val();
+            var status = $('#status').val();
+           
+            OpenPopup('/Logvip/Export?CustomerInfo=' + CustomerInfo + '&status=' + status + '&IsPopup=true', '', 0, 900);
+
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 200000);
+            HideLoading();
+        };
+    </script>
+}

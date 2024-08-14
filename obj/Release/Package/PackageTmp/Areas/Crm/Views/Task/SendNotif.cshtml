@@ -1,0 +1,77 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Crm.Models
+
+@model TaskViewModel
+
+@{
+    ViewBag.Title = "Gửi thông báo";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+   
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Task",
+        ActionName = "SendNotif",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+   
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+            {
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @Html.Raw(ViewBag.SuccessMessage)
+    </div>
+}
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+            {
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check red"></i>
+        @Html.Raw(ViewBag.FailedMessage)
+    </div>
+}
+
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    <div id="" class="control-group form-group ">
+        <label class="control-label col-lg-5 col-md-4 col-sm-4 control-label-textarea" for="title">Tiêu đề</label>
+        <div class="control-value col-lg-7 col-md-8 col-sm-8" style="width: 277px;">
+            <div class="clearfix">
+                <input type="text" class="col-xs-12" cols="20" id="title" name="title" placeholder="" rows="2" />
+            </div>
+            <div class="clearfix">
+                <span class="field-validation-valid help-inline" data-valmsg-for="title" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+    </div>
+    <div id="" class="control-group form-group ">
+        <label class="control-label col-lg-5 col-md-4 col-sm-4 control-label-textarea" for="body">Nội dung</label>
+        <div class="control-value col-lg-7 col-md-8 col-sm-8" style="width: 277px;">
+            <div class="clearfix">
+                <textarea class="col-xs-12" cols="20" id="body" name="body" placeholder="" rows="2"></textarea>
+            </div>
+            <div class="clearfix">
+                <span class="field-validation-valid help-inline" data-valmsg-for="body" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-sm btn-primary btn-white" type="submit" style="margin-top: 5px;">
+        <i class="ace-icon fa fa-send"></i>
+        Gửi thông báo
+    </button>
+}

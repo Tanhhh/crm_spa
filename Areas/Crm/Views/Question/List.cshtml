@@ -1,0 +1,134 @@
+@model List<Erp.BackOffice.Areas.Cms.Models.CategoryViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = Wording.PageIndex_Question;
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Question",
+        ActionName = "List",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    IEnumerable<QuestionViewModel> list_question = (IEnumerable<QuestionViewModel>)ViewBag.list_question;
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+
+<div id="accordion" class="accordion-style1 panel-group">
+    @foreach (var item in Model.Where(x => x.Level == 0))
+    {
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4 class="panel-title">
+                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse_@item.Id" aria-expanded="false">
+                        <i class="bigger-110 ace-icon fa fa-angle-right" data-icon-hide="ace-icon fa fa-angle-down" data-icon-show="ace-icon fa fa-angle-right"></i>
+                        @item.Name
+                    </a>
+                </h4>
+            </div>
+
+            <div class="panel-collapse collapse" id="collapse_@item.Id" aria-expanded="false" style="height: 0px;">
+                <div class="panel-body">
+                    <div id="accordion" class="accordion-style1 panel-group">
+                        @foreach (var ii in Model.Where(x => x.Level == 1 && x.Code == item.Value))
+                        {
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title">
+                                        <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion1" href="#collapse_@ii.Id" aria-expanded="false">
+                                            <i class="bigger-110 ace-icon fa fa-angle-right" data-icon-hide="ace-icon fa fa-angle-down" data-icon-show="ace-icon fa fa-angle-right"></i>
+                                            @ii.Name
+                                        </a>
+                                    </h4>
+                                </div>
+
+                                <div class="panel-collapse collapse" id="collapse_@ii.Id" aria-expanded="false" style="height: 0px;">
+                                    <div class="panel-body">
+                                        @if (list_question.Any(x => x.Category == ii.Value))
+                                        {
+                                            foreach (var _ques in list_question.Where(x => x.Category == ii.Value).OrderBy(x=>x.OrderNo))
+                                            {
+                                                <p>
+                                                    <a href="@Url.Action("EditQ", pageSetting.ModuleName, new { Id = _ques.Id })">@_ques.Name</a>
+                                                </p>
+                                            }
+                                        }
+                                        @foreach (var i in Model.Where(x => x.Level == 2 && x.Code == ii.Value))
+                                        {
+                                            <p> <label class="control-label bolder blue">@i.Name</label></p>
+                                            if (list_question.Any(x=>x.Category==i.Value))
+                                            {
+                                                foreach (var _ques in list_question.Where(x => x.Category == i.Value).OrderBy(x => x.OrderNo))
+                                                {
+                                                    <p>
+                                                        <a href="@Url.Action("EditQ", pageSetting.ModuleName, new { Id = _ques.Id })">@_ques.Name</a>
+                                                    </p>
+                                                }
+                                            }
+                                            <a class="btn btn-mini btn-primary btn-white" href="@Url.Action("CreateQ", pageSetting.ModuleName, new { category=i.Value})">
+                                                <i class="ace-icon fa fa-plus"></i>
+                                                @Wording.CreateQuestion
+                                            </a>
+                                        }
+                                        <div class="hr hr-18 hr-double dotted"></div>
+                                        <a class="btn btn-mini btn-primary btn-white" href="@Url.Action("CreateQ", pageSetting.ModuleName, new { category = ii.Value })">
+                                            <i class="ace-icon fa fa-plus"></i>
+                                            @Wording.CreateQuestion
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
+</div>

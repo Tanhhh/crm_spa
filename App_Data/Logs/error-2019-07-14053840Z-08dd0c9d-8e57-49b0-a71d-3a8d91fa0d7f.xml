@@ -1,0 +1,176 @@
+﻿<error errorId="08dd0c9d-8e57-49b0-a71d-3a8d91fa0d7f" application="/LM/W3SVC/2/ROOT" host="DESKTOP-H6FQOND" type="System.OutOfMemoryException" message="Exception of type 'System.OutOfMemoryException' was thrown." source="mscorlib" detail="System.OutOfMemoryException: Exception of type 'System.OutOfMemoryException' was thrown.&#xD;&#xA;   at System.Text.StringBuilder.ToString()&#xD;&#xA;   at Microsoft.VisualStudio.Web.PageInspector.Runtime.Tracing.BrowserLinkExecutionListener.StringWriterPositionTracker.get_TrackedContent()&#xD;&#xA;   at Microsoft.VisualStudio.Web.PageInspector.Runtime.Tracing.BrowserLinkExecutionListener.OutputPositionTracker.Microsoft.VisualStudio.Web.PageInspector.Runtime.Tracing.IRenderedOutput.get_RenderedText()&#xD;&#xA;   at Microsoft.VisualStudio.Web.PageInspector.Runtime.MappingData.CombinedRenderedOutput.CombinableOutput.SetParent(CombinableOutput newParent, Int32 positionWithinParent)&#xD;&#xA;   at Microsoft.VisualStudio.Web.PageInspector.Runtime.MappingData.CombinedRenderedOutput.TreeifyOutputsWithExplicitRelationships(IEnumerable`1 outputs)&#xD;&#xA;   at Microsoft.VisualStudio.Web.PageInspector.Runtime.MappingData.CombinedRenderedOutput.CombineOutputs(IEnumerable`1 outputsToCombine)&#xD;&#xA;   at Microsoft.VisualStudio.Web.PageInspector.Runtime.MappingData.MappingDataUtilities.ProcessDataIntoJsonObjects(IEnumerable`1 renderedOutputList, Boolean legacyJsonObjects)&#xD;&#xA;   at Microsoft.VisualStudio.Web.PageInspector.Runtime.Tracing.RequestDataHttpHandler.System.Web.IHttpHandler.ProcessRequest(HttpContext context)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="adminq1" time="2019-07-14T05:38:40.5853428Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_ACCEPT:application/json, text/javascript, */*; q=0.01&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:en-US,en;q=0.9,vi;q=0.8&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=ak51rw3bh3v0em3dzpe2fyz3; __RequestVerificationToken=wjZhK8siRv-oLVc4ORLKRhmYQG_0BtsUh8SAiz6Cejt4-zVabcz2eCZCvuV9NELcDYLMN0xz4KKax1OEP3A6NN_alxjoAB8xAIahWjlXvww1; BO=79D0788AAA72FDFFF04207F4F771D67EA511157514709ABFB909FEDBEF47776FD1A4529533BA88E0DA35F8B567F31F68CB50ECA170B979A51B5772CFD9884F42839181854AFD4A942265B6890D23ED32A6BC74D9D74B42710B7CE16B2D0DEE44&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/BH_DOANHSO/Edit/2460?month=7&amp;year=2019&amp;FullName=adminQ1%20adminQ1&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36&#xD;&#xA;HTTP_X_REQUESTED_WITH:XMLHttpRequest&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Connection: keep-alive&#xD;&#xA;Accept: application/json, text/javascript, */*; q=0.01&#xD;&#xA;Accept-Encoding: gzip, deflate, br&#xD;&#xA;Accept-Language: en-US,en;q=0.9,vi;q=0.8&#xD;&#xA;Cookie: ASP.NET_SessionId=ak51rw3bh3v0em3dzpe2fyz3; __RequestVerificationToken=wjZhK8siRv-oLVc4ORLKRhmYQG_0BtsUh8SAiz6Cejt4-zVabcz2eCZCvuV9NELcDYLMN0xz4KKax1OEP3A6NN_alxjoAB8xAIahWjlXvww1; BO=79D0788AAA72FDFFF04207F4F771D67EA511157514709ABFB909FEDBEF47776FD1A4529533BA88E0DA35F8B567F31F68CB50ECA170B979A51B5772CFD9884F42839181854AFD4A942265B6890D23ED32A6BC74D9D74B42710B7CE16B2D0DEE44&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/BH_DOANHSO/Edit/2460?month=7&amp;year=2019&amp;FullName=adminQ1%20adminQ1&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36&#xD;&#xA;X-Requested-With: XMLHttpRequest&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="0" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/__browserLink/requestData/3cde817cbd294b7c9d8670027a79612f" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\__browserLink\requestData\3cde817cbd294b7c9d8670027a79612f" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="version=2" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="7186" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="GET" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/__browserLink/requestData/3cde817cbd294b7c9d8670027a79612f" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/__browserLink/requestData/3cde817cbd294b7c9d8670027a79612f" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="application/json, text/javascript, */*; q=0.01" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="en-US,en;q=0.9,vi;q=0.8" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=ak51rw3bh3v0em3dzpe2fyz3; __RequestVerificationToken=wjZhK8siRv-oLVc4ORLKRhmYQG_0BtsUh8SAiz6Cejt4-zVabcz2eCZCvuV9NELcDYLMN0xz4KKax1OEP3A6NN_alxjoAB8xAIahWjlXvww1; BO=79D0788AAA72FDFFF04207F4F771D67EA511157514709ABFB909FEDBEF47776FD1A4529533BA88E0DA35F8B567F31F68CB50ECA170B979A51B5772CFD9884F42839181854AFD4A942265B6890D23ED32A6BC74D9D74B42710B7CE16B2D0DEE44" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/BH_DOANHSO/Edit/2460?month=7&amp;year=2019&amp;FullName=adminQ1%20adminQ1" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36" />
+    </item>
+    <item name="HTTP_X_REQUESTED_WITH">
+      <value string="XMLHttpRequest" />
+    </item>
+  </serverVariables>
+  <queryString>
+    <item name="version">
+      <value string="2" />
+    </item>
+  </queryString>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="ak51rw3bh3v0em3dzpe2fyz3" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="wjZhK8siRv-oLVc4ORLKRhmYQG_0BtsUh8SAiz6Cejt4-zVabcz2eCZCvuV9NELcDYLMN0xz4KKax1OEP3A6NN_alxjoAB8xAIahWjlXvww1" />
+    </item>
+    <item name="BO">
+      <value string="79D0788AAA72FDFFF04207F4F771D67EA511157514709ABFB909FEDBEF47776FD1A4529533BA88E0DA35F8B567F31F68CB50ECA170B979A51B5772CFD9884F42839181854AFD4A942265B6890D23ED32A6BC74D9D74B42710B7CE16B2D0DEE44" />
+    </item>
+  </cookies>
+</error>

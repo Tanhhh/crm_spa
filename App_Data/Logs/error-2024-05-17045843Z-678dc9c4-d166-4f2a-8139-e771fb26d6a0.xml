@@ -1,0 +1,209 @@
+﻿<error errorId="678dc9c4-d166-4f2a-8139-e771fb26d6a0" application="/LM/W3SVC/2/ROOT" host="LAPTOP-P0L1UGL9" type="System.Data.SqlClient.SqlException" message="The conversion of the nvarchar value '2222222222' overflowed an int column." source=".Net SqlClient Data Provider" detail="System.Data.SqlClient.SqlException (0x80131904): The conversion of the nvarchar value '2222222222' overflowed an int column.&#xD;&#xA;   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)&#xD;&#xA;   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)&#xD;&#xA;   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean&amp; dataReady)&#xD;&#xA;   at System.Data.SqlClient.SqlDataReader.TryHasMoreRows(Boolean&amp; moreRows)&#xD;&#xA;   at System.Data.SqlClient.SqlDataReader.TryReadInternal(Boolean setTimeout, Boolean&amp; more)&#xD;&#xA;   at System.Data.SqlClient.SqlDataReader.Read()&#xD;&#xA;   at Erp.Domain.Account.Helper.SqlMapper.&lt;QueryImpl&gt;d__61`1.MoveNext() in C:\src\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.Domain.Account\SqlMapper.cs:line 1608&#xD;&#xA;   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)&#xD;&#xA;   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)&#xD;&#xA;   at Erp.Domain.Account.Helper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType) in C:\src\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.Domain.Account\SqlMapper.cs:line 1481&#xD;&#xA;   at Erp.Domain.Account.Helper.SqlHelper.QuerySP[T](String storedProcedure, Object param, Object outParam, SqlTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, String connectionString) in C:\src\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.Domain.Account\SqlHelper.cs:line 49&#xD;&#xA;   at Erp.BackOffice.Sale.Controllers.AdviseCardController.AddNewModal(Int32 type, Int32 ldcusview, Int32 Id, String Email, String Address, String Phone, String LastName) in C:\src\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Areas\Sale\Controllers\AdviseCardController.cs:line 1880&#xD;&#xA;   at lambda_method(Closure , ControllerBase , Object[] )&#xD;&#xA;   at System.Web.Mvc.ReflectedActionDescriptor.Execute(ControllerContext controllerContext, IDictionary`2 parameters)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionMethod(ControllerContext controllerContext, ActionDescriptor actionDescriptor, IDictionary`2 parameters)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass42.&lt;BeginInvokeSynchronousActionMethod&gt;b__41()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethod(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass37.&lt;&gt;c__DisplayClass39.&lt;BeginInvokeActionMethodWithFilters&gt;b__33()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethodWithFilters(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;&gt;c__DisplayClass2a.&lt;BeginInvokeAction&gt;b__20()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;BeginInvokeAction&gt;b__22(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeAction(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.&lt;&gt;c__DisplayClass1d.&lt;BeginExecuteCore&gt;b__18(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.&lt;&gt;c__DisplayClass8.&lt;BeginProcessRequest&gt;b__3(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)&#xD;&#xA;ClientConnectionId:1e38f350-a20a-4518-9659-6947ae398046&#xD;&#xA;Error Number:248,State:1,Class:16" user="admin" time="2024-05-17T04:58:43.2085505Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_ACCEPT:text/html, */*; q=0.01&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br, zstd&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:en-US,en;q=0.9&#xD;&#xA;HTTP_COOKIE:cids=1; fblo_1107993096924616=y; ListOrKanbanId=0; pageNumber=1; ASP.NET_SessionId=vdvq2e32q5vdkj3dnmgv2fqr; __RequestVerificationToken=NZVd2FmwnoO6ivQk3W-VVLQbNoJWOMahYFb60zu4A0FMVpkgSlqVQWFVutPIZ1EfYA9xA80GBgzUt2ghok2kn5Hvl4NSTDBO1-PWmizTFyk1; BO=2C9A6B5F1EF024DF080A70EA0CFE78E3D164114E30545F9E6DE14551EC390500DBD7010A22B044F1734576762B35174E2A607256E03F4338A630CD521139E9BB8418F0573E7418E8E36A9015A9B572C4881511B180EF9A2163398CFF48D9B4E3&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/AdviseCard/LeadIndex&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0&#xD;&#xA;HTTP_SEC_CH_UA:&quot;Chromium&quot;;v=&quot;124&quot;, &quot;Microsoft Edge&quot;;v=&quot;124&quot;, &quot;Not-A.Brand&quot;;v=&quot;99&quot;&#xD;&#xA;HTTP_X_REQUESTED_WITH:XMLHttpRequest&#xD;&#xA;HTTP_SEC_CH_UA_MOBILE:?0&#xD;&#xA;HTTP_SEC_CH_UA_PLATFORM:&quot;Windows&quot;&#xD;&#xA;HTTP_SEC_FETCH_SITE:same-origin&#xD;&#xA;HTTP_SEC_FETCH_MODE:cors&#xD;&#xA;HTTP_SEC_FETCH_DEST:empty&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Connection: keep-alive&#xD;&#xA;Accept: text/html, */*; q=0.01&#xD;&#xA;Accept-Encoding: gzip, deflate, br, zstd&#xD;&#xA;Accept-Language: en-US,en;q=0.9&#xD;&#xA;Cookie: cids=1; fblo_1107993096924616=y; ListOrKanbanId=0; pageNumber=1; ASP.NET_SessionId=vdvq2e32q5vdkj3dnmgv2fqr; __RequestVerificationToken=NZVd2FmwnoO6ivQk3W-VVLQbNoJWOMahYFb60zu4A0FMVpkgSlqVQWFVutPIZ1EfYA9xA80GBgzUt2ghok2kn5Hvl4NSTDBO1-PWmizTFyk1; BO=2C9A6B5F1EF024DF080A70EA0CFE78E3D164114E30545F9E6DE14551EC390500DBD7010A22B044F1734576762B35174E2A607256E03F4338A630CD521139E9BB8418F0573E7418E8E36A9015A9B572C4881511B180EF9A2163398CFF48D9B4E3&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/AdviseCard/LeadIndex&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0&#xD;&#xA;sec-ch-ua: &quot;Chromium&quot;;v=&quot;124&quot;, &quot;Microsoft Edge&quot;;v=&quot;124&quot;, &quot;Not-A.Brand&quot;;v=&quot;99&quot;&#xD;&#xA;X-Requested-With: XMLHttpRequest&#xD;&#xA;sec-ch-ua-mobile: ?0&#xD;&#xA;sec-ch-ua-platform: &quot;Windows&quot;&#xD;&#xA;Sec-Fetch-Site: same-origin&#xD;&#xA;Sec-Fetch-Mode: cors&#xD;&#xA;Sec-Fetch-Dest: empty&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="C:\src\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="admin" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="admin" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="admin" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="0" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/AdviseCard/AddNewModal" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="C:\src\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\AdviseCard\AddNewModal" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="type=0&amp;ldcusview=" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="59014" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="GET" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/AdviseCard/AddNewModal" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/AdviseCard/AddNewModal" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="text/html, */*; q=0.01" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br, zstd" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="en-US,en;q=0.9" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="cids=1; fblo_1107993096924616=y; ListOrKanbanId=0; pageNumber=1; ASP.NET_SessionId=vdvq2e32q5vdkj3dnmgv2fqr; __RequestVerificationToken=NZVd2FmwnoO6ivQk3W-VVLQbNoJWOMahYFb60zu4A0FMVpkgSlqVQWFVutPIZ1EfYA9xA80GBgzUt2ghok2kn5Hvl4NSTDBO1-PWmizTFyk1; BO=2C9A6B5F1EF024DF080A70EA0CFE78E3D164114E30545F9E6DE14551EC390500DBD7010A22B044F1734576762B35174E2A607256E03F4338A630CD521139E9BB8418F0573E7418E8E36A9015A9B572C4881511B180EF9A2163398CFF48D9B4E3" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/AdviseCard/LeadIndex" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0" />
+    </item>
+    <item name="HTTP_SEC_CH_UA">
+      <value string="&quot;Chromium&quot;;v=&quot;124&quot;, &quot;Microsoft Edge&quot;;v=&quot;124&quot;, &quot;Not-A.Brand&quot;;v=&quot;99&quot;" />
+    </item>
+    <item name="HTTP_X_REQUESTED_WITH">
+      <value string="XMLHttpRequest" />
+    </item>
+    <item name="HTTP_SEC_CH_UA_MOBILE">
+      <value string="?0" />
+    </item>
+    <item name="HTTP_SEC_CH_UA_PLATFORM">
+      <value string="&quot;Windows&quot;" />
+    </item>
+    <item name="HTTP_SEC_FETCH_SITE">
+      <value string="same-origin" />
+    </item>
+    <item name="HTTP_SEC_FETCH_MODE">
+      <value string="cors" />
+    </item>
+    <item name="HTTP_SEC_FETCH_DEST">
+      <value string="empty" />
+    </item>
+  </serverVariables>
+  <queryString>
+    <item name="type">
+      <value string="0" />
+    </item>
+    <item name="ldcusview">
+      <value string="" />
+    </item>
+  </queryString>
+  <cookies>
+    <item name="cids">
+      <value string="1" />
+    </item>
+    <item name="fblo_1107993096924616">
+      <value string="y" />
+    </item>
+    <item name="ListOrKanbanId">
+      <value string="0" />
+    </item>
+    <item name="pageNumber">
+      <value string="1" />
+    </item>
+    <item name="ASP.NET_SessionId">
+      <value string="vdvq2e32q5vdkj3dnmgv2fqr" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="NZVd2FmwnoO6ivQk3W-VVLQbNoJWOMahYFb60zu4A0FMVpkgSlqVQWFVutPIZ1EfYA9xA80GBgzUt2ghok2kn5Hvl4NSTDBO1-PWmizTFyk1" />
+    </item>
+    <item name="BO">
+      <value string="2C9A6B5F1EF024DF080A70EA0CFE78E3D164114E30545F9E6DE14551EC390500DBD7010A22B044F1734576762B35174E2A607256E03F4338A630CD521139E9BB8418F0573E7418E8E36A9015A9B572C4881511B180EF9A2163398CFF48D9B4E3" />
+    </item>
+  </cookies>
+</error>

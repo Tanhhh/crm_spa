@@ -1,0 +1,591 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Sale.Controllers
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using Erp.BackOffice.Sale.Models
+@using System.ComponentModel
+
+@{
+
+    ViewBag.Title = "Lead";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "AdviseCard",
+        ActionName = "LeadIndex",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+
+}
+@*hau them*@
+<style>
+    #AndOr {
+        width: 145px;
+    }
+    .col-xs-11 {
+        width: 95%;
+    }
+    .icons {
+        padding: 10px;
+        background: #cee8ff;
+    }
+    .card:hover {
+        background: #fff9c4;
+        cursor:pointer;
+    }
+    .card:hover .card_name {
+        /*    padding: 10px 10px 0;*/
+        display: block; /* Hiển thị toàn bộ nội dung khi hover */
+        -webkit-line-clamp: unset; /* Bỏ giới hạn số dòng */
+        height: auto; /* Đặt lại chiều cao tự động */
+        overflow: visible; /* Hiển thị toàn bộ nội dung */
+        cursor: pointer;
+    }
+    .card {
+        min-height: 150px;
+        display: grid;
+        align-content: space-between;
+        box-shadow: 1px 1px 10px 1px;
+        overflow: hidden;
+        color: black;
+        height: auto;
+        width: 100%;
+        margin-bottom: 10px;
+        background-color: #fff;
+        padding: 0px;
+       /* transition: all 0.5s ease;*/
+    }
+    .card_name {
+        padding: 0px 10px;
+        height: auto;
+        width: 100%;
+        display: -webkit-box;
+        -webkit-line-clamp: 5;
+        -webkit-box-orient: vertical;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        transition: all 0.5s ease;
+    }
+    .page-content {
+        overflow: scroll;
+        width: 100%;
+        height: 680px;
+        background-image: url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2133x1600/171af0933cade9cf983c0ccd6086af40/photo-1556761175-4b46a572b786.jpg");
+        background-size: cover;
+        background-position: center center;
+        padding: 0;
+    }
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+        border-right-color: #fff !important;
+    }
+
+    #muc-luc li:hover {
+        background: #12e4ff;
+    }
+
+    #muc-luc ul {
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        width: 100%;
+        margin: 0 !important;
+    }
+
+    #muc-luc li {
+        padding: 5px 0;
+        border-bottom: 1px solid #0000002b;
+        margin: 0 !important;
+        padding-left: 10px;
+    }
+
+    #searchInputForm span {
+        height: 86% !important;
+        background: #12e4ff;
+        display: inline-table;
+        border-radius: 3px;
+        margin: 0 2px;
+        padding-left: 5px;
+    }
+
+    #searchInputForm button {
+        height: 100%
+    }
+
+    #searchInputForm {
+        display: flex;
+        align-items: center;
+    }
+
+    #SearchLeadForm {
+        box-shadow: 0px 0px 15px #000;
+    }
+
+    .width-34 {
+        width: 34%;
+    }
+
+    section label {
+        color: #3F51B5;
+    }
+
+    .custom-class {
+        color: #3f4d9d;
+        vertical-align: middle;
+    }
+
+    .modal-open .modal {
+        overflow-y: unset;
+    }
+
+    #muc-luc {
+        border-right: 1px solid #337ab7;
+        width: 35%;
+    }
+
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .content {
+        width: 80%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    #searchPanelContent {
+        display: flex;
+        height: 600px;
+        overflow: hidden;
+        padding-right: 0px;
+        padding-left: 0px;
+    }
+
+    #btnAdd {
+        position: sticky;
+        bottom: 20px;
+    }
+
+    .select2-container .select2-selection--multiple .select2-selection__rendered {
+        display: block !important;
+    }
+
+    @@media (max-width : 1480px) {
+        #modal-search {
+            left: 75px !important;
+            width: 50% !important;
+        }
+
+        .content {
+            width: 90%;
+        }
+    }
+
+    @@media (max-width : 1440px) {
+        #modal-search {
+            left: 18px !important;
+            width: 44% !important;
+        }
+    }
+
+
+    @@media (max-width : 1440px) {
+        #modal-search {
+            left: 120px !important;
+            width: 44% !important;
+        }
+
+        .content {
+            width: 65%;
+        }
+
+        .width-34 {
+            width: 80%;
+            margin-bottom: 10px;
+        }
+    }
+
+    #searchPanelContent input {
+        border: 1px solid #d5d5d5;
+       /* điều kiện/LeadRuleIndex*/
+            margin-right: 10px;
+    }
+
+    .modal-backdrop.in {
+        display: none;
+    }
+
+    .table > thead:first-child > tr:first-child > th {
+        background: #fff;
+        color: #3f51b5;
+    }
+
+    .btn-success, .btn-success.focus, .btn-success:focus {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        border-color: #fff !important;
+        border: 1px solid !important;
+    }
+
+    .btn-search, .btn-setting {
+        display: inline-block;
+        float: left;
+        width: 33px;
+        height: 24px;
+        cursor: pointer;
+        background: url('/assets/img/btn_title_right.gif') no-repeat;
+        margin: 0px;
+        margin-left: -33px;
+    }
+
+    .btn-search {
+        background-position: -1px -24px;
+    }
+
+        .btn-search:hover {
+            background-position: -35px -24px;
+        }
+
+    .btn-setting:hover {
+        background-position: -34px 0px;
+    }
+
+    .tag-container {
+        display: inline-block;
+        /*            border: 1px solid #ccc;*/
+        padding: 5px;
+    }
+
+        .tag-container span {
+            background-color: #f0f0f0;
+            padding: 3px 5px;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+
+    #btnSearchLead, #btnCloseSearch, #saveLeadModal, #btnCloseAdd {
+        margin: 0;
+        border-radius: 3px;
+        padding: 3px 20px;
+    }
+
+    #saveLeadModal {
+        margin-left: 20px;
+        padding: 3px 40px;
+    }
+
+    #searchPanelContent span {
+        background-color: unset;
+        /* width:200px;*/
+    }
+
+    .select2-results__option[aria-selected] {
+        background: #fff;
+    }
+</style>
+@*end*@
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<div id="leadRuleBody" style="height:100%;width:100%">
+    <div style="padding-bottom: 5px; border-bottom: 1px solid #ddd; width: 37rem; height: 42px; background: #fff; border-radius: 3px; box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .3); ">
+        <label style="font-weight: bold;margin: 10px;color: #333;">Loại trạng thái</label>
+        <select data-val="true" data-val-required="Bắt buộc nhập" id="idTypeLead" style="width: 240px; height: 29px" onchange="onTypeLeadChange()">
+            <option value="1" selected>Lead</option>
+            <option value="0">Contact</option>
+        </select>
+    </div>
+    <div style="display: flex;" id="idLeadRulePartial">
+        
+    </div>
+</div>
+<!-- Modal content -->
+<div style="top: 30px; background: rgba(0, 0, 0, 0.5); box-shadow: rgba(0, 0, 0, 0.5) 0px 23px 10px 1000px;" class="modal fade bs-searchPanel-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div id="modal-search" class="modal-dialog modal-sm" style="left: 50px; right: 0%; position: absolute; width: 60%; top: -31px; " role="document">
+        <div class="modal-content">
+            <!-- Modal header -->
+            <div style="display:none" class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Tìm kiếm</h4>
+            </div>
+            <form id="SearchLeadForm" action="/AdviseCard/SaveLeadRule" method="post">
+                <input name="StatusFrom" hidden />
+                <input name="Id" hidden />
+                <input name="ruleDetails.Id" hidden />
+                <!-- Modal body -->
+                <div id="searchPanelContent" class="modal-body"></div>
+                <!-- Modal footer -->
+
+                <div style="position: sticky; bottom: 20px; padding: 5px;" class="modal-footer">
+
+                    <button id="btnCloseSearch" type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                    <button type="button" style="display:none !important" id="btnCancelEdit" class="btn btn-default">Hủy</button>
+                    <button style="padding: 5px 30px !important;" id="btnSearchLead" type="button" class="btn btn-primary2">Lưu</button>
+                    <button type="button" style="display:none !important" id="btnEditLeadRule" class="btn btn-primary">Xác nhận</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<div style="top: 30px;" class="modal fade bs-delete-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div id="modal-del" class="modal-dialog modal-sm" style="left: 50px; right: 0%; position: absolute; width: 300px; top: 30px; box-shadow: rgba(0, 0, 0, 0.5) 0px 23px 10px 1000px; " role="document">
+        <div class="modal-content">
+            <!-- Modal header -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Thông báo</h4>
+            </div>
+                <!-- Modal body -->
+                <div class="modal-body" style="height:50px">
+                    Xác nhận xóa
+                    <input id="idDel" hidden/>
+                </div>
+                <!-- Modal footer -->
+
+                <div style="position: sticky; bottom: 20px; padding: 5px;" class="modal-footer">
+
+                    <button style="width:80px;height:40px" type="button" class="btn btn-default2" data-dismiss="modal">Đóng</button>
+                    <button style="width:auto;height:40px" type="button" onclick="DelAccept()" class="btn btn-primary2">Xác nhận</button>
+                </div> 
+
+        </div>
+    </div>
+</div>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+<script src="/Scripts/ckeditor/ckeditor.js"></script>
+<script>
+    function searchPanel(Name,Id, Iddt, a, b, c, d,e) { //work.StatusTo,work.ContentEmail`,work.ContentRule`,work.TileEmail,TypeRuleId
+        var typeLead = $("#idTypeLead").val();
+        debugger
+        $.ajax({
+            url: "/AdviseCard/LeadRuleModal",
+            data: { typeLead: typeLead },
+            method: "get",
+            async: false,
+            dataType: "html",
+            success: function (data) {       
+                $("#searchPanelContent").html(data)
+                $("input[name=StatusFrom]").val(Id)
+                $("#StatusFromCurr").text(Name)
+                f5fieldRule()
+                if (Iddt > 0) {
+                    $("select[name=StatusTo]").val(a)
+                    $("select[name=StatusTo]").change()
+                    $("select[name=TypeRuleId]").val(e)
+                    $("select[name=TypeRuleId]").change()
+                    if ($("#cttemplate").find(`option[value='${c}']`).length > 0) {
+                        $("#cttemplate").val(c)
+                        $("#cttemplate").change()
+                    } else {
+                        $("#cttemplate").change()
+                        $('textarea[name=ContentRule]').val(c)
+                    }
+                    if ($("select[name=TileEmail]").find(`option[value='${b}']`).length > 0) {
+                        $("select[name=TileEmail]").val(b)
+                        $("select[name=TileEmail]").change()
+                    } else {
+                        $("select[name=TileEmail]").change()
+                        $('textarea[name=ContentEmail]').val(b)
+                        CKEDITOR.instances['ContentEmail'].setData(b)
+                    }
+                    e == 1 || e==4 ? smsshow() : e == 2 ? mailshow() : statusshow()
+                }
+                $("input[name=Id]").val(Iddt)
+                f5RuleDetail(Iddt)
+            }
+        })
+    }
+    function f5fieldRule() {
+        $("select[name=StatusTo]").val('')
+        $("select[name=StatusTo]").change()
+        $("select[name=TypeRuleId]").val(3)
+        $("textarea[name=ContentEmail]").val('')
+        CKEDITOR.instances['ContentEmail'].setData('')
+        $("textarea[name=ContentRule]").val('')
+        $("#cttemplate").val('')
+        $("#cttemplate").change()
+        $("select[name=TileEmail]").val('')
+        $("select[name=TileEmail]").change()
+    }
+    $(function () {
+        $('#btnSearchLead,#btnEditLeadRule').click(function () {
+            debugger
+            $(this).is('#btnSearchLead') ? $("input[name='ruleDetails.Id']").val('') : ''
+            if ($("input[name=Id]").val() == '' && !($('select[name="ruleDetails.FieldName"]').val() != '' && $('select[name="ruleDetails.Logic"]').val() != '' && $('input[name="ruleDetails.ContentRule"]').val() != '')) {
+                toastr.warning('Vui lòng nhập điều kiện')
+                $('select[name="ruleDetails.FieldName"]').focus()
+                return
+            }
+            SaveLeadRule(this)
+        })
+        $('#btnCancelEdit').click(function () {
+            $('#btnCancelEdit,#btnEditLeadRule').hide()
+            $('#btnCloseSearch,#btnSearchLead').show()
+        })
+    })
+    function SaveLeadRule(i) {
+        if ($('select[name="ruleDetails.FieldName"]').val() != '' && $('select[name="ruleDetails.Logic"]').val() != '' && $('input[name="ruleDetails.ContentRule"]').val() != '' && $('#AndOr').val() == ''
+            && $("#tblRuleDetail tbody tr td:first-child").text()!='') {
+            toastr.warning('Vui lòng nhập AndOr')
+            $('#AndOr')[0].focus()
+            return
+        }
+        debugger
+        if ($('select[name="ruleDetails.FieldName"]').val() != '' && $('select[name="ruleDetails.Logic"]').val() != '' && $('input[name="ruleDetails.ContentRule"]').val() != '' 
+            && $("#tblRuleDetail tbody tr td:first-child").text() != '') {
+            let dkn = $('select[name="ruleDetails.FieldName"] option:selected').text() + $('select[name="ruleDetails.Logic"] option:selected').text() + $('input[name="ruleDetails.ContentRule"]').val()
+            let dkn1 = $('select[name="ruleDetails.FieldName"] option:selected').text() + $('select[name="ruleDetails.Logic"] option:selected').text() + $('#CodeList option:selected').text()
+            if ($(`#tblRuleDetail tbody tr td:nth-child(2):contains(${dkn})`).length>0 || ($('#CodeList').val() != '' && $('#CodeList').val() != undefined && $('#CodeList').val() != null && $(`#tblRuleDetail tbody tr td:nth-child(2):contains(${dkn1})`).length>0)) {
+                toastr.warning('Điều kiện đã tồn tại')
+                return
+            }
+        }
+        $('textarea[name=ContentEmail]').val(CKEDITOR.instances['ContentEmail'].getData())
+        var typeLead = $("#idTypeLead").val();
+        let form = new FormData($(i)[0].form)
+        form.append("TypeLead", typeLead);
+        $.ajax({
+            url: $(i)[0].form.action,
+            method: $(i)[0].form.method,
+            data: form,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function (data) {
+                debugger;
+                if (data > 0) {
+                    toastr.success('Lưu thành công')
+                    $("input[name=Id]").val(data)
+                    f5RuleDetail(data)
+                    $(i).is('#btnEditLeadRule') ? addTrigger() : ''
+                } else {
+                    toastr.warning('Lưu thất bại')
+                }
+            }
+        })
+    }
+    function f5RuleDetail(Id) {
+        var typeLead = $("#idTypeLead").val();
+        $.ajax({
+            url: "/AdviseCard/f5RuleDetail?id=" + Id,
+            method: "get",
+            dataType: "json",
+            success: function (data) {
+                let html = ''
+                $.each(data, function (index, item) {
+                    html += `<tr><td>${index + 1}</td><td>${(item.LabelName + item.Logic + item.ContentRuleName)}</td><td>${item.StatusToName != null ? item.StatusToName:''}</td><td>${(item.AndOr == '1' ? 'And' : item.AndOr == '0' ? 'Or' : '')}</td>
+                    <td><button title='chỉnh sửa' type='button' onclick='editRuleDetail(${item.Id},"${item.FieldName}","${item.Logic}","${item.ContentRule}","${item.AndOr}")' style='border: unset; background: #fff; vertical-align: middle;'><i  class='fa fa-edit'></i></button>
+                    <button title='xóa' type='button' onclick='deleteRuleDetail(${item.Id})' style='background: #fff;border: unset;vertical-align: middle;'><i  class='fa fa-trash'></i></button></td></tr>`
+                })
+                $("#tblRuleDetail tbody").html(html)
+                f5leadRuleBody(typeLead)
+                debugger
+                let mem = data.length
+                if (mem > 0) {
+                    $('#AndOr').attr('disabled', false)
+                } else {
+                    $('#AndOr').val('')
+                    $('#AndOr').attr('disabled', true)
+                }
+            }
+        })
+    }
+    function editTrigger() {
+        $('#btnCloseSearch,#btnSearchLead').hide()
+        $('#btnCancelEdit,#btnEditLeadRule').show()
+    }
+    function addTrigger() {
+        $('#btnCloseSearch,#btnSearchLead').show()
+        $('#btnCancelEdit,#btnEditLeadRule').hide()
+    }
+    function editRuleDetail(id, fieldName, logic, contentRule, AndOr) {
+        debugger
+        $("input[name='ruleDetails.Id']").val(id)
+        $('#SearchLeadForm select[name="ruleDetails.FieldName"]').val(fieldName)
+        $('#SearchLeadForm select[name="ruleDetails.FieldName"]').change()
+        $('#SearchLeadForm select[name="ruleDetails.Logic"]').val(logic)
+        $('#SearchLeadForm input[name="ruleDetails.ContentRule"]').val(contentRule)
+        $('#SearchLeadForm select[name="ruleDetails.AndOr"]').val(AndOr)
+        if ($('#SearchLeadForm input[name="ruleDetails.ContentRule"]').css('display')=="none") {
+            $('#CodeList').val(contentRule)
+            $('#CodeList').change()
+        }
+
+        editTrigger()
+
+    }
+    function deleteRuleDetail(id) {
+        $.ajax({
+            url: '/AdviseCard/deleteRuleDetail',
+            method: 'post',
+            data: { id },
+            dataType: "json",
+            success: function (data) {
+                if (data > 0) {
+                    toastr.success('Xóa thành công')
+                    f5RuleDetail(data)
+
+                } else {
+                    toastr.warning('Xóa thất bại')
+                }
+            }
+        })
+    }
+    function f5leadRuleBody(typeLead) {
+        $.ajax({
+            url: "/AdviseCard/LeadRulePartial",
+            data: { typeLead: typeLead },
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                $('#idLeadRulePartial').html(data)
+            }
+        })
+    }
+    function deleteLeadRule(Id) {
+        $('#idDel').val(Id)
+        $('.bs-delete-modal-sm').modal('show')
+      
+    }
+    function DelAccept() {
+        var typeLead = $("#idTypeLead").val();
+        let Id = $('#idDel').val()
+        $.ajax({
+            url: "/AdviseCard/deleteLeadRule",
+            method: "post",
+            data: { Id },
+            dataType: "json",
+            success: function (data) {
+                f5leadRuleBody(typeLead)
+                $('.bs-delete-modal-sm').modal('hide')
+            }
+        })
+    }
+
+    $(document).ready(function () {
+        f5leadRuleBody(1);
+    });
+    function onTypeLeadChange() {
+        var typeLead = $("#idTypeLead").val();
+        f5leadRuleBody(typeLead);
+    }
+</script>

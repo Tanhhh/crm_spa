@@ -1,0 +1,279 @@
+﻿@model IEnumerable<Erp.BackOffice.Sale.Models.LeadSectionModel>
+
+    @{
+        Layout = "";
+        var stt = 1;
+        var orderedModel = Model.OrderBy(m => m.OrderSection);
+        int totalItems = orderedModel.Count();
+    }
+
+    @foreach (var item in orderedModel)
+    {
+        <tr data-id="@item.Id" data-ordersection="@item.OrderSection">
+            <td class="stt">@(stt++)</td>
+            <td class="showLeadSectionField">
+                <span class="name">@item.Name</span>
+                <input type="text" class="edit-name" value="@item.Name" style="display:none" />
+            </td>
+            <td style="text-align:center !important">
+                <!-- Nút lên chỉ hiển thị khi không phải là phần tử đầu tiên -->
+                @if (stt > 2)
+                {
+                    <button class="move-up changeOrderSection">▲</button>
+                }
+                <!-- Nút xuống chỉ hiển thị khi không phải là phần tử cuối cùng -->
+                @if (stt < totalItems + 1)
+                {
+                    <button class="move-down changeOrderSection">▼</button>
+                }
+            </td>
+        </tr>
+    }
+
+    <script>
+        $(document).ready(function () {
+            function attachEventLeadSectionLefts() {
+
+                $('.name').dblclick(function () {
+                    debugger
+                    $(this).hide();
+                    $(this).siblings('.edit-name').show().focus();
+                });
+
+                $('.changeOrderSection').click(function () {
+                    debugger
+                    var currentButton = $(this);
+                    var currentRow = currentButton.closest('tr');
+                    var currentOrderSection = currentRow.data('ordersection');
+                    var targetRow;
+
+                    // Kiểm tra class của nút
+                    if (currentButton.hasClass('move-up')) {
+                        // Lấy id của hàng đó
+                        var currentId = currentRow.data('id');
+                        // Lấy hàng liền kề trên
+                        targetRow = currentRow.prev('tr');
+                        if (targetRow.length !== 0) {
+                            // Lấy id của hàng liền kề trên
+                            var targetId = targetRow.data('id');
+                            // Lấy OrderSection của hàng liền kề trên
+                            var targetOrderSection = targetRow.data('ordersection');
+                            $.ajax({
+                                type: 'POST',
+                                url: '/LeadMeeting/UpdateOrderSection',
+                                data: {
+                                    currentId: currentId,
+                                    targetId: targetId,
+                                    currentOrderSection: currentOrderSection,
+                                    targetOrderSection: targetOrderSection
+                                },
+                                beforeSend: function () {
+                                    // Trước khi gửi yêu cầu, hiển thị thông báo loading
+                                    ShowLoading();
+                                },
+                                success: function (response) {
+                                    // Sau khi nhận được phản hồi từ server, ẩn thông báo loading và xử lý phản hồi
+                                    var typeLead = $('.form-select').val();
+                                    f5LeadSectionLeft(typeLead);
+                                    HideLoading();
+                                    if (response.success) {
+                                        // Xử lý khi cập nhật thành công
+                                        console.log(response.message);
+                                    } else {
+                                        // Xử lý khi có lỗi
+                                        console.error(response.message);
+                                    }
+                                },
+                                error: function (xhr, status, error) {
+                                    // Xử lý khi gặp lỗi trong quá trình gửi request
+                                    HideLoading();
+                                    console.error("Error: ", error);
+                                }
+                            });
+                        }
+                    } else if (currentButton.hasClass('move-down')) {
+                        // Tương tự cho trường hợp move-down
+                        var currentId = currentRow.data('id');
+                        targetRow = currentRow.next('tr');
+                        if (targetRow.length !== 0) {
+                            var targetId = targetRow.data('id');
+                            var targetOrderSection = targetRow.data('ordersection');
+                            $.ajax({
+                                type: 'POST',
+                                url: '/LeadMeeting/UpdateOrderSection',
+                                data: {
+                                    currentId: currentId,
+                                    targetId: targetId,
+                                    currentOrderSection: currentOrderSection,
+                                    targetOrderSection: targetOrderSection
+                                },
+                                beforeSend: function () {
+                                    // Trước khi gửi yêu cầu, hiển thị thông báo loading
+                                    ShowLoading();
+                                },
+                                success: function (response) {
+                                    // Sau khi nhận được phản hồi từ server, ẩn thông báo loading và xử lý phản hồi
+                                    var typeLead = $('.form-select').val();
+                                    f5LeadSectionLeft(typeLead);
+                                    HideLoading();
+                                    if (response.success) {
+                                        // Xử lý khi cập nhật thành công
+                                        console.log(response.message);
+                                    } else {
+                                        // Xử lý khi có lỗi
+                                        console.error(response.message);
+                                    }
+                                },
+                                error: function (xhr, status, error) {
+                                    // Xử lý khi gặp lỗi trong quá trình gửi request
+                                    HideLoading();
+                                    console.error("Error: ", error);
+                                }
+                            });
+                        }
+                    }
+                });
+                $('.edit-name').focusout(function () {
+                    debugger
+                    var typeLead = $('.form-select').val();
+                    var newName = $(this).val();
+                    var $span = $(this).siblings('.name');
+                    var oldValue = $span.text();
+                    $(this).hide();
+                    $(this).siblings('.name').text(newName).show();
+                    
+                    // Lấy ID của hàng chứa tên
+                    var currentRowId = $(this).closest('tr').data('id');
+
+
+
+
+                    var rows = $('#leadSection tbody tr');
+                    var penultimateRow = rows.eq(rows.length - 2);
+                    var previousOrderSection = penultimateRow.data('ordersection');
+                    if (currentRowId !== undefined && newName !== oldValue) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '/LeadMeeting/UpdateNameLeadSection',
+                            data: {
+                                idLeadSection: currentRowId,
+                                newName: newName
+                            },
+                            beforeSend: function () {
+                                // Trước khi gửi yêu cầu, hiển thị thông báo loading
+                                ShowLoading();
+                            },
+                            success: function (response) {
+                                // Xử lý phản hồi từ máy chủ
+                                HideLoading();
+                                if (response.success) {
+                                    console.log(response.message);
+                                } else {
+                                    console.error(response.message);
+                                }
+                                f5LeadSectionRight(currentRowId);
+                            },
+                            error: function (xhr, status, error) {
+                                // Xử lý khi gặp lỗi trong quá trình gửi request
+                                HideLoading();
+                                console.error("Error: ", error);
+                            }
+                        });
+                    } else {
+                        if (newName == '') {
+                            alert('Vui lòng nhập tên trường!');
+                            $(this).focus();
+                        }
+
+                        else
+                            $.ajax({
+                                type: 'POST',
+                                url: '/LeadMeeting/InsertLeadSection',
+                                data: {
+                                    newName: newName,
+                                    previousOrderSection: previousOrderSection,
+                                    typeLead: typeLead
+                                },
+                                beforeSend: function () {
+                                    // Trước khi gửi yêu cầu, hiển thị thông báo loading
+                                    ShowLoading();
+                                },
+                                success: function (response) {
+                                    // Xử lý phản hồi từ máy chủ
+                                    HideLoading();
+                                    if (response.success) {
+                                        console.log(response.message);
+                                    } else {
+                                        console.error(response.message);
+                                    }
+                                    f5LeadSectionRight(currentRowId);
+
+                                },
+                                error: function (xhr, status, error) {
+                                    // Xử lý khi gặp lỗi trong quá trình gửi request
+                                    HideLoading();
+                                    console.error("Error: ", error);
+                                }
+                            });
+                    }
+
+                    
+                    f5LeadSectionLeft(typeLead);
+                    $('.cancelNewRowsLeadFieldSection').hide();
+                });
+                $('.showLeadSectionField').click(function () {
+                    debugger
+                    var currentButton = $(this);
+                    var currentRow = currentButton.closest('tr');
+                    var rows = $('#leadSection tbody tr');
+                    rows.each(function () {
+                        $(this).removeClass('selected-row');
+                    });
+                    currentRow.addClass('selected-row');
+                    var idLeadSection = currentRow.data('id');
+                    $.ajax({
+                        url: "/LeadMeeting/LeadSectionRight?idLeadSection=" + idLeadSection,
+                        method: "get",
+                        dataType: "html",
+                        success: function (data) {
+                            $("#leadFieldSection tbody").html(data);
+            
+                            $("#leadFieldSection").attr("data-leadsectionid", idLeadSection);
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(error); // Xử lý lỗi nếu có
+                        }
+                    });
+                    $('.cancelNewRowsLeadFieldSection').hide();
+                });
+            }
+            attachEventLeadSectionLefts();
+            $('.addleadSection').click(function () {
+                // Kiểm tra xem đã có hàng mới được thêm vào trước đó hay chưa
+                if ($('#leadSection tbody').find('.new-row').length === 0) {
+                    var lastRow = $('#leadSection tbody tr').last();
+                    lastRow.find('td:last-child').append('<button class="move-down changeOrderSection">▼</button>');
+                    // Lấy số lượng hàng hiện có
+                    var totalRows = $('#leadSection tbody tr').length;
+
+                    // Tạo mã HTML cho hàng mới
+                    var newRowHtml = '<tr class="new-row">' +
+                        '<td class="stt">' + (totalRows + 1) + '</td>' +
+                        '<td>' +
+                        '<span class="name"></span> <input type="text" class="edit-name" value="">' +
+                        '</td>' +
+                        '<td>' +
+                        '<button class="move-up changeOrderSection">▲</button>' +
+                        '</td>' +
+                        '</tr>';
+
+                    // Thêm hàng mới vào cuối bảng
+                    $('#leadSection tbody').append(newRowHtml);
+                    $('#leadSection tbody .new-row:last-child .edit-name').focus();
+                    attachEventLeadSectionLefts();
+                }
+            });
+        });
+
+    </script>
+

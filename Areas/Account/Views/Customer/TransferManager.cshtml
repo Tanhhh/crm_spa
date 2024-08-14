@@ -1,0 +1,358 @@
+﻿@model IEnumerable<CustomerViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Crm.Models
+@*@model CustomerViewModel*@
+@{
+    ViewBag.Title = "Chuyển đổi Nhân viên quản lý";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    //List<SelectListItem> listCategories = ViewBag.listCategories;
+    //List<SelectListItem> listUserTypes = new SelectList(ViewBag.listUserTypes, "Id", "Name").ToList();
+    List<SelectListItem> listSts = ViewBag.listStatus;
+    List<SelectListItem> listUserType = ViewBag.listUserTypes;
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Customer",
+        ActionName = "TransferManager",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int rowNumber = 0;
+    int numberOfItem = 10;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+}
+
+
+@helper BuildCheckAll()
+        {
+    <label>
+        <input type="checkbox" name="checkAll" id="checkAll" class="ace" />
+        <span class="lbl"></span>
+    </label>
+}
+@helper GridColumnAdviseCard(int Id, string name, bool IsPopup)
+{
+    <a name="Id" value="Id" onclick="OpenPopup('@Url.Action("Create", "AdviseCard",new { area="Sale",Id=Id,name=name, IsPopup =false})','',0,0)">Lập phiếu tư vấn</a>
+
+}
+@helper GridColumnEconomicStatus(int Id, bool IsPopup)
+{
+    <a name="Id" value="Id" onclick="OpenPopup('@Url.Action("EditNT", "Customer",new { area="Account",Id=Id, IsPopup =false})','',0,0)">Đánh giá KH</a>
+
+}
+
+@helper GridColumnAction(int? Id, string TargetModule, string TargetCode, string TargetName, bool isPopup)
+{
+if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("LiabilitiesDetail", "TransactionLiabilities", "Account"))
+{
+        <a class="btn btn-white btn-danger btn-minier" onclick="OpenPopup('@Url.Action("LiabilitiesDetail", "TransactionLiabilities", new { TargetModule = TargetModule, TargetCode = TargetCode, TargetName = TargetName, popup = true })', 'Chi tiết công nợ', 0, 500)">
+            <i class="ace-icon fa fa-money"></i> Công nợ
+        </a>
+}
+    @*if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "CommisionCustomer", "Sale"))
+        {
+            <a class="btn btn-white btn-success btn-minier" onclick="OpenPopup('@Url.Action("Create", "CommisionCustomer", new { area = "Sale", CustomerId = Id, popup = true })', 'Cài đặt chiết khấu', 500, 700)">
+                <i class="ace-icon fa fa-cog"></i>
+                Chiết khấu
+            </a>
+        }*@
+}
+
+@helper GridColumnAction2(int CustomerId, bool isPopup)
+{
+
+}
+
+@*@helper GridColumnBranch(int? Id)
+    {
+    }*@
+@helper GridColumnschedule(int id)
+{
+    <a href="@Url.Action("DetailSearch", "Customer", new { Id = id })">Xem lịch hẹn</a>
+}
+
+@helper GridColumnName(string name, string code, int id, string note, string Image, int? pluspoint, string phone, bool isPopup = false)
+{
+
+name = string.IsNullOrEmpty(name) == false ? name : "No Title";
+    <div class="itemdiv commentdiv">
+        <div class="user">
+
+            <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image,"Customer","user"))" title="@name" data-rel="colorbox" class="cboxElement">
+                <img id="myImg" alt="@name" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))">
+            </a>
+
+        </div>
+        <div class="body">
+            <div class="name" data-toggle="tooltip" title="Tên khách hàng">
+                @if (!isPopup)
+                {
+                    <a href="@Url.Action("Detail", "Customer", new { Id = id })">@name</a>
+                }
+                else
+                {
+
+
+                    <a onclick="parent.selectItem_Customer(@id,'@code','@name','@pluspoint')">@name</a>
+
+
+                }
+                @if (!string.IsNullOrEmpty(note))
+                {
+                    <span class="help-button" data-rel="tooltip" data-placement="bottom" data-original-title="@note">?</span>
+                }
+            </div>
+            <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+                @code
+            </div>
+        </div>
+    </div>
+}
+@helper GridColumnNote(string note)
+{
+    <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+        @note
+    </div>
+}
+@helper GridColumnNameAddress(string DistrictName, string WardName, string ProvinceName, string Address)
+{
+    <p data-toggle="tooltip" title="Địa chỉ - Phường/Xã">
+        <i class="fa fa-map-marker"></i> @(Address == null ? "chưa có" : Address) - @(WardName == null ? "chưa có" : WardName)
+    </p>
+    <span data-toggle="tooltip" title="Quận/huyện - Thành phố/Tỉnh">
+        <i class="fa fa-globe"></i> @(DistrictName == null ? "chưa có" : DistrictName) - @(ProvinceName == null ? "chưa có" : ProvinceName)
+    </span>
+
+}
+
+@helper GridColumnContact(string Phoneghep, string Email)
+{
+    <p data-toggle="tooltip" title="Số điện thoại">
+        <i class="fa fa-mobile-phone"></i> @(Phoneghep == null ? "chưa có" : Phoneghep.EndsWith("-") ? Phoneghep.Remove(Phoneghep.Length - 1) : Phoneghep)
+
+    </p>
+    <span data-toggle="tooltip" title="Email">
+        <i class="fa fa-envelope"></i> @(Email == null ? "chưa có" : Email)
+    </span>
+
+}
+@helper GridColumnDateName(DateTime? CreateDate, DateTime? DateOfIssue)
+{
+    <p data-toggle="tooltip" title="Ngày tạo">
+        <i class="fa fa-calendar-plus-o"></i> @CreateDate.Value.ToString("dd/MM/yyyy HH:mm")
+    </p>
+    <span data-toggle="tooltip" title="Ngày cập nhật"><i class="fa fa-calendar-check-o"></i> @(DateOfIssue.HasValue ? DateOfIssue.Value.ToString("dd/MM/yyyy HH:mm") : "chưa có")</span>
+}
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+
+
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <p>
+        @Html.TextBox("txtCusInfo", Request["txtCusInfo"], new { @class = "", autocomplete = "off", placeholder = "Mã hoặc Tên khách hàng..." })
+
+
+        <select class="chzn-select" style="width:250px !important; float:left" name="SalerId" id="SalerId">
+            <option value="">- Nhân viên QL -</option>
+            @foreach (var item in SelectListHelper.GetSelectList_FullUserName(null, null))
+                {
+                <option @(Request["SalerId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+    </p>
+
+}
+
+
+
+@using (Html.BeginForm("TransferManager", "Customer", FormMethod.Post))
+{
+    <div>
+        <p>
+            <label style="float:left">Chọn Nhân viên được chuyển:</label>
+            <select class="chzn-select" style="width:250px; float:left" name="SalerId2" id="SalerId2">
+                <option value="">- Nhân viên QL -</option>
+                @foreach (var item in SelectListHelper.GetSelectList_User(null, null))
+                {
+                    <option @(Request["SalerId2"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </p>
+        <p>
+            <label style="float:left">Chọn nhóm được chuyển:</label>
+            <select class="chzn-select" style="width:250px;" name="GroupSaler" id="GroupSaler">
+                <option value="">- Nhóm quản lý -</option>
+                @foreach (var item in SelectListHelper.GetSelectList_User_kd(null, null))
+                {
+                    <option @(Request["GroupSaler"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </p>
+
+    </div>
+    if (Model != null)
+    {
+
+        <p id="tranferManager" style="float: right;">Tổng số: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Model.Count())</b></p>
+        if (Model.Count() > 0)
+        {
+            @Html.Grid(Model).Columns(columns =>
+       {
+           columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+           //columns.Add().Titled(Wording.Code).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCustomerCode(u.Code, u.Image, path, u.CompanyName, u.Birthday, u.IdCardNumber, u.IdCardDate, u.CardIssuedName)).SetWidth(150);
+           columns.Add(model => model.BranchName).Titled("Chi nhánh").Sortable(false).Sanitized(false).Encoded(false);
+
+           columns.Add().Titled(Wording.Name).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.CompanyName, u.Code, u.Id, u.Note, u.Image, u.PlusPoint, u.Phone, true));
+           columns.Add().Titled(Wording.ContactId).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnContact(u.Phone, u.Email));
+           columns.Add().Titled(Wording.Address).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnNameAddress(u.DistrictName, u.WardName, u.ProvinceName, u.Address));
+           columns.Add(model => model.ManagerStaffName).Titled(Wording.ManagerStaffName).Sortable(true).Sanitized(false).Encoded(false);
+           columns.Add(model => model.TenNhomHuong).Titled("Nhóm hưởng DS").Sortable(true).Sanitized(false).Encoded(false);
+
+       }).WithPaging(100)
+        }
+        <p style="margin-top:60px"></p>
+    }
+
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("TransferManager", "Customer", "Account"))
+        {
+            <button class="btn btn-mini btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                <i class="ace-icon fa fa-plus"></i>
+                Chuyển đổi
+            </button>
+        }
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+
+        function CheckIsval() {
+            if ($("#SalerId2").val() == "" && $("#GroupSaler").val() == "") {
+                alert("Chưa chọn nhân viên hoặc nhóm quản lý");
+                return false;
+            }
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 KH.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn chuyển đổi KH đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+        })
+
+        $(function () {
+            $("#Phone").focus().select();
+            $('[data-rel=tooltip]').tooltip({ container: 'body' });
+            $("#Phone").click(function () {
+                $("#Phone").select();
+            });
+        });
+
+        var url = '/api/BackOfficeServiceAPI/FetchLocation';
+        var districts = $("#DistrictId"); // cache it
+        var ward = $("#WardId");
+
+        $("#ProvinceId").change(function () {
+            ShowLoading();
+            var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+            $.getJSON(url, { parentId: id }, function (response) {
+                districts.empty(); // remove any existing options
+                ward.empty();
+                $(document.createElement('option'))
+                    .attr('value', '')
+                    .text('- Rỗng -')
+                    .appendTo(ward).trigger('chosen:updated');
+                $(response).each(function () {
+                    $(document.createElement('option'))
+                        .attr('value', this.Id)
+                        .text(capitalizeFirstAllWords(this.Name.toLowerCase().replace('huyện', '').replace('quận', '')))
+                        .appendTo(districts).trigger('chosen:updated');
+                    HideLoading();
+                });
+            });
+        });
+
+        $("#DistrictId").change(function () {
+            ShowLoading();
+            var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+            $.getJSON(url, { parentId: id }, function (response) {
+                ward.empty(); // remove any existing options
+                $(response).each(function () {
+                    $(document.createElement('option'))
+                        .attr('value', this.Id)
+                        .text(capitalizeFirstAllWords(this.Name.toLowerCase()))
+                        .appendTo(ward).trigger('chosen:updated');
+                    HideLoading();
+                });
+            });
+        });
+        $('.popover-dismiss').popover({
+            trigger: 'focus'
+        })
+        $(document).ready(function () {
+            $('[data-rel=popover]').popover({ html: true });
+        });
+
+        $('.grid-header').mouseover(function () {
+            $('.grid-header')[0].title = "Chọn tất cả";
+        });
+
+        $(document).click(function () {
+            $("#tabCustomer").tabs({ active: 2 });
+            $("#action").on("click", function () { });
+        });
+
+
+
+
+    </script>
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+@Html.ScriptBottom_ChosenStyle()
+}
+
+

@@ -1,0 +1,115 @@
+﻿@model List<Erp.BackOffice.Sale.Models.ServiceScheduleViewModel>
+@using Erp.BackOffice.App_GlobalResources
+@{
+
+}
+@helper GridColumnStatusName(string status)
+{
+switch (status)
+{
+    case "pending":
+            <span class="label-sm label label-info arrowed arrowed-right">Khách đặt</span>
+        break;
+
+    case "accept":
+            <span class="label-sm label label-info arrowed arrowed-right">Tiếp nhận</span>
+        break;
+    case "inprogress":
+            <span class="label-sm label label-warning arrowed arrowed-right">Đang phục vụ</span>
+        break;
+    case "completed":
+            <span class="label-sm label label-success arrowed arrowed-right">Đã xong</span>
+        break;
+    case "cancel":
+            <span class="label-sm label label-danger arrowed arrowed-right">Đã hủy</span>
+        break;
+}
+}
+<div class="widget-box">
+    <div class="widget-header">
+        <h5 class="widget-title bigger lighter">
+            <i class="ace-icon fa fa-users"></i> Danh sách khách đặt hẹn <span class="badge badge-danger" style="position:initial!important;padding:1px 5px;">@Model.Count()</span>
+        </h5>
+
+        <div class="widget-toolbar">
+            <a href="#" data-action="collapse">
+                <i class="ace-icon fa fa-chevron-up"></i>
+            </a>
+        </div>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            @if (Model.Any())
+            {
+                <div class="dialogs ace-scroll">
+                    @foreach (var item in Model)
+                    {
+                        var mau = "";
+                        if (item.Chanel == 2)
+                        {
+                            mau = "lavender";
+                        }
+                        else
+                        {
+                            mau = "aliceblue";
+                        }
+                        <div class="itemdiv dialogdiv" style="background-color:@mau">
+                            <div class="user">
+                                <div class="ace-thumbnails">
+                                    <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(item.CustomerImage, "Customer", "user"))" title="@item.CustomerName" data-rel="colorbox" class="cboxElement">
+                                        <img id="myImg" alt="@item.CustomerName" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(item.CustomerImage, "Customer", "user"))">
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="body">
+                                <div class="time">
+                                    <i class="ace-icon fa fa-clock-o"></i>
+                                    <span class="green">@item.StartDate.Value.ToString("HH:mm") - @item.DueDate.Value.ToString("HH:mm")</span>
+                                </div>
+
+                                <div class="name">
+                                    <b class="red">@item.CustomerCode - @item.CustomerName</b>
+                                    @GridColumnStatusName(item.Status)
+                                </div>
+                                <div class="name">
+                                    Mã đặt lịch: <a onclick="OpenPopup('@Url.Action("Detail", "ServiceSchedule", new { Id = item.Id, IsPopup = true })', '', 0, 0)">@item.Code</a>
+                                </div>
+                                <div class="name">
+                                    Dịch vụ: @item.ServiceCode - @item.ServiceName
+                                </div>
+                                <div class="name">
+                                    Nhân viên được book: @item.NameAssignedUser <span>(@item.AssignedUserId)</span>
+                                </div>
+                                <div class="name">
+                                    Ghi chú: @item.Note
+                                </div>
+
+                                <div class="action-buttons tools bigger-125">
+                                    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Edit", "ServiceSchedule", "Sale"))
+                                    {
+                                        <a data-toggle="tooltip" title="Cập nhật trạng thái" onclick="OpenPopup('@Url.Action("Edit", "ServiceSchedule", new { area="Sale",Id=item.Id, IsPopup = true })', 'Cập nhật lịch đặt phục vụ', 900, 500)">
+                                            <i class="ace-icon fa fa-pencil green"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-block alert-info">
+                    Không có dữ liệu
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+</script>

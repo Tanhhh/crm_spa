@@ -1,0 +1,186 @@
+﻿<error errorId="4de5c537-d063-47ae-8a6c-de4417dcd906" application="/LM/W3SVC/2/ROOT" host="PCHOA" type="System.Web.HttpException" message="The controller for path '/Scripts/jquery.signalR-2.2.1.min.js' was not found or does not implement IController." source="System.Web.Mvc" detail="System.Web.HttpException (0x80004005): The controller for path '/Scripts/jquery.signalR-2.2.1.min.js' was not found or does not implement IController.&#xD;&#xA;   at System.Web.Mvc.DefaultControllerFactory.GetControllerInstance(RequestContext requestContext, Type controllerType)&#xD;&#xA;   at System.Web.Mvc.DefaultControllerFactory.CreateController(RequestContext requestContext, String controllerName)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.ProcessRequestInit(HttpContextBase httpContext, IController&amp; controller, IControllerFactory&amp; factory)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="adminq1" time="2024-04-23T10:42:13.2800668Z" statusCode="404">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_ACCEPT:*/*&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br, zstd&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:en-US,en;q=0.9&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=glepa1prgzsui1mzqusmxfux; __RequestVerificationToken=HN_Tjwqnz5RXMkauFyzACFsd5z3hMYM3N6ZKk26bhPJLRJCZPbpadBGiPnh_SY8CK8MZ9wDDnYN6zYNwgZPaOvuKWsFfuWH96dbIP1VqzRU1; BO=7AC795D3B3E2D596F04CDCE54B64A2FE75E16A8DE6E7C76D05E9DC18B1D8F1E91B39F3A47C4F9DADB73B55A65A34FABA6DACB110BC96EBF1DDCC80C3E279378EFF6950AF0860B65A402BF07AF0A21C352609E363A47EC1EE7F41F02BC95D1588&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/Customer/Detail/724638&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36&#xD;&#xA;HTTP_SEC_CH_UA:&quot;Google Chrome&quot;;v=&quot;123&quot;, &quot;Not:A-Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;123&quot;&#xD;&#xA;HTTP_SEC_CH_UA_MOBILE:?0&#xD;&#xA;HTTP_SEC_CH_UA_PLATFORM:&quot;Windows&quot;&#xD;&#xA;HTTP_SEC_FETCH_SITE:same-origin&#xD;&#xA;HTTP_SEC_FETCH_MODE:no-cors&#xD;&#xA;HTTP_SEC_FETCH_DEST:script&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Connection: keep-alive&#xD;&#xA;Accept: */*&#xD;&#xA;Accept-Encoding: gzip, deflate, br, zstd&#xD;&#xA;Accept-Language: en-US,en;q=0.9&#xD;&#xA;Cookie: ASP.NET_SessionId=glepa1prgzsui1mzqusmxfux; __RequestVerificationToken=HN_Tjwqnz5RXMkauFyzACFsd5z3hMYM3N6ZKk26bhPJLRJCZPbpadBGiPnh_SY8CK8MZ9wDDnYN6zYNwgZPaOvuKWsFfuWH96dbIP1VqzRU1; BO=7AC795D3B3E2D596F04CDCE54B64A2FE75E16A8DE6E7C76D05E9DC18B1D8F1E91B39F3A47C4F9DADB73B55A65A34FABA6DACB110BC96EBF1DDCC80C3E279378EFF6950AF0860B65A402BF07AF0A21C352609E363A47EC1EE7F41F02BC95D1588&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/Customer/Detail/724638&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36&#xD;&#xA;sec-ch-ua: &quot;Google Chrome&quot;;v=&quot;123&quot;, &quot;Not:A-Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;123&quot;&#xD;&#xA;sec-ch-ua-mobile: ?0&#xD;&#xA;sec-ch-ua-platform: &quot;Windows&quot;&#xD;&#xA;Sec-Fetch-Site: same-origin&#xD;&#xA;Sec-Fetch-Mode: no-cors&#xD;&#xA;Sec-Fetch-Dest: script&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="0" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/Scripts/jquery.signalR-2.2.1.min.js" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Scripts\jquery.signalR-2.2.1.min.js" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="24247" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="GET" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/Scripts/jquery.signalR-2.2.1.min.js" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/Scripts/jquery.signalR-2.2.1.min.js" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="*/*" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br, zstd" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="en-US,en;q=0.9" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=glepa1prgzsui1mzqusmxfux; __RequestVerificationToken=HN_Tjwqnz5RXMkauFyzACFsd5z3hMYM3N6ZKk26bhPJLRJCZPbpadBGiPnh_SY8CK8MZ9wDDnYN6zYNwgZPaOvuKWsFfuWH96dbIP1VqzRU1; BO=7AC795D3B3E2D596F04CDCE54B64A2FE75E16A8DE6E7C76D05E9DC18B1D8F1E91B39F3A47C4F9DADB73B55A65A34FABA6DACB110BC96EBF1DDCC80C3E279378EFF6950AF0860B65A402BF07AF0A21C352609E363A47EC1EE7F41F02BC95D1588" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/Customer/Detail/724638" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" />
+    </item>
+    <item name="HTTP_SEC_CH_UA">
+      <value string="&quot;Google Chrome&quot;;v=&quot;123&quot;, &quot;Not:A-Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;123&quot;" />
+    </item>
+    <item name="HTTP_SEC_CH_UA_MOBILE">
+      <value string="?0" />
+    </item>
+    <item name="HTTP_SEC_CH_UA_PLATFORM">
+      <value string="&quot;Windows&quot;" />
+    </item>
+    <item name="HTTP_SEC_FETCH_SITE">
+      <value string="same-origin" />
+    </item>
+    <item name="HTTP_SEC_FETCH_MODE">
+      <value string="no-cors" />
+    </item>
+    <item name="HTTP_SEC_FETCH_DEST">
+      <value string="script" />
+    </item>
+  </serverVariables>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="glepa1prgzsui1mzqusmxfux" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="HN_Tjwqnz5RXMkauFyzACFsd5z3hMYM3N6ZKk26bhPJLRJCZPbpadBGiPnh_SY8CK8MZ9wDDnYN6zYNwgZPaOvuKWsFfuWH96dbIP1VqzRU1" />
+    </item>
+    <item name="BO">
+      <value string="7AC795D3B3E2D596F04CDCE54B64A2FE75E16A8DE6E7C76D05E9DC18B1D8F1E91B39F3A47C4F9DADB73B55A65A34FABA6DACB110BC96EBF1DDCC80C3E279378EFF6950AF0860B65A402BF07AF0A21C352609E363A47EC1EE7F41F02BC95D1588" />
+    </item>
+  </cookies>
+</error>

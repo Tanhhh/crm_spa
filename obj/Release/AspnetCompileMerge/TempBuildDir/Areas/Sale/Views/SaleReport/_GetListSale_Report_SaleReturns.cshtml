@@ -1,0 +1,69 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_Report_SaleReturnsViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+    @helper GridColumnStatusEquipment(string status)
+        {
+
+            switch (status)
+            {
+                case "pending":
+                    <span class="label label-info">@Wording.OrderStatusDisplay_pending</span>
+                    break;
+                case "inprogress":
+                    <span class="label label-warning">@Wording.OrderStatusDisplay_inprogress</span>
+                    break;
+                case "shipping":
+                    <span class="label label-warning">@Wording.OrderStatusDisplay_shipping</span>
+                    break;
+                case "complete":
+                    <span class="label label-success">@Wording.OrderStatusDisplay_complete</span>
+                    break;
+                case "delete":
+                    <span class="label label-danger">@Wording.OrderStatusDisplay_delete</span>
+                    break;
+            }
+}
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Trạng thái</th>
+                <th class="text-center">Mã đơn hàng</th>
+                <th class="text-center">Mã khách hàng</th>
+                <th class="text-center">Tên khách hàng</th>
+                <th class="text-center">Tổng tiền</th>
+                <th class="text-center">Số lượng</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+                <td>@GridColumnStatusEquipment(item.Status)</td>
+                <td>
+                    <a onclick="OpenPopup('@Url.Action("Detail", "SalesReturns", new { area = "Sale", Id = item.SalesReturnsId, IsPopup = true })', '', 0, 0)">@item.Code</a>
+                </td>
+                <td>@item.CustomerCode</td>
+                <td>@item.CustomerName</td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(item.TotalAmount, null))</td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(item.Quantity, null))</td>
+            </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" style="text-align:right"><b>Tổng</b></td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalAmount), null))</td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Quantity), null))</td>
+            </tr>
+        </tfoot>
+    </table>

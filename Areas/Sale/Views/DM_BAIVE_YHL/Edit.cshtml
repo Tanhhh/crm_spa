@@ -1,0 +1,190 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.Domain.Sale.Entities
+
+@model DM_BAIVE_YHLViewModel
+
+@{
+    ViewBag.Title = "Cập nhật Bài viết";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "DM_BAIVE_YHL",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    IEnumerable<SelectListItem> loaibaiList = (IEnumerable<SelectListItem>)ViewBag.loaibaiList;
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+<div class="text-danger">@ViewBag.errors</div>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Edit", "DM_BAIVE_YHL", null, FormMethod.Post, new { id = "EditTinTuc", @class = "form-horizontal clearfix", enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+    @Html.HiddenFor(model => model.BAIVE_YHL_ID)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.HiddenFor(model => model.IS_SHOW)
+    @Html.HiddenFor(model => model.HINHANH)
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-info-circle"></i> Tổng quan</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#image" aria-expanded="false"><i class="fa fa-image"></i> Hình ảnh</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#TT" aria-expanded="false"><i class="fa fa-comment-o"></i> Tóm Tắt</a>
+                                </li>
+                                <li>
+                                    <a data-toggle="tab" href="#ND" aria-expanded="false"><i class="fa fa-comment-o"></i> Nội dung</a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane active">
+                                    @Html.CustomDropDownListFor(model => model.CODE_LOAIBAI, loaibaiList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                    
+                                    @Html.CustomTextboxFor(model => model.TIEUDE, null, null, WidthType.span12)
+
+                                    <div class="control-group form-group">
+                                        <label class="control-label col-lg-5 col-md-4 col-sm-4">Hiện</label>
+                                        <label>
+                                            <input id=" is_show" class="ace class-is-show text-center" type="checkbox" name="is-show-checkbox" value="1" checked="@(Model.IS_SHOW == 1 ? "checked" : null)">
+                                            <span class="lbl"></span>
+                                        </label>
+                                    </div>
+                                   
+                                </div>
+
+                                <div id="image" class="tab-pane">
+                                    <div class="wrap-btn-upload">
+                                        <a class="btn btn-primary btn-sm btn-white"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                                        <input type="file" id="file-image" name="file-image" class="file-image" onchange="previewFileImage(event, '#display-image img')" />
+                                    </div>
+                                    <div class="text-center" id="display-image">
+                                        <img src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.HINHANH, "tintuckhac-image-folder", "tintuckhac"))" title="@Model.TIEUDE" id="" style="max-height:250px" />
+                                    </div>
+                                </div>
+                                <div id="TT" class="tab-pane">
+                                    <textarea class="ckeditor" cols="20" id="TOMTAT" name="TOMTAT" placeholder="" rows="2">@Model.TOMTAT</textarea>
+
+                                </div>
+                                <div id="ND" class="tab-pane">
+                                    <textarea class="ckeditor" cols="20" id="NOIDUNG" name="NOIDUNG" placeholder="" rows="2">@Model.NOIDUNG</textarea>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+@section Scripts {
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    <script>
+        $("#save").click(function () {
+            if ($('#ANH_DAIDIEN').val() == null) {
+                if ($('#file-image').get(0).files.length === 0) {
+                    alert("Chưa chọn banner");
+                    return false;
+                }
+            }
+        });
+
+        $(document).ready(function () {
+
+            // resetLableRequired('#EditProduct');
+            //parseValidatorForm('#ProductInBound');
+            $('#Save').click(function () {
+                ShowLoading();
+
+                
+                        ClearFormatBeforeSubmit($("#EditTinTuc"));
+                        $("#EditTinTuc").submit();
+                    
+                
+
+                // HideLoading();
+            });
+
+        });
+
+        function initCkeditor() {
+            $('.ckeditor').ckeditor({
+                "extraPlugins": 'imagebrowser',
+                "imageBrowser_listUrl": "@Url.Action("ListJson","Images")",
+                // Define the toolbar groups as it is a more accessible solution.
+                toolbarGroups: [
+                    { "name": "document", "groups": ["mode", "document", "doctools"] },
+                    { "name": "editing", "groups": ["find", "selection", "spellchecker"] },
+                    { "name": "forms" },
+                    { "name": "tools" },
+                    { "name": "basicstyles", "groups": ["basicstyles", "cleanup"] },
+                    { "name": "clipboard", "groups": ["clipboar", "undo"] },
+                    { "name": "links", "groups": ["links"] },
+                    { "name": "paragraph", "groups": ["list", "blocks"] },
+                    { "name": "insert", "groups": ["insert"] },
+                    { "name": "styles", "groups": ["styles"] },
+                    //{ "name": "about", "groups": ["about"] },
+                    { "name": "styles" },
+                    { "name": "colors" },
+                    { "name": "align", "groups": ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+
+                ],
+                // Remove the redundant buttons from toolbar groups defined above.
+                removeButtons: 'Underline,Strike,Subscript,Superscript,Anchor,Styles,Specialchar'
+            });
+        }
+        var $tr_template = $('#detailList tr:first-child');
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.BAIVE_YHL_ID" >@Model.TIEUDE</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+
+        });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

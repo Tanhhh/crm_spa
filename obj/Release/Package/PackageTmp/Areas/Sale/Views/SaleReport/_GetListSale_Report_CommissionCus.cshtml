@@ -1,0 +1,57 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_Report_CommissionCusViewModel>
+    @{
+        Layout = null;
+        int index = 0;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-center">Chương trình Khuyến mãi</th>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Tên sản phẩm/dịch vụ</th>
+                <th class="text-center">Mã sản phẩm/dịch vụ</th>
+                <th class="text-center">HSD(tháng)</th>
+                <th class="text-center">Ngày bắt  đầu</th>
+                <th class="text-center">Ngày kết thúc</th>
+                <th class="text-center">Số lượng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var qq in Model.GroupBy(x => x.Name))
+            {
+                var row_count = 0;
+                foreach (var item in Model.Where(x => x.Name == qq.Key))
+                {
+                    @*@foreach (var item in Model)
+                        {*@
+                    index++;
+
+                    <tr class="@(index%2==0?"alert-warning":"")">
+                        @if (row_count == 0)
+                        {
+                            row_count++;
+                            <td rowspan="@Model.Where(x=>x.Name==qq.Key).Count()" data-name="" style="width:100px;text-align:center">@item.Name</td>
+                        }
+                        <td style="width:40px;text-align:center">@(index)</td>
+                        @*<td>@item.Name</td>*@
+                        <td class="text-center">@item.ProductName</td>
+                        <td class="text-center">@item.ProductCode</td>
+                        <td class="text-center">@(CommonSatic.ToCurrencyStr(item.ExpiryMonth, null))</td>
+                        <td class="text-center">@(item.StartDate.HasValue ? item.StartDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                        <td class="text-center">@(item.EndDate.HasValue ? item.EndDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                        <td class="text-right">@(CommonSatic.ToCurrencyStr(item.Quantity, null))</td>
+                    </tr>
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="7" style="text-align:right"><b>Tổng</b></td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Quantity), null))</td>
+            </tr>
+        </tfoot>
+    </table>

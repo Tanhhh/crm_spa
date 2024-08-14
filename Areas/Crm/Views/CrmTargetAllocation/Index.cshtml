@@ -1,0 +1,2932 @@
+﻿@model List<Erp.BackOffice.Crm.Models.CrmTargetAllocationViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = Wording.PageIndex_TargetAllocation;
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "CrmTargetAllocation",
+            ActionName = "Index",
+            PageTitle = "Nhập Target các chỉ số",
+            DisplaySearchPanel = false,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        //
+
+    }
+   
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.0/js/select2.min.js"></script>
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    @section HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+    }
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+
+    }
+    <style>
+        #employeeData .col-md-2 {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 0;
+        }
+
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            background-color: #fff;
+            border-collapse: collapse;
+        }
+
+
+            .table th,
+            .table td {
+                padding: 0.75rem;
+                vertical-align: middle;
+                border: 1px solid #dee2e6;
+                text-align: center;
+            }
+
+        .table-bordered {
+            border: 1px solid #dee2e6;
+        }
+
+            .table-bordered th,
+            .table-bordered td {
+                border: 1px solid #dee2e6;
+            }
+
+        .table-hover tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .header-cell {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+            color: white;
+            padding: 0.3rem 1rem;
+            font-size: 0.875rem;
+            border: none;
+            outline: none !important;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+
+        .edit-button {
+            padding: 0.3rem 1rem;
+            border: none;
+            outline: none !important;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+
+        .distribute-button {
+            padding: 0.3rem 1rem;
+            border: none;
+            outline: none !important;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .form-control {
+            padding: 0.3rem 0.6rem;
+            font-size: 1.25rem;
+        }
+
+        .table-container {
+            /*width: 300rem !important;*/
+            overflow-x: auto;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+
+
+
+        #dataTable th,
+        #dataTable td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        #dataTable th {
+            background-color: #428BCA;
+            color: white;
+        }
+
+            #dataTable th:first-child,
+            #dataTable td:first-child {
+                width: 500px;
+            }
+
+        #dataTable {
+            width: 300rem;
+            border-collapse: collapse;
+        }
+
+        .btn-style,
+        .btn-styleReset {
+            padding: .7rem 1.5rem !important;
+            border: none !important;
+            border-radius: 2px !important;
+            outline: none !important;
+            margin: auto !important;
+        }
+
+        .btn-styleReset {
+            padding: .5rem 1.5rem !important;
+            background: #e48484 !important;
+        }
+
+            .btn-styleReset:hover {
+                background: #ff4444 !important;
+            }
+
+            .btn-style:hover,
+            .btn-styleReset:hover,
+            .btn-styleSave:hover {
+                cursor: pointer !important;
+                transform: scale(.98);
+                box-shadow: 0 5px 10px rgba(0,0,0, 0.3);
+                transition: .3s linear;
+            }
+
+        .btn-styleSave {
+            border: none;
+            outline: none !important;
+            font-size: 14px;
+            padding: .6rem 2.5rem;
+            background: #11c42c !important;
+            border-radius: 3px;
+        }
+
+        #tableBody input[type=number] {
+            text-align: right
+        }
+
+        .btn-addIndex {
+            border: none !important;
+            border-radius: 2px;
+            outline: none !important;
+            font-size: 1.3rem;
+            padding: .5rem 2rem;
+            text-transform: uppercase;
+        }
+    </style>
+    <div class="row">
+        <div class="col-md-4">
+            <label for="branch">Chi nhánh:</label>
+            <select id="branch" class="form-control custom-select">
+                <option value="">Chọn chi nhánh</option>
+                @foreach (var branch in ViewBag.Branches)
+                {
+                    if (!string.IsNullOrEmpty(branch.Value) && !string.IsNullOrEmpty(branch.Text))
+                    {
+                        <option value="@branch.Value">@branch.Text</option>
+                    }
+                }
+            </select>
+
+        </div>
+        <div class="col-md-1">
+            <label for="month">Tháng:</label>
+            <br />
+            <select id="month" style="height: 30px; border-radius: 3px;">
+                <option value="01">Tháng 1</option>
+                <option value="02">Tháng 2</option>
+                <option value="03">Tháng 3</option>
+                <option value="04">Tháng 4</option>
+                <option value="05">Tháng 5</option>
+                <option value="06">Tháng 6</option>
+                <option value="07">Tháng 7</option>
+                <option value="08">Tháng 8</option>
+                <option value="09">Tháng 9</option>
+                <option value="10">Tháng 10</option>
+                <option value="11">Tháng 11</option>
+                <option value="12">Tháng 12</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <label for="year">Năm:</label>
+            <br />
+            <select id="year" style="height: 30px; border-radius: 3px; width: 8rem;">
+                <!-- Populate the options dynamically in JavaScript -->
+            </select>
+        </div>
+        <div class="col-md-2" style="display:none">
+            <label for="monthYear">Tháng năm:</label>
+            <br />
+            <input id="MonthYear" name="MonthYear" type="month">
+        </div>
+        <div class="col-md-4">
+            <label for="indexType">Loại chỉ số:</label>
+            <select id="indexType" class="form-control custom-select" style="height: 30px; border-radius: 3px;" ">
+                <option value="">Chọn loại chỉ số</option>
+                <option value="1">Call</option>
+                <option value="2">Play</option>
+                <option value="3">Hẹn</option>
+                <option value="4">Lên</option>
+                <option value="5">Mua</option>
+                <option value="6">Doanh số ảo</option>
+                <option value="7">Doanh số thực</option>
+
+                <!-- Populate with options -->
+            </select>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <label for="target">Target:</label>
+            <input type="text" id="target" style="border-radius: 3px !important;" class="form-control" placeholder="Nhập Target">
+        </div>
+        <div class="col-md-1" style="margin-top:25px">
+            <button id="allocateButton" class="btn btn-primary btn-style">Phân bổ</button>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <label for="target">Target 2:</label>
+            <input type="text" id="target2" style="border-radius: 3px !important;" class="form-control" placeholder="Nhập Target 2">
+        </div>
+        <div class="col-md-1" style="margin-top:25px">
+            <button id="allocateButton2" class="btn btn-primary btn-style">Phân bổ</button>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <label for="employeeGroupDropdown">Nhóm nhân viên:</label>
+            <select id="employeeGroupDropdown" class="form-control">
+                <option value="" selected style="color: #aaa;">Chọn nhóm nhân viên</option>
+                <!-- Options sẽ được cập nhật bằng JavaScript -->
+            </select>
+        </div>
+        <div class="col-md-1" style="margin-top:24px; ">
+            <button class="btn btn-primary btn-styleReset" type="button" id="resetButton" style="margin-top: 15px; width: 100%;">Reset</button>
+        </div>
+    </div>
+    <br />
+
+
+    <div class="row" id="employeeGrid" style="display: none;">
+        <div class="col-md-12">
+            <label>Nhân viên:</label>
+            <div id="employeeData"></div>
+        </div>
+    </div>
+
+    <br />
+    <div class="row" id="addButtonRow" style="display: none;">
+        <div class="col-md-12">
+            <button id="addButton" class="btn btn-primary btn-addIndex">Add</button>
+        </div>
+    </div>
+
+
+
+
+    <br />
+    <div class="row" id="tableRow" style="display: none;">
+        <div class="col-md-12">
+
+            <table class="table table-bordered table-hover">
+                <tbody id="tableBody">
+                    <tr id="employeeRow">
+                        <td class="header-cell">Nhân viên</td>
+                    </tr>
+                    <tr id="targetRow">
+                        <td class="header-cell">Target</td>
+                    </tr>
+                    <tr id="targetRow2">
+                        <td class="header-cell">Target 2</td>
+                    </tr>
+                    <tr id="actionRow">
+                        <td class="header-cell">Thao tác</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <div class="col-md-12">
+            <button id="saveMultipleButton" class="btn btn-primary btn-styleSave">Lưu</button>
+        </div>
+    </div>
+
+    <br />
+    <div class="row" id="tableRowOfDay" style="display:none;">
+        <div class="col-md-12">
+            <div class="table-container">
+                <table class=" table-bordered table-hover table-striped table-responsive" id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Tên</th>
+                            <th>Thao tác</th>
+                            <th>1</th>
+                            <th>2</th>
+                            <th>3</th>
+                            <th>4</th>
+                            <th>5</th>
+                            <th>6</th>
+                            <th>7</th>
+                            <th>8</th>
+                            <th>9</th>
+                            <th>10</th>
+                            <th>11</th>
+                            <th>12</th>
+                            <th>13</th>
+                            <th>14</th>
+                            <th>15</th>
+                            <th>16</th>
+                            <th>17</th>
+                            <th>18</th>
+                            <th>19</th>
+                            <th>20</th>
+                            <th>21</th>
+                            <th>22</th>
+                            <th>23</th>
+                            <th>24</th>
+                            <th>25</th>
+                            <th>26</th>
+                            <th>27</th>
+                            <th>28</th>
+                            <th>29</th>
+                            <th>30</th>
+                            <th>31</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" style="width: 300rem !important; ">
+                        <!-- Nội dung bảng -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+
+    </div>
+    <br />
+    <div class="col-md-12" id="btnSaveTargetOfDayRow" style="display: none; padding: 0">
+        <button id="btnSaveTargetOfDay" class="btn btn-primary btn-styleSave">Lưu</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script>
+        document.getElementById('target').addEventListener('input', function (e) {
+            var targetInput = e.target;
+            var value = targetInput.value.replace(/\D/g, ''); // Loại bỏ tất cả các ký tự không phải số
+            var formattedValue = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Thêm dấu chấm phân cách hàng nghìn
+
+            targetInput.value = formattedValue;
+        });
+
+        document.getElementById('target2').addEventListener('input', function (e) {
+            var targetInput = e.target;
+            var value = targetInput.value.replace(/\D/g, ''); // Loại bỏ tất cả các ký tự không phải số
+            var formattedValue = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); // Thêm dấu chấm phân cách hàng nghìn
+
+            targetInput.value = formattedValue;
+        });
+    // Lắng nghe sự kiện khi thay đổi dropdown
+        $(document).ready(function () {
+
+        $('#employeeGroupDropdown').select2();
+        $('#branch').select2();
+            // Thêm mã JavaScript để tạo dropdown chọn tháng và năm
+            var currentYear = new Date().getFullYear();
+            var yearDropdown = $('#year');
+            for (var i = currentYear; i <= currentYear + 100; i++) {
+                yearDropdown.append('<option value="' + i + '">' + i + '</option>');
+            }
+
+            // Lắng nghe sự kiện thay đổi của các dropdown
+            $('#month, #year').change(function () {
+
+                $('#employeeGrid').hide();
+                $('#employeeData').empty();
+                $('#addButtonRow').hide();
+                $('#tableRow').hide();
+                $('#tableRowOfDay').hide();
+                $('#btnSaveTargetOfDay').hide();
+                $('#tableRowOfDay tbody').empty();
+
+                dailyTargetsOfDay = [];
+                dailyTargetsOfDay2 = [];
+
+                var selectedMonth = $('#month').val();
+                var selectedYear = $('#year').val();
+                var monthYearInput = $('#MonthYear');
+                monthYearInput.val(selectedYear + '-' + selectedMonth);
+
+            });
+
+        // Khi thay đổi chi nhánh
+$('#branch').change(function () {
+    var branchId = $(this).val();
+    var groups = @Html.Raw(Json.Encode(ViewBag.Groups)); // Change this line
+    var firstColumnHtml = $('#employeeRow td:first-child').prop('outerHTML');
+    var firstColumnHtml2 = $('#targetRow td:first-child').prop('outerHTML');
+    var firstColumnHtml3 = $('#actionRow td:first-child').prop('outerHTML');
+    $('#employeeRow').empty().append(firstColumnHtml);
+    $('#targetRow').empty().append(firstColumnHtml2);
+    $('#actionRow').empty().append(firstColumnHtml3);
+    $('#employeeGroupDropdown').empty().append('<option value="" selected>Chọn nhóm nhân viên</option>');
+    $('#employeeGrid').hide();
+    $('#employeeData').empty();
+    $('#addButtonRow').hide();
+    $('#tableRow').hide();
+    $('#tableRowOfDay').hide();
+    $('#tableRowOfDay tbody').empty();
+
+    $('#btnSaveTargetOfDay').hide();
+    var selectedMonth = $('#month').val();
+    var selectedYear = $('#year').val();
+    var monthYearNow = $('#MonthYear').val();
+    if (!monthYearNow) {
+        if (!selectedMonth) {
+            selectedMonth = '01';
+        }
+        if (!selectedYear) {
+            selectedYear = '2024';
+        }
+        $('#MonthYear').val(selectedYear + '-' + selectedMonth);
+    }
+    dailyTargetsOfDay = [];
+    dailyTargetsOfDay2 = [];
+
+    selectedEmployees = [];
+    console.log('groups', groups);
+    $.each(groups, function (index, group) {
+        if (group.Text !== null) {
+            $('#employeeGroupDropdown').append('<option value="' + group.Value + '">' + group.Text + '</option>');
+        }
+    });
+});
+
+         // Khi thay đổi chi nhánh
+            $('#indexType').change(function () {
+
+             $('#employeeGrid').hide();
+             $('#employeeData').empty();
+             $('#addButtonRow').hide();
+             $('#tableRow').hide();
+             $('#tableRowOfDay').hide();
+                 $('#btnSaveTargetOfDay').hide();
+                $('#tableRowOfDay tbody').empty();
+                dailyTargetsOfDay = [];
+                dailyTargetsOfDay2 = [];
+
+         selectedEmployees = [];
+                var selectedMonth = $('#month').val();
+                var selectedYear = $('#year').val();
+                var monthYearNow = $('#MonthYear').val();
+                if (!monthYearNow) {
+                    if (!selectedMonth) {
+                        selectedMonth = '01';
+                    }
+                    if (!selectedYear) {
+                        selectedYear = '2024';
+                    }
+                    $('#MonthYear').val(selectedYear + '-' + selectedMonth);
+                }
+ });
+
+
+        $('#employeeGroupDropdown').on('change', function () {
+            var selectedGroupId = $(this).val();
+
+            // Kiểm tra xem giá trị được chọn có phải là "Chọn nhóm nhân viên" không
+            if (selectedGroupId === "") {
+                // Ẩn phần lưới và reset dữ liệu
+                $('#employeeGrid').hide();
+                $('#employeeData').empty();
+                $('#addButtonRow').hide();
+
+            } else {
+                // Nếu không, gọi hàm để hiển thị dữ liệu tương ứng
+                displayEmployeeData(selectedGroupId);
+            }
+        });
+
+        $('#branch, #month, #year, #indexType').change(function () {
+    var selectedBranchId = $('#branch').val();
+    var selectedMonthYear = $('#MonthYear').val();
+    var selectedTypeTarget = $('#indexType').val();
+
+    // Kiểm tra xem tất cả các dropdown đã được chọn chưa
+    if (selectedBranchId && selectedMonthYear && selectedTypeTarget) {
+        $('#employeeRow td.employee-name').remove();
+        $('#targetRow td.employee-target').remove();
+        $('#targetRow2 td.employee-target2').remove();
+
+        $('#actionRow .employee-action').remove();
+
+        var targetNew = @Html.Raw(Json.Encode(ViewBag.TargetNew));
+
+        // Lọc dữ liệu theo branchId, typeTarget và monthYear
+        var filteredTargetNew = targetNew.filter(function (item) {
+            return item.BranchId == selectedBranchId && item.TypeTarget == selectedTypeTarget && item.MonthYear == selectedMonthYear;
+        });
+            var isEmployee = @Html.Raw(Json.Encode(ViewBag.IsEmployee));
+
+        // Nếu là nhân viên
+        if (isEmployee === 1) {
+            var loggedInUserId = @Html.Raw(Json.Encode(ViewBag.UserLoginId));
+
+            // Lọc dữ liệu chỉ cho người đăng nhập
+            filteredTargetNew = filteredTargetNew.filter(function (item) {
+                return item.UserId === loggedInUserId;
+            });
+        }
+
+        // Tính tổng các giá trị TargetTotal và TargetTotal2
+        var totalTarget = filteredTargetNew.reduce(function (sum, item) {
+            return sum + parseInt(item.TargetTotal.replace(".", ""), 10);
+        }, 0);
+
+        var totalTarget2 = filteredTargetNew.reduce(function (sum, item) {
+            return sum + parseInt(item.TargetTotal2.replace(".", ""), 10);
+        }, 0);
+
+        var formattedValue = totalTarget.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        var formattedValue2 = totalTarget2.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+        // Hiển thị tổng các giá trị trong các ô đầu vào
+        $('#target').val(formattedValue);
+        $('#target2').val(formattedValue2);
+        checkDataTargetNew(selectedBranchId, selectedTypeTarget, selectedMonthYear);
+    }
+});
+
+// Hàm kiểm tra dữ liệu
+function checkDataTargetNew(branchId, typeTarget, monthYear) {
+    var targetNew = @Html.Raw(Json.Encode(ViewBag.TargetNew));
+    var isEmployee = @Html.Raw(Json.Encode(ViewBag.IsEmployee));
+    console.log('isEmployee', isEmployee);
+
+    // Lọc dữ liệu theo branchId, typeTarget và monthYear
+    var filteredTargetNew = targetNew.filter(function (item) {
+        return item.BranchId == branchId && item.TypeTarget == typeTarget && item.MonthYear == monthYear;
+    });
+    console.log(filteredTargetNew);
+
+    $.ajax({
+        url: '/CrmTargetAllocation/CheckTargetNewUsers',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            BranchId: branchId,
+            TypeTarget: typeTarget,
+            MonthYear: monthYear
+        }),
+        success: function (response) {
+            if (response.success && response.targetData && response.targetData.length > 0) {
+                if (isEmployee === 1) {
+                    // Nếu là nhân viên, chỉ hiển thị target của người đăng nhập
+                    var loggedInUserId = @Html.Raw(Json.Encode(ViewBag.UserLoginId));
+                    var filteredTargetData = response.targetData.filter(function (item) {
+                        return item.UserId === loggedInUserId;
+                    });
+
+                    console.log('filteredTargetData', filteredTargetData);
+                    showDataInTable(filteredTargetData);
+                } else {
+                    // Nếu không phải nhân viên, hiển thị tất cả dữ liệu như bình thường
+                    showDataInTable(response.targetData);
+                }
+                console.log('response.targetData',response.targetData);
+            } else {
+                $('#employeeRow .employee-name').remove();
+                $('#targetRow .employee-target').remove();
+                $('#targetRow2 .employee-target2').remove();
+                $('#actionRow .employee-action').remove();
+                $('#tableRow').hide();
+            }
+        },
+        error: function () {
+            console.log('Error occurred while calling the API.');
+        }
+    });
+            }
+            function showDataInTable(filteredTargetNew) {
+                // Lặp qua từng phần tử trong mảng filteredTargetNew và hiển thị dữ liệu tương ứng
+                filteredTargetNew.forEach(function (item) {
+                    var employeeName = item.UserName;
+                    var employeeId = item.UserId;
+                    var selectedBranchId = $('#branch').val();
+                    var selectedMonthYear = $('#MonthYear').val();
+                    var selectedTypeTarget = $('#indexType').val();
+
+                    // AJAX call to get target data from the server
+                    $.ajax({
+                        url: '/CrmTargetAllocation/CheckTargetNew',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            BranchId: selectedBranchId,
+                            UserId: employeeId,
+                            TypeTarget: selectedTypeTarget,
+                            MonthYear: selectedMonthYear
+                        }),
+                        success: function (response) {
+                            if (response.success) {
+                                var target = parseInt(response.targetData.TargetTotal.replace(".", ""), 10);
+                                var target2 = parseInt(response.targetData.TargetTotal2.replace(".", ""), 10);
+
+                                $('#employeeRow tr[data-user-id="' + employeeId + '"]').show();
+                                // Thêm dòng mới và các nút thao tác vào cột "Thao tác"
+                                addRowAndButtons(employeeId, selectedBranchId, selectedTypeTarget, selectedMonthYear, target, target2, employeeName, response.targetData.TargetTotal, response.targetData.TargetTotal2);
+                                $('#tableRow').show();
+
+                            } else {
+                                $('#employeeRow tr[data-user-id="' + employeeId + '"]').hide();
+                                $('#tableRow').hide();
+
+                            }
+                        },
+                        error: function () {
+                            console.log('Error occurred while calling the API.');
+                        }
+                    });
+                });
+
+            }
+
+
+            function addRowAndButtons(employeeId, selectedBranchId, selectedTypeTarget, selectedMonthYear, target, target2, employeeName, targetTotalDB, targetTotal2DB) {
+                $('#employeeRow').append('<td class="employee-name" data-user-id="' + employeeId + '">' + employeeName + '</td>');
+
+                $('#targetRow').append('<td class="employee-target" data-user-id="' + employeeId + '" data-edited="false">' + target + '</td>');
+                $('#targetRow2').append('<td class="employee-target2" data-user-id="' + employeeId + '" data-edited="false">' + target2 + '</td>');
+
+                // Thêm nút thao tác vào cột "Thao tác"
+                var deleteButton = $('<button class="btn btn-mini btn-danger delete-danger" data-user-id="' + employeeId + '"><i class="fa fa-trash mr-1"></i>Xóa</button>');
+                var editButton = $('<button class="btn btn-mini btn-warning edit-button" style="margin-left:5px"><i class="fa fa-edit mr-1"></i>Sửa</button>');
+                var saveButton = $('<button class="btn btn-mini btn-success save-button" style="display:none;margin-left:5px"><i class="fa fa-save mr-1"></i>Đồng ý</button>');
+
+                var distributeButton;
+                distributeButton = $('<button class="btn btn-mini btn-primary distribute-button" style="margin-left:5px" data-user-id="' + employeeId + '"></button>');
+                updateDistributeButton(selectedBranchId, employeeId, selectedTypeTarget, selectedMonthYear, targetTotalDB, targetTotal2DB);
+                $('#actionRow').append('<td class="employee-action"></td>').children('td:last').append(deleteButton).append(editButton).append(saveButton).append(distributeButton);
+            }
+
+            function updateDistributeButton(selectedBranchId, employeeId, selectedTypeTarget, selectedMonthYear, targetTotalDB, targetTotal2DB) {
+      $.ajax({
+          url: '@Url.Action("CheckTargetNewDay", "CrmTargetAllocation")',
+          type: 'POST',
+          contentType: "application/json; charset=utf-8",
+          data: JSON.stringify({
+              BranchId: selectedBranchId,
+              UserId: employeeId,
+              TypeTarget: selectedTypeTarget,
+              MonthYear: selectedMonthYear
+          }),
+          success: function (response) {
+              if (response.success) {
+                  var totalTarget = 0;
+                  for (var i = 1; i <= 31; i++) {
+                      var targetValue = response.targetData['TargetDay' + i] ? parseFloat(response.targetData['TargetDay' + i].replace(',', '.')) : 0;
+                      totalTarget += targetValue;
+                  }
+                  var totalTarget2 = 0;
+                  for (var i = 1; i <= 31; i++) {
+                      var targetValue2 = response.targetData['TargetDay' + i + '_2'] ? parseFloat(response.targetData['TargetDay' + i + '_2'].replace(',', '.')) : 0;
+                      totalTarget2 += targetValue2; // Cộng vào tổng target 2
+                  }
+                  targetTotalDB = targetTotalDB.replace(',', '.');
+                  targetTotal2DB = targetTotal2DB.replace(',', '.');
+                  console.log('targetTotalDB', targetTotalDB);
+                  console.log('targetTotal2DB', targetTotal2DB);
+                  console.log('totalTarget', totalTarget);
+                  console.log('totalTarget2', totalTarget2);
+
+                  var epsilon = 2;
+                  if (Math.abs(totalTarget - targetTotalDB) < epsilon && Math.abs(totalTarget2 - targetTotal2DB) < epsilon) {
+                      $('.distribute-button[data-user-id="' + employeeId + '"]').text('Xem');
+
+                  }
+                  else {
+                      $('.distribute-button[data-user-id="' + employeeId + '"]').text('Phân bổ');
+
+                  }
+
+              } else {
+                  $('.distribute-button[data-user-id="' + employeeId + '"]').text('Phân bổ');
+              }
+          },
+          error: function () {
+              // Xử lý lỗi khi gọi ajax
+              console.log('Error occurred while calling the API.');
+          }
+      });
+  }
+          function checkTargetAndSetText(selectedBranchId, employeeId, selectedTypeTarget, selectedMonthYear) {
+            $.ajax({
+                url: '@Url.Action("CheckTargetNewDay", "CrmTargetAllocation")',
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    BranchId: selectedBranchId,
+                    UserId: employeeId,
+                    TypeTarget: selectedTypeTarget,
+                    MonthYear: selectedMonthYear
+                }),
+                success: function (response) {
+                    if (response.success) {
+                        return true; // Trả về true nếu có dữ liệu
+                    } else {
+                        return false; // Trả về false nếu không có dữ liệu
+                    }
+                },
+                error: function () {
+                    // Xử lý lỗi khi gọi ajax
+                    console.log('Error occurred while calling the API.');
+                    return false; // Trả về false nếu có lỗi xảy ra
+                }
+            });
+        }
+
+        $(document).on('change', '#employeeData input[type="checkbox"]', function () {
+            var anyChecked = $('#employeeData input[type="checkbox"]:checked').length > 0;
+            if (anyChecked) {
+                $('#addButtonRow').show();
+            } else {
+                $('#addButtonRow').hide();
+            }
+        });
+            var selectedEmployees = []; // Mảng để lưu các nhân viên đã được chọn trước đó
+            var editingColumn = false; // Biến để theo dõi trạng thái đang sửa của cột
+            $('#addButton').on('click', function () {
+
+                // Lấy danh sách nhân viên đã chọn
+                var newlySelectedEmployees = $('#employeeData input[type="checkbox"]:checked');
+
+                if (newlySelectedEmployees.length === 0) {
+                    toastr.clear();
+                    toastr.warning('Vui lòng chọn ít nhất một nhân viên');
+                    return;
+                }
+
+                // Kiểm tra xem có nhân viên đã tồn tại trong bảng hay không ,
+                var duplicatedEmployees = [];
+                newlySelectedEmployees.each(function () {
+                    var employeeId = $(this).val();
+                    var employeeName = $(this).parent().text().trim();
+                    if ($('#employeeRow td.employee-name:contains("' + employeeName + '")').length > 0) {
+                        duplicatedEmployees.push(employeeName);
+                    } else {
+                        selectedEmployees.push({ id: employeeId, name: employeeName });
+
+                        // Lấy target tổng đã được phân bổ
+                        var savedTarget = getTarget();
+                        console.log(savedTarget);
+                        // Cập nhật số lượng nhân viên đã chọn
+                        var selectedEmployeeCount = $('#employeeRow td.employee-name').length + 1; // Số lượng nhân viên đã chọn + 1
+
+                        // Tính giá trị target mới cho nhân viên mới
+                        var targetValue = 0;
+
+                        // Thêm dữ liệu cho nhân viên mới vào bảng
+                        $('#employeeRow').append('<td class="employee-name" data-user-id="' + employeeId + '">' + employeeName + '</td>');
+                        $('#targetRow').append('<td class="employee-target" data-user-id="' + employeeId + '" data-edited="false">' + targetValue + '</td>');
+                        $('#targetRow2').append('<td class="employee-target2" data-user-id="' + employeeId + '" data-edited="false">' + targetValue + '</td>');
+
+                        // Thêm nút thao tác vào cột "Thao tác"
+                        var deleteButton = $('<button class="btn btn-mini btn-danger delete-danger" data-user-id="' + employeeId + '"><i class="fa fa-trash mr-1"></i>Xóa</button>');
+                        var editButton = $('<button class="btn btn-mini btn-warning edit-button" style="margin-left:5px"><i class="fa fa-edit mr-1"></i>Sửa</button>');
+                        var saveButton = $('<button class="btn btn-mini btn-success save-button" style="display:none;margin-left:5px"><i class="fa fa-save mr-1"></i>Lưu</button>');
+                        var distributeButton = $('<button class="btn btn-mini btn-primary distribute-button" style="display:none;margin-left:5px" data-user-id="' + employeeId + '">Phân bổ</button>');
+                        $('#actionRow').append('<td class="employee-action"></td>').children('td:last').append(deleteButton).append(editButton).append(saveButton).append(distributeButton);
+                    }
+                });
+
+                if (duplicatedEmployees.length > 0) {
+                    toastr.clear();
+                    toastr.warning('Nhân viên ' + duplicatedEmployees.join(', ') + ' đã tồn tại trong bảng');
+                    return;
+                }
+
+                // Hiển thị bảng
+                $('#tableRow').show();
+            });
+
+            var targetValuesArray = [];
+
+            // Hàm lưu thông tin userId và target ban đầu vào mảng
+            function saveInitialTargetValues(userId, targetValue1, targetValue2) {
+                // Kiểm tra xem userId đã tồn tại trong mảng chưa
+                var existingEntry = targetValuesArray.find(entry => entry.userId === userId);
+                if (!existingEntry) {
+                    // Nếu chưa tồn tại, thêm thông tin mới vào mảng
+                    targetValuesArray.push({
+                        userId: userId,
+                        targetValue1: targetValue1,
+                        targetValue2: targetValue2
+                    });
+                }
+            }
+
+            // Xử lý sự kiện khi nhấn nút sửa
+            $(document).on('click', '.edit-button', function () {
+                if (editingColumn) {
+                    toastr.clear();
+                    toastr.warning('Vui lòng lưu thay đổi trước khi chỉnh sửa cột khác');
+                    return;
+                }
+
+                var $this = $(this);
+                $this.hide();
+                $this.siblings('.save-button').show();
+
+                var userId = $this.siblings('.distribute-button').data('user-id');
+                var targetValue1, targetValue2;
+
+                // Lưu giá trị ban đầu của target
+                $('td.employee-target[data-user-id="' + userId + '"]').each(function () {
+                    targetValue1 = $(this).text();
+                    $(this).html('<input type="text" class="form-control target-input" value="' + targetValue1 + '" data-original-value="' + targetValue1 + '">');
+                });
+
+                $('td.employee-target2[data-user-id="' + userId + '"]').each(function () {
+                    targetValue2 = $(this).text();
+                    $(this).html('<input type="text" class="form-control target-input" value="' + targetValue2 + '" data-original-value="' + targetValue2 + '">');
+                });
+
+                // Gọi hàm lưu thông tin vào mảng
+                saveInitialTargetValues(userId, targetValue1, targetValue2);
+                console.log(targetValuesArray);
+
+            });
+            $(document).on('click', '.save-button', function () {
+                var $this = $(this);
+                var userId = $this.siblings('.distribute-button').data('user-id');
+                var $input = $('td.employee-target[data-user-id="' + userId + '"] .target-input');
+                var $input2 = $('td.employee-target2[data-user-id="' + userId + '"] .target-input');
+                var inputValue = $input.val();
+                var inputValue2 = $input2.val();
+
+                // Kiểm tra nếu giá trị nhập vào là trống thì sử dụng giá trị hiện tại của cột
+                if (inputValue === null || inputValue === undefined || inputValue.trim() === '') {
+                    inputValue = $input.closest('td.employee-target').text();
+                }
+                if (inputValue2 === null || inputValue2 === undefined || inputValue2.trim() === '') {
+                    inputValue2 = $input2.closest('td.employee-target2').text();
+                }
+
+                // Kiểm tra giá trị nhập vào có hợp lệ không
+                if (!$.isNumeric(inputValue) || !$.isNumeric(inputValue2)) {
+                    toastr.clear();
+                    toastr.warning('Số nhập vào không hợp lệ.');
+                    return;
+                }
+
+                var newTargetValue = parseFloat(inputValue);
+                var newTargetValue2 = parseFloat(inputValue2);
+
+                // Kiểm tra tổng giá trị các target vượt quá target tổng
+                var totalOtherTargets = newTargetValue;
+                var totalOtherTargets2 = newTargetValue2;
+
+                var targetCells = $('td.employee-target, td.employee-target2').filter(function () {
+                    return $(this).data('user-id') !== userId;
+                });
+
+                targetCells.each(function () {
+                    var $cell = $(this);
+                    if ($cell.data('edited') === 'true') {
+                        totalOtherTargets += parseFloat($cell.text());
+                    }
+                });
+
+                var savedTarget = getTarget();
+                var savedTarget2 = getTarget2();
+
+                // Cập nhật giá trị cho cột hiện tại và đánh dấu là đã chỉnh sửa
+                var $targetCell = $input.closest('td.employee-target');
+                var $targetCell2 = $input2.closest('td.employee-target2');
+                $targetCell.text(newTargetValue).data('edited', 'true');
+                $targetCell2.text(newTargetValue2).data('edited', 'true');
+                $this.hide();
+                $this.siblings('.edit-button').show();
+
+
+                if (totalOtherTargets > savedTarget) {
+
+                    return;
+                }
+                else {
+                    if (savedTarget === null) {
+                        return false;
+                    }
+                    else {
+                        updateOtherTargets(userId, newTargetValue, savedTarget);
+                    }
+                }
+
+
+                if (totalOtherTargets2 > savedTarget) {
+
+                    return;
+                }
+                else {
+                    if (savedTarget2 === null) {
+                        return false;
+                    }
+                    else {
+                        updateOtherTargets2(userId, newTargetValue2, savedTarget2);
+                    }
+                }
+
+
+                // Thoát khỏi input chỉnh sửa
+                $input.blur();
+                $input2.blur();
+            });
+
+            $(document).on('click', '.delete-danger', function () {
+                var index = $(this).closest('td').index();
+                var userId = $(this).data('user-id');
+                var branchId = $('#branch').val();
+                var selectedIndexType = $('#indexType').val();
+                var monthYear = $('#MonthYear').val();
+                console.log('userId',userId);
+                console.log('branchId', branchId);
+                console.log('selectedIndexType', selectedIndexType);
+                console.log('monthYear', monthYear);
+
+                Swal.fire({
+                    title: 'Bạn có chắc chắn muốn xóa?',
+                    text: "Dữ liệu Target của nhân viên sẽ bị xóa!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        ShowLoading();
+                         $.ajax({
+                            url: '@Url.Action("DeleteTargetNew", "CrmTargetAllocation")',
+                            type: 'POST',
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify({
+                                BranchId: branchId,
+                                UserId: userId,
+                                TypeTarget: selectedIndexType,
+                                MonthYear: monthYear
+                            }),
+                                            success: function (response) {
+                                if (response.success) {
+                                    // Xóa cột tương ứng trong tất cả các hàng
+                                    $('#employeeRow td').eq(index).remove();
+                                    $('#targetRow td').eq(index).remove();
+                                    $('#targetRow2 td').eq(index).remove();
+                                    $('#actionRow td').eq(index).remove();
+
+                                    if ($('#employeeRow td').length === 0) {
+                                        $('#tableRow').hide();
+                                    }
+                                    HideLoading();
+                                    toastr.clear();
+                                    toastr.success('Xóa thành công!');
+                                    checkRemainingColumns();
+
+                                } else {
+                                    toastr.error(response.message);
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                toastr.error('Đã xảy ra lỗi khi gọi API: ' + error);
+                            }
+                        });
+                    }
+                });
+            });
+
+
+
+            function updateOtherTargets(exceptUserId, newTargetValue, savedTarget) {
+                var totalOtherTargets = newTargetValue;
+                var targetCells = $('td.employee-target').filter(function () {
+                    return $(this).data('user-id') !== exceptUserId;
+                });
+
+                targetCells.each(function () {
+                    var $cell = $(this);
+                    if ($cell.data('edited') === 'true') {
+                        totalOtherTargets += parseFloat($cell.text());
+                    }
+                });
+
+                var remainingTarget = savedTarget - totalOtherTargets;
+                var uneditedCells = targetCells.filter(function () {
+                    return $(this).data('edited') !== 'true';
+                });
+
+                var otherTargetsCount = uneditedCells.length;
+
+                uneditedCells.each(function () {
+                    var newValue = (remainingTarget / otherTargetsCount).toFixed(1).replace(/\.?0+$/, '');
+                    if (newValue.endsWith('.')) {
+                        newValue = newValue.slice(0, -1);
+                    }
+                    $(this).text(newValue);
+                });
+            }
+
+            function updateOtherTargets2(exceptUserId, newTargetValue, savedTarget) {
+
+                var totalOtherTargets = newTargetValue;
+                var targetCells = $('td.employee-target2').filter(function () {
+                    return $(this).data('user-id') !== exceptUserId;
+                });
+
+                targetCells.each(function () {
+                    var $cell = $(this);
+                    if ($cell.data('edited') === 'true') {
+                        totalOtherTargets += parseFloat($cell.text());
+                    }
+                });
+
+                var remainingTarget = savedTarget - totalOtherTargets;
+                var uneditedCells = targetCells.filter(function () {
+                    return $(this).data('edited') !== 'true';
+                });
+
+                var otherTargetsCount = uneditedCells.length;
+
+                uneditedCells.each(function () {
+                    var newValue = (remainingTarget / otherTargetsCount).toFixed(1).replace(/\.?0+$/, '');
+                    if (newValue.endsWith('.')) {
+                        newValue = newValue.slice(0, -1);
+                    }
+                    $(this).text(newValue);
+                });
+            }
+
+
+            function getTargetValuesByUserId(userId) {
+                var entry = targetValuesArray.find(entry => entry.userId === userId);
+                if (entry) {
+                    return {
+                        targetValue1: entry.targetValue1,
+                        targetValue2: entry.targetValue2
+                    };
+                } else {
+                    return null; // Hoặc giá trị mặc định nếu không tìm thấy
+                }
+            }
+
+           $('#saveMultipleButton').on('click', function () {
+
+            var branchId = $('#branch').val();
+            if (!branchId) {
+                toastr.clear();
+                toastr.warning('Vui lòng chọn chi nhánh.');
+                return;
+               }
+               var selectedMonth = $('#month').val();
+               var selectedYear = $('#year').val();
+               var monthYearNow = $('#MonthYear').val();
+               if (!monthYearNow) {
+                   if (!selectedMonth) {
+                       selectedMonth = '01';
+                   }
+                   if (!selectedYear) {
+                       selectedYear = '2024';
+                   }
+                   $('#MonthYear').val(selectedYear + '-' + selectedMonth);
+               }
+               var monthYear = $('#MonthYear').val();
+
+               console.log('monthYear',monthYear);
+
+
+               var monthYearArray = monthYear.split('-');
+               var selectedYear = parseInt(monthYearArray[0]);
+               var selectedMonth = parseInt(monthYearArray[1]);
+
+               // Lấy tháng và năm hiện tại
+               var currentYear = new Date().getFullYear();
+               var currentMonth = new Date().getMonth() + 1; // Tháng trong JavaScript đếm từ 0, nên cần cộng thêm 1
+
+
+    var selectedIndexType = $('#indexType').val();
+    if (!selectedIndexType) {
+        toastr.clear();
+        toastr.warning('Vui lòng chọn loại chỉ số.');
+        return;
+    }
+
+    // Lấy tất cả ID có trong bảng
+    var userIds = [];
+    var zeroTargetUsers = [];
+    var zeroTargetUsers2 = [];
+
+    $('#employeeRow td').each(function () {
+        var userId = $(this).data('user-id');
+        if (userId) {
+            userIds.push(userId);
+            var targetValue = parseFloat($('#targetRow td[data-user-id="' + userId + '"]').text());
+            if (targetValue === 0) {
+                zeroTargetUsers.push(userId);
+            }
+            var targetValue2 = parseFloat($('#targetRow2 td[data-user-id="' + userId + '"]').text());
+            if (targetValue2 === 0) {
+                zeroTargetUsers2.push(userId);
+            }
+        }
+    });
+
+    // Kiểm tra nếu có người dùng nào có target bằng 0
+    if (zeroTargetUsers.length > 0) {
+        toastr.clear();
+        toastr.warning('Không thể lưu vì có nhân viên có target bằng 0.');
+        return;
+               }
+
+    var completedRequests = 0;
+
+    userIds.forEach(function (userId) {
+        var targetValue = parseFloat($('#targetRow td[data-user-id="' + userId + '"]').text());
+        var targetValue2 = parseFloat($('#targetRow2 td[data-user-id="' + userId + '"]').text());
+        var targetValues = getTargetValuesByUserId(userId);
+
+         var targetNew = @Html.Raw(Json.Encode(ViewBag.TargetNew));
+    // Lọc dữ liệu theo branchId, typeTarget và monthYear
+    var filteredTargetNew = targetNew.filter(function (item) {
+        return item.BranchId == branchId && item.TypeTarget == selectedIndexType && item.MonthYear == monthYear;
+    });
+        console.log(targetValue);
+        console.log('targetValue2',targetValue2);
+        $.ajax({
+       url: '@Url.Action("CheckTargetNewDay", "CrmTargetAllocation")',
+       type: 'POST',
+       contentType: "application/json; charset=utf-8",
+       data: JSON.stringify({
+           BranchId: branchId,
+           UserId: userId,
+           TypeTarget: selectedIndexType,
+           MonthYear: monthYear
+       }),
+       success: function (response) {
+           if (response.success) {
+               if (targetValues.targetValue1 !== targetValue || targetValues.targetValue2 !== targetValue2) {
+                   $('.distribute-button[data-user-id="' + userId + '"]').text('Phân bổ');
+
+               }
+               else {
+
+                   $('.distribute-button[data-user-id="' + userId + '"]').text('Xem');
+               }
+
+           } else {
+               $('.distribute-button[data-user-id="' + userId + '"]').text('Phân bổ');
+           }
+           targetValuesArray = [];
+       },
+       error: function () {
+           // Xử lý lỗi khi gọi ajax
+           console.log('Error occurred while calling the API.');
+       }
+   });
+        $.ajax({
+            url: '@Url.Action("SaveTargetNew", "CrmTargetAllocation")',
+            type: 'POST',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                BranchId: branchId,
+                UserId: userId,
+                TypeTarget: selectedIndexType,
+                TargetTotal: targetValue.toString(),
+                TargetTotal2: targetValue2.toString(),
+                MonthYear: monthYear
+            }),
+            success: function (response) {
+
+                ShowLoading();
+                completedRequests++;
+                // Nếu tất cả các yêu cầu đã hoàn thành, hiển thị thông báo thành công
+                if (completedRequests === userIds.length) {
+                    HideLoading();
+                    toastr.clear();
+                    toastr.success('Lưu thành công.');
+                    $('.distribute-button').show();
+
+                }
+            },
+            error: function (xhr, status, error) {
+                toastr.clear();
+                toastr.error('Đã xảy ra lỗi khi lưu dữ liệu.');
+                console.error(error);
+            }
+        });
+
+    });
+});
+
+            $('#btnSaveTargetOfDay').on('click', function () {
+
+
+                var userIds = [];
+                var target1Values = [];
+                var target2Values = [];
+                var target3Values = [];
+                var target4Values = [];
+                var target5Values = [];
+                var target6Values = [];
+                var target7Values = [];
+                var target8Values = [];
+                var target9Values = [];
+                var target10Values = [];
+                var target11Values = [];
+                var target12Values = [];
+                var target13Values = [];
+                var target14Values = [];
+                var target15Values = [];
+                var target16Values = [];
+                var target17Values = [];
+                var target18Values = [];
+                var target19Values = [];
+                var target20Values = [];
+                var target21Values = [];
+                var target22Values = [];
+                var target23Values = [];
+                var target24Values = [];
+                var target25Values = [];
+                var target26Values = [];
+                var target27Values = [];
+                var target28Values = [];
+                var target29Values = [];
+                var target30Values = [];
+                var target31Values = [];
+                var target1Values2 = [];
+                var target2Values2 = [];
+                var target3Values2 = [];
+                var target4Values2 = [];
+                var target5Values2 = [];
+                var target6Values2 = [];
+                var target7Values2 = [];
+                var target8Values2 = [];
+                var target9Values2 = [];
+                var target10Values2 = [];
+                var target11Values2 = [];
+                var target12Values2 = [];
+                var target13Values2 = [];
+                var target14Values2 = [];
+                var target15Values2 = [];
+                var target16Values2 = [];
+                var target17Values2 = [];
+                var target18Values2 = [];
+                var target19Values2 = [];
+                var target20Values2 = [];
+                var target21Values2 = [];
+                var target22Values2 = [];
+                var target23Values2 = [];
+                var target24Values2 = [];
+                var target25Values2 = [];
+                var target26Values2 = [];
+                var target27Values2 = [];
+                var target28Values2 = [];
+                var target29Values2 = [];
+                var target30Values2 = [];
+                var target31Values2 = [];
+                var branchId = $('#branch').val();
+                var selectedIndexType = $('#indexType').val();
+                var monthYear = $('#MonthYear').val();
+
+
+                $('#dataTable tbody tr').each(function () {
+                    var userId = $(this).data('user-id');
+                    if (!userIds.includes(userId)) { // Kiểm tra xem userId đã tồn tại trong mảng chưa
+                        userIds.push(userId);
+                    }
+                    // Tìm kiếm targetObject tương ứng với userId
+                    var targetObject = dailyTargetsOfDay.find(obj => obj.userId === userId);
+                    var targetObject2 = dailyTargetsOfDay2.find(obj => obj.userId === userId);
+
+                    // Nếu không tìm thấy targetObject, tạo mới và gán userId
+                    if (!targetObject) {
+                        targetObject = {
+                            userId: userId
+                        };
+                    }
+                    if (!targetObject2) {
+                        targetObject2 = {
+                            userId: userId
+                        };
+                    }
+
+                    // Biến kiểm tra xem có giá trị mới trong cột editedColumn hay không
+                    var hasNewValue = false;
+                    var hasNewValue2 = false;
+
+                    // Lặp qua các cột từ 1 đến 30 để kiểm tra giá trị mới
+                    for (var i = 0; i < 31; i++) {
+                        var target;
+                        if ($('#userRow_' + userId + ' #editedColumn_' + i).length) {
+                            target = $('#userRow_' + userId + ' #editedColumn_' + i).text().trim();
+                        } else {
+                            target = $('#userRow_' + userId).text().trim();
+                        }
+
+                        // Kiểm tra nếu giá trị là chuỗi rỗng hoặc là 0.0, gán giá trị là 0
+                        if (target === '' || parseFloat(target) === 0.0) {
+                            target = 0;
+                        }
+
+                        // Chuyển đổi giá trị target thành số và kiểm tra nếu không phải số, bỏ qua
+                        target = parseFloat(target);
+                        if (isNaN(target)) {
+                            continue;
+                        }
+
+                        // Cập nhật giá trị trong targetObject và đặt cờ hasNewValue thành true
+                        targetObject['target' + (i + 1)] = target.toFixed(1);
+                        hasNewValue = true;
+                    }
+
+
+                    for (var i = 0; i < 31; i++) {
+                        var target2;
+                        if ($('#userRow_' + userId + '_2 #editedColumn_' + i + '_2').length) {
+                            target2 = $('#userRow_' + userId + '_2 #editedColumn_' + i + '_2').text().trim();
+                        } else {
+                            target2 = $('#userRow_' + userId+'_2').text().trim();
+                        }
+
+                        // Kiểm tra nếu giá trị là chuỗi rỗng hoặc là 0.0, gán giá trị là 0
+                        if (target2 === '' || parseFloat(target2) === 0.0) {
+                            target2 = 0;
+                        }
+
+                        // Chuyển đổi giá trị target thành số và kiểm tra nếu không phải số, bỏ qua
+                        target2 = parseFloat(target2);
+                        if (isNaN(target2)) {
+                            continue;
+                        }
+
+                        // Cập nhật giá trị trong targetObject và đặt cờ hasNewValue thành true
+                        targetObject2['target' + (i + 1)] = target2.toFixed(1);
+                        hasNewValue2 = true;
+                    }
+
+                    // Nếu có giá trị mới trong cột editedColumn, cập nhật lại toàn bộ giá trị từ 1 đến 30
+                    if (hasNewValue) {
+                        for (var i = 0; i < 30; i++) {
+                            var target;
+                            if ($('#userRow_' + userId + ' #editedColumn_' + i).length) {
+                                target = $('#userRow_' + userId + ' #editedColumn_' + i).text().trim();
+                            } else {
+                                target = $('#userRow_' + userId).text().trim();
+                            }
+
+                            // Nếu giá trị rỗng, gán giá trị mặc định là 0
+                            if (target === '') {
+                                target = 0;
+                            }
+
+                            // Chuyển đổi giá trị target thành số và cập nhật vào targetObject
+                            target = parseFloat(target);
+                            targetObject['target' + (i + 1)] = !isNaN(target) ? target.toFixed(1) : '';
+                        }
+                    }
+                    if (hasNewValue2) {
+                        for (var i = 0; i < 30; i++) {
+                            var target2;
+                            if ($('#userRow_' + userId + '_2 #editedColumn_' + i + '_2').length) {
+                                target2 = $('#userRow_' + userId + '_2 #editedColumn_' + i + '_2').text().trim();
+                            } else {
+                                target2 = $('#userRow_' + userId + '_2').text().trim();
+                            }
+
+                            // Nếu giá trị rỗng, gán giá trị mặc định là 0
+                            if (target2 === '') {
+                                target2 = 0;
+                            }
+
+                            // Chuyển đổi giá trị target thành số và cập nhật vào targetObject
+                            target2 = parseFloat(target2);
+                            targetObject2['target' + (i + 1)] = !isNaN(target2) ? target2.toFixed(1) : '';
+                        }
+                    }
+                    // Kiểm tra xem targetObject đã tồn tại trong dailyTargetsOfDay hay chưa
+                    var existingIndex = dailyTargetsOfDay.findIndex(obj => obj.userId === userId);
+                    if (existingIndex !== -1) {
+                        // Nếu đã tồn tại, cập nhật lại giá trị
+                        dailyTargetsOfDay[existingIndex] = targetObject;
+                    } else {
+                        // Nếu chưa tồn tại, thêm mới vào mảng
+                        dailyTargetsOfDay.push(targetObject);
+                    }
+
+                    var existingIndex2 = dailyTargetsOfDay2.findIndex(obj => obj.userId === userId);
+                    if (existingIndex2 !== -1) {
+                        // Nếu đã tồn tại, cập nhật lại giá trị
+                        dailyTargetsOfDay2[existingIndex2] = targetObject2;
+                    } else {
+                        // Nếu chưa tồn tại, thêm mới vào mảng
+                        dailyTargetsOfDay2.push(targetObject2);
+                    }
+                });
+
+
+
+
+                console.log('dailyTargetsOfDay', dailyTargetsOfDay);
+
+                    console.log('dailyTargetsOfDay2',dailyTargetsOfDay2);
+
+                for (var i = 0; i < dailyTargetsOfDay.length; i++) {
+                    var targetObject = dailyTargetsOfDay[i];
+                    for (var j = 1; j <= 31; j++) {
+                        var targetValue = targetObject['target' + j];
+                        if (targetValue !== undefined) {
+                            switch (j) {
+                                case 1:
+                                    target1Values.push(targetValue);
+                                    break;
+                                case 2:
+                                    target2Values.push(targetValue);
+                                    break;
+                                case 3:
+                                    target3Values.push(targetValue);
+                                    break;
+                                case 4:
+                                    target4Values.push(targetValue);
+                                    break;
+                                case 5:
+                                    target5Values.push(targetValue);
+                                    break;
+                                case 6:
+                                    target6Values.push(targetValue);
+                                    break;
+                                case 7:
+                                    target7Values.push(targetValue);
+                                    break;
+                                case 8:
+                                    target8Values.push(targetValue);
+                                    break;
+                                case 9:
+                                    target9Values.push(targetValue);
+                                    break;
+                                case 10:
+                                    target10Values.push(targetValue);
+                                    break;
+                                case 11:
+                                    target11Values.push(targetValue);
+                                    break;
+                                case 12:
+                                    target12Values.push(targetValue);
+                                    break;
+                                case 13:
+                                    target13Values.push(targetValue);
+                                    break;
+                                case 14:
+                                    target14Values.push(targetValue);
+                                    break;
+                                case 15:
+                                    target15Values.push(targetValue);
+                                    break;
+                                case 16:
+                                    target16Values.push(targetValue);
+                                    break;
+                                case 17:
+                                    target17Values.push(targetValue);
+                                    break;
+                                case 18:
+                                    target18Values.push(targetValue);
+                                    break;
+                                case 19:
+                                    target19Values.push(targetValue);
+                                    break;
+                                case 20:
+                                    target20Values.push(targetValue);
+                                    break;
+                                case 21:
+                                    target21Values.push(targetValue);
+                                    break;
+                                case 22:
+                                    target22Values.push(targetValue);
+                                    break;
+                                case 23:
+                                    target23Values.push(targetValue);
+                                    break;
+                                case 24:
+                                    target24Values.push(targetValue);
+                                    break;
+                                case 25:
+                                    target25Values.push(targetValue);
+                                    break;
+                                case 26:
+                                    target26Values.push(targetValue);
+                                    break;
+                                case 27:
+                                    target27Values.push(targetValue);
+                                    break;
+                                case 28:
+                                    target28Values.push(targetValue);
+                                    break;
+                                case 29:
+                                    target29Values.push(targetValue);
+                                    break;
+                                case 30:
+                                    target30Values.push(targetValue);
+                                    break;
+                                case 31:
+                                    target31Values.push(targetValue);
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+
+                for (var i = 0; i < dailyTargetsOfDay2.length; i++) {
+                    var targetObject2 = dailyTargetsOfDay2[i];
+                    for (var j = 1; j <= 31; j++) {
+                        var targetValue2 = targetObject2['target' + j];
+                        if (targetValue2 !== undefined) {
+                            switch (j) {
+                                case 1:
+                                    target1Values2.push(targetValue2);
+                                    break;
+                                case 2:
+                                    target2Values2.push(targetValue2);
+                                    break;
+                                case 3:
+                                    target3Values2.push(targetValue2);
+                                    break;
+                                case 4:
+                                    target4Values2.push(targetValue2);
+                                    break;
+                                case 5:
+                                    target5Values2.push(targetValue2);
+                                    break;
+                                case 6:
+                                    target6Values2.push(targetValue2);
+                                    break;
+                                case 7:
+                                    target7Values2.push(targetValue2);
+                                    break;
+                                case 8:
+                                    target8Values2.push(targetValue2);
+                                    break;
+                                case 9:
+                                    target9Values2.push(targetValue2);
+                                    break;
+                                case 10:
+                                    target10Values2.push(targetValue2);
+                                    break;
+                                case 11:
+                                    target11Values2.push(targetValue2);
+                                    break;
+                                case 12:
+                                    target12Values2.push(targetValue2);
+                                    break;
+                                case 13:
+                                    target13Values2.push(targetValue2);
+                                    break;
+                                case 14:
+                                    target14Values2.push(targetValue2);
+                                    break;
+                                case 15:
+                                    target15Values2.push(targetValue2);
+                                    break;
+                                case 16:
+                                    target16Values2.push(targetValue2);
+                                    break;
+                                case 17:
+                                    target17Values2.push(targetValue2);
+                                    break;
+                                case 18:
+                                    target18Values2.push(targetValue2);
+                                    break;
+                                case 19:
+                                    target19Values2.push(targetValue2);
+                                    break;
+                                case 20:
+                                    target20Values2.push(targetValue2);
+                                    break;
+                                case 21:
+                                    target21Values2.push(targetValue2);
+                                    break;
+                                case 22:
+                                    target22Values2.push(targetValue2);
+                                    break;
+                                case 23:
+                                    target23Values2.push(targetValue2);
+                                    break;
+                                case 24:
+                                    target24Values2.push(targetValue2);
+                                    break;
+                                case 25:
+                                    target25Values2.push(targetValue2);
+                                    break;
+                                case 26:
+                                    target26Values2.push(targetValue2);
+                                    break;
+                                case 27:
+                                    target27Values2.push(targetValue2);
+                                    break;
+                                case 28:
+                                    target28Values2.push(targetValue2);
+                                    break;
+                                case 29:
+                                    target29Values2.push(targetValue2);
+                                    break;
+                                case 30:
+                                    target30Values2.push(targetValue2);
+                                    break;
+                                case 31:
+                                    target31Values2.push(targetValue2);
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                var allTargetValues = [
+                    target1Values, target2Values, target3Values, target4Values, target5Values, target6Values, target7Values, target8Values, target9Values, target10Values,
+                    target11Values, target12Values, target13Values, target14Values, target15Values, target16Values, target17Values, target18Values, target19Values, target20Values,
+                    target21Values, target22Values, target23Values, target24Values, target25Values, target26Values, target27Values, target28Values, target29Values, target30Values, target31Values
+                ];
+
+                // Log từng mảng giá trị target từ 1 đến 31
+                for (var i = 0; i < allTargetValues.length; i++) {
+                    console.log('Danh sách giá trị target cho cột ' + (i + 1) + ':', allTargetValues[i]);
+                }
+
+                var allTargetValues2 = [
+                    target1Values2, target2Values2, target3Values2, target4Values2, target5Values2, target6Values2, target7Values2, target8Values2, target9Values2, target10Values2,
+                    target11Values2, target12Values2, target13Values2, target14Values2, target15Values2, target16Values2, target17Values2, target18Values2, target19Values2, target20Values2,
+                    target21Values2, target22Values2, target23Values2, target24Values2, target25Values2, target26Values2, target27Values2, target28Values2, target29Values2, target30Values2, target31Values2
+                ];
+
+                // Log từng mảng giá trị target từ 1 đến 31
+                for (var i = 0; i < allTargetValues2.length; i++) {
+                    console.log('Danh sách giá trị target2 cho cột ' + (i + 1) + ':', allTargetValues2[i]);
+                }
+
+                console.log(branchId);
+                console.log(selectedIndexType);
+                console.log(monthYear);
+                var completedRequests = 0;
+                if (userIds.length === 1) {
+                    var userId = userIds[0];
+                    var targetValue = parseFloat($('#targetRow td[data-user-id="' + userId + '"]').text());
+                    var targetValue2 = parseFloat($('#targetRow2 td[data-user-id="' + userId + '"]').text());
+
+                        ShowLoading();
+                      $.ajax({
+
+                      url: '@Url.Action("SaveTargetNew", "CrmTargetAllocation")',
+                      type: 'POST',
+                      contentType: "application/json; charset=utf-8",
+                      data: JSON.stringify({
+                          BranchId: branchId,
+                          UserId: userId,
+                          TypeTarget: selectedIndexType,
+                          TargetTotal: targetValue.toString(),
+                          TargetTotal2: targetValue2.toString(),
+                          MonthYear: monthYear
+                      }),
+                      success: function (response) {
+
+                          completedRequests++;
+                          // Nếu tất cả các yêu cầu đã hoàn thành, hiển thị thông báo thành công
+                          if (completedRequests === userIds.length) {
+
+
+                          }
+                      },
+                      error: function (xhr, status, error) {
+                          toastr.clear();
+                          toastr.error('Đã xảy ra lỗi khi lưu dữ liệu.');
+                          console.error(error);
+                      }
+                  });
+
+                    $.ajax({
+                        url: '@Url.Action("SaveTargetNewOfDay", "CrmTargetAllocation")',
+                        type: 'POST',
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify({
+                            BranchId: branchId,
+                            UserId: userId,
+                            TypeTarget: selectedIndexType,
+                            TargetTotal: targetValue.toString(),
+                            TargetTotal2: targetValue2.toString(),
+                            MonthYear: monthYear,
+                            TargetDay1: target1Values[target1Values.length - 1],
+                            TargetDay2: target2Values[target2Values.length - 1],
+                            TargetDay3: target3Values[target3Values.length - 1],
+                            TargetDay4: target4Values[target4Values.length - 1],
+                            TargetDay5: target5Values[target5Values.length - 1],
+                            TargetDay6: target6Values[target6Values.length - 1],
+                            TargetDay7: target7Values[target7Values.length - 1],
+                            TargetDay8: target8Values[target8Values.length - 1],
+                            TargetDay9: target9Values[target9Values.length - 1],
+                            TargetDay10: target10Values[target10Values.length - 1],
+                            TargetDay11: target11Values[target11Values.length - 1],
+                            TargetDay12: target12Values[target12Values.length - 1],
+                            TargetDay13: target13Values[target13Values.length - 1],
+                            TargetDay14: target14Values[target14Values.length - 1],
+                            TargetDay15: target15Values[target15Values.length - 1],
+                            TargetDay16: target16Values[target16Values.length - 1],
+                            TargetDay17: target17Values[target17Values.length - 1],
+                            TargetDay18: target18Values[target18Values.length - 1],
+                            TargetDay19: target19Values[target19Values.length - 1],
+                            TargetDay20: target20Values[target20Values.length - 1],
+                            TargetDay21: target21Values[target21Values.length - 1],
+                            TargetDay22: target22Values[target22Values.length - 1],
+                            TargetDay23: target23Values[target23Values.length - 1],
+                            TargetDay24: target24Values[target24Values.length - 1],
+                            TargetDay25: target25Values[target25Values.length - 1],
+                            TargetDay26: target26Values[target26Values.length - 1],
+                            TargetDay27: target27Values[target27Values.length - 1],
+                            TargetDay28: target28Values[target28Values.length - 1],
+                            TargetDay29: target29Values[target29Values.length - 1],
+                            TargetDay30: target30Values[target30Values.length - 1],
+                            TargetDay31: target31Values[target31Values.length - 1],
+                            TargetDay1_2: target1Values2[target1Values2.length - 1],
+                            TargetDay2_2: target2Values2[target2Values2.length - 1],
+                            TargetDay3_2: target3Values2[target3Values2.length - 1],
+                            TargetDay4_2: target4Values2[target4Values2.length - 1],
+                            TargetDay5_2: target5Values2[target5Values2.length - 1],
+                            TargetDay6_2: target6Values2[target6Values2.length - 1],
+                            TargetDay7_2: target7Values2[target7Values2.length - 1],
+                            TargetDay8_2: target8Values2[target8Values2.length - 1],
+                            TargetDay9_2: target9Values2[target9Values2.length - 1],
+                            TargetDay10_2: target10Values2[target10Values2.length - 1],
+                            TargetDay11_2: target11Values2[target11Values2.length - 1],
+                            TargetDay12_2: target12Values2[target12Values2.length - 1],
+                            TargetDay13_2: target13Values2[target13Values2.length - 1],
+                            TargetDay14_2: target14Values2[target14Values2.length - 1],
+                            TargetDay15_2: target15Values2[target15Values2.length - 1],
+                            TargetDay16_2: target16Values2[target16Values2.length - 1],
+                            TargetDay17_2: target17Values2[target17Values2.length - 1],
+                            TargetDay18_2: target18Values2[target18Values2.length - 1],
+                            TargetDay19_2: target19Values2[target19Values2.length - 1],
+                            TargetDay20_2: target20Values2[target20Values2.length - 1],
+                            TargetDay21_2: target21Values2[target21Values2.length - 1],
+                            TargetDay22_2: target22Values2[target22Values2.length - 1],
+                            TargetDay23_2: target23Values2[target23Values2.length - 1],
+                            TargetDay24_2: target24Values2[target24Values2.length - 1],
+                            TargetDay25_2: target25Values2[target25Values2.length - 1],
+                            TargetDay26_2: target26Values2[target26Values2.length - 1],
+                            TargetDay27_2: target27Values2[target27Values2.length - 1],
+                            TargetDay28_2: target28Values2[target28Values2.length - 1],
+                            TargetDay29_2: target29Values2[target29Values2.length - 1],
+                            TargetDay30_2: target30Values2[target30Values2.length - 1],
+                            TargetDay31_2: target31Values2[target31Values2.length - 1],
+                        }),
+                        success: function (response) {
+
+                            $('#tableRowOfDay').hide();
+                            $('#btnSaveTargetOfDay').hide();
+                            $('#tableRowOfDay tbody').empty();
+                            dailyTargetsOfDay = [];
+                            dailyTargetsOfDay2 = [];
+                            allTargetValues = [];
+                            allTargetValues2 = [];
+                                    $.ajax({
+                            url: '@Url.Action("CheckTargetNewDay", "CrmTargetAllocation")',
+                            type: 'POST',
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify({
+                                BranchId: branchId,
+                                UserId: userId,
+                                TypeTarget: selectedIndexType,
+                                MonthYear: monthYear
+                            }),
+                            success: function (response) {
+                                if (response.success) {
+                                    $('.distribute-button[data-user-id="' + userId + '"]').text('Xem');
+                                } else {
+                                    $('.distribute-button[data-user-id="' + userId + '"]').text('Phân bổ');
+                                }
+                            },
+                            error: function () {
+                                // Xử lý lỗi khi gọi ajax
+                                console.log('Error occurred while calling the API.');
+                            }
+                        });
+                            setTimeout(function () {
+                                HideLoading();
+                            }, 2000);
+                            toastr.clear();
+                            toastr.success('Lưu thành công.');
+
+                        },
+                        error: function (xhr, status, error) {
+                            toastr.clear();
+                            toastr.error('Đã xảy ra lỗi khi lưu dữ liệu.');
+                            console.error(error);
+                            HideLoading();
+                        }
+                    });
+                } else { // Nếu lưu nhiều user
+                    userIds.forEach(function (userId, index) {
+                        var targetValue = parseFloat($('#targetRow td[data-user-id="' + userId + '"]').text());
+                        var targetValue2 = parseFloat($('#targetRow2 td[data-user-id="' + userId + '"]').text());
+                        var currentUser = userId;
+                        console.log(targetValue);
+                            ShowLoading();
+
+
+                        $.ajax({
+                            url: '@Url.Action("SaveTargetNewOfDay", "CrmTargetAllocation")',
+                            type: 'POST',
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify({
+                                BranchId: branchId,
+                                UserId: userId,
+                                TypeTarget: selectedIndexType,
+                                TargetTotal: targetValue.toString(),
+                                TargetTotal2: targetValue2.toString(),
+                                MonthYear: monthYear,
+                                TargetDay1: target1Values[index],
+                                TargetDay2: target2Values[index],
+                                TargetDay3: target3Values[index],
+                                TargetDay4: target4Values[index],
+                                TargetDay5: target5Values[index],
+                                TargetDay6: target6Values[index],
+                                TargetDay7: target7Values[index],
+                                TargetDay8: target8Values[index],
+                                TargetDay9: target9Values[index],
+                                TargetDay10: target10Values[index],
+                                TargetDay11: target11Values[index],
+                                TargetDay12: target12Values[index],
+                                TargetDay13: target13Values[index],
+                                TargetDay14: target14Values[index],
+                                TargetDay15: target15Values[index],
+                                TargetDay16: target16Values[index],
+                                TargetDay17: target17Values[index],
+                                TargetDay18: target18Values[index],
+                                TargetDay19: target19Values[index],
+                                TargetDay20: target20Values[index],
+                                TargetDay21: target21Values[index],
+                                TargetDay22: target22Values[index],
+                                TargetDay23: target23Values[index],
+                                TargetDay24: target24Values[index],
+                                TargetDay25: target25Values[index],
+                                TargetDay26: target26Values[index],
+                                TargetDay27: target27Values[index],
+                                TargetDay28: target28Values[index],
+                                TargetDay29: target29Values[index],
+                                TargetDay30: target30Values[index],
+                                TargetDay31: target31Values[index],
+                                TargetDay1_2: target1Values2[index],
+                                TargetDay2_2: target2Values2[index],
+                                TargetDay3_2: target3Values2[index],
+                                TargetDay4_2: target4Values2[index],
+                                TargetDay5_2: target5Values2[index],
+                                TargetDay6_2: target6Values2[index],
+                                TargetDay7_2: target7Values2[index],
+                                TargetDay8_2: target8Values2[index],
+                                TargetDay9_2: target9Values2[index],
+                                TargetDay10_2: target10Values2[index],
+                                TargetDay11_2: target11Values2[index],
+                                TargetDay12_2: target12Values2[index],
+                                TargetDay13_2: target13Values2[index],
+                                TargetDay14_2: target14Values2[index],
+                                TargetDay15_2: target15Values2[index],
+                                TargetDay16_2: target16Values2[index],
+                                TargetDay17_2: target17Values2[index],
+                                TargetDay18_2: target18Values2[index],
+                                TargetDay19_2: target19Values2[index],
+                                TargetDay20_2: target20Values2[index],
+                                TargetDay21_2: target21Values2[index],
+                                TargetDay22_2: target22Values2[index],
+                                TargetDay23_2: target23Values2[index],
+                                TargetDay24_2: target24Values2[index],
+                                TargetDay25_2: target25Values2[index],
+                                TargetDay26_2: target26Values2[index],
+                                TargetDay27_2: target27Values2[index],
+                                TargetDay28_2: target28Values2[index],
+                                TargetDay29_2: target29Values2[index],
+                                TargetDay30_2: target30Values2[index],
+                                TargetDay31_2: target31Values2[index],
+                            }),
+                            success: function (response) {
+
+
+                                completedRequests++;
+                                // Nếu tất cả các yêu cầu đã hoàn thành, hiển thị thông báo thành công
+                                if (completedRequests === userIds.length) {
+                                    $('#tableRowOfDay').hide();
+                                    $('#btnSaveTargetOfDay').hide();
+                                    $('#tableRowOfDay tbody').empty();
+                                 userIds.forEach(function(userId) {
+                                $.ajax({
+                                    url: '@Url.Action("CheckTargetNewDay", "CrmTargetAllocation")',
+                                    type: 'POST',
+                                    contentType: "application/json; charset=utf-8",
+                                    data: JSON.stringify({
+                                        BranchId: branchId,
+                                        UserId: userId,
+                                        TypeTarget: selectedIndexType,
+                                        MonthYear: monthYear
+                                    }),
+                                    success: function(response) {
+                                        if (response.success) {
+                                            $('.distribute-button[data-user-id="' + userId + '"]').text('Xem');
+                                        } else {
+                                            $('.distribute-button[data-user-id="' + userId + '"]').text('Phân bổ');
+                                        }
+                                    },
+                                    error: function() {
+                                        // Xử lý lỗi khi gọi ajax
+                                        console.log('Error occurred while calling the API for userId: ' + userId);
+                                    }
+                                });
+                            });
+                                    dailyTargetsOfDay = [];
+                                    dailyTargetsOfDay2 = [];
+                                    allTargetValues = [];
+                                    allTargetValues2 = [];
+                                    setTimeout(function () {
+                                        HideLoading();
+                                    }, 2000);
+
+                                    toastr.clear();
+                                    toastr.success('Lưu thành công.');
+
+
+
+
+
+
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                toastr.clear();
+                                toastr.error('Đã xảy ra lỗi khi lưu dữ liệu.');
+                                console.error(error);
+                            }
+
+
+                        });
+
+                    });
+
+                }
+            });
+
+            function getWorkingDaysInMonth(year, month) {
+                var selectedTypeTarget = parseInt($('#indexType').val());
+                if (selectedTypeTarget === 1 || selectedTypeTarget === 2 || selectedTypeTarget === 3) {
+                    var date = new Date(year, month - 1, 1);
+                    var daysInMonth = new Date(year, month, 0).getDate();
+                    var workingDays = 0;
+
+                    for (var i = 1; i <= daysInMonth; i++) {
+                        date.setDate(i);
+                        if (date.getDay() !== 0) {
+                            workingDays++;
+                        }
+                    }
+                    return workingDays;
+                } else {
+                    // Trả về số ngày trong tháng
+                    return new Date(year, month, 0).getDate();
+                }
+            }
+            function getSundays(year, month) {
+                var date = new Date(year, month - 1, 1);
+                var daysInMonth = new Date(year, month, 0).getDate();
+                var sundays = [];
+
+                for (var i = 1; i <= daysInMonth; i++) {
+                    date.setDate(i);
+                    if (date.getDay() === 0) { // Sunday is 0
+                        sundays.push(i);
+                    }
+                }
+                return sundays;
+            }
+            function removeThousandsSeparator(numberString) {
+                return numberString.replace(/\./g, '');
+            }
+
+            var dailyTarget = '';
+            var dailyTargetNoSunday = '';
+
+            var dailyTargetsOfDay = [];
+            var dailyTargetsOfDay2 = [];
+
+            $(document).on('click', '.distribute-button', function () {
+                $('#btnSaveTargetOfDay').show();
+
+                var selectedBranchId = $('#branch').val();
+                var selectedMonthYear = $('#MonthYear').val();
+                var selectedTypeTarget = $('#indexType').val();
+                var userId = $(this).data('user-id');
+                var targetValue = parseFloat($('#targetRow td[data-user-id="' + userId + '"]').text());
+                var targetValue2 = parseFloat($('#targetRow2 td[data-user-id="' + userId + '"]').text());
+
+                console.log(targetValue);
+
+                var targetValueCurrent = removeThousandsSeparator(targetValue.toLocaleString('de-DE', { minimumFractionDigits: 1 }));
+                var targetValueCurrent2 = removeThousandsSeparator(targetValue2.toLocaleString('de-DE', { minimumFractionDigits: 1 }));
+
+                console.log('selectedBranchId', selectedBranchId);
+                console.log('selectedMonthYear', selectedMonthYear);
+                console.log('selectedTypeTarget', selectedTypeTarget);
+                console.log(filteredTargetNewOfDay);
+                var targetNew = @Html.Raw(Json.Encode(ViewBag.TargetNew));
+
+                var filteredTargetNew = targetNew.filter(function (item) {
+                    return item.BranchId == selectedBranchId &&
+                        item.TypeTarget == selectedTypeTarget &&
+                        item.MonthYear == selectedMonthYear &&
+                        item.UserId === userId &&
+                        parseFloat(item.TargetTotal) === parseFloat(targetValue)
+                        && parseFloat(item.TargetTotal2) === parseFloat(targetValue2);
+                });
+                var targetId;
+
+
+                if (filteredTargetNew.length > 0) {
+                    targetId = filteredTargetNew[0].TargetId;
+
+
+
+                } else {
+                    targetId = null;
+
+
+                }
+                   var targetNewOfDay = @Html.Raw(Json.Encode(ViewBag.TargetOfDay));
+                     var filteredTargetNewOfDay = targetNewOfDay.filter(function (item) {
+                         return item.BranchId == selectedBranchId &&
+                             item.TypeTarget == selectedTypeTarget &&
+                             item.MonthYear == selectedMonthYear &&
+                             item.UserId === userId &&
+                             item.TargetId === targetId;
+
+                     });
+                console.log('targetId', targetId);
+
+
+                var employeeName = $('#employeeRow td[data-user-id="' + userId + '"]').text();
+
+                if ($('#dataTable tbody tr[data-user-id="' + userId + '"]').length > 0) {
+                    $('#userRow_' + userId + ', #userRow_' + userId + '_2').remove();
+
+                    // Kiểm tra nếu chỉ còn một người dùng trong bảng, ẩn bảng
+                    if ($('#dataTable tbody tr').length === 0) {
+                        $('#tableRowOfDay').hide();
+                        $('#btnSaveTargetOfDayRow').hide();
+                    }
+                    return;
+                }
+
+                var monthYear = $('#MonthYear').val();
+                if (!monthYear) {
+                    toastr.clear();
+                    toastr.warning('Vui lòng chọn tháng năm.');
+                    return;
+                }
+
+                var [year, month] = monthYear.split('-');
+                var workingDaysInMonthNoSunday = getWorkingDaysInMonth(parseInt(year), parseInt(month));
+                dailyTargetNoSunday = targetValue / workingDaysInMonthNoSunday;
+                dailyTargetNoSunday2 = targetValue2 / workingDaysInMonthNoSunday;
+                 var sundays = getSundays(parseInt(year), parseInt(month));
+
+                console.log('workingDaysInMonthNoSunday',workingDaysInMonthNoSunday);
+                console.log('targetTotal2DB', targetTotal2DB);
+
+                console.log(dailyTargetNoSunday);
+                var daysInMonth = new Date(year, month, 0).getDate();
+                dailyTarget = targetValue / daysInMonth;
+                dailyTarget2 = targetValue2 / daysInMonth;
+                var targetTotalDB;
+                var targetTotal2DB;
+                var targetObject = {
+                    userId: userId,
+                    target1: dailyTargetNoSunday.toFixed(1),
+                    target2: dailyTargetNoSunday.toFixed(1),
+                    target3: dailyTargetNoSunday.toFixed(1),
+                    target4: dailyTargetNoSunday.toFixed(1),
+                    target5: dailyTargetNoSunday.toFixed(1),
+                    target6: dailyTargetNoSunday.toFixed(1),
+                    target7: dailyTargetNoSunday.toFixed(1),
+                    target8: dailyTargetNoSunday.toFixed(1),
+                    target9: dailyTargetNoSunday.toFixed(1),
+                    target10: dailyTargetNoSunday.toFixed(1),
+                    target11: dailyTargetNoSunday.toFixed(1),
+                    target12: dailyTargetNoSunday.toFixed(1),
+                    target13: dailyTargetNoSunday.toFixed(1),
+                    target14: dailyTargetNoSunday.toFixed(1),
+                    target15: dailyTargetNoSunday.toFixed(1),
+                    target16: dailyTargetNoSunday.toFixed(1),
+                    target17: dailyTargetNoSunday.toFixed(1),
+                    target18: dailyTargetNoSunday.toFixed(1),
+                    target19: dailyTargetNoSunday.toFixed(1),
+                    target20: dailyTargetNoSunday.toFixed(1),
+                    target21: dailyTargetNoSunday.toFixed(1),
+                    target22: dailyTargetNoSunday.toFixed(1),
+                    target23: dailyTargetNoSunday.toFixed(1),
+                    target24: dailyTargetNoSunday.toFixed(1),
+                    target25: dailyTargetNoSunday.toFixed(1),
+                    target26: dailyTargetNoSunday.toFixed(1),
+                    target27: dailyTargetNoSunday.toFixed(1),
+                    target28: dailyTargetNoSunday.toFixed(1),
+                    target29: 0,
+                    target30: 0,
+                    target31: 0
+                };
+                 for (var i = 1; i <= daysInMonth; i++) {
+                 if (sundays.includes(i) && (selectedTypeTarget == 1 || selectedTypeTarget == 2 || selectedTypeTarget == 3)) {
+                     targetObject['target' + i] = 0;
+                  }
+                 }
+                if (daysInMonth >= 29) targetObject.target29 = dailyTargetNoSunday.toFixed(1);
+                if (daysInMonth >= 30) targetObject.target30 = dailyTargetNoSunday.toFixed(1);
+                if (daysInMonth === 31) targetObject.target31 = dailyTargetNoSunday.toFixed(1);
+
+                dailyTargetsOfDay.push(targetObject);
+
+                var targetObject2 = {
+                    userId: userId,
+                    target1: dailyTargetNoSunday2.toFixed(1),
+                    target2: dailyTargetNoSunday2.toFixed(1),
+                    target3: dailyTargetNoSunday2.toFixed(1),
+                    target4: dailyTargetNoSunday2.toFixed(1),
+                    target5: dailyTargetNoSunday2.toFixed(1),
+                    target6: dailyTargetNoSunday2.toFixed(1),
+                    target7: dailyTargetNoSunday2.toFixed(1),
+                    target8: dailyTargetNoSunday2.toFixed(1),
+                    target9: dailyTargetNoSunday2.toFixed(1),
+                    target10: dailyTargetNoSunday2.toFixed(1),
+                    target11: dailyTargetNoSunday2.toFixed(1),
+                    target12: dailyTargetNoSunday2.toFixed(1),
+                    target13: dailyTargetNoSunday2.toFixed(1),
+                    target14: dailyTargetNoSunday2.toFixed(1),
+                    target15: dailyTargetNoSunday2.toFixed(1),
+                    target16: dailyTargetNoSunday2.toFixed(1),
+                    target17: dailyTargetNoSunday2.toFixed(1),
+                    target18: dailyTargetNoSunday2.toFixed(1),
+                    target19: dailyTargetNoSunday2.toFixed(1),
+                    target20: dailyTargetNoSunday2.toFixed(1),
+                    target21: dailyTargetNoSunday2.toFixed(1),
+                    target22: dailyTargetNoSunday2.toFixed(1),
+                    target23: dailyTargetNoSunday2.toFixed(1),
+                    target24: dailyTargetNoSunday2.toFixed(1),
+                    target25: dailyTargetNoSunday2.toFixed(1),
+                    target26: dailyTargetNoSunday2.toFixed(1),
+                    target27: dailyTargetNoSunday2.toFixed(1),
+                    target28: dailyTargetNoSunday2.toFixed(1),
+                    target29: 0,
+                    target30: 0,
+                    target31: 0
+                };
+                for (var i = 1; i <= daysInMonth; i++) {
+                if (sundays.includes(i) && (selectedTypeTarget == 1 || selectedTypeTarget == 2 || selectedTypeTarget == 3)) {
+                    targetObject2['target' + i] = 0;
+                 }
+                }
+                if (daysInMonth >= 29) targetObject2.target29 = dailyTargetNoSunday2.toFixed(1);
+                if (daysInMonth >= 30) targetObject2.target30 = dailyTargetNoSunday2.toFixed(1);
+                if (daysInMonth === 31) targetObject2.target31 = dailyTargetNoSunday2.toFixed(1);
+
+                dailyTargetsOfDay2.push(targetObject2);
+                console.log('dailyTargetsOfDay', dailyTargetsOfDay);
+
+                console.log('dailyTargetsOfDay2', dailyTargetsOfDay2);
+                $('#tableRowOfDay').show();
+                $('#btnSaveTargetOfDayRow').show();
+                $.ajax({
+                    url: '/CrmTargetAllocation/CheckTargetNew',
+                    type: 'POST',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        BranchId: selectedBranchId,
+                        UserId: userId,
+                        TypeTarget: selectedTypeTarget,
+                        MonthYear: selectedMonthYear
+                    })
+                }).done(function (response) {
+                    if (response.success) {
+                        targetTotalDB = response.targetData.TargetTotal;
+                        targetTotal2DB = response.targetData.TargetTotal2;
+                        console.log('targetTotalDB', targetTotalDB);
+                        console.log('targetTotal2DB', targetTotal2DB);
+                        console.log('targetValueCurrent', targetValueCurrent);
+                        console.log('targetValueCurrent2', targetValueCurrent2);
+
+
+                        // Gọi AJAX thứ hai sau khi AJAX đầu tiên hoàn tất
+                        $.ajax({
+                            url: '/CrmTargetAllocation/CheckTargetNewDay',
+                            type: 'POST',
+                            contentType: 'application/json',
+                            data: JSON.stringify({
+                                BranchId: selectedBranchId,
+                                UserId: userId,
+                                TypeTarget: selectedTypeTarget,
+                                MonthYear: selectedMonthYear
+                            }),
+                            success: function (response) {
+                                var newRow = '<tr id="userRow_' + userId + '" data-user-id="' + userId + '"><td>' + employeeName + '</td>';
+                                newRow += '<td><button id="deleteButton_' + userId + '" class="btn btn-danger btn-sm delete-button" data-user-id="' + userId + '" style="margin-bottom:5px"><i class="fa fa-trash mr-1"></i>Xóa</button>';
+                                newRow += '<button class="btn btn-mini btn-warning edit-button-day" style="border-radius: 3px;outline: none; padding: 0 .6rem;"><i class="fa fa-edit mr-1"></i>Sửa</button>';
+                                newRow += '<button class="btn btn-mini btn-success save-button-day" style="display:none;border-radius: 3px; outline: none;"><i class="fa fa-save mr-1"></i>Đồng ý</button></td>';
+
+                                var newRow2 = '<tr id="userRow_' + userId + '_2" data-user-id="' + userId + '">';
+                                newRow2 += '<td></td>'; // Cột trống ở cột đầu tiên
+                                newRow2 += '<td>';
+                                newRow2 += '<button class="btn btn-mini btn-warning edit-button-day2" style="border-radius: 3px;padding: 0 .6rem; outline: none;"><i class="fa fa-edit mr-1"></i>Sửa</button>';
+                                newRow2 += '<button class="btn btn-mini btn-success save-button-day2" style="display:none;border-radius: 3px; outline: none;"><i class="fa fa-save mr-1"></i>Đồng ý</button>';
+                                newRow2 += '</td>'; // Kết thúc cột thao tác
+
+
+
+                                if (response.success) {
+                                    var totalTarget = 0;
+                                    for (var i = 1; i <= 31; i++) {
+                                        var targetValue = response.targetData['TargetDay' + i] ? parseFloat(response.targetData['TargetDay' + i].replace(',', '.')) : 0;
+                                        totalTarget += targetValue; // Cộng vào tổng target
+                                    }
+                                   targetTotalDB = targetTotalDB.replace(',', '.');
+
+                                    console.log('totalTarget', totalTarget);
+                                    console.log('targetTotalDB', targetTotalDB);
+                                    var epsilon = 2;
+                                    if (Math.abs(totalTarget - targetTotalDB) < epsilon) {
+                                        for (var i = 1; i <= 31; i++) {
+                                            var index = i - 1;
+                                            var targetValue = response.targetData['TargetDay' + i] ? response.targetData['TargetDay' + i].replace(',', '.') : '0';
+                                            var displayValue = parseFloat(targetValue) === 0 ? '' : targetValue;
+                                            newRow += '<td id="editedColumn_' + index + '" class="employee-target-day" data-user-id="' + userId + '" data-original-value="' + targetValue + '" data-edited="false" style="width: 150px;">' + displayValue + '</td>';
+                                        }
+                                    } else {
+                                        for (var i = 1; i <= daysInMonth; i++) {
+                                            var targetValue = dailyTargetNoSunday.toFixed(1);
+                                            if (sundays.includes(i) && (selectedTypeTarget == 1 || selectedTypeTarget == 2 || selectedTypeTarget == 3)) {
+                                                targetValue = 0;
+                                            }
+                                            var displayValue = targetValue === 0 ? '' : targetValue;
+                                            var index = i - 1;
+                                            newRow += '<td id="editedColumn_' + index + '" class="employee-target-day" data-user-id="' + userId + '" data-original-value="' + targetValue + '" data-edited="false" style="width: 150px;">' + displayValue + '</td>';
+                                        }
+                                    }
+                                }
+                                else {
+                                    for (var i = 1; i <= daysInMonth; i++) {
+                                        var targetValue = dailyTargetNoSunday.toFixed(1);
+                                        if (sundays.includes(i) && (selectedTypeTarget == 1 || selectedTypeTarget == 2 || selectedTypeTarget == 3)) {
+                                            targetValue = 0;
+                                        }
+                                        var displayValue = targetValue === 0 ? '' : targetValue;
+                                        var index = i - 1;
+                                        newRow += '<td id="editedColumn_' + index + '" class="employee-target-day" data-user-id="' + userId + '" data-original-value="' + targetValue + '" data-edited="false" style="width: 150px;">' + displayValue + '</td>';
+                                    }
+                                }
+
+                                newRow += '</tr>';
+                                if (response.success) {
+                                    var totalTarget2 = 0;
+                                    for (var i = 1; i <= 31; i++) {
+                                        var targetValue2 = response.targetData['TargetDay' + i + '_2'] ? parseFloat(response.targetData['TargetDay' + i + '_2'].replace(',', '.')) : 0;
+                                        totalTarget2 += targetValue2; // Cộng vào tổng target 2
+                                    }
+                                    targetTotal2DB = targetTotal2DB.replace(',', '.');
+                                    var epsilon2 = 2;
+                                    console.log('totalTarget2', totalTarget2);
+                                    console.log('targetTotal2DB', targetTotal2DB);
+                                    if (Math.abs(totalTarget2 - targetTotal2DB) < epsilon2) {
+                                        for (var i = 1; i <= 31; i++) {
+                                            var index = i - 1;
+                                            var targetValue2 = response.targetData['TargetDay' + i + '_2'] ? response.targetData['TargetDay' + i + '_2'].replace(',', '.') : '0';
+                                            var displayValue2 = parseFloat(targetValue2) === 0 ? '' : targetValue2;
+                                            newRow2 += '<td id="editedColumn_' + index + '_2" class="employee-target-day" data-user-id="' + userId + '" data-original-value="' + targetValue2 + '" data-edited="false" style="width: 150px;">' + displayValue2 + '</td>';
+                                        }
+                                    } else {
+                                        for (var i = 1; i <= daysInMonth; i++) {
+                                            var targetValue2 = dailyTargetNoSunday2.toFixed(1);
+                                            if (sundays.includes(i) && (selectedTypeTarget == 1 || selectedTypeTarget == 2 || selectedTypeTarget == 3)) {
+                                                targetValue2 = 0;
+                                            }
+                                            var displayValue2 = targetValue2 === 0 ? '' : targetValue2;
+                                            var index = i - 1;
+                                            newRow2 += '<td id="editedColumn_' + index + '_2" class="employee-target-day" data-user-id="' + userId + '" data-original-value="' + targetValue2 + '" data-edited="false" style="width: 150px;">' + displayValue2 + '</td>';
+                                        }
+                                    }
+                                }
+                                     else {
+                                    for (var i = 1; i <= daysInMonth; i++) {
+                                        var targetValue2 = dailyTargetNoSunday2.toFixed(1);
+                                        if (sundays.includes(i) && (selectedTypeTarget == 1 || selectedTypeTarget == 2 || selectedTypeTarget == 3)) {
+                                            targetValue2 = 0;
+                                        }
+                                        var displayValue2 = targetValue2 === 0 ? '' : targetValue2;
+                                        var index = i - 1;
+
+                                        newRow2 += '<td id="editedColumn_' + index + '_2" class="employee-target-day" data-user-id="' + userId + '" data-original-value="' + targetValue2 + '" data-edited="false" style="width: 150px;">' + displayValue2 + '</td>';
+                                    }
+                                }
+
+                                newRow2 += '</tr>';
+                                $('#dataTable tbody').append(newRow);
+                                $('#dataTable tbody').append(newRow2);
+                            },
+                            error: function () {
+                                console.log('Error occurred while calling the API.');
+                            }
+                        });
+                    } else {
+                        console.log("Không có dữ liệu được trả về từ cơ sở dữ liệu.");
+                    }
+                }).fail(function () {
+                    console.log('Error occurred while calling the API.');
+                });
+
+
+                console.log('Button "Phân bổ" được click cho user:', userId);
+            });
+            $(document).on('click', '.delete-button', function () {
+                var userId = $(this).data('user-id');
+                var branchId = $('#branch').val();
+                var selectedIndexType = $('#indexType').val();
+                var monthYear = $('#MonthYear').val();
+                Swal.fire({
+                    title: 'Bạn có chắc chắn muốn xóa?',
+                    text: "Dữ liệu của người dùng sẽ bị xóa!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        ShowLoading();
+                        $.ajax({
+                             url: '@Url.Action("DeleteTargetNewOfDay", "CrmTargetAllocation")',
+                            type: 'POST',
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify({
+
+                                BranchId: branchId,
+                                UserId: userId,
+                                TypeTarget: selectedIndexType,
+                                MonthYear: monthYear
+                            }),
+                            success: function (response) {
+                                if (response.success) {
+                                    $('#userRow_' + userId + ', #userRow_' + userId + '_2').remove();
+
+                                    // Kiểm tra nếu chỉ còn một người dùng trong bảng, ẩn bảng
+                                    if ($('#dataTable tbody tr').length === 0) {
+                                        $('#tableRowOfDay').hide();
+                                        $('#btnSaveTargetOfDayRow').hide();
+                                    }
+                                    $('.distribute-button[data-user-id="' + userId + '"]').text('Phân bổ');
+
+                                     dailyTargetsOfDay = [];
+                                    dailyTargetsOfDay2 = [];
+                                    HideLoading();
+                                    toastr.clear();
+                                    toastr.success('Xóa thành công');
+                                } else {
+                                    HideLoading();
+                                    toastr.error(response.message);
+                                }
+
+                            },
+                            error: function (xhr, status, error) {
+                                HideLoading();
+                                toastr.error('Đã xảy ra lỗi khi xóa dữ liệu: ' + error);
+                            }
+                        });
+                    }
+                });
+            });
+
+            $(document).on('click', '.edit-button-day2', function () {
+                var userId = $(this).closest('tr').data('user-id');
+                $('#userRow_' + userId + '_2 .employee-target-day').each(function () {
+                    var currentValue = $(this).text().trim();
+                    // Kiểm tra nếu giá trị là rỗng thì hiển thị giá trị là 0
+                    var displayValue = currentValue === '' ? '0' : currentValue;
+                    $(this).html('<input type="number" class="form-control edit-target-input" style="width: 100px; text-align: right" value="' + displayValue + '">');
+                });
+                $(this).hide();
+                $('#userRow_' + userId + '_2 .save-button-day2').show();
+            });
+            $(document).on('click', '.save-button-day2', function () {
+                var userId = $(this).closest('tr').data('user-id');
+                var editedColumnsCount = 0;
+                var totalNewTarget = 0;
+                var editedColumnIndexes = [];
+
+                // Lấy giá trị target ban đầu
+                var targetValue = parseFloat($('#targetRow2 td[data-user-id="' + userId + '"]').text());
+                var monthYear = $('#MonthYear').val();
+                var [year, month] = monthYear.split('-');
+                var daysInMonth = new Date(year, month, 0).getDate();
+                var selectedTypeTarget = parseInt($('#indexType').val());
+                var newTargets = [];
+
+                // Duyệt qua các ô đã chỉnh sửa và tính tổng target mới
+                $('#userRow_' + userId + '_2 .edit-target-input').each(function (index) {
+                    var newValue = parseFloat($(this).val().trim());
+                    var cell = $(this).parent();
+
+                    // Kiểm tra giá trị nhập vào
+                    if (isNaN(newValue)) {
+                        toastr.warning('Số nhập vào không hợp lệ.');
+                        return false;
+                    }
+
+
+
+                    if (newValue > targetValue) {
+                        toastr.warning('Số nhập vào lớn hơn Target tổng.');
+                        return false;
+                    }
+
+                    // Nếu giá trị mới khác giá trị ban đầu và giá trị ban đầu không phải là 0
+                    if (newValue !== parseFloat(cell.data('original-value'))) {
+                        editedColumnsCount++;
+                        totalNewTarget += newValue;
+
+                        newTargets.push(newValue);
+
+                        // Gán id mới cho cột đã chỉnh sửa để phân biệt
+                        var newId = 'editedColumn_' + index + '_2'; // Sửa đổi ID ở đây
+                        cell.attr('id', newId);
+                        editedColumnIndexes.push(index); // Thêm chỉ mục vào mảng
+                    } else {
+                        // Nếu không có sự thay đổi hoặc giá trị ban đầu là 0, lưu giá trị ban đầu vào mảng tạm thời
+                        newTargets.push(parseFloat(cell.data('original-value')));
+                    }
+                });
+
+                // Tính giá trị target cho các cột chưa chỉnh sửa
+                var remainingTarget = targetValue - totalNewTarget;
+                var nonEditedColumnsCount = 0;
+                var dayNoSunday = getWorkingDaysInMonth(parseInt(year), parseInt(month));
+                var sundays = getSundays(parseInt(year), parseInt(month));
+                if (selectedTypeTarget === 1 || selectedTypeTarget === 2 || selectedTypeTarget === 3) {
+                    nonEditedColumnsCount = dayNoSunday - editedColumnsCount;
+                } else {
+                    nonEditedColumnsCount = daysInMonth - editedColumnsCount;
+                }
+                var newTargetForNonEdited = remainingTarget / nonEditedColumnsCount;
+                if (newTargetForNonEdited < 1) {
+                    toastr.warning('Target nhập vào không thể chia được nữa.');
+                    return;
+                }
+                if (editedColumnsCount === 0 || totalNewTarget === 0) {
+                    $('#userRow_' + userId + '_2 .employee-target-day').each(function (index) {
+                        var cell = $(this);
+                        if (!editedColumnIndexes.includes(index)) {
+                            var originalValue = parseFloat(cell.data('original-value'));
+                            if (originalValue === 0) {
+                                cell.html('');
+                            } else {
+                                cell.html(originalValue.toFixed(1));
+                            }
+                        }
+                    });
+
+                    $(this).hide();
+                    $('#userRow_' + userId + '_2 .edit-button-day2').show();
+                    return;
+                }
+                // Duyệt qua các ô và cập nhật giá trị mới
+                $('#userRow_' + userId + '_2 .employee-target-day').each(function (index) {
+                    var cell = $(this);
+
+                    // Nếu chỉ mục không có trong mảng của các chỉ mục đã chỉnh sửa và giá trị ban đầu không phải là 0, cập nhật giá trị mới cho cột
+                    if (!editedColumnIndexes.includes(index) && parseFloat(cell.data('original-value')) !== 0) {
+                        // Kiểm tra xem ngày hiện tại có phải là Chủ nhật không và giá trị target ban đầu có phải là 0 không
+                        if (!sundays.includes(index + 1) || parseFloat(cell.data('original-value')) !== 0) {
+                            cell.html(newTargetForNonEdited.toFixed(1));
+                        }
+                    } else {
+                        cell.html(newTargets[index].toFixed(1));
+                    }
+
+                    // Cập nhật lại ID của các cột từ 0 đến 30
+                    cell.attr('id', 'editedColumn_' + index + '_2');
+                });
+
+                // Cập nhật lại giá trị ban đầu của các ô chưa chỉnh sửa
+                $('#userRow_' + userId + '_2 .employee-target-day').each(function (index) {
+                    var cell = $(this);
+                    if (!editedColumnIndexes.includes(index) && parseFloat(cell.data('original-value')) !== 0) {
+                        cell.data('original-value', newTargetForNonEdited.toFixed(1));
+                    }
+                });
+
+                // Ẩn nút lưu và hiển thị lại nút chỉnh sửa
+                $(this).hide();
+                $('#userRow_' + userId + '_2 .edit-button-day2').show();
+                var userId = $(this).closest('tr').data('user-id');
+                var targetObjectIndex = dailyTargetsOfDay2.findIndex(obj => obj.userId === userId);
+                if (targetObjectIndex !== -1) {
+                    var targetObject = dailyTargetsOfDay2[targetObjectIndex];
+                    editedColumnIndexes.forEach((index, idx) => {
+                        var editedColumn = 'target' + (index + 1);
+                        targetObject[editedColumn] = newTargets[idx].toFixed(1);
+                    });
+                    dailyTargetsOfDay2[targetObjectIndex] = targetObject;
+                } else {
+                    var newTargetObject = { userId: userId };
+                    editedColumnIndexes.forEach((index, idx) => {
+                        var editedColumn = 'target' + (index + 1);
+                        newTargetObject[editedColumn] = newTargets[idx].toFixed(1);
+                    });
+                    dailyTargetsOfDay2.push(newTargetObject);
+                }
+                // Log the count of edited columns and the total of new targets
+                console.log('Số cột đã chỉnh sửa:', editedColumnsCount);
+                console.log('Tổng các target mới:', totalNewTarget.toFixed(1));
+                console.log('remainingTarget:', remainingTarget.toFixed(1));
+                console.log('nonEditedColumnsCount:', nonEditedColumnsCount);
+                console.log('newTargetForNonEdited:', newTargetForNonEdited);
+                console.log('dailyTargetsOfDay2:', dailyTargetsOfDay2);
+
+            });
+
+
+            $(document).on('click', '.edit-button-day', function () {
+                var userId = $(this).closest('tr').data('user-id');
+                $('#userRow_' + userId + ' .employee-target-day').each(function () {
+                    var currentValue = $(this).text().trim();
+                    // Kiểm tra nếu giá trị là rỗng thì hiển thị giá trị là 0
+                    var displayValue = currentValue === '' ? '0' : currentValue;
+                    $(this).html('<input type="number" class="form-control edit-target-input" style="width: 100px;" value="' + displayValue + '">');
+                });
+                $(this).hide();
+                $('#userRow_' + userId + ' .save-button-day').show();
+            });
+
+            $(document).on('click', '.save-button-day', function () {
+
+                var userId = $(this).closest('tr').data('user-id');
+
+
+                var editedColumnsCount = 0;
+                var totalNewTarget = 0;
+                var editedColumnIndexes = []; // Mảng để lưu các chỉ mục của các cột đã chỉnh sửa
+
+                // Lấy giá trị target ban đầu
+                var targetValue = parseFloat($('#targetRow td[data-user-id="' + userId + '"]').text());
+                var monthYear = $('#MonthYear').val();
+                var [year, month] = monthYear.split('-');
+                var daysInMonth = new Date(year, month, 0).getDate();
+                var dayNoSunday = getWorkingDaysInMonth(parseInt(year), parseInt(month));
+                var selectedTypeTarget = parseInt($('#indexType').val());
+                var newTargets = [];
+
+                // Duyệt qua các ô đã chỉnh sửa và tính tổng target mới
+                $('#userRow_' + userId + ' .edit-target-input').each(function (index) {
+                    var newValue = parseFloat($(this).val().trim());
+                    var cell = $(this).parent();
+
+                    // Kiểm tra giá trị nhập vào
+                    if (isNaN(newValue)) {
+                        toastr.warning('Số nhập vào không hợp lệ.');
+                        return false;
+                    }
+
+                    if (newValue > targetValue) {
+                        toastr.warning('Số nhập vào lớn hơn Target tổng.');
+                        return false;
+                    }
+
+                    // Nếu giá trị mới khác giá trị ban đầu và giá trị ban đầu không phải là 0
+                    if (newValue !== parseFloat(cell.data('original-value')) && parseFloat(cell.data('original-value')) !== 0) {
+                        editedColumnsCount++;
+                        totalNewTarget += newValue;
+
+                        newTargets.push(newValue);
+
+                        // Gán id mới cho cột đã chỉnh sửa để phân biệt
+                        var newId = 'editedColumn_' + index;
+                        cell.attr('id', newId);
+                        editedColumnIndexes.push(index); // Thêm chỉ mục vào mảng
+                    } else {
+                        // Nếu không có sự thay đổi hoặc giá trị ban đầu là 0, lưu giá trị ban đầu vào mảng tạm thời
+                        newTargets.push(parseFloat(cell.data('original-value')));
+                    }
+                });
+
+                // Tính giá trị target cho các cột chưa chỉnh sửa
+                var remainingTarget = targetValue - totalNewTarget;
+                var nonEditedColumnsCount = 0;
+                if (selectedTypeTarget === 1 || selectedTypeTarget === 2 || selectedTypeTarget === 3) {
+                    nonEditedColumnsCount = dayNoSunday - editedColumnsCount;
+                } else {
+                    nonEditedColumnsCount = daysInMonth - editedColumnsCount;
+                }
+                var newTargetForNonEdited = remainingTarget / nonEditedColumnsCount;
+                if (newTargetForNonEdited < 1) {
+                    toastr.warning('Target nhập vào không thể chia được nữa.');
+                    return;
+                }
+                if (editedColumnsCount === 0 || totalNewTarget === 0) {
+                    $('#userRow_' + userId + ' .employee-target-day').each(function (index) {
+                        var cell = $(this);
+                        if (!editedColumnIndexes.includes(index)) {
+                            var originalValue = parseFloat(cell.data('original-value'));
+                            if (originalValue === 0) {
+                                cell.html('');
+                            } else {
+                                cell.html(originalValue.toFixed(1));
+                            }
+                        }
+                    });
+
+                    $(this).hide();
+                    $('#userRow_' + userId + ' .edit-button-day').show();
+                    return;
+                }
+                // Duyệt qua các ô và cập nhật giá trị mới
+                $('#userRow_' + userId + ' .employee-target-day').each(function (index) {
+                    var cell = $(this);
+
+                    // Nếu chỉ mục không có trong mảng của các chỉ mục đã chỉnh sửa và giá trị ban đầu không phải là 0, cập nhật giá trị mới cho cột
+                    if (!editedColumnIndexes.includes(index) && parseFloat(cell.data('original-value')) !== 0) {
+                        cell.html(newTargetForNonEdited.toFixed(1));
+                    } else {
+                        cell.html(newTargets[index].toFixed(1));
+                    }
+
+                    // Cập nhật lại ID của các cột từ 0 đến 30
+                    cell.attr('id', 'editedColumn_' + index);
+                });
+
+
+                // Cập nhật lại giá trị ban đầu của các ô chưa chỉnh sửa
+                 $('#userRow_' + userId + ' .employee-target-day').each(function (index) {
+                    var cell = $(this);
+                    if (!editedColumnIndexes.includes(index) && parseFloat(cell.data('original-value')) !== 0) {
+                        cell.data('original-value', newTargetForNonEdited.toFixed(1));
+                    }
+                });
+
+                // Ẩn nút lưu và hiển thị lại nút chỉnh sửa
+                $(this).hide();
+                $('#userRow_' + userId + ' .edit-button-day').show();
+
+                // Log the count of edited columns and the total of new targets
+                console.log('Số cột đã chỉnh sửa:', editedColumnsCount);
+                console.log('Tổng các target mới:', totalNewTarget.toFixed(1));
+                console.log('remainingTarget:', remainingTarget.toFixed(1));
+                console.log('nonEditedColumnsCount:', nonEditedColumnsCount);
+                console.log('newTargetForNonEdited:', newTargetForNonEdited);
+            });
+
+            function removeColumnByUserId(userId) {
+                // Tìm chỉ số cột dựa trên userId
+                var columnIndexToRemove = $('#employeeRow td.employee-name[data-user-id="' + userId + '"]').index();
+
+                // Kiểm tra nếu không tìm thấy cột
+                if (columnIndexToRemove === -1) {
+                    console.log('Không tìm thấy cột với userId: ' + userId);
+                    return;
+                }
+
+                // Xóa cột user và cột action tương ứng
+                $('#employeeRow td.employee-name[data-user-id="' + userId + '"]').remove();
+                $('#targetRow td.employee-target[data-user-id="' + userId + '"]').remove();
+                $('#targetRow2 td.employee-target2[data-user-id="' + userId + '"]').remove();
+                $('#actionRow td').eq(columnIndexToRemove).remove();
+            }
+            function checkRemainingColumns() {
+                var remainingColumns = $('#targetRow td.employee-target').length;
+                if (remainingColumns === 0) {
+                    // Set các trường #branch, #month, #year, #indexType về rỗng
+                    $('#branch').val('');
+                    $('#month').val('');
+                    $('#year').val('');
+                    $('#indexType').val('');
+
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1500);
+                }
+            }
+
+
+            function saveTarget(value) {
+                // Loại bỏ dấu chấm phẩy từ chuỗi giá trị
+                var targetValue = value.replace(/\./g, "");
+                localStorage.setItem('savedTarget', targetValue);
+            }
+
+            function saveTarget2(value) {
+                // Loại bỏ dấu chấm phẩy từ chuỗi giá trị
+                var targetValue = value.replace(/\./g, "");
+                localStorage.setItem('savedTarget', targetValue);
+            }
+        // Hàm lấy giá trị từ localStorage
+        function getTarget() {
+            return localStorage.getItem('savedTarget');
+        }
+            function getTarget2() {
+                return localStorage.getItem('saveTarget2');
+            }
+
+        // Hàm reset giá trị target trong localStorage
+        function resetTarget() {
+            localStorage.removeItem('savedTarget');
+            }
+            function resetTarget2() {
+                localStorage.removeItem('saveTarget2');
+            }
+
+        resetTarget();
+            resetTarget2();
+
+            // Sự kiện khi nhấn nút Phân bổ
+            $('#allocateButton').on('click', function () {
+                var targetValue = $('#target').val().trim().replace(/\./g, ''); // Loại bỏ dấu chấm phân cách hàng nghìn khi lưu vào localStorage
+                console.log(targetValue);
+
+                // Kiểm tra xem giá trị có phải là số và không bắt đầu bằng số 0
+                if (/^[1-9]\d*$/.test(targetValue)) {
+                    // Lưu giá trị vào localStorage
+                    saveTarget(targetValue);
+
+                    // Hiển thị giá trị có dấu phân cách hàng nghìn trong input
+                    $('#target').val(targetValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+
+                    // Tính toán giá trị target cho mỗi người dùng
+                    var numberOfUsers = $('#employeeRow td.employee-name').length; // Số lượng người dùng
+                    var targetForEachUser = Math.floor(targetValue / numberOfUsers); // Giá trị target cho mỗi người dùng
+
+                    // Cập nhật giá trị target cho mỗi người dùng trong bảng
+                    $('#targetRow td.employee-target').each(function () {
+                        $(this).text(targetForEachUser);
+                    });
+
+                    if ($('.save-button').is(':visible')) {
+                        // Nếu nút save-button xuất hiện, thực hiện các hành động tương ứng ở đây
+                        // Ví dụ: ẩn nút save-button và hiển thị nút edit-button
+                        $('.save-button').hide();
+                        $('.edit-button').show();
+                    }
+                    toastr.clear();
+                    toastr.success('Phân bổ thành công');
+                } else {
+                    toastr.clear();
+                    toastr.warning('Vui lòng nhập một số hợp lệ, không bắt đầu bằng số 0.');
+                }
+
+
+            });
+            $('#allocateButton2').on('click', function () {
+                var targetValue = $('#target2').val().trim().replace(/\./g, ''); // Loại bỏ dấu chấm phân cách hàng nghìn khi lưu vào localStorage
+                console.log(targetValue);
+
+                // Kiểm tra xem giá trị có phải là số và không bắt đầu bằng số 0
+                if (/^[1-9]\d*$/.test(targetValue)) {
+                    // Lưu giá trị vào localStorage
+                    saveTarget2(targetValue);
+
+                    // Hiển thị giá trị có dấu phân cách hàng nghìn trong input
+                    $('#target').val(targetValue.replace(/\B(?=(\d{3})+(?!\d))/g, '.'));
+
+                    // Tính toán giá trị target cho mỗi người dùng
+                    var numberOfUsers = $('#employeeRow td.employee-name').length;
+                    var targetForEachUser = Math.floor(targetValue / numberOfUsers);
+
+                    // Cập nhật giá trị target cho mỗi người dùng trong bảng
+                    $('#targetRow2 td.employee-target2').each(function () {
+                        $(this).text(targetForEachUser);
+                    });
+                    if ($('.save-button').is(':visible')) {
+                        // Nếu nút save-button xuất hiện, thực hiện các hành động tương ứng ở đây
+                        // Ví dụ: ẩn nút save-button và hiển thị nút edit-button
+                        $('.save-button').hide();
+                        $('.edit-button').show();
+                    }
+                    toastr.clear();
+                    toastr.success('Phân bổ thành công');
+                } else {
+                    toastr.clear();
+                    toastr.warning('Vui lòng nhập một số hợp lệ, không bắt đầu bằng số 0.');
+                }
+
+
+            });
+
+
+
+            $('#resetButton').on('click', function () {
+                // Kiểm tra nếu bảng tableRowOfDay không rỗng
+                if ($('#dataTable tbody tr').length > 0) {
+                    toastr.warning('Vui lòng thực hiện xong thao tác.');
+                    return;
+                }
+
+                // Reset các hàng
+                var firstColumnHtml = $('#employeeRow td:first-child').prop('outerHTML');
+                var firstColumnHtml2 = $('#targetRow td:first-child').prop('outerHTML');
+                var firstColumnHtml4 = $('#targetRow2 td:first-child').prop('outerHTML');
+
+                var firstColumnHtml3 = $('#actionRow td:first-child').prop('outerHTML');
+
+                $('#employeeRow').empty().append(firstColumnHtml);
+                $('#targetRow').empty().append(firstColumnHtml2);
+                $('#targetRow2').empty().append(firstColumnHtml4);
+
+                $('#actionRow').empty().append(firstColumnHtml3);
+
+                // Ẩn các thành phần
+                $('#employeeGrid').hide();
+                $('#employeeData').empty();
+                $('#addButtonRow').hide();
+                $('#tableRow').hide();
+                editingColumn = false;
+
+                // Xóa danh sách nhân viên đã chọn
+                selectedEmployees = [];
+            });
+
+
+
+        // Khi trang được tải lại, kiểm tra và hiển thị giá trị đã lưu (nếu có)
+        var savedTarget = getTarget();
+        if (savedTarget) {
+            $('#target').val(savedTarget);
+            }
+            var savedTarget2 = getTarget2();
+            if (savedTarget2) {
+                $('#target2').val(savedTarget2);
+            }
+    });
+        function isUserInTable(userId) {
+            return $('#employeeRow td[data-user-id="' + userId + '"]').length > 0;
+        }
+function displayEmployeeData(groupId) {
+    // Lấy dữ liệu nhân viên tương ứng với nhóm từ ViewBag.UsersByGroup
+    var users = @Html.Raw(Json.Encode(ViewBag.UsersByGroup));
+    var employeeData = users[groupId]; // Lấy danh sách nhân viên từ nhóm được chọn
+
+    var employeeDataHtml = '<div class="container">';
+    // Tạo HTML cho danh sách nhân viên
+    employeeDataHtml += '<div class="row">';
+    employeeData.forEach(function (employee) {
+        // Kiểm tra xem người dùng đã xuất hiện trên bảng chưa
+        if (!isUserInTable(employee.Value)) {
+            employeeDataHtml += '<div class="col-md-2">';
+            employeeDataHtml += '<label class="checkbox-inline">';
+            employeeDataHtml += '<input type="checkbox" value="' + employee.Value + '"> ' + employee.Text;
+            employeeDataHtml += '</label>';
+            employeeDataHtml += '</div>';
+        }
+    });
+    employeeDataHtml += '</div>';
+    employeeDataHtml += '</div>';
+
+    // Hiển thị dữ liệu nhân viên
+    var employeeDataContainer = document.getElementById("employeeData");
+    employeeDataContainer.innerHTML = employeeDataHtml;
+
+    // Hiển thị phần lưới
+    document.getElementById("employeeGrid").style.display = "block";
+}
+
+    </script>
+    <script src="~/Scripts/script.js"></script>

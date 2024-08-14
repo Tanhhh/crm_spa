@@ -1,0 +1,204 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@model List<ActiveCustomerViewModel>
+    @{
+        ViewBag.Title = "SL Active Chi Nhánh";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "SLActiveChiNhanh",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+
+
+        string MonthStared = Request["monthStared"] != null ? Request["monthStared"] : (int.Parse(DateTime.Now.AddMonths(1).ToString("MM")) - int.Parse(DateTime.Now.Month.ToString())).ToString();
+        string MonthEnd = Request["monthEnd"] != null ? Request["monthEnd"] : DateTime.Now.Month.ToString();
+        string YearStared = Request["yearStared"] != null ? Request["yearStared"] : DateTime.Now.Year.ToString();
+        string YearEnd = Request["yearEnd"] != null ? Request["yearEnd"] : DateTime.Now.Year.ToString();
+
+        //var warehouseSelected = warehouseList.Where(x => x.Value == Request["warehouseId"]).FirstOrDefault();
+        //string warehouseName = warehouseSelected == null ? "" : warehouseSelected.Text;
+        //string category = Request["category"] != null ? Request["category"] : "";
+        //string group = Request["group"] != null ? Request["group"] : "";
+        //string manufacturer = Request["manufacturer"] != null ? Request["manufacturer"] : "";
+        int k = 0;
+        int month = 0;
+        var listmonthyear = ViewBag.listmonthyear as List<ListMonthYearActiveBrandViewModel>;
+        int skip = 0;
+    }
+    <!-- THEMES:  black    blueopal    bootstrap    default    Fiori    Flat    HighContrast    material    MaterialBlack    Metro    MetroBlack    Moonlight    Nova    Office365    Silver    Uniform -->
+    <!--kendo.all.min.js can be used as well instead of kendo.web.min.js and kendo.mobile.min.js-->
+
+    <style>
+        #reportViewer1 {
+            /*position: absolute;*/
+            left: 5px;
+            right: 5px;
+            top: 120px;
+            bottom: 5px;
+            overflow: hidden;
+            font-family: Verdana, Arial;
+            height: 700px;
+        }
+
+            #reportViewer1 * {
+                -webkit-box-sizing: initial;
+                -moz-box-sizing: initial;
+                box-sizing: initial;
+            }
+
+        .help-inline {
+            color: red;
+        }
+    </style>
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <label>Từ </label>
+        <select id="monthStared" name="monthStared">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(MonthStared == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+            }
+        </select>
+        <label>Năm </label>
+        <select id="yearStared" name="yearStared">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+            {
+                <option @(YearStared == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+            }
+        </select>
+        <label>Đến</label>
+        <select id="monthEnd" name="monthEnd">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(MonthEnd == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+            }
+        </select>
+        <label>Năm </label>
+        <select id="yearEnd" name="yearEnd">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+            {
+                <option @(YearEnd == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+            }
+        </select>
+    }
+
+    <div class="table-responsive">
+        <div class="">
+            <span class="" colspan="11" style="text-align:center"><h4>BÁO CÁO SL ACTIVE CHI NHÁNH TỪ THÁNG @MonthStared NĂM @YearStared ĐẾN THÁNG @MonthEnd NĂM @YearEnd</h4></span>
+        </div>
+        <table id="SLActiveBrand" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th style="width:40px;">#</th>
+                    <th style="width:40px;">Đầu kỳ</th>
+                    <th style="width:40px;">SL Tăng</th>
+                    <th style="width:40px;">SL Giảm</th>
+                    <th style="width:40px;">Tuần</th>
+                    <th style="width:40px;">Tháng</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var kk in listmonthyear)
+                {
+
+                    foreach (var item in Model.Skip(skip))
+                    {
+
+                        k++;
+
+                        <tr>
+                            @if (k == 1)
+                            {
+                                <td rowspan="4">Tháng @kk.month-Năm @kk.year</td>
+                            }
+                            <td>Tuần @k</td>
+                            <td>@item.DauKy</td>
+                            <td>@item.Tang</td>
+                            <td>@item.Giam</td>
+                            <td>@item.CuoiKy</td>
+                            @if (k == 4)
+                            {
+                                <td rowspan="4">@item.CuoiKy</td>
+                                k = 0;
+                                skip = skip + 4;
+                                break;
+                            }
+
+
+
+                        </tr>
+
+                    }
+
+                }
+
+
+                @*for (int y = int.Parse(YearStared); y <= int.Parse(YearEnd); y++)
+                    {
+                    if (y == int.Parse(YearEnd))
+                    {
+                    month = int.Parse(MonthEnd);
+                    }
+                    else
+                    {
+                    month = 12;
+                    }
+                    for (int i = int.Parse(MonthStared); i <= month; i++)
+                    {*@
+
+
+            </tbody>
+        </table>
+
+    </div>
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="ExportSLACTIVECHINHANH()">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    }
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    @section Scripts {
+        <script>
+            function ExportSLACTIVECHINHANH() {
+                var monthstard = $('#monthStared').val();
+                var monthend = $('#monthEnd').val();
+                var yearstar = $('#yearStared').val();
+                var yearend = $('#yearEnd').val();
+
+                OpenPopup('/SaleReport/Export_SLActiveChiNhanh?monthStared=' + monthstard + '&monthEnd=' + monthend + '&yearStared=' + yearstar + '&yearEnd=' + yearend + '&IsPopup=true', '', 0, 900);
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 200000);
+                HideLoading();
+            }
+        </script>
+        @*<script type="text/javascript">
+
+                var tableToExcel = (function () {
+                    var uri = 'data:application/vnd.ms-excel;base64,'
+                        , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                        , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                        , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+
+                    return function (table, name) {
+                        if (!table.nodeType) table = document.getElementById(table)
+                        var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+                        window.location.href = uri + base64(format(template, ctx))
+                    }
+                })()
+            </script>*@
+    }

@@ -1,0 +1,59 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using GridMvc.Html
+@using Erp.BackOffice.Account.Models
+@model int
+@{
+    var CustomerRecommendList = ViewBag.CustomerRecommendList as List<CustomerRecommendViewModel>;
+
+    var CustomerUserList = ViewBag.CustomerUserList as List<CustomerUserViewModel>;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    int rowNumber = 0;
+    int numberOfItem = 10;
+}
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+@helper GridColumnCommand(int? id)
+{
+    <p>
+        <button name="Delete" value="@id" type="submit" class="Delete btn btn-mini btn-danger">
+            <i class="ace-icon fa fa-trash bigger-120"></i>
+        </button>
+
+    </p>
+
+}
+@if (Model == 1)
+{
+    @Html.Grid(CustomerRecommendList).Columns(columns =>
+                      {
+                      columns.Add().Titled("#").SetWidth(20).RenderValueAs(o =>
+                      {
+                      rowNumber++;
+
+                      return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+});
+columns.Add(u => u.FullName).Titled(Wording.FullName).Sortable(false).Sanitized(false).Encoded(false).SetWidth(130);
+columns.Add(u => u.Code).Titled("Mã KH").Sortable(false).Sanitized(false).Encoded(false).SetWidth(130);
+
+columns.Add(u => u.StartDate).Format("{0:dd/MM/yyyy}").Titled(Wording.StartDate).SetWidth(100);
+//columns.Add(u => u.EndDate).Format("{0:dd/MM/yyyy}").Titled(Wording.EndDate).SetWidth(100);
+//columns.Add(u => u.CustomerId).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+}).WithPaging(10)
+
+}
+else if (Model == 0)
+{
+    @Html.Grid(CustomerUserList).Columns(columns =>
+          {
+          columns.Add().Titled("#").SetWidth(20).RenderValueAs(o =>
+          {
+          rowNumber++;
+
+          return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+});
+columns.Add(u => u.FullName).Titled(Wording.FullName).Sortable(false).Sanitized(false).Encoded(false).SetWidth(130);
+columns.Add(u => u.StartDate).Format("{0:dd/MM/yyyy}").Titled(Wording.StartDate).SetWidth(100);
+columns.Add(u => u.EndDate).Format("{0:dd/MM/yyyy}").Titled(Wording.EndDate).SetWidth(100);
+columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+}).WithPaging(10)
+}

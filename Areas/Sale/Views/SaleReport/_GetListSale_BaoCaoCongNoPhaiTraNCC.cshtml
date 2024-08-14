@@ -1,0 +1,42 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_BaoCaoCongNoPhaiTraNCCViewModel>
+@{
+    Layout = null;
+    int index = 1;
+}
+
+<table id="CTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th style="width:40px;text-align:center">STT</th>
+
+            <th classname="text-center">Mã nhà cung cấp</th>
+            <th classname="text-center">Tên nhà cung cấp</th>
+            <th classname="text-center">Số tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+
+                <td>@item.SupplierCode</td>
+                <td>@item.SupplierName</td>
+                <td classname="text-right">@(CommonSatic.ToCurrencyStr(item.CongNo, null))</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td classname="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.CongNo), null))</td>
+        </tr>
+    </tfoot>
+</table>

@@ -1,0 +1,1005 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model ProductOutboundTransferViewModel
+
+@{
+    ViewBag.Title = "Xuất kho";
+
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "ProductOutBound",
+        ActionName = "Transfer",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    IEnumerable<SelectListItem> warehouseList = (IEnumerable<SelectListItem>)ViewBag.warehouseList;
+
+    IEnumerable<InventoryViewModel> productList = (IEnumerable<InventoryViewModel>)ViewBag.productList;
+    IEnumerable<SelectListItem> productCategoryList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("product", null, "value");
+
+    IEnumerable<SelectListItem> warehouseSourceList = (IEnumerable<SelectListItem>)ViewBag.warehouseSourceList;
+    IEnumerable<SelectListItem> warehouseDestinationList = (IEnumerable<SelectListItem>)ViewBag.warehouseDestinationList;
+    //IEnumerable<SelectListItem> drugStoreList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_DepartmentAllNew(Model.BranchId, Wording.Empty);
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+<style type="text/css">
+    .has_error {
+        border: 1px #f2a696 solid !important;
+        color: #D68273;
+    }
+
+    .box {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+        margin-top: 0px !important;
+    }
+
+    .popover {
+        width: 100% !important;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+        /* padding-left: 7px; */
+        /* font-size: 13px; */
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 42px;
+    }
+
+        .itemdiv > .body > .name {
+            color: black;
+        }
+
+    #popup_archive2 {
+        position: center;
+        bottom: 30%;
+        left: 20%;
+        width: 60%;
+        height: 535px;
+        max-width: 500px;
+        /*top: 30%;*/
+        right: 30%;
+        /*max-height: 100%;*/
+        /* overflow-y:scroll;*/
+    }
+
+    #chitiet {
+        position: relative;
+        /* bottom: 50%; */
+        left: 80%;
+        /* right: 0%; */
+        top: auto;
+        margin-bottom: 10px;
+    }
+
+    #TongSoLuong, ProductItemCount {
+        /*width: 3%;
+            height: 1.8%;
+            text-align: center;
+            border-radius: 100px;
+            color: #ffc107;
+            background: none !important;
+            font-weight: bold;
+
+            font-size: 14px;
+            padding: unset;
+            margin: unset;
+            top: 9%;*/
+        width: 5%;
+        height: 3.8%;
+        text-align: right;
+        border-radius: 100px;
+        color: #ffc107;
+        background: none !important;
+        font-weight: bold;
+        font-size: 23px;
+        padding: unset;
+        margin: unset;
+        margin-left: 10px;
+        top: 15%;
+        z-index: 5;
+    }
+
+    #TongSoLuong, ProductItemCount {
+        background: none;
+        border: none;
+    }
+
+    #TongSoLuong, ProductItemCount {
+        /*left: 5.7%;*/
+        left: 20.7%;
+    }
+
+    form .table-responsive {
+        overflow: auto !important;
+    }
+
+    #mauexcel {
+        border-radius: 5px;
+        padding: 15px 60px;
+        top: 30%;
+        position: relative;
+        left: 30%;
+        font-size: 16px;
+    }
+
+    #scrolltable {
+        margin-top: 20px;
+        height: 300px;
+        overflow: auto;
+    }
+
+        #scrolltable table {
+            border-collapse: collapse;
+        }
+
+        #scrolltable tr:nth-child(even) {
+            background: #EEE;
+        }
+
+        #scrolltable th div {
+            position: absolute;
+            margin-top: -20px;
+        }
+
+    #exceltable {
+        width: 100%;
+        overflow-y: scroll !important;
+        max-height: 300px !important;
+    }
+
+    #addproduct, #viewfile {
+        width: 80px;
+    }
+</style>
+
+
+<style>
+    .edit-view .control-group, .edit-view .form-group {
+        border-top: 1px solid #dedede !important;
+    }
+</style>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Create", "ProductOutBound", null, FormMethod.Post, new { id = "CreateProductOutBound", @class = "form-horizontal clearfix" }))
+{
+    @Html.ValidationSummary(true)
+
+    <div id="OutboundCreate" class="row">
+        <div class="col-md-7 col-sm-12">
+            @if (Model.WarehouseSourceId != null && Model.WarehouseSourceId > 0)
+            {
+                <div class="product-search-box top-10">
+                    <input id="product_barcode" type="text" placeholder="Mã sản phẩm..." autocomplete="off" style="width:30%" />
+                    <select id="productSelectList" name="productSelectList" style="width:30%">
+                        <option value="">- Tìm sản phẩm -</option>
+                        @foreach (var item in productList)
+                        {
+                            <option value="@item.Id" data-selected="0" data-value="@item.Id | @(Common.KiemTraTonTaiHinhAnh(item.Image_Name,"product-image-folder","product")) | @(item.ProductCode + " - " + item.ProductName + " (Lô:"+item.LoCode+"-HSD:"+(item.ExpiryDate==null?"":item.ExpiryDate.Value.ToString("dd/MM/yyyy"))+"-Tồn kho: " + Common.PhanCachHangNgan2(item.Quantity) + ")")" data-code="@item.ProductCode" data-lo-code="@item.LoCode" data-expiry-date="@(item.ExpiryDate == null ? "" : item.ExpiryDate.Value.ToString("dd/MM/yyyy"))" data-product-type="@item.CategoryCode" data-price="@(item.ProductPriceOutbound)" data-unit="@item.ProductUnit" data-product-id="@item.ProductId" data-quantity-inventory="@(item.Quantity==null?0:item.Quantity.Value)">@item.ProductName</option>
+                        }
+                    </select>
+                </div>
+
+                <div id="listOrderDetail" class="table-responsive top-10">
+                    <a class="btn btn-primary btn-mini btn-sm" data-toggle="collapse" data-target="#popup_archive2" id="chitiet" style="border-radius:5px;">
+                        <i class="ace-icon fa fa-cloud-upload"></i>
+                        Nhập excel
+                    </a>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th style="width:5%">STT</th>
+                                <th>Tên sản phẩm</th>
+                                <th style="width: 100px;">Lô/Hạn SD</th>
+                                <th style="width:10%">Số lượng</th>
+                                <th style="width:15%">Đơn giá</th>
+                                <th style="width:15%">Thành tiền</th>
+                                <th style="width:50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="detailList"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td>
+                                    <input style="width:30px;" autocomplete="off" data-val="true" data-val-number="The field Sản phẩm đã chọn must be a number." data-val-required="Bắt buộc nhập" id="ProductItemCount" maskformat="" name="ProductItemCount" placeholder="" type="text" value="" readonly="readonly" />
+                                </td>
+                                <td colspan="2" class="red"><span id="status"></span></td>
+                                <td id="TongSoLuong" align="right" style="font-weight:bold"></td>
+                                <td></td>
+                                <td id="TongThanhTien" align="right" style="font-weight:bold"></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <span style="color:red" class="field-validation-valid help-inline" data-valmsg-for="ProductItemCount" data-valmsg-replace="true"></span>
+                </div>
+            }
+        </div>
+        <div class="col-md-5 col-sm-12">
+            <div class="widget-box" id="widget-box-1">
+                <div class="widget-header">
+                    <h5 class="widget-title">Thông tin khởi tạo</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @if (Model.WarehouseSourceId == null)
+                        {
+                            <div class="alert alert-danger">
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <i class="ace-icon fa fa-times"></i>
+                                </button>
+
+                                <strong>
+                                    <i class="ace-icon fa fa-times"></i>
+                                    Thông báo!
+                                </strong>
+
+                                @*<div class="detail_list_product">*@
+                                Chọn kho nguồn để thêm sản phẩm
+                                @*</div>*@
+                                <br>
+                            </div>
+                        }
+                        @*<div class="control-group form-group">
+                                <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Kho nguồn</label>
+                                <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                                    <span class="ctl">
+                                        @Html.TextBox("WarehouseSourceName", "", new { placeholder = "", autocomplete = "off", style = "width:200px; margin-right:3px;" })
+                                    </span>
+                                </div>
+                            </div>*@
+                        @*@Html.CustomDropDownListFor(model => model.BranchId, drugStoreList, WidthType.span4, true, null, DropdownListStyle.DropdownListStyleChosen)*@
+                        @Html.CustomDropDownListFor(model => model.WarehouseSourceId, warehouseSourceList, WidthType.span12, true, "- Chọn kho -", DropdownListStyle.DropdownListStyleChosen)
+                        <div class="control-group form-group">
+                            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Xuất cho kho khác</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                                <label class="radio"><input type="radio" value="internal" class="group_choice ace" data-target="#group_choice_wrap1" name="group_choice" />  <span class="lbl"></span></label>
+                            </div>
+                        </div>
+                        <div class="control-group form-group">
+                            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Xuất phục vụ</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                                <label class="radio"><input id="checkedservice" type="radio" value="service" class="group_choice ace" data-target="#group_choice_wrap2" checked name="group_choice" /> <span class="lbl"></span></label>
+                            </div>
+                        </div>
+                        <div id="group_choice_wrap1" class="group_choice_wrap clearfix">
+                            @Html.CustomDropDownListFor(model => model.WarehouseDestinationId, warehouseDestinationList, WidthType.span12, true, "- Chọn kho -", DropdownListStyle.DropdownListStyleChosen)
+                        </div>
+
+                        <div id="group_choice_wrap2" class="group_choice_wrap clearfix" style="height:0;overflow: hidden;">
+                        </div>
+                        @*@Html.ModulePopupFor(m => m.CreatedStaffId, "Staffs", Model.CreatedStaffName, false, false, false, null, null, "Search")*@
+                        @*@Html.DateTimePicker(model => model.CreatedDate, "dd/MM/yyyy H:mm", "00/00/0000 00:00:00", true, false)*@
+                        @Html.CustomTextAreaFor(model => model.Note, null, WidthType.span12)
+                        @Html.CustomTextboxFor(model => model.TotalAmount, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-sm-12" }, { "disabled", "disabled" } })
+
+                    </div>
+                    <div class="downloadFIle" style="padding-top:10px; height:30%">
+                        <a class="btn btn-white btn-success btn-sm" id="mauexcel" href="@Url.Action("PrintExample","ProductOutbound")">
+                            <i class="fa fa-cloud-download fa-1x" aria-hidden="true"></i>
+                            Tải file mẫu
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mini-popup">
+        <div id="popup_archive2" class="popover fade top">
+            <h3 class="popover-title"><i class="ace-icon fa fa-arrow-circle-right"></i> Import excel</h3>
+            <div class="popover-content">
+                <div class="row-1">
+                    <div class="col-sm-12">
+                        <label for="excelfile">Chọn File Excel</label>
+                        <input type="file" id="excelfile" style="border-radius:5px;" accept=".xls,.xlsx" />
+                        <input type="button" id="viewfile" value="Xem trước" style="border-radius:5px;" />
+                        <br />
+                        <br />
+                        <div id="scrolltable">
+                            <table id="exceltable" class="table table-bordered" style="border-radius:5px;">
+                                @*<thead>
+                                        <tr>
+                                            <th style="width:5%">STT</th>
+                                            <th style="width:20%">Mã Sản Phẩm</th>
+                                            <th style="width:15%">Số lượng</th>
+                                            <th style="width:15%">Đơn Giá</th>
+                                        </tr>
+                                    </thead>*@
+                            </table>
+                        </div>
+                        <p class="top-10">
+                            <input class="btn btn-white btn-success btn-sm hideinput" data-toggle="collapse" data-target="#popup_archive2" id="addproduct" value="Import" name="Save" type="button" style="border-radius:5px;" />
+                            <a class="btn btn-white btn-sm no-border" data-toggle="collapse" id="closepopup" data-target="#popup_archive2" style="border-radius:5px;margin-top:5px">Đóng</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+@section Scripts {
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+    <script src="/Scripts/combojax.js?=vs1.011"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.5/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.5/jszip.js"></script>
+    @*<script src="/Scripts/combojax.js"></script>
+        <link href="/assets/css/combojax.css" rel="stylesheet" />*@
+    <script type="text/javascript">
+        $(function () {
+            if ($('#checkedservice').is(":checked")) {
+                $(".group_choice_wrap").attr('hidden', 'hidden');
+            }
+        });
+        $(document).ready(function () {
+            LoadNumberInput();
+            $('#listOrderDetail').on('change', 'input', function () {
+                var value = $(this).val();
+                if (value == "") {
+                    $(this).addClass("valid_null");
+                }
+                else {
+                    $(this).removeClass("valid_null");
+                    $(this).removeClass("has_error");
+
+                }
+            });
+            $(".group_choice").change(function () {
+                ShowLoading();
+                $(".group_choice_wrap").css('height', 'initial');
+                if ($(this).is(":checked")) {
+                    $(".group_choice_wrap").hide();
+                    $($(this).data("target")).show();
+                }
+                HideLoading();
+            });
+            $('#Save').click(function () {
+                ShowLoading();
+                var WarehouseSourceId = $("#WarehouseSourceId").val();
+                var messagge = "";
+                if ($(".group_choice :checked").val() == "internal") {
+                    var warehouseDestinationId = $("#WarehouseDestinationId").val();
+                    if (warehouseDestinationId == '') {
+                        messagge += "Kho nhận sản phẩm chưa có <br>";
+                    }
+                }
+                if (WarehouseSourceId == '') {
+                    messagge += "Kho xuất sản phẩm chưa có <br>";
+                }
+                if (messagge != '') {
+                    alertPopup('Lỗi!', messagge, 'error');
+                    HideLoading();
+                }
+                else {
+                    ClearFormatBeforeSubmit($("#CreateProductOutBound"));
+                    $("#CreateProductOutBound").submit();
+                    //  HideLoading();
+                }
+
+            });
+            $("#WarehouseSourceId").change(function () {
+                ShowLoading();
+                //var staff = $("#CreatedStaffId").val();
+                window.location = window.location.href.split("?")[0] + "?WarehouseSourceId=" + $(this).val();
+            });
+
+            //init rcb chọn sản phẩm
+            $('#productSelectList').radComboBox({
+                colTitle: 'ID, Hình, Tên sản phẩm',
+                colValue: 1,
+                colImage: 2,
+                colHide: '1',
+                colSize: '0px,50px,',
+                colClass: ',,',
+                //width: 600,
+                height: 300,
+                boxSearch: true,
+                colSearch: 2
+            });
+
+            //$('#TotalAmount').numberFormat();
+            //$('.detail_item_price').numberFormat('before');
+            //$('#PaymentViewModel_Amount').val('0').numberFormat();
+            $("#ProductItemCount").attr("readonly", "true");
+
+            //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+            $('#productSelectList').on('change', function () {
+                debugger
+                var $this = $(this);
+                var selected = $this.find("option:selected");
+
+                if (selected.val() == '' || $('#product_item_' + selected.val()).length > 0)
+                    return;
+                if (selected.data("quantity-inventory") <= 0) {
+                    return;
+                }
+                var OrderNo = $('.detailList tr.detail_item').length;
+                var ProductId = selected.data("product-id");
+                var ProductName = selected.text();
+                var Unit = selected.data("unit");
+                var Quantity = 1;
+                var Price = selected.data("price");
+                var ProductType = selected.data("product-type");
+                var ProductCode = selected.data("code");
+                var QuantityInventory = selected.data("quantity-inventory");
+                var WarehouseId = $("#WarehouseSourceId").find("option:selected").val();
+                var LoCode = selected.data("lo-code");
+                var ExpiryDate = selected.data("expiry-date");
+                var formdata = {
+                    OrderNo: OrderNo,
+                    ProductId: ProductId,
+                    ProductName: ProductName,
+                    Unit: Unit,
+                    Quantity: Quantity,
+                    Price: Price,
+                    ProductType: ProductType,
+                    ProductCode: ProductCode,
+                    QuantityInventory: QuantityInventory,
+                    WarehouseId: WarehouseId,
+                    LoCode: LoCode,
+                    ExpiryDate: ExpiryDate
+                };
+                //Cộng dồn khi chọn sản phẩm cùng loại
+                $("#listOrderDetail tbody tr").each(function () {
+                    debugger
+                    var row = $(this);
+                    var w = $(window);
+                    //$(this).removeClass('selected_grey').addClass("text_data");
+
+                    var ProductCode1 = $(this).closest('tr').find("td:eq(1) input").val();
+
+                    //alert($('#product_barcode3').val());
+                    if (ProductId == ProductCode1) {
+                        //alert(ProductId);
+                        $(this).closest('tr').find("td:eq(3) input:nth-child(2)").val(parseInt($(this).closest('tr').find("td:eq(3) input:nth-child(2)").val()) + 1);
+                        $(this).closest('tr').find("td:eq(3) input:nth-child(2)").trigger('change');
+                        //$(this).addClass('selected_grey');
+                        //var body = $("html,#listOrderDetail");
+                        //body.stop().animate({ scrollTop: row.offset().top - (w.height() / 1.6) }, 500, 'swing', function () {
+                        // row.addClass('scrollCode');
+                        //});
+                        formdata = {};
+                        return;
+                    } else {
+                        //$(this).removeClass("scrollCode");
+                    }
+                    //alert(ProductId);
+
+                });
+                //Thêm dòng mới
+                ClickEventHandler(true, "/ProductOutBound/LoadProductItem", ".detailList", formdata, function () {
+                    //debugger
+                    LoadNumberInput();
+                    $('#ProductItemCount').val($('#listOrderDetail .detailList tr.detail_item').length);
+                    $("#DetailList_" + OrderNo + "__Quantity").focus().select();
+                    $.mask.definitions['~'] = '[+-]';
+                    $('.input-mask-date').mask('99/99/9999');
+                    var _product_id = $("#DetailList_" + OrderNo + "__ProductId").val();
+                    var _LoCode = $("#DetailList_" + OrderNo + "__LoCode").val();
+                    var _ExpiryDate = $("#DetailList_" + OrderNo + "__ExpiryDate").val();
+                    var _quantity_inventory = $("#DetailList_" + OrderNo + "__Quantity").data("quantity-inventory");
+                    var _qty = $("#DetailList_" + OrderNo + "__Quantity").val();
+                    var selector = '.detailList tr';
+                    var quantity_used = 0;
+                    $(selector).each(function (index, elem) {
+                        if (index != OrderNo) {
+                            var product_id = $("#DetailList_" + index + "__ProductId").val();
+                            var LoCode = $("#DetailList_" + index + "__LoCode").val();
+                            var ExpiryDate = $("#DetailList_" + index + "__ExpiryDate").val();
+                            var Quantity = $("#DetailList_" + index + "__Quantity").val();
+                            if (product_id == _product_id && LoCode == _LoCode && ExpiryDate == _ExpiryDate) { // la số thì mới tính
+                                quantity_used += parseInt(removeComma(Quantity));
+                            }
+                        }
+                    });
+                    //calcTotalAmount();
+                    var inventory_qty = parseInt(_quantity_inventory) - parseInt(quantity_used);
+                    var _quantity = parseInt(removeComma(_qty));
+                    $("#status").text("");
+                    if (_quantity > inventory_qty) {
+                        $("#DetailList_" + OrderNo + "__Quantity").val(inventory_qty);
+                        $("#status").text("Tổng số lượng xuất ra không được lớn hơn số lượng tồn kho hiện tại!!");
+                    }
+                    calcAmountItem(OrderNo);
+                    calcTotalAmount();
+                });
+            });
+
+            $('#listOrderDetail').on('focus', '.detail_item_price', function () {
+                $(this).select();
+            });
+
+            $('#listOrderDetail').on('focus', '.detail_item_qty', function () {
+                $(this).select();
+            });
+
+            // tính thành tiền và tổng cộng
+            $('#listOrderDetail').on('change', '.detail_item_qty', function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(1);
+                }
+                var $this = $(this);
+                var id = $this.closest('tr').data('id');
+                //tính tổng cộng
+                calcAmountItem(id);
+                calcTotalAmount();
+            });
+            $('list')
+            $('#listOrderDetail').on('change', '.detail-product-price .detail_item_price', function () {
+                debugger
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(1);
+                }
+                var $this = $(this);
+                var id = $this.closest('tr').data('id');
+                calcAmountItem(id);
+                calcTotalAmount();
+            });
+            $('#listOrderDetail').on('change', '.detail_item_price:not(.mask-format-currency)', function () {
+                debugger
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(1);
+                }
+                var $this = $(this);
+                var id = $this.closest('tr').data('id');
+                calcAmountItem(id);
+                calcTotalAmount();
+            });
+            $('#listOrderDetail').on('change', '.detail_item_price', function () {
+                debugger
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(1);
+                }
+                var $this = $(this);
+                var id = $this.closest('tr').data('id');
+                calcAmountItem(id);
+                calcTotalAmount();
+            });
+            $('#listOrderDetail').on('keypress', '.detail_item_price, .detail_item_qty', function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                }
+            });
+
+            $('#product_barcode').keypress(function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $('#product_barcode').trigger('change');
+                }
+            });
+            
+            //khi nhập barcode
+            $('#product_barcode').change(function () {
+                var $this = $(this);
+                if ($this.val() != '') {
+
+                    var barcode = $this.val();
+                    //đặt lại giá trị rỗng
+                    $this.val('').focus();
+
+                    var valueSearch = searchProductByBarCodeContain(barcode);
+                    if (valueSearch == undefined) {
+                        alert('Không tìm thấy sản phẩm với mã code trên!');
+                        return;
+                    }
+
+                    $('#productSelectList').val(valueSearch).trigger("change");
+                }
+            });
+
+            // xóa sản phẩm
+            $('#listOrderDetail').on('click', '.btn-delete-item', function () {
+                //$(this).closest('tr').next('tr.template_location').remove();
+                $(this).closest('tr').remove();
+
+                var countItem = $('.detailList tr.detail_item').length;
+                $('#ProductItemCount').val(countItem);
+
+                if (countItem == 0) {
+                    $('#ProductItemCount').val('');
+                    $('#TongSoLuong').text('');
+                    $('#TongThanhTien').text('');
+                }
+                calcTotalAmount();
+
+                $('.detailList tr.detail_item').each(function (index, tr) {
+                    $(tr).attr('data-id', index);
+                    $(tr).attr('id', "product_item_" + index);
+                    $(tr).attr('role', index).attr("id", "product_item_" + index).data("id", index);
+                    $(tr).find('td:first-child').text(index + 1);
+
+                    $(tr).find('.detail-locode input').attr('name', 'DetailList[' + index + '].ExpiryDate').attr('id', 'DetailList_' + index + '__ExpiryDate');
+                    $(tr).find('.detail-locode input').attr('name', 'DetailList[' + index + '].LoCode').attr('id', 'DetailList_' + index + '__LoCode');
+                    $(tr).find('.detail_item_id input').attr('name', 'DetailList[' + index + '].ProductId').attr('id', 'DetailList_' + index + '__ProductId');
+                    $(tr).find('.detail_item_qty').attr('name', 'DetailList[' + index + '].Quantity').attr('id', 'DetailList_' + index + '__Quantity');
+                    $(tr).find('.detail_item_price').filter(':not(.mask-format-currency)').attr('name', 'DetailList[' + index + '].Price').attr('id', 'DetailList_' + index + '__Price');
+                    $(tr).find('.detail_item_unit').attr('name', 'DetailList[' + index + '].Unit');
+                });
+            });
+        });
+
+        function selectLocationItem(id, LoCode, Floor, ExpiryDate, Shelf, SN, orderNo) {
+            $("#LocationItemList_" + orderNo + "__Id").val(id);
+            $("#LocationItemList_" + orderNo + "__SN").val(SN);
+            $("#LocationItemList_" + orderNo + "__Shelf").val(Shelf);
+            $("#LocationItemList_" + orderNo + "__Floor").val(Floor);
+            $("#LocationItemList_" + orderNo + "__LoCode").val(LoCode);
+            $("#LocationItemList_" + orderNo + "__ExpiryDate").val(ExpiryDate);
+            ClosePopup();
+        }
+
+        function searchProductByBarCodeContain(barcode) {
+            barcode = barcode.toLowerCase();
+            //var $productSelect = $('.detail_item_id').first();
+
+            var $optionList = $("#productSelectList").find('option');
+
+            var arrResulft = [];
+            for (var i = 0; i < $optionList.length; i++) {
+                var data_code = $($optionList[i]).data('code') != undefined ? $($optionList[i]).data('code').toString().toLowerCase() : undefined;
+                if (barcode.indexOf(data_code) != -1)
+                    arrResulft.push($($optionList[i]).attr('value'));
+
+                if (arrResulft.length == 1) {
+                    return arrResulft[0];
+                }
+            }
+
+            return arrResulft[0];
+        };
+
+        function calcAmountItem(id) {
+            var input_price = $('#DetailList_' + id + '__Price');
+            var _price = input_price.val() != '' ? removeComma(input_price.val()) : 0;
+
+            var $qty = $('tr#product_item_' + id).find('.detail_item_qty');
+            var qty = 1;
+            if ($qty.val() == '') {
+                $qty.val(1);
+            } else {
+                qty = parseInt(removeComma($qty.val())) < 0 ? parseInt(removeComma($qty.val())) * -1 : parseInt(removeComma($qty.val()));
+            }
+            var total = parseFloat(_price) * qty;
+            $('tr#product_item_' + id).find('.detail_item_total').text(numeral(total).format('0,0'));
+        };
+
+        function calcTotalAmount() {
+            var total = 0;
+            var total1 = 0;
+
+            var selector = '.detailList tr.detail_item.detail_item';
+            $(selector).each(function (index, elem) {
+                if ($(elem).find('.detail_item_total').text() != '') { // la số thì mới tính
+                    total += parseFloat(removeComma($(elem).find('.detail_item_total').text()));
+                    $("#TongThanhTien").text(numeral(total).format('0,0'));
+
+                }
+                //   console.log($(elem).find('.detail_item_qty').val());
+                if ($(elem).find('.detail_item_qty').val() != '') { // la số thì mới tính
+                    total1 += parseInt($(elem).find('.detail_item_qty').val().replace(/\./g, ''));
+                    $("#TongSoLuong").text(currencyFormat(total1));
+                }
+
+                if (index == $(selector).length - 1) {
+                    $('#mask-TotalAmount').val(numeral(total).format('0,0'));
+                    $('#TotalAmount').val(numeral(total).format('0,0'));
+                }
+            });
+        };
+
+        function checkChosenProductOnTable() {
+            var flag = true;
+            if ($('#PurchaseOrderId').val() == '') {
+                $('.detailList select.detail_item_id').each(function (index, elem) {
+                    if ($(elem).val() == '') {
+                        var message = $(elem).data('val-required') != undefined ? $(elem).data('val-required') : 'Chưa chọn sản phẩm!';
+                        $(elem).next('span').text(message);
+                        flag = false;
+                    }
+                });
+            }
+            return flag;
+        }
+
+        //hàm gọi lại từ form tạo mới phiếu nhập
+        function ClosePopupAndAppendSelectPurchaseOrder(optionSelect) {
+            ClosePopup(false);
+            $('#PurchaseOrderId').append($(optionSelect)).trigger("chosen:updated");
+        }
+
+        function parseValidatorForm(form) {
+            //jQuery.noConflict();
+
+            // if the form is in a dialog box {
+            var form = $(form);
+            form.removeData('validator').removeData('nobtrusiveValidation');
+            $.validator.unobtrusive.parse(form); // }
+
+            $.fn.extend({
+                // form validation {
+                isValid: function () {
+                    var self = $(this);
+                    $.validator.unobtrusive.parse(self);
+                    return self.data('unobtrusiveValidation').validate();
+                } // }
+            });
+        };
+
+    
+        $("body").on("click", "#viewfile", function () {
+            var fileUpload = $("#excelfile")[0];
+            debugger
+            var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+            if (regex.test(fileUpload.value.toLowerCase())) {
+                if (typeof (FileReader) != "undefined") {
+                    var reader = new FileReader();
+
+                    //For Browsers other than IE.
+                    if (reader.readAsBinaryString) {
+                        reader.onload = function (e) {
+                            ProcessExcel(e.target.result);
+                        };
+                        reader.readAsBinaryString(fileUpload.files[0]);
+                    } else {
+                        //For IE Browser.
+                        reader.onload = function (e) {
+                            var data = "";
+                            var bytes = new Uint8Array(e.target.result);
+                            for (var i = 0; i < bytes.byteLength; i++) {
+                                data += String.fromCharCode(bytes[i]);
+                            }
+                            ProcessExcel(data);
+                        };
+                        reader.readAsArrayBuffer(fileUpload.files[0]);
+                    }
+                } else {
+                    alert("This browser does not support HTML5.");
+                }
+            } else {
+                alert("Please upload a valid Excel file.");
+            }
+        });
+        function ProcessExcel(data) {
+            //Read the Excel File data.
+            var workbook = XLSX.read(data, {
+                type: 'binary'
+            });
+
+            //Fetch the name of First Sheet.
+            var firstSheet = workbook.SheetNames[0];
+
+            //Read all rows from First Sheet into an JSON array.
+            var excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
+
+            //Create a HTML Table element.
+            var table = $("<table/>");
+            table[0].border = "1";
+            table[0].id = "exceltable";
+            table[0].addClass = "table table-bordered";
+
+            //Add the header row.
+            var row = $(table[0].insertRow(-1));
+
+            //Add the header cells.
+            var headerCell = $("<th/>");
+            headerCell.html("STT");
+            headerCell.css("width", "20%");
+            row.append(headerCell);
+
+            var headerCell = $("<th/>");
+            headerCell.html("MaSanPham");
+            row.append(headerCell);
+
+            var headerCell = $("<th/>");
+            headerCell.html("SoLuong");
+            row.append(headerCell);
+
+            var headerCell = $("<th/>");
+            headerCell.html("DonGia");
+            row.append(headerCell);
+            //Add the data rows from Excel file.
+            for (var i = 0; i < excelRows.length; i++) {
+                debugger
+                //Add the data row.
+                var row = $(table[0].insertRow(-1));
+
+                //Add the data cells.
+                var cell = $("<td/> ");
+                cell.html(excelRows[i].STT);
+                cell.css("width", "20%");
+                row.append(cell);
+
+                cell = $("<td/> ");
+                cell.html(excelRows[i].MaSanPham);
+                cell.css("width", "40%");
+                row.append(cell);
+
+                cell = $("<td/> ");
+                cell.html(excelRows[i].SoLuong);
+                cell.css("width", "20%");
+                cell.css("text-align", "center");
+                row.append(cell);
+
+                cell = $("<td/>");
+                cell.html(excelRows[i].DonGia);
+                cell.css("width", "20%");
+                cell.css("text-align", "center");
+                row.append(cell);
+            }
+
+            var dvExcel = $("#scrolltable");
+            dvExcel.html("");
+            dvExcel.append(table);
+        };
+    
+        function BindTable(jsondata, tableid) {/*Function used to convert the JSON array to Html Table*/
+            var columns = BindTableHeader(jsondata, tableid); /*Gets all the column headings of Excel*/
+            for (var i = 0; i < jsondata.length; i++) {
+                var row$ = $('<tr/>');
+                for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+                    var cellValue = jsondata[i][columns[colIndex]];
+                    if (cellValue == null)
+                        cellValue = "";
+                    row$.append($('<td/>').html(cellValue));
+                }
+                $(tableid).append(row$);
+            }
+        }
+        function BindTableHeader(jsondata, tableid) {/*Function used to get all column names from JSON and bind the html table header*/
+            var columnSet = [];
+            var headerTr$ = $('<tr/>');
+            for (var i = 0; i < jsondata.length; i++) {
+                var rowHash = jsondata[i];
+                for (var key in rowHash) {
+                    if (rowHash.hasOwnProperty(key)) {
+                        if ($.inArray(key, columnSet) == -1) {/*Adding each unique column names to a variable array*/
+                            columnSet.push(key);
+                            headerTr$.append($('<th/>').html(key));
+                        }
+                    }
+                }
+            }
+            $(tableid).append(headerTr$);
+            return columnSet;
+        }
+
+        $("body").on("click", "#addproduct", function (e) {
+            //var a = $('.detailList').find("tr:eq(0)").find("td:eq(1)").html();
+            ////ShowLoading();
+
+            //if (a == null) {
+            e.preventDefault();
+            var stt = 0;
+            var ListForm = Array();
+
+            var WarehouseId = $("#WarehouseDestinationId").find("option:selected").val();
+
+            document.getElementById("exceltable").deleteRow(0);
+            //ShowLoading();
+            $("#exceltable TBODY TR").each(function () {
+                var row = $(this);
+
+                var OrderNo = row.find("TD").eq(0).html();
+                var ProductCode = row.find("TD").eq(1).html();
+                var Quantity = row.find("TD").eq(2).html();
+                var price = row.find("TD").eq(3).html();
+
+                var formdata = {
+                    STT: OrderNo,
+                    MaSanPham: ProductCode,
+                    SoLuong: Quantity,
+                    DonGia: price,
+                    WarehouseId: WarehouseId
+                };
+                ListForm.push(formdata);
+
+                row.remove();
+            });
+            //ShowLoading();
+            $.ajax({
+                type: "POST",
+                url: "/ProductOutbound/ImportExcel",
+                data: JSON.stringify(ListForm),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (r) {
+                    //location.reload();
+                    //ShowLoading();
+                    $(".detailList").html(r);
+                    debugger
+                    var countItem = $('.detailList tr.detail_item').length;
+                    $('#ProductItemCount').val(countItem);
+                    calcTotalAmount();
+
+                    var irow = 1;
+                    $("#listOrderDetail tbody tr").each(function () {
+                        var row = $(this);
+                        if (irow == $('.detailList tr.detail_item').length) {
+                            $(this).closest('tr').remove();
+
+                            var countItem = $('.detailList tr.detail_item').length;
+                            $('#ProductItemCount').val(countItem);
+
+                            if (countItem == 0) {
+                                $('#ProductItemCount').val('');
+                                $('#TongSoLuong').text('');
+                                $('#TongThanhTien').text('');
+                            }
+                            calcTotalAmount();
+
+                            $('.detailList tr.detail_item').each(function (index, tr) {
+                                debugger
+                                $(tr).attr('data-id', index);
+                                $(tr).find('td:first-child').text(index);
+                                $(tr).find('.item_material_id').attr('name', 'DetailList[' + index + '].MaterialId').attr('id', 'DetailList_' + index + '__MaterialId');
+                                $(tr).find('.item_id').attr('name', 'DetailList[' + index + '].Id').attr('id', 'DetailList_' + index + '__Id');
+                                $(tr).find('.item_quantity').attr('name', 'DetailList[' + index + '].Quantity').attr('id', 'DetailList_' + index + '__Quantity');
+                                $(tr).find('.item_price').attr('name', 'DetailList[' + index + '].Price').attr('id', 'DetailList_' + index + '__Price');
+                                $(tr).find('.item_locode').attr('name', 'DetailList[' + index + '].LoCode').attr('id', 'DetailList_' + index + '__LoCode');
+                                $(tr).find('.item_expiry_date').attr('name', 'DetailList[' + index + '].ExpiryDate').attr('id', 'DetailList_' + index + '__ExpiryDate');
+                                $(tr).find('.item_unit').attr('name', 'DetailList[' + index + '].Unit').attr('id', 'DetailList_' + index + '__Unit');
+                            });
+                        }
+                        irow = irow + 1;
+
+                    });
+
+                    HideLoading();
+                }
+            });
+
+            $('#addproduct').addClass('hideinput');
+            $("#exceltable TBODY").remove();
+
+
+        });
+        
+        $("#closepopup").click(function () {
+            $("#exceltable TBODY").remove();
+            document.getElementById("excelfile").value = "";
+        });
+        $("#viewfile").click(function () {
+            $("#addproduct").removeClass('hideinput');
+        });
+
+    </script>
+}

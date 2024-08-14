@@ -1,0 +1,32 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model List<LogPromotionViewModel>
+
+@foreach (var ii in Model)
+{
+    <p>
+        @if (ii.Type == "product_donate")
+        {
+            <span><i class="fa fa-gift red"></i> Mua <b class="red">@ii.ProductName @ii.ProductSymbolQuantity @ii.ProductQuantity </b> được tặng <b class="red">@ii.GiftProductName</b></span>
+        }
+        @if (ii.Type == "product_discount")
+        {
+            <span><i class="fa fa-gift red"></i> Mua <b class="red">@ii.ProductName @ii.ProductSymbolQuantity @ii.ProductQuantity</b> được giảm giá  <b class="red">@ii.CommissionValue.ToCurrencyStr(null) @((ii.IsMoney==null?false: ii.IsMoney.Value) == true ? "VNĐ" : "%" )</b></span>
+        }
+        @if (ii.Type == "invoice_donate")
+        {
+            <span><i class="fa fa-gift red"></i> Hóa đơn từ  <b class="red"> @ii.StartAmount.ToCurrencyStr(null) @ii.StartSymbol</b> đến <b class="red">@ii.EndSymbol @ii.EndAmount.ToCurrencyStr(null)</b> được tặng <b class="red">@ii.GiftProductName</b></span>
+        }
+        @if (ii.Type == "invoice_discount")
+        {
+            <span><i class="fa fa-gift red"></i> Hóa đơn từ  <b class="red"> @ii.StartAmount.ToCurrencyStr(null) @ii.StartSymbol</b> đến <b class="red">@ii.EndSymbol @ii.EndAmount.ToCurrencyStr(null)</b> được giảm giá  <b class="red">@ii.CommissionValue.ToCurrencyStr(null) @(ii.IsMoney.HasValue ? "VNĐ" : "%" )</b></span>
+        }
+        @if (ii.Type == "invoice_discountdif")
+        {
+            <span><i class="fa fa-gift red"></i><b class="red"> @ii.Name được giảm giá  @ii.CommissionValue.ToCurrencyStr(null) @(ii.IsMoney.HasValue ? "VNĐ" : "%" )</b></span>
+        }
+    </p>
+}

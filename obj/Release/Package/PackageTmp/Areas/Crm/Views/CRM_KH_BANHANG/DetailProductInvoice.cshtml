@@ -1,0 +1,507 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model ProductInvoiceViewModel
+
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+
+
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+
+    SelectList provinceList = SelectListHelper.GetSelectList_Location("0", null, "- Tỉnh/Thành phố -");
+    SelectList districtList = SelectListHelper.GetSelectList_Location(Model.ShipCityId, null, "- Quận/Huyện -");
+    SelectList wardList = SelectListHelper.GetSelectList_Location(Model.ShipDistrictId, null, "- Xã/Phường -");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CRM_KH_BANHANG",
+        ActionName = "DetailProductInvoice",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        //IsPopup = IsPopup,
+        DisplayBackButton = true
+    };
+    int index = 1;
+    var setting = Erp.BackOffice.Helpers.Common.GetSetting("hide_discount_product_invoice");
+    var user_type_onl = Erp.BackOffice.Helpers.Common.CurrentUser.UserTypeCode;
+    var tien_sauCK = Model.InvoiceList.Sum(x => x.Amount.Value) - Model.DiscountAmount;
+    var vat = tien_sauCK * Convert.ToDecimal(Model.TaxFee / 100);
+}
+@*<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />*@
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <style type="text/css">
+        .mini-popup {
+            position: relative;
+            display: inline;
+        }
+
+        #popup_huy {
+            position: absolute;
+            bottom: 45px;
+            left: 0px;
+            width: 410px;
+            height: 160px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        #popup_MoneyMove {
+            position: absolute;
+            bottom: 45px;
+            left: -150px;
+            width: 410px;
+            height: 235px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        #popup_archive_coc {
+            position: absolute;
+            bottom: 45px;
+            left: -100px;
+            width: 410px;
+            height: 235px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        #popup_archive {
+            position: absolute;
+            bottom: 45px;
+            left: -40px;
+            width: 410px;
+            height: 235px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        .popover {
+            max-width: 650px !important;
+        }
+
+        .widget-body .table thead:first-child tr {
+            background: repeat-x #F2F2F2;
+        }
+    </style>
+    <style>
+        .ui-ribbon {
+            position: relative;
+            display: block;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            transform: rotate(43deg);
+            padding: 7px 0;
+            left: -2px;
+            top: 19px;
+            width: 140px;
+            line-height: 20px;
+            /*background-color: rgba(183, 51, 51, 0.94);*/
+            box-shadow: 0 0 3px rgba(0,0,0,.3);
+        }
+
+        .ui-ribbon-wrapper {
+            position: absolute;
+            overflow: hidden;
+            width: 108px;
+            height: 103px;
+            top: 0px;
+            right: 12px;
+            z-index: 1;
+        }
+    </style>
+}
+
+
+@helper renderStatus(string status)
+    {
+        switch (status)
+        {
+            case "pending":
+                <span class="label label-info pull-left" style="margin-right:5px">@Wording.OrderStatusDisplay_pending</span>
+                break;
+            case "inprogress":
+                <span class="label label-warning pull-left" style="margin-right:5px">@Wording.OrderStatusDisplay_inprogress</span>
+                break;
+            case "shipping":
+                <span class="label label-warning pull-left" style="margin-right:5px">@Wording.OrderStatusDisplay_shipping</span>
+                break;
+            case "complete":
+                <span class="label label-success pull-left" style="margin-right:5px">@Wording.OrderStatusDisplay_complete</span>
+                break;
+            case "cancel":
+                <span class="label label-danger pull-left" style="margin-right:5px">@Wording.OrderStatusDisplay_cancel</span>
+                break;
+            case "deposit":
+                <span class="label label-warning">Đặt cọc</span>
+                break;
+            case "delete":
+                <span class="label label-danger">@Wording.OrderStatusDisplay_delete</span>
+                break;
+        }
+}
+@helper renderCusstomer(int CustomerId, string CustomerName)
+    {
+        <a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = CustomerId, IsPopup = true })', '', 0, 0)">
+            @CustomerName
+        </a>
+}
+@helper renderStaff(int StaffId, string StaffName)
+    {
+        <a onclick="OpenPopup('@Url.Action("DetailBasicFull", "Staffs", new { area = "Staff", Id = StaffId, IsLayout = false })', '', 0, 0)">
+            @StaffName
+        </a>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+<div class="row">
+    <div class="col-sm-7">
+        <h4 class="green" style="margin-top:0px">
+            @renderStatus(Model.Status)
+            <span>Đơn hàng: @Model.Code (@Model.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm"))</span>
+            <span class="pull-right red"><b>@CommonSatic.ToCurrencyStr(Model.TotalAmount, null)</b></span>
+        </h4>
+        <div id="home" class="tab-pane active">
+            @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+            {
+                <div class="alert alert-block alert-success">
+                    <button class="close" data-dismiss="alert" type="button">
+                        <i class="ace-icon fa fa-times"></i>
+                    </button>
+                    <i class="ace-icon fa fa-check green"></i>
+                    @Html.Raw(ViewBag.SuccessMessage)
+                </div>
+            }
+
+            @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+            {
+                <div class="alert alert-block alert-danger">
+                    <button class="close" data-dismiss="alert" type="button">
+                        <i class="ace-icon fa fa-times"></i>
+                    </button>
+                    <i class="ace-icon fa fa-warning red"></i>
+                    @Html.Raw(ViewBag.FailedMessage)
+                </div>
+            }
+
+            @if (!string.IsNullOrEmpty(Model.Note))
+            {
+                <div class="alert alert-warning">@Model.Note</div>
+            }
+
+            @if (Model.IsDeleted == true)
+            {
+                <div class="alert alert-danger">
+                    <p><i class="ace-icon fa fa-warning red"></i> @Model.ModifiedUserName đã hủy bỏ chứng từ lúc @Model.ModifiedDate.Value.ToString("HH:mm dd/MM/yyyy").</p>
+                    <p>Lý do hủy: @Model.CancelReason</p>
+                </div>
+            }
+
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="">STT</th>
+                            <th class="">Tên SP/DV</th>
+                            <th>Lô</th>
+                            <th>Hạn SD</th>
+                            <th class="">Số lượng</th>
+                            <th class="">Đơn giá</th>
+                            <th class="">Chiết khấu</th>
+                            <th class="detail-th-total">Thành tiền</th>
+                            <th class="">Tặng</th>
+                        </tr>
+
+                    </thead>
+                    <tbody class="detailList">
+                        @foreach (var qq in Model.InvoiceList.GroupBy(x => x.ProductType))
+                        {
+                            <tr class="warning">
+                                <td colspan="4">
+                                    @(qq.Key == "product" ? "Sản phẩm" : "Dịch vụ")
+                                </td>
+                                <td class="text-right">@Common.PhanCachHangNgan2(qq.Sum(x => x.Quantity))</td>
+                                <td></td>
+                                <td class="text-right">@Common.PhanCachHangNgan2(qq.Sum(x => x.DiscountAmount))</td>
+                                <td class="text-right">@Common.PhanCachHangNgan2(qq.Sum(x => x.Amount))</td>
+                                <td></td>
+                            </tr>
+
+                            foreach (var item in Model.InvoiceList.Where(x => x.ProductType == qq.Key))
+                            {
+
+                                <tr data-type="" data-id="">
+                                    <td class="text-center">@(index++)</td>
+                                    <td class="has-error">
+                                        @*<p><b>@item.CategoryCode</b></p><p>*@
+                                        @(item.ProductCode) - @(item.ProductName)
+
+                                    </td>
+                                    <td>@item.LoCode</td>
+                                    <td>@(item.ExpiryDate == null ? "" : item.ExpiryDate.Value.ToString("dd/MM/yyyy"))</td>
+                                    <td class="text-right">@Common.PhanCachHangNgan2(item.Quantity)</td>
+                                    <td class="text-right detail-product-price">@CommonSatic.ToCurrencyStr(item.Price, null)</td>
+                                    <td class="text-right">
+                                        @CommonSatic.ToCurrencyStr(item.DiscountAmount, null)<br><i>(@(item.Discount)%)</i>
+                                    </td>
+                                    <td class="detail_item_total text-right">
+                                        @CommonSatic.ToCurrencyStr(item.Amount, null)
+                                    </td>
+                                    <td>
+                                        @if (item.is_TANG == 1)
+                                        {
+                                            <input type="checkbox" class="ace" value="@(item.is_TANG)" checked="checked" disabled>
+                                            <span class="lbl"></span>
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" class="ace" value="@(item.is_TANG)" disabled>
+                                            <span class="lbl"></span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr data-type="" data-id="">
+                            <td class="text-center" colspan="4"></td>
+                            <td class="text-right">@Common.PhanCachHangNgan2(Model.InvoiceList.Sum(x => x.Quantity))</td>
+                            <td class="text-right"></td>
+                            <td class="text-right">
+                                @CommonSatic.ToCurrencyStr(Model.InvoiceList.Sum(x => x.DiscountAmount), null)
+                            </td>
+                            <td class="text-right">
+                                @CommonSatic.ToCurrencyStr(Model.InvoiceList.Sum(x => x.Amount), null)
+                            </td>
+                            <td class="text-right"></td>
+                        </tr>
+
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="col-sm-5">
+        <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+            <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                <div class="widget-header widget-header-small">
+                    <div class="widget-toolbar no-border pull-left">
+                        <ul class="nav nav-tabs" id="myTab">
+                            <li class="active">
+                                <a data-toggle="tab" href="#info_invoice" aria-expanded="true"><i class="fa fa-spinner"></i> Tổng quan</a>
+                            </li>
+
+                            <li class="">
+                                <a data-toggle="tab" href="#ship" aria-expanded="false"><i class="fa fa-ship"></i> Giao hàng</a>
+                            </li>
+                            @*<li class="">
+                                <a data-toggle="tab" href="#pay_amount" aria-expanded="false"><i class="fa fa-paypal"></i> Thanh toán</a>
+                            </li>*@
+                        </ul>
+                    </div>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main padding-6">
+                        <div class="tab-content">
+                            <div id="info_invoice" class="tab-pane active">
+                                <div class="detail-view">
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.BranchName, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.Code, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.CustomerCode, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                    @*<div class="row control-group">
+                                        @Html.DetailViewItem(renderCusstomer(Model.CustomerId.Value, Model.CustomerName), "CustomerName", Wording.Customer, null, null, "col-xs-4", "col-xs-8")
+                                    </div>*@
+
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.StaffCreateName, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.CountForBrand, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.ManagerUserName, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="ship" class="tab-pane"
+                                <div class="detail-view">
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.ShipName, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.ShipPhone, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.ShipCityName, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.ShipDistrictName, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.ShipWardName, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.ShipAddress, null, null, "col-xs-4", "col-xs-8")
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="pay_amount" class="tab-pane">
+                                <div class="detail-view">
+                                    <div class="row control-group">
+                                        @Html.DetailViewItem(CommonSatic.ToCurrencyStr(Model.InvoiceList.Sum(x => x.Amount), null), "TotalAmount", "Tổng tiền theo SP/DV", null, "", "col-xs-5", "col-xs-7")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItem(CommonSatic.ToCurrencyStr(Model.DiscountAmount, null) + " (" + Common.PhanCachHangNgan2(Model.Discount) + "%)", "DiscountAmount", "Tiền chiết khấu HĐ", null, "", "col-xs-5", "col-xs-7")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItem(CommonSatic.ToCurrencyStr(tien_sauCK, null), "TienSauCK", "Tổng tiền sau CK", null, "", "col-xs-5", "col-xs-7")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItem(CommonSatic.ToCurrencyStr(vat, null) + " (" + Common.PhanCachHangNgan2(Model.TaxFee) + "%)", "VAT", "Tiền VAT", null, "", "col-xs-5", "col-xs-7")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItem(CommonSatic.ToCurrencyStr(Model.TotalAmount, null), "TotalAmount", "Tổng tiền cần thanh toán", null, "font-weight:bold;color:red", "col-xs-5", "col-xs-7")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.NextPaymentDate, true, null, "font-weight:bold;", "col-xs-5", "col-xs-7")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.Discount_KM, null, "font-weight:bold;", "col-xs-5", "Discount_KM col-xs-7")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.Discount_DB, null, "font-weight:bold;", "col-xs-5", "Discount_DB col-xs-7")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.Discount_VIP, null, "font-weight:bold;", "col-xs-5", "Discount_VIP col-xs-7")
+                                    </div>
+                                    <div class="row control-group">
+                                        @Html.DetailViewItemFor2(model => model.Total_Discount, null, "font-weight:bold;", "col-xs-5", "Total_Discount col-xs-7")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+     
+        @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CreateProductInvoice", "CRM_KH_BANHANG", "Crm"))
+        {
+        <a style="margin-right:0.3%" class="btn btn-primary btn-mini" href="@Url.Action("CreateProductInvoice", "CRM_KH_BANHANG", new { Id = Model.Id })">
+            <i class="ace-icon fa fa-edit "></i>
+            Chỉnh sửa
+        </a>
+        }
+        <a class="btn btn-primary btn-white btn-sm" href="@Url.Action("AddPromotionCRM", "CRM_KH_BANHANG", new { Id = Model.Id })">
+            <i class="ace-icon fa fa-gift"></i>
+            Thêm khuyến mãi
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    @*<script src="~/assets/js/jquery-ui.custom.min.js"></script>*@
+    <script src="~/assets/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            LoadNumberInput();
+
+            $('#ReceiptViewModel_Amount').blur(function () {
+
+                var Amount = '@Model.tienconno';
+                var totalAmount = parseFloat(Amount);
+                var amount = parseFloat(removeComma($('#ReceiptViewModel_Amount').val()));
+                if (amount < totalAmount) {
+                    $('.NextPaymentDate-container').show();
+                    $('#AmountRemain').val(numeral(totalAmount - amount).format('0,0'));
+                }
+                else {
+                    $('#ReceiptViewModel_Amount').val(numeral(totalAmount).format('0,0'));
+                    $('.NextPaymentDate-container').hide();
+                }
+                if (amount >= 20000000) {
+                    $("#ReceiptViewModel_PaymentMethod").val("Chuyển khoản").css("border-color", "#b5b5b5");
+                }
+                else {
+                    $("#ReceiptViewModel_PaymentMethod").val("Tiền mặt").css("border-color", "red");
+                }
+            });
+
+            $(function () {
+                var TotalCredit = parseFloat(removeComma($('#TotalCredit').text()));
+                var TotalDebit = parseFloat(removeComma($('#TotalDebit').text()));
+                var sum = 0;
+                sum = TotalDebit - TotalCredit;
+                $('#Total').text(numeral(sum).format('0,0'));
+               
+
+                var Discount_KM = 0;
+                var Discount_VIP = 0;
+                var Discount_DB = 0;
+
+                Discount_KM = (isNaN(parseFloat($('.Discount_KM').text())) ? 0 : parseFloat($('.Discount_KM').text()));
+                //PlusPoint = (isNaN(parseFloat($('#PlusPoint').val())) ? 0 : parseFloat($('#PlusPoint').val()));
+                Discount_VIP = (isNaN(parseFloat($('.Discount_VIP').text())) ? 0 : parseFloat($('.Discount_VIP').text()));
+                Discount_DB = (isNaN(parseFloat($('.Discount_DB').text())) ? 0 : parseFloat($('.Discount_DB').text()));
+
+                var totalDiscount = 0;
+                totalDiscount = (parseFloat(Discount_KM) + parseFloat(Discount_VIP) + parseFloat(Discount_DB)); //+ parseFloat(PlusPoint));
+
+                totalDiscount = parseFloat(totalDiscount);
+                $('.Total_Discount').text(totalDiscount);
+            });
+        });
+
+
+       
+        function UpdateNote(Id) {
+            ShowLoading();
+            var status = $("#status_" + Id).val();
+            $.ajax({
+                url: '/Service/UpdateUsingServiceLogDetail',
+                type: 'GET',
+                data: { Id: Id, status: status },
+                success: function (res) {
+                    if (res == "success") {
+                        alertPopup("Thông báo", "Cập nhật ghi chú thành công!", "success");
+                        $("#status__" + Id).text(status);
+                        $("#status_" + Id).val(status);
+                        $("#status_" + Id).text(status);
+                        //$('[data-rel=popover]').popover('hide');
+                        //setInterval(function () {
+                        //    window.location.reload();
+                        //}, 2000);
+                        $("#myModal_" + Id).modal("hide");
+                    } else {
+                        alertPopup("Lỗi", "Cập nhật ghi chú thất bại!", "danger");
+                    }
+                    HideLoading();
+                }
+            });
+
+        };
+
+    </script>
+}

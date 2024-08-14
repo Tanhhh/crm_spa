@@ -1,0 +1,81 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_ProductSampleDetailViewModel>
+    @{
+        Layout = null;
+        int index = 0;
+    }
+   
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th class="text-center">Mã chương trình</th>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Ngày tạo</th>
+                <th class="text-center">Tên khách hàng</th>
+                <th class="text-center">Mã khách hàng</th>
+                <th class="text-center">Mã sản phẩm</th>
+                <th class="text-center">Tên sản phẩm</th>
+            </tr>
+        </thead>
+        <tbody>
+             @foreach (var qq in Model.GroupBy(x => x.ProductSampleCode))
+            {
+                var row_count = 0;
+                foreach (var item in Model.Where(x => x.ProductSampleCode == qq.Key))
+                {
+                    index++;
+
+                    <tr class="@(index%2==0?"alert-warning":"")">
+                        @if (row_count == 0)
+                        {
+                            row_count++;
+                        <td rowspan="@Model.Where(x=>x.ProductSampleCode==qq.Key).Count()" data-name="" style="width:100px;text-align:center">
+                            <a href="@Url.Action("Detail", "ProductSample" , new { Id= item.ProductSampleId })">@item.ProductSampleCode</a>
+                        </td>
+                        }
+                <td style="width:40px;text-align:center">@(index)</td>
+                <td>@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                <td class="text-center">
+                    <a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = item.CustomerId, IsPopup = true })', '', 0, 0)">@item.CompanyName</a>
+                </td>
+                <td>@item.CustomerCode</td>
+                <td>@item.ProductCode</td>
+                <td>@item.ProductName</td>
+                    </tr>
+                }
+            }
+            @*@foreach (var item in Model)
+            {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+                <td>@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                <td class="text-center">
+                    <a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = item.CustomerId, IsPopup = true })', '', 0, 0)">@item.CompanyName</a>
+                </td>
+                <td>@item.CustomerCode</td>
+                <td class="text-center">*@
+                    @*<a onclick="OpenPopup('@Url.Action("Detail", "ProductSample", new { area = "Sale", Id = item.ProductSampleId,IsPopup = true })', '', 0, 0)">@item.ProductSampleCode</a>*@
+                    @*<a href="@Url.Action("Detail", "ProductSample" , new { Id= item.ProductSampleId })">@item.ProductSampleCode</a>
+                </td>
+                <td>@item.ProductCode</td>
+                <td>@item.ProductName</td>
+
+            </tr>
+            }*@
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>

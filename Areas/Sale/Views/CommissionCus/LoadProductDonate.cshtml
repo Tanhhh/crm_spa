@@ -1,0 +1,254 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+@model Erp.BackOffice.Sale.Models.CommisionCustomerViewModel
+@{
+    IEnumerable<ProductViewModel> productList = (IEnumerable<ProductViewModel>)ViewBag.productList;
+}
+<tr class="detail_item" role="@(Model.OrderNo)" id="product_item_@Model.OrderNo" data-id="@Model.OrderNo">
+    <td class="text-center">
+
+        <span>@(Model.OrderNo + 1)</span>
+    </td>
+    <td>
+        <p class="show-details-btn" data-target="@Model.Index" onclick="ShowDetailBtn(@Model.Index)">
+            <a class="green bigger-140" title="Xem chi tiết">
+                <i class="ace-icon fa fa-angle-double-down"></i>
+            </a>
+            @Model.ProductCode - @Model.ProductName
+        </p>
+
+    </td>
+    <td class="text-right">@CommonSatic.ToCurrencyStr(Model.Price, null)</td>
+    <td>
+        @Html.Hidden("DetailList[" + Model.Index + "].Id", Model.Id)
+        @Html.Hidden("DetailList[" + Model.Index + "].ProductId", Model.ProductId)
+        @Html.Hidden("DetailList[" + Model.Index + "].Price", Model.Price)
+        @Html.Hidden("DetailList[" + Model.Index + "].Type", "donate")
+        <select class="control-value" name="DetailList[@(Model.Index)].Symbol" id="DetailList_@(Model.Index)__Symbol" style="width:50px;background: #F89406;color: white">
+            @foreach (var item in Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("SymbolDK", Model.Symbol, null))
+            {
+                <option @(item.Value == Model.Symbol ? "selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        @Html.TextBox("DetailList[" + Model.Index + "].Quantity", Model.Quantity, new { style = "width:50px; text-align:right; ", @class = "numberinput2", autocomplete = "off" })
+    </td>
+    <td>@Html.TextBox("DetailList[" + Model.Index + "].ExpiryMonth", Model.ExpiryMonth, new { style = "width:50px; text-align:right; ", @class = "numberinput2", autocomplete = "off" })</td>
+    <td class="text-center">
+        <p class="hide-details-btn" data-target="@Model.Index" onclick="HideDetailBtn(@Model.Index)">
+            <a class="btn-delete-item1" id="delete-item">
+                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+            </a>
+        </p>
+    </td>
+</tr>
+<tr>
+    <td colspan="6" class="cell-has-table">
+        <div id="table-detail-@Model.Index" class="table-detail">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title">Danh sách sản phẩm/dịch vụ tặng</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <span class="ctl">
+
+                            @*@Html.TextBox("ProductName_" + Model.Index, "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "off", style = "width:300px; margin-right:3px;margin-bottom:5px" })*@
+                            <select class="chzn-select" id="ProductName_@Model.Index" name="ProductName_@Model.Index" style="width:30%">
+                                <option value="">Tìm Sản phẩm/Dịch vụ...</option>
+                                @foreach (var item in productList.OrderBy(x => x.Name))
+                                {
+                                    <option value="@item.Id" data-selected="0" data-value="@item.Id | @(Common.KiemTraTonTaiHinhAnh(item.Image_Name,"product-image-folder","product"))  | @(item.Code + " - " + item.Name + " (" + item.PriceInbound.ToCurrencyStr(null) + ")")" data-code="@item.Code" data-barcode="@item.Barcode" data-product-type="@item.CategoryCode" data-price="@(item.PriceInbound)" data-unit="@item.Unit">@item.Code - @item.Name</option>
+                                }
+                            </select>
+
+                        </span>
+                        <div class="grid-mvc">
+                            <div class="grid-wrap">
+                                <table class="table table-striped grid-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="grid-header" width="30">STT</th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Mã SP/DV</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Tên SP/DV</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Đơn giá</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Số lượng</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Tổng SL hàng tặng</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">HSD (tháng)</div>
+                                            </th>
+                                        </tr>
+
+                                    </thead>
+                                    <tbody class="DonateDetailList_@Model.Index" id="DonateDetailListItem">
+                                        @if (Model.DonateDetailList.Count > 0)
+                                        {
+                                            var index = 0;
+                                            foreach (var item in Model.DonateDetailList)
+                                            {
+                                                item.OrderNo = index;
+                                                @Html.Partial("LoadDonateItembyProduct", item);
+                                                index++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </td>
+
+</tr>
+
+<link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+<script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+<script src="@Url.Content("~/assets/js/chosen.jquery.min.js")"></script>
+
+<script>
+
+    @*$('#ProductName_@(Model.Index)').radComboBox({
+        colTitle: 'ID, Hình, Tên sản phẩm',
+        colValue: 1,
+        colImage: 2,
+        colHide: '1',
+        colSize: '0px,50px,',
+        colClass: ',,',
+        //width: 600,
+        height: 300,
+        boxSearch: true,
+        colSearch: 2
+    });*@
+    $('#ProductName_@(Model.Index)').on('change', function () {
+        var $this = $(this);
+        //debugger
+        var selected = $this.find("option:selected");
+
+
+        var OrderNo = $(".DonateDetailList_@(Model.Index)").find("tr").length;
+        var ParentOrderNo=@(Model.Index);
+
+        var ProductId = selected.val();
+        var ProductName = selected.text();
+        var Unit = selected.data("unit");
+        var Quantity = 1;
+        var Price = selected.data("price");
+        var ProductType = selected.data("product-type");
+        var ProductCode = selected.data("code");
+        var formdata = {
+            OrderNo: OrderNo,
+            ProductCode: ProductCode,
+            ProductName: ProductName,
+            ProductId: ProductId,
+            Price: Price,
+            ParentOrderNo:ParentOrderNo
+        };
+        ClickEventHandler(true, "/CommissionCus/LoadDonateItembyProduct", ".DonateDetailList_@(Model.Index)", formdata, function () {
+            LoadNumberInput();
+        });
+    });
+
+    $(function () {
+        $("#PproductName_@(Model.Index)").combojax({
+            url: "/CommissionCus/GetListJsonAll",
+            onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+                //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+            },
+            onSelected: function (obj) {
+                console.log(obj);
+                if (obj) {
+                    var OrderNo = $(".DonateDetailList_@(Model.Index)").find("tr").length;
+                    var ParentOrderNo=@(Model.Index);
+                    var ProductId = obj.Id;
+                    var ProductName = obj.Name;
+                    var ProductCode = obj.Code;
+                    var Price = obj.Price;
+                    var formdata = {
+                        OrderNo: OrderNo,
+                        ProductCode: ProductCode,
+                        ProductName: ProductName,
+                        ProductId: ProductId,
+                        Price: Price,
+                        ParentOrderNo:ParentOrderNo
+                    };
+                    ClickEventHandler(true, "/CommissionCus/LoadDonateItembyProduct", ".DonateDetailList_@(Model.Index)", formdata, function () {
+                        LoadNumberInput();
+                    });
+                }
+            }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+            , onShowImage: true                  //hiển thị hình ảnh
+            , onSearchSaveSelectedItem: false    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+            , onRemoveSelected: true  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+        });
+
+        $('#donate').on('click', '#delete-item', function () {
+            //$(this).closest('tr').next('tr.template_location').remove();
+            $(this).closest('tr').remove();
+            $('.detailListDonate tr.detail_item').each(function (index, tr) {
+                $(tr).attr('data-id', index);
+                $(tr).attr('id', "product_item_" + index);
+                $(tr).attr('data-id', index).attr("id", "product_item_" + index).data("id", index);
+                $(tr).find('td:first-child').text(index + 1);
+            });
+        });
+       
+    });
+
+
+
+    function HideDetailBtn(targetId) {
+        var tableDetail = $("#table-detail-" + targetId);
+        tableDetail.removeClass('open');
+        tableDetail.remove();
+    };
+</script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        initChosen($('#ProductName_@Model.Index'));
+        
+    });
+    
+    function initChosen($selector) {
+        if (window.outerWidth > 767) {
+            $selector.chosen();
+
+            $selector.next(".chzn-container").css("width", "100%");
+            $selector.closest("form").on("reset", function () {
+                $selector.val($selector.prev("input[type=hidden]").val()).trigger('chosen:updated');
+            });
+            $selector.on("change", function () {
+                $(this).valid();
+            });
+
+            $selector.css({
+                'opacity': '0',
+                'display': 'block',
+                'width': 0,
+                'height': 0,
+                'padding': 0,
+                'margin': 0,
+                'border': 'none'
+            });
+        }
+    };
+</script>
+
+
+@Html.ScriptBottom_ValidationMvc()
+@*@Html.ScriptBottom_ChosenStyle()*@
+@Html.ScriptBottom_DatePicker("dd/MM/yyyy")

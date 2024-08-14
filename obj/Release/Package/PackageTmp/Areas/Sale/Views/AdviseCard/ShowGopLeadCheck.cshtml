@@ -1,0 +1,144 @@
+@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@using System.Linq
+@model IEnumerable<GopLeadCheckViewModel>
+
+
+    @{
+        Layout = null;
+        string[] selection = ViewBag.selection;
+        int stt = 1;
+    }
+
+    <form id="GopLeadCheckForm">
+        <table id="GopLeadCheckTbl" class="table table-hover" style="display: block; overflow-x: auto; white-space: nowrap;">
+            <thead>
+
+                @{
+                    var properties = typeof(GopLeadCheckViewModel).GetProperties();
+                    int outchk;
+                    var prop = properties.Where(x => selection.Contains(x.Name));
+                    string thele = "";
+                    string trele = "";
+                    string tdele = "";
+                }
+                @foreach (var item1 in prop)
+                {
+                    var display = item1.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;
+                    string displayname = display != null ? display.DisplayName : "";
+                    if (item1.Name == "MainId")
+                    {
+                        thele += "<th>" + displayname + "</th>";
+                    }
+                    else
+                    {
+                        thele += "<th>" + displayname + "</th>";
+                    }
+
+                }
+                <tr>
+                    <th><input type="checkbox" class="checkboxgoplead chkall" /></th>
+                    <th>STT</th>
+                    @Html.Raw(@thele)
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+
+                        foreach (var item in Model)
+                    {
+                        foreach (var item1 in prop)
+                        {
+
+                            object dsplay = item1.GetValue(item);
+                            string dsplay1 = dsplay != null ? dsplay.ToString().Trim() : "";
+                            string dsplay2 = dsplay1;//== "1" ? "Có" : dsplay1 == "0" ? "Không" : dsplay1;
+                            if (item1.Name == "MainId")
+                            {
+                                //Khang_test
+                                string inputele = "<input type='text' hidden value='" + dsplay2 + "' name ='" + item1.Name + "'/>";
+                                //   inputele = "<input class='edit-iput' type='text' hidden disabled value = '" + dsplay2 + "'" + "name='LeadModel[" + (stt - 1).ToString() + "]." + item1.Name + "'/>";
+                                //tdele += "<td>" + dsplay2 + "</td>";
+                                tdele += "<td style='color:#333; !important' name='" + item1.Name + "'>" + inputele + "<span class='txt'>" + dsplay2 + "</span></td>";
+                            }
+                            else
+                            {
+                                //Khang_test
+                                string inputele = "<input type='text' hidden value='" + dsplay2 + "' name ='" + item1.Name + "'/>";
+                                //   inputele = "<input class='edit-iput' type='text' hidden disabled value = '" + dsplay2 + "'" + "name='LeadModel[" + (stt - 1).ToString() + "]." + item1.Name + "'/>";
+                                //tdele += "<td>" + dsplay2 + "</td>";
+                                tdele += "<td style='color:#333; !important' name='" + item1.Name + "'>" + inputele + "<span class='txt'>" + dsplay2 + "</span></td>";
+                            }
+                        }
+
+                        trele += "<tr><td><input type=\"checkbox\" class=\"checkboxGopLead\"/></td><td style='color:#333; !important' name ='STT'>" + (stt++) + "</td>" + tdele + "<td name='Link'><span style='color:#576297; text-decoration:none; cursor:pointer; font-weight:bold;text-transform: uppercase;' class='txt text-name' name='Link'>Xem</span></td></tr>";
+                        tdele = "";
+                    }
+                    @Html.Raw(trele)
+                }else
+            {
+                <tr><td colspan="10"><h1>Không có Lead trùng!</h1></td></tr>
+            }
+
+
+
+            </tbody>
+        </table>
+    </form>
+
+    <script>
+        var gopLeadTable = document.getElementById("GopLeadCheckTbl");
+        var gopLeadrows = gopLeadTable.getElementsByTagName("tr");
+        for (let i = 0; i < gopLeadrows.length; i++) {
+            let currentRow = gopLeadTable.rows[i];
+            var createClickHandler = function (row) {
+                var id = row.querySelector('td[name="MainId"]').innerText;
+                var stt = row.querySelector('td[name="STT"]').innerText;
+                var leadName = row.querySelector('td[name="LeadName"]') ? (row.querySelector('td[name="LeadName"]').innerText ? row.querySelector('td[name="LeadName"]').innerText : "") : "";
+                var mobile = row.querySelector('td[name="Mobile"]') ? (row.querySelector('td[name="Mobile"]').innerText ? row.querySelector('td[name="Mobile"]').innerText : "") : "";
+                var taxCode = row.querySelector('td[name="TaxCode"]') ? (row.querySelector('td[name="TaxCode"]').innerText ? row.querySelector('td[name="TaxCode"]').innerText : "") : "";
+                var email = row.querySelector('td[name="Email"]') ? (row.querySelector('td[name="Email"]').innerText ? row.querySelector('td[name="Email"]').innerText : "") : "";
+                DetailGopLeadCheck(id, leadName, mobile, taxCode,stt, email)
+            };
+            currentRow.onclick = function (e) {
+                
+                if (e.target !== this && $(e.target).attr('name') != 'Link') {
+                    return;
+                }
+                if ($(e.target).attr('name') == 'Link') {
+                    createClickHandler(currentRow);
+                }
+            };
+        }
+        function DetailGopLeadCheck(id, leadName, mobile, taxCode,stt, email) {
+            $.ajax({
+                url: "/AdviseCard/ShowGopLeadDetail?" + "leadName=" + leadName.trim() + "&mobile=" + mobile.trim() + "&taxCode=" + taxCode.trim() + "&id=" + id.trim() + "&stt=" + stt + "&email=" + email.trim(),
+                method: "GET",
+                contentType: "application/json; charset=utf-8",
+                dataType: 'html',
+                success: function (data) {
+                    $('#tblGopLeadDetail').html(data);
+                    $('#modalGopLeadDetail').modal("show");
+                }
+            });
+        }
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.checkboxgoplead').change(function () {
+                let $tbl = $('#GopLeadCheckTbl');
+                let allInputs = $tbl.find('input[class=checkboxGopLead]');
+                if ($(this).prop('checked')) {
+                    $.each(allInputs, function () {
+                        $(this).prop('checked', true);
+                    })
+                } else {
+                    $.each(allInputs, function () {
+                        $(this).prop('checked', false);
+                    })
+                }
+            })
+        });
+    </script>

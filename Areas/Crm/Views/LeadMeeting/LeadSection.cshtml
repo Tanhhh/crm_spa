@@ -1,0 +1,287 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Sale.Controllers
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using Erp.BackOffice.Sale.Models
+@using System.ComponentModel
+
+@{
+    ViewBag.Title = "Lead";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "AdviseCard",
+        ActionName = "LeadIndex",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+
+}
+<style>
+    .table-container {
+        display: flex;
+        gap: 4rem; 
+    }
+        .table-container .flex-default {
+            flex: 1 1;
+            max-width: 50rem
+        }
+        .table-container .table-1 {
+            max-width: 50rem
+        }
+        .table-container .table-2 {
+            max-width: 100rem
+        }
+
+    .table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+        border: none;
+    }
+    table {
+        border: none !important;
+    }
+
+    .table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+        border-bottom: .1rem solid #dbdbdb;
+        border-right: none !important;
+    }
+
+    .table > thead > tr {
+        color: #707070;
+        font-weight: 400;
+        /* background: repeat-x #F2F2F2; */
+        /* background-image: -webkit-linear-gradient(top, #F8F8F8 0, #ECECEC 100%); */
+        background: #fff !important;
+      
+    }
+
+
+    /*/===============================================/*/
+
+        #leadSection td, #leadFieldSection td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 13.5px;
+            vertical-align: middle;
+        }
+        #leadSection td:not(.stt), #leadFieldSection td:not(.stt) {
+            padding: 10px;
+        }
+        #leadSection td.stt, #leadFieldSection td.stt {
+            text-align: center;
+        }
+    .select-dropdown {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .dropdown-title {
+        margin-right: 10px;
+        font-size: 20px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .form-select {
+            color: black;
+            font-size: 14px;
+            font-weight: bolder;
+            max-width: 200px;
+            border-radius: 5px;
+            border: 1px solid black;
+            height: 30px !important;
+        }
+
+    .table-caption {
+        font-weight: bold; /* In đậm */
+        font-size: 18px; /* Kích thước chữ */
+        text-align: center; /* Căn giữa nội dung */
+        padding: 10px; /* Khoảng cách đệm */
+        color: #333 !important;
+        border-top: .1rem solid #dbdbdb;
+    }
+
+    /* CSS cho các bảng */
+   .table-bordered {
+        border: 2px solid #ccc;
+        border-radius: 5px;
+    }
+    
+    .move-up {
+        background-color: #5cb85c;
+        color: white; 
+        border: none;
+        border-radius: 5px; 
+        transition: background-color 0.3s;
+        padding: 4px 7px; 
+        font-size: 10px;
+    }
+
+        .move-up:hover {
+            background-color: #4cae4c;
+        }
+
+
+    .move-down {
+        background-color: #d9534f; 
+        color: white; 
+        border: none; 
+        border-radius: 5px;
+        transition: background-color 0.3s; 
+        padding: 4px 7px; 
+        font-size: 10px; 
+    }
+
+        .move-down:hover {
+            background-color: #c9302c;
+        }
+    .addleadFieldSection, .addleadSection {
+        background-color: #28a745;
+        color: #fff;
+        padding: 4px 20px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .addleadFieldSection:hover, .addleadSection:hover {
+            background-color: #0056b3;
+        }
+    .showLeadSectionField {
+        cursor: pointer;
+    }
+    .hidden-checkbox-field {
+        margin-left: 10px;
+        padding: 27px;
+        transform: scale(1.6);
+        font-size: 29px;
+    }
+    .selected-row {
+        background-color: #d8d7d7;
+    }
+    .cancelNewRowsLeadFieldSection {
+        background-color: #d9534f;
+        color: #fff;
+        padding: 4px 20px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+</style>
+
+    <div class="select-dropdown">
+        <div class="dropdown-title">Chọn trạng thái</div>
+        <select class="form-select" aria-label="Select">
+            <option value="1" selected>Lead</option>
+            <option value="0">Contact</option>
+        </select>
+    </div>
+    <div class="table-container">
+        <div class="flex-default table-1">
+            <table class="table table-bordered" id="leadSection">
+
+                <caption class="table-caption" style="text-transform:capitalize">
+                    Danh sách vùng
+                </caption>
+                <tbody>
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Data 1</td>
+                        <td>Data 2</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="addleadSection">Thêm mới</button>
+
+        </div>
+        
+        <div class="flex-default table-2">
+            <table class="table table-bordered" id="leadFieldSection">
+                <caption class="table-caption" style="text-transform:capitalize">Các trường</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">STT</th>
+                        <th scope="col">Tên</th>
+                        <th scope="col">Tên trường</th>
+                        <th scope="col">Kiểu</th>
+                        <th scope="col">Danh mục</th>
+                        <th scope="col">Ẩn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    </tr>
+                    <!-- Thêm các dòng dữ liệu khác nếu cần -->
+                </tbody>
+            </table>
+            <button class="addleadFieldSection">Thêm mới</button>
+            <button class="cancelNewRowsLeadFieldSection" style="display: none">Hủy</button>
+        </div>
+
+        
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            f5LeadSectionLeft(1);   
+            f5LeadSectionRight(2);
+            $('.form-select').change(function () {
+                var typeLead = $(this).val(); // Lấy giá trị đã chọn từ dropdown
+                f5LeadSectionLeft(typeLead); // Gọi hàm với giá trị mới
+            });
+        });
+        function f5LeadSectionLeft(typeLead) {
+            $.ajax({
+                url: "/LeadMeeting/LeadSectionLeft?typeLead=" + typeLead,
+                method: "get",
+                dataType: "html",
+                success: function (data) {
+                    $("#leadSection tbody").html(data);
+                    $("#leadSection tbody").find("tr:first").addClass("selected-row");
+                },
+                error: function (xhr, status, error) {
+                    console.error(error); // Xử lý lỗi nếu có
+                }
+            });
+        }
+        function f5LeadSectionRight(idLeadSection) {
+            $.ajax({
+                url: "/LeadMeeting/LeadSectionRight?idLeadSection=" + idLeadSection,
+                method: "get",
+                dataType: "html",
+                success: function (data) {
+                    $("#leadFieldSection tbody").html(data);
+                    $("#leadFieldSection").attr("data-leadsectionid", idLeadSection);
+                },
+                error: function (xhr, status, error) {
+                    console.error(error); // Xử lý lỗi nếu có
+                }
+            });
+        }
+        
+    </script>
+
+
+
+
+

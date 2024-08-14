@@ -1,0 +1,502 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Account.Models;
+@using System.Globalization;
+@*@model  List<KhachHangTheoThuViewModel>*@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+    <link href="~/Scripts/fullcalendar-3.6.1/fullcalendar.min.css" rel="stylesheet" />
+    <link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />
+
+    @{
+        /**/
+
+        ViewBag.Title = "Số lượng khách mua theo thứ";
+        if (Request["IsPopup"] == "true")
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            if (Request["IsPopup"] == "null")
+            {
+                Layout = null;
+            }
+            else
+            {
+                Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+            }
+        }
+        bool IsDisplaySearchPanel = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? false : true;
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "SoLuongKhachMuaChamSocTheoThu",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = IsDisplaySearchPanel,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        int index = 1;
+        List<DateTime> listDate = ViewBag.listDate as List<DateTime>;
+        var ngaydautien = listDate.FirstOrDefault();
+        int z = 0;
+
+        if (z == 0)
+        {
+            switch (ngaydautien.DayOfWeek.ToString())
+            {
+
+                case "Sunday":
+                    z = 1;
+                    break;
+                case "Monday":
+                    z = 2;
+                    break;
+                case "Tuesday":
+                    z = 3;
+                    break;
+                case "Wednesday":
+                    z = 4;
+                    break;
+                case "Thursday":
+                    z = 5;
+                    break;
+                case "Friday":
+                    z = 6;
+                    break;
+                case "Saturday":
+                    z = 7;
+                    break;
+
+            }
+        }
+
+        int hh = 0;
+        int kk = 0;
+        int l = 0;
+        int? Sum1 = 0;
+        int? sum2 = 0;
+        int? sum3 = 0;
+        int? sum4 = 0;
+        int? sum5 = 0;
+        int? sum6 = 0;
+
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <select id="month" name="month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(Month == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+            }
+        </select>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+            {
+                <option @(Year == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+            }
+        </select>
+        <label>
+            <input id="single4" name="nKHCU" type="checkbox" class="ace" value="0" @(Request["nKHCU"] == "0" ? "checked=checked" : "")>
+            <span class="lbl"> Khách hàng cũ</span>
+        </label>
+        <input type="hidden" id="KHC" value="@Request["nKHCU"]" />
+    }
+    <div class="table-responsive" id="BaoCaoSoLuongKhachHangtheodoitheothu" style="margin-bottom:40px">
+        <table id="cTable" class="table table-bordered">
+            <span style="text-align:center;font-weight:bold;padding-left: 500px; font-size:16px;">SỐ LƯƠNG KHÁCH @(Request["nKHCU"] == "0" ? "CŨ" : "MỚI") MUA THEO THỨ THÁNG @Month NĂM  @Year </span>
+            <thead>
+                <tr>
+                    <th style="text-align:center">#</th>
+                    <th style="text-align:center">CN</th>
+                    <th style="text-align:center">Thứ 2</th>
+                    <th style="text-align:center">Thứ 3</th>
+                    <th style="text-align:center">Thứ 4</th>
+                    <th style="text-align:center">Thứ 5</th>
+                    <th style="text-align:center">Thứ 6</th>
+                    <th style="text-align:center">Thứ 7</th>
+                    <th style="text-align:center">Tổng</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+
+                    <td>
+                        Tuần 1
+                    </td>
+
+                    @for (int i = 1; i <= 8; i++)
+                    {
+                        if (i % 8 == 0 && i > 1)
+                        {
+                            <td style="text-align:center">@Sum1</td>
+                            break;
+                        }
+                        else
+                        {
+
+                            if (i == z) // lấy đc ngày đầu tháng bắt đầu từ thứ bao nhiu
+                            {
+                                foreach (var item in listDate)
+                                {
+                                    foreach (var items in Model)
+                                    {
+                                        if (items.date == item.Date)
+                                        {
+                                            <td style="text-align:center">@items.SoLuongKH</td>
+
+                                            l++;  // tạo ra biến để biết rằng td  trong ngày đó đã tồn tại hay chưa . nếu ngày đó có data thì td đã đc sinh . không tạo thêm td
+                                            Sum1 = Sum1 + items.SoLuongKH;
+                                            break;
+                                        }
+
+                                    }
+                                    if (l == 0)
+                                    {
+                                        <td></td>
+                                    }
+                                    l = 0;
+                                    kk++;   // Đếm số lượng ngày để Skip
+
+                                    hh++;
+                                    break; //1 ngày chạy đúng vòng lặp 1 lần r thoát
+                                }
+
+
+                            }
+                            else
+                            {
+
+                                if (hh != 0)
+                                {
+                                    foreach (var item in listDate.Skip(kk).ToList()) // lượt bỏ ngày đã đi qua
+                                    {
+                                        foreach (var items in Model)
+                                        {
+                                            if (items.date == item.Date)
+                                            {
+                                                <td style="text-align:center">@items.SoLuongKH</td>
+                                                Sum1 = Sum1 + items.SoLuongKH;
+                                                l++;
+                                                break;
+                                            }
+
+                                        }
+                                        if (l == 0)
+                                        {
+                                            <td></td>
+                                        }
+                                        l = 0;
+                                        //listdd.Add(item.Date);
+
+                                        kk++;
+
+                                        break;
+                                    }
+
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
+
+
+                            }
+                        }
+                    }
+
+
+
+                </tr>
+                <tr>
+                    <td> Tuần 2</td>
+                    @for (int i = 1; i <= 8; i++)
+                    {
+                        if (i % 8 == 0 && i > 1)
+                        {
+                            //listdd.AddRange(listdd2);
+                            <td style="text-align:center">@sum2</td>
+                            break;
+                        }
+                        else
+                        {
+                            foreach (var item in listDate.Skip(kk))
+                            {
+
+
+                                foreach (var k in Model)
+                                {
+                                    if (k.date == item.Date)
+                                    {
+                                        <td style="text-align:center">@k.SoLuongKH</td>
+                                        //listdd2.Add(item.Date);
+                                        l++;
+                                        sum2 = sum2 + k.SoLuongKH;
+                                        break;
+                                        // tạo ra biến để biết rằng td  trong ngày đó đã tồn tại hay chưa . nếu ngày đó có data thì td đã đc sinh . không tạo thêm td
+                                    }
+
+                                }
+                                if (l == 0)
+                                {
+                                    <td></td>
+                                }
+                                l = 0;
+                                //listdd.Add(item.Date);
+
+                                kk++;
+
+                                break;
+
+                            }
+                        }
+
+                    }
+
+                </tr>
+                <tr>
+                    <td> Tuần 3</td>
+                    @for (int i = 1; i <= 8; i++)
+                    {
+                        if (i % 8 == 0 && i > 1)
+                        {
+                            //listdd.AddRange(listdd2);
+                            <td style="text-align:center">@sum3</td>
+                            break;
+                        }
+                        else
+                        {
+                            foreach (var item in listDate.Skip(kk))
+                            {
+
+
+                                foreach (var k in Model)
+                                {
+                                    if (k.date == item.Date)
+                                    {
+                                        <td style="text-align:center">@k.SoLuongKH</td>
+                                        l++; // tạo ra biến để biết rằng td  trong ngày đó đã tồn tại hay chưa . nếu ngày đó có data thì td đã đc sinh . không tạo thêm td
+                                        sum3 = sum3 + k.SoLuongKH;
+                                        break;
+                                    }
+
+                                }
+                                if (l == 0)
+                                {
+                                    <td></td>
+                                }
+                                l = 0;
+
+                                //listdd.Add(item.Date);
+
+                                kk++;
+
+                                break;
+
+                            }
+                        }
+
+                    }
+                </tr>
+                <tr>
+                    <td> Tuần 4</td>
+                    @for (int i = 1; i <= 8; i++)
+                    {
+                        if (i % 8 == 0 && i > 1)
+                        {
+                            //listdd.AddRange(listdd2);
+                            <td style="text-align:center">@sum4</td>
+                            break;
+                        }
+                        else
+                        {
+                            foreach (var item in listDate.Skip(kk))
+                            {
+
+
+                                foreach (var k in Model)
+                                {
+                                    if (k.date == item.Date)
+                                    {
+                                        <td style="text-align:center">@k.SoLuongKH</td>
+                                        //listdd2.Add(item.Date);
+                                        sum4 = sum4 + k.SoLuongKH;
+                                        l++;
+                                        break;
+                                    }
+
+                                }
+                                if (l == 0)
+                                {
+                                    <td></td>
+                                }
+                                l = 0;
+
+                                //listdd.Add(item.Date);
+
+                                kk++;
+
+                                break;
+
+                            }
+                        }
+
+                    }
+                </tr>
+                <tr>
+                    <td> Tuần 5</td>
+                    @for (int i = 1; i <= 8; i++)
+                    {
+                        if (i % 8 == 0 && i > 1)
+                        {
+                            //listdd.AddRange(listdd2);
+                            <td style="text-align:center">@sum5</td>
+                            break;
+                        }
+                        else
+                        {
+                            var zz = listDate.Skip(kk); // bắt trường hợp này để khi nó chạy hết số ngày thì nó dừng lại
+                            if (zz.Count() != 0)
+                            {
+                                foreach (var item in zz)
+                                {
+
+
+                                    foreach (var k in Model)
+                                    {
+                                        if (k.date == item.Date)
+                                        {
+                                            <td style="text-align:center">@k.SoLuongKH</td>
+                                            //listdd2.Add(item.Date);
+                                            l++;
+                                            sum5 = sum5 + k.SoLuongKH;
+                                            break;
+                                        }
+
+                                    }
+                                    if (l == 0)
+                                    {
+                                        <td></td>
+                                    }
+                                    l = 0;
+
+                                    //listdd.Add(item.Date);
+
+                                    kk++;
+
+                                    break;
+
+                                }
+
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+
+                        }
+
+                    }
+                </tr>
+                <tr>
+                    <td> Tuần 6</td>
+                    @for (int i = 1; i <= 8; i++)
+                    {
+                        if (i % 8 == 0 && i > 1)
+                        {
+                            //listdd.AddRange(listdd2);
+                            <td style="text-align:center">@sum6</td>
+                            break;
+                        }
+                        else
+                        {
+                            var zz = listDate.Skip(kk); // bắt trường hợp này để khi nó chạy hết số ngày thì nó dừng lại
+                            if (zz.Count() != 0)
+                            {
+                                foreach (var item in zz)
+                                {
+
+
+                                    foreach (var k in Model)
+                                    {
+                                        if (k.date == item.Date)
+                                        {
+                                            <td style="text-align:center">@k.SoLuongKH</td>
+                                            //listdd2.Add(item.Date);
+                                            l++;
+                                            sum6 = sum6 + k.SoLuongKH;
+                                            break;
+                                        }
+
+                                    }
+                                    if (l == 0)
+                                    {
+                                        <td></td>
+                                    }
+                                    l = 0;
+
+                                    //listdd.Add(item.Date);
+
+                                    kk++;
+
+                                    break;
+
+                                }
+
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+
+                        }
+
+                    }
+                </tr>
+            </tbody>
+            <thead>
+                <tr>
+                    @*<td colspan="5" style="text-align:right"><b>Tổng:</b></td>
+                        <td style="text-align:right"><b>@Model.Count()</b></td>*@
+                    @*<td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalAmount), null))</b></td>
+
+                        <td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.PaidAmount), null))</b></td>*@
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+
+
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="tableToExcel('BaoCaoSoLuongKhachHangtheodoitheothu', 'BaoCaoDoanhThu')">
+            <i class="ace-icon fa fa-download"></i>
+            Xuất excel
+        </button>
+    }
+    @section Scripts {
+        <script type="text/javascript">
+
+            var tableToExcel = (function () {
+                var uri = 'data:application/vnd.ms-excel;base64,'
+                    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                    , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                    , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+                return function (table, name) {
+                    if (!table.nodeType) table = document.getElementById(table)
+                    var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+                    window.location.href = uri + base64(format(template, ctx))
+                }
+            })()
+        </script>
+    }
+
+
+
+

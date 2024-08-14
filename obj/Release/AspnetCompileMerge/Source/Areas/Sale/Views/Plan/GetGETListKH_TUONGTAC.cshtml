@@ -1,0 +1,261 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<KH_TUONGTACViewModel>
+    @{
+        Layout = null;
+        int index = 0;
+    }
+    <style type="text/css">
+        .has_error {
+            border: 1px #f2a696 solid !important;
+            color: #D68273;
+        }
+
+        .mini-popup {
+            position: relative;
+            display: inline;
+        }
+
+        #popup_archive {
+            position: absolute;
+            bottom: 34px;
+            left: -154px;
+            width: 410px;
+            height: 235px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+
+        #myImg {
+            outline: none;
+        }
+    </style>
+    @helper GridColumnName(string HINH_ANH)
+        {
+
+            <div class="itemdiv commentdiv">
+                <div class="user">
+                    <div class="ace-thumbnails">
+                        <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(HINH_ANH,"Plan","user"))" data-rel="colorbox" class="cboxElement">
+                            Xem
+                        </a>
+                    </div>
+                </div>
+            </div>
+}
+    @helper GridColumnCommand(int KH_TUONGTAC_ID)
+        {
+            <p>
+                @*<button id="Delete" name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                </button>*@
+
+                <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                </button>
+            </p>
+
+}
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+@helper CheckDeleteColumns(int KH_TUONGTAC_ID)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_TUONGTAC_ID">
+        <span class="lbl"></span>
+    </label>
+}
+
+
+    @*@helper CheckDeleteColumns(int? KH_TUONGTAC_ID)
+        {
+            <label>
+                <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_TUONGTAC_ID">
+                <span class="lbl"></span>
+            </label>
+}*@
+    @helper GridColumnName(int? NGUOILAP_ID, string NGAYLAP, int? KHACHHANG_ID, int? KH_TUONGTAC_ID, string CustomerName, string jsCallback = null)
+        {
+            @*<a href="@Url.Action("Edit", "Plan", new { KH_TUONGTAC_ID = KH_TUONGTAC_ID,CustomerName=CustomerName })">@CustomerName</a>*@
+            <a onclick="OpenPopup('@Url.Action("Edit", "Plan", new { area = "Sale",NGUOILAP_ID=NGUOILAP_ID, KH_TUONGTAC_ID = KH_TUONGTAC_ID,CustomerName=CustomerName,NGAYLAP=NGAYLAP,KHACHHANG_ID=KHACHHANG_ID , IsPopup = true })', '', 0, 0)">@CustomerName</a>
+}
+    @helper GridColumnLSTT(int? NGUOILAP_ID, string NGAYLAP, int? KHACHHANG_ID, int? KH_TUONGTAC_ID, string CustomerName, string jsCallback = null)
+        {
+            @*<a href="@Url.Action("Edit", "Plan", new { KH_TUONGTAC_ID = KH_TUONGTAC_ID,CustomerName=CustomerName })">@CustomerName</a>*@
+            <a onclick="OpenPopup('@Url.Action("LichSuTuongTac", "Plan", new { area = "Sale",NGUOILAP_ID=NGUOILAP_ID, KH_TUONGTAC_ID = KH_TUONGTAC_ID,CustomerName=CustomerName,NGAYLAP=NGAYLAP,KHACHHANG_ID=KHACHHANG_ID , IsPopup = true })', '', 0, 0)">Xem</a>
+        }
+    @helper GridColumnNGUOILAP(int? NGUOILAP)
+        {
+            <a href="@Url.Action("Index", "Plan", new { NGUOILAP = NGUOILAP})">Xem</a>
+
+}
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th hidden rowspan="2">#</th>
+                <th rowspan="2">Stt</th>
+                <th rowspan="2">Mã khách hàng</th>
+                <th rowspan="2">Tên khách hàng</th>
+                <th rowspan="2">Điện thoại</th>
+                <th colspan="2" style="text-align:center">Tương tác</th>
+                <th colspan="4" style="text-align:center">Thông tin kỹ thuật</th>
+                <th rowspan="2">Ghi chú</th>
+                <th rowspan="2">Giải pháp</th>
+                <th rowspan="2">Lịch tiếp theo</th>
+                <th rowspan="2">Mức cảnh báo</th>
+                <th rowspan="2">Lịch sử tương tác</th>
+                <th rowspan="2">Kết quả sau tương tác</th>
+                <th rowspan="2">Hình đính kèm</th>
+                <th rowspan="2"></th>
+            </tr>
+            <tr>
+                <th>Hình thức</th>
+                <th>Giờ</th>
+                <th>Loại</th>
+                <th>Phân loại</th>
+                <th>Tình trạng</th>
+                <th>Đánh giá mức độ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td hidden>@CheckDeleteColumns(item.KH_TUONGTAC_ID)</td>
+                    <td>@(index += 1)</td>
+                    <td>@item.CustomerCode</td>
+                    <td>
+                        @GridColumnName(item.NGUOILAP_ID, item.NGAYLAP, item.CustomerId, item.KH_TUONGTAC_ID, item.CustomerName)
+                    </td>
+                    <td>@item.Phone</td>
+                    <td>@item.HINHTHUC_TUONGTAC</td>
+                    <td>@item.GIO_TUONGTAC</td>
+                    <td>@item.LOAI_TUONGTAC</td>
+                    <td>@item.PHANLOAI_TUONGTAC</td>
+                    <td>@item.TINHTRANG_TUONGTAC</td>
+                    <td>@item.MUCDO_TUONGTAC</td>
+                    <td>@item.GHI_CHU</td>
+                    <td>@item.GIAIPHAP_TUONGTAC</td>
+                    <td>@item.NGAYTUONGTAC_TIEP @item.GIOTUONGTAC_TIEP </td>
+                    @if (item.MUCCANHBAO_TUONGTAC == "1")
+                    {
+                        <td style="color:cyan">@item.MUCCANHBAO_TUONGTAC</td>
+                    }
+                    else if (item.MUCCANHBAO_TUONGTAC == "2")
+                    {
+                        <td style="color:darkorange">@item.MUCCANHBAO_TUONGTAC</td>
+                    }
+                    else if (item.MUCCANHBAO_TUONGTAC == "3")
+                    {
+                        <td style="color:red">@item.MUCCANHBAO_TUONGTAC</td>
+                    }
+                    else
+                    {
+                        <td>@item.MUCCANHBAO_TUONGTAC</td>
+                    }
+                    <td>
+                        @GridColumnLSTT(item.NGUOILAP_ID, item.NGAYLAP, item.CustomerId, item.KH_TUONGTAC_ID, item.CustomerName)
+                    </td>
+                    <td>@item.KETQUA_SAUTUONGTAC</td>
+                    <td>@GridColumnName(item.HINH_ANH)</td>
+                    <td>@GridColumnCommand(item.KH_TUONGTAC_ID)</td>
+                    
+                </tr>
+              
+
+            }
+        </tbody>
+        <thead>
+            <tr>
+                <td id="KQ_STT" colspan="3">@(Model.Count(x => x.KETQUA_SAUTUONGTAC != null))</td>
+                <td id="KH_TT" colspan="2">@(Model.Count(x => x.KH_TUONGTAC_ID != 0))</td>
+            </tr>
+        </thead>
+    </table>
+
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    <script src="/Scripts/combojax.js"></script>
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <script type="text/javascript">
+        //$('#Delete').click(function () {
+        //    if (confirm('Bạn có chắc muốn xóa item ?')) {
+        //        $(this).closest('tr').children('td').each(function (i, e) {
+        //            $(this).find("input.class-delete-all").prop("checked", true);
+        //            return true;
+        //        })
+        //    }
+        //    else {
+        //        return false;
+        //    }
+
+        //})
+        $('#NGAYTUONGTAC_TIEP').datetimepicker({
+            format: 'DD/MM/YYYY'
+        });
+
+        $('#GIOTUONGTAC_TIEP').datetimepicker({
+            format: 'HH:mm'
+        });
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+        $(function () {
+            var KQ_STT = parseFloat(removeComma($('#KQ_STT').text()));
+            var KH_TT = parseFloat(removeComma($('#KH_TT').text()));
+            var sum = 0;
+                
+            sum = (KH_TT/KH_TT)*100;
+            sum.toFixed(2);
+
+            $('#TUONGTACDAT').text(numeral(sum).format('0,0'));
+
+
+        });
+    </script>

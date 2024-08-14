@@ -1,0 +1,752 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers;
+@using Erp.BackOffice.Account.Models;
+@using System.Globalization;
+@using Erp.BackOffice.Areas.Sale.Models
+@{
+    ViewBag.Title = "So sánh số lượng khách và danh sách mới theo tuần";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "BC_SLKHACHVADSMOITHEOTUAN",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        SearchButtonText = "Xem báo cáo"
+    };
+
+    IEnumerable<SelectListItem> NguonKhach = Erp.BackOffice.Helpers.Common.GetSelectList_Category("NguonKhach", null, "value");
+    //DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    //// Cộng thêm 1 tháng và trừ đi một ngày.
+    //DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    string NK = Request["NK"] != null ? Request["NK"] : NguonKhach.Last().Value.ToString();
+    string ManagerStaffid = Request["ManagerStaffId"] != null ? Request["ManagerStaffId"] : SelectListHelper.GetSelectList_FullUserNameKD(null, null).FirstOrDefault().Value.ToString();
+    var tuan1 = ViewBag.SLKHACHVADSMOITHEOTUANtuan1 as ChiSoNhanVienTheoNguonKhachViewModel;
+    var tuan2 = ViewBag.SLKHACHVADSMOITHEOTUANtuan2 as ChiSoNhanVienTheoNguonKhachViewModel;
+    var tuan3 = ViewBag.SLKHACHVADSMOITHEOTUANtuan3 as ChiSoNhanVienTheoNguonKhachViewModel;
+    var tuan4 = ViewBag.SLKHACHVADSMOITHEOTUANtuan4 as ChiSoNhanVienTheoNguonKhachViewModel;
+    int? tr1 = 0;
+    int? tr2 = 0;
+    decimal? tr3 = 0;
+    decimal? tr4 = 0;
+    decimal? tr5 = 0;
+    decimal? tr6 = 0;
+    decimal? tr7 = 0;
+    decimal? tr8 = 0;
+    decimal? tr9 = 0;
+    decimal? tr10 = 0;
+}
+@section HeadOfPage {
+    <style type="text/css">
+        .cell-center {
+            text-align: center;
+        }
+
+        .tr-bold {
+            font-weight: 700;
+        }
+
+        .ctl {
+            position: relative;
+            /*float: left;*/
+            margin-right: 3px;
+        }
+
+            .ctl .error {
+                position: absolute;
+                background: #de2a2a;
+                left: 0px;
+                top: 28px;
+                padding: 2px 5px;
+                color: #fff;
+                z-index: 999;
+            }
+
+                .ctl .error:before {
+                    border-bottom: 7px solid #de2a2a;
+                    border-left: 7px solid transparent;
+                    border-right: 7px solid transparent;
+                    left: 9px;
+                    top: -6px;
+                    content: "";
+                    display: inline-block;
+                    position: absolute;
+                }
+
+        .icon-add {
+            margin-top: 0px !important;
+        }
+
+        .combojax {
+            display: inline-block;
+            position: initial !important;
+            float: none !important;
+        }
+    </style>
+
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <select id="month" name="month">
+        @for (int i = 1; i <= 12; i++)
+        {
+            <option @(Month == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+        }
+    </select>
+    <select id="year" name="year">
+        @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+        {
+            <option @(Year == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+        }
+    </select>
+    <select class="chzn-select" style="width:250px; float:left" id="ManagerStaffId" name="ManagerStaffId">
+        <option value="">- Nhân viên QL -</option>
+        @foreach (var item in SelectListHelper.GetSelectList_FullUserNameKD(null, null))
+        {
+            <option @(ManagerStaffid== item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+        }
+    </select>
+    <select class="chzn-select" style="width:250px; float:left" id="NK" name="NK">
+        <option value="">- Nguồn Khách -</option>
+        @foreach (var item in SelectListHelper.GetSelectList_AllNguonKhach(null, null))
+        {
+            <option @(NK == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+        }
+    </select>
+}
+<div class="table-responsive" id="BaoCaoTrangThaiNgungtheoDoi" style="margin-bottom:40px">
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            @*<tr class="">
+                    <th class="" colspan="11" style="text-align:center"><h4>BÁO CÁO DOANH SỐ TỪ @startDate ĐẾN @endDate</h4></th>
+                </tr>*@
+            <tr>
+                <th style="width:400px;text-align:center">#</th>
+                <th style="min-width:100px;text-align:center">TUẦN 1</th>
+                <th style="min-width:100px;text-align:center">TUẦN 2</th>
+                <th style="min-width:100px;text-align:center">TUẦN 3</th>
+                <th style="text-align:center">TUẦN 4</th>
+                <th style="text-align:center">TỔNG THÁNG</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @*@if (NK.Equals("khachsalemoi"))
+        {*@
+            <tr>
+                <td>SL TƯƠNG TÁC MỚI</td>
+                @if (tuan1 != null)
+                {
+                    <td>@(tuan1.SLTuongTacMoi != null ? tuan1.SLTuongTacMoi : 0)</td>
+                    if (tuan1.SLTuongTacMoi != null)
+                    {
+                        tr8 = tr8 + tuan1.SLTuongTacMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan2 != null)
+                {
+                    <td>@(tuan2.SLTuongTacMoi != null ? tuan2.SLTuongTacMoi : 0)</td>
+                    if (tuan2.SLTuongTacMoi != null)
+                    {
+                        tr8 = tr8 + tuan2.SLTuongTacMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan3 != null)
+                {
+                    <td>@(tuan3.SLTuongTacMoi != null ? tuan3.SLTuongTacMoi : 0)</td>
+                    if (tuan3.SLTuongTacMoi != null)
+                    {
+                        tr8 = tr8 + tuan3.SLTuongTacMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan4 != null)
+                {
+                    <td>@(tuan4.SLTuongTacMoi != null ? tuan4.SLTuongTacMoi : 0)</td>
+                    if (tuan4.SLTuongTacMoi != null)
+                    {
+                        tr8 = tr8 + tuan4.SLTuongTacMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+
+
+
+                <td>@(tr8 != 0 ? tr8 : null)</td>
+            </tr>
+            <tr>
+                <td>SL TƯƠNG TÁC Cũ</td>
+                @if (tuan1 != null)
+                {
+                    <td>@(tuan1.SLTuongTacCu != null ? tuan1.SLTuongTacCu : 0)</td>
+                    if (tuan1.SLTuongTacCu != null)
+                    {
+                        tr10 = tr10 + tuan1.SLTuongTacCu;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan2 != null)
+                {
+                    <td>@(tuan2.SLTuongTacCu != null ? tuan2.SLTuongTacCu : 0)</td>
+                    if (tuan2.SLTuongTacCu != null)
+                    {
+                        tr10 = tr10 + tuan2.SLTuongTacCu;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan3 != null)
+                {
+                    <td>@(tuan3.SLTuongTacCu != null ? tuan3.SLTuongTacCu : 0)</td>
+                    if (tuan3.SLTuongTacCu != null)
+                    {
+                        tr10 = tr10 + tuan3.SLTuongTacCu;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan4 != null)
+                {
+                    <td>@(tuan4.SLTuongTacCu != null ? tuan4.SLTuongTacCu : 0)</td>
+                    if (tuan4.SLTuongTacCu != null)
+                    {
+                        tr10 = tr10 + tuan4.SLTuongTacCu;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+
+
+
+                <td>@(tr10 != 0 ? tr10 : null)</td>
+            </tr>
+            <tr>
+                <td>SL KHÁCH MỚI HẸN</td>
+                @if (tuan1 != null)
+                {
+                    <td>@(tuan1.SLKhachMoiHen != null ? tuan1.SLKhachMoiHen : 0)</td>
+                    if (tuan1.SLKhachMoiHen != null)
+                    {
+                        tr9 = tr9 + tuan1.SLKhachMoiHen;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan2 != null)
+                {
+                    <td>@(tuan2.SLKhachMoiHen != null ? tuan2.SLKhachMoiHen : 0)</td>
+                    if (tuan2.SLKhachMoiHen != null)
+                    {
+                        tr9 = tr9 + tuan2.SLKhachMoiHen;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan3 != null)
+                {
+                    <td>@(tuan3.SLKhachMoiHen != null ? tuan3.SLKhachMoiHen : 0)</td>
+                    if (tuan3.SLKhachMoiHen != null)
+                    {
+                        tr9 = tr9 + tuan3.SLKhachMoiHen;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan4 != null)
+                {
+                    <td>@(tuan4.SLKhachMoiHen != null ? tuan4.SLKhachMoiHen : 0)</td>
+                    if (tuan4.SLKhachMoiHen != null)
+                    {
+                        tr9 = tr9 + tuan4.SLKhachMoiHen;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+
+
+
+                <td>@(tr9 != 0 ? tr9 : null)</td>
+            </tr>
+
+            @*}*@
+
+            <tr>
+                <td>SL KHÁCH MỚI LÊN</td>
+
+                @if (tuan1 != null)
+                {
+                    <td>@(tuan1.SLLenMoi != null ? tuan1.SLLenMoi : 0)</td>
+                    if (tuan1.SLLenMoi != null)
+                    {
+                        tr1 = tr1 + tuan1.SLLenMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan2 != null)
+                {
+                    <td>@(tuan2.SLLenMoi != null ? tuan2.SLLenMoi : 0)</td>
+                    if (tuan2.SLLenMoi != null)
+                    {
+                        tr1 = tr1 + tuan2.SLLenMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan3 != null)
+                {
+                    <td>@(tuan3.SLLenMoi != null ? tuan3.SLLenMoi : 0)</td>
+                    if (tuan3.SLLenMoi != null)
+                    {
+                        tr1 = tr1 + tuan3.SLLenMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan4 != null)
+                {
+                    <td>@(tuan4.SLLenMoi != null ? tuan4.SLLenMoi : 0)</td>
+                    if (tuan4.SLLenMoi != null)
+                    {
+                        tr1 = tr1 + tuan4.SLLenMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+
+
+
+                <td>@(tr1 != 0 ? tr1 : null)</td>
+            </tr>
+            <tr>
+                <td>SL KHÁCH MỚI MUA</td>
+                @if (tuan1 != null)
+                {
+                    <td>@(tuan1.SLMuaMoi != null ? tuan1.SLMuaMoi : 0)</td>
+                    if (tuan1.SLMuaMoi != null)
+                    {
+                        tr2 = tr2 + tuan1.SLMuaMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan2 != null)
+                {
+
+                    <td>@(tuan2.SLMuaMoi != null ? tuan2.SLMuaMoi : 0)</td>
+                    if (tuan2.SLMuaMoi != null)
+                    {
+                        tr2 = tr2 + tuan2.SLMuaMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan3 != null)
+                {
+                    <td>@(tuan3.SLMuaMoi != null ? tuan3.SLMuaMoi : 0)</td>
+                    if (tuan3.SLMuaMoi != null)
+                    {
+                        tr2 = tr2 + tuan3.SLMuaMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan4 != null)
+                {
+                    <td>@(tuan4.SLMuaMoi != null ? tuan4.SLMuaMoi : 0)</td>
+                    if (tuan4.SLMuaMoi != null)
+                    {
+                        tr2 = tr2 + tuan4.SLMuaMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+
+                <td>@(tr2 != 0 ? tr2 : null)</td>
+            </tr>
+
+            <tr>
+                <td> TỶ LỆ MUA TRÊN LÊN MỚI</td>
+                @if (tuan1 != null)
+                {
+                    <td>@(tuan1.TyLeMuaLenMoi != null ? tuan1.TyLeMuaLenMoi : 0)</td>
+                    if (tuan1.TyLeMuaLenMoi != null)
+                    {
+                        tr3 = tr3 + tuan1.TyLeMuaLenMoi;
+                    }
+
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan2 != null)
+                {
+                    <td>@(tuan2.TyLeMuaLenMoi != null ? tuan2.TyLeMuaLenMoi : 0)</td>
+                    if (tuan2.TyLeMuaLenMoi != null)
+                    {
+                        tr3 = tr3 + tuan2.TyLeMuaLenMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan3 != null)
+                {
+                    <td>@(tuan3.TyLeMuaLenMoi != null ? tuan3.TyLeMuaLenMoi : 0)</td>
+                    if (tuan3.TyLeMuaLenMoi != null)
+                    {
+                        tr3 = tr3 + tuan3.TyLeMuaLenMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan4 != null)
+                {
+                    <td>@(tuan4.TyLeMuaLenMoi != null ? tuan4.TyLeMuaLenMoi : 0)</td>
+                    if (tuan4.TyLeMuaLenMoi != null)
+                    {
+                        tr3 = tr3 + tuan4.TyLeMuaLenMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td>@(tr3 != 0 ? tr3 + "%" : null)</td>
+            </tr>
+            <tr>
+                <td>DOANH SỐ ẢO MỚI</td>
+                @if (tuan1 != null)
+                {
+                    <td>@(tuan1.DSAoMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan1.DSAoMoi, null) : "0")</td>
+                    if (tuan1.DSAoMoi != null)
+                    {
+                        tr4 = tr4 + tuan1.DSAoMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan2 != null)
+                {
+                    <td>@(tuan2.DSAoMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan2.DSAoMoi, null) : "0")</td>
+                    if (tuan2.DSAoMoi != null)
+                    {
+                        tr4 = tr4 + tuan2.DSAoMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan3 != null)
+                {
+                    <td>@(tuan3.DSAoMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan3.DSAoMoi, null) : "0")</td>
+                    if (tuan3.DSAoMoi != null)
+                    {
+                        tr4 = tr4 + tuan3.DSAoMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+
+                @if (tuan4 != null)
+                {
+                    <td>@(tuan4.DSAoMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan4.DSAoMoi, null) : "0")</td>
+                    if (tuan4.DSAoMoi != null)
+                    {
+                        tr4 = tr4 + tuan4.DSAoMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td>@(tr4 != 0 ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tr4, null) : null)</td>
+            </tr>
+            <tr>
+                <td>DOANH SỐ THỰC MỚI</td>
+                @if (tuan1 != null)
+                {
+                    <td>@(tuan1.DSThucMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan1.DSThucMoi, null) : "0")</td>
+                    if (tuan1.DSThucMoi != null)
+                    {
+                        tr5 = tr5 + tuan1.DSThucMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan2 != null)
+                {
+                    <td>@(tuan2.DSThucMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan2.DSThucMoi, null) : "0")</td>
+                    if (tuan2.DSThucMoi != null)
+                    {
+                        tr5 = tr5 + tuan2.DSThucMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan3 != null)
+                {
+                    <td>@(tuan3.DSThucMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan3.DSThucMoi, null) : "0")</td>
+                    if (tuan3.DSThucMoi != null)
+                    {
+                        tr5 = tr5 + tuan3.DSThucMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+
+                @if (tuan4 != null)
+                {
+                    <td>@(tuan4.DSThucMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan4.DSThucMoi, null) : "0")</td>
+                    if (tuan4.DSThucMoi != null)
+                    {
+                        tr5 = tr5 + tuan4.DSThucMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td>@(tr5 != 0 ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tr5, null) : null)</td>
+            </tr>
+            <tr>
+                <td>TB HĐ ẢO MỚI</td>
+                @if (tuan1 != null)
+                {
+                    <td>@(tuan1.TBDSThucAOMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan1.TBDSThucAOMoi, null) : "0")</td>
+                    if (tuan1.TBDSThucAOMoi != null)
+                    {
+                        tr6 = tr6 + tuan1.TBDSThucAOMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan2 != null)
+                {
+                    <td>@(tuan2.TBDSThucAOMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan2.TBDSThucAOMoi, null) : "0")</td>
+                    if (tuan2.TBDSThucAOMoi != null)
+                    {
+                        tr6 = tr6 + tuan2.TBDSThucAOMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan3 != null)
+                {
+                    <td>@(tuan3.TBDSThucAOMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan3.TBDSThucAOMoi, null) : "0")</td>
+                    if (tuan3.TBDSThucAOMoi != null)
+                    {
+                        tr6 = tr6 + tuan3.TBDSThucAOMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+
+                @if (tuan4 != null)
+                {
+                    <td>@(tuan4.TBDSThucAOMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan4.TBDSThucAOMoi, null) : "0")</td>
+                    if (tuan4.TBDSThucAOMoi != null)
+                    {
+                        tr6 = tr6 + tuan4.TBDSThucAOMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td>@(tr6 != 0 ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tr6, null) : null)</td>
+            </tr>
+            <tr>
+                <td>
+                    TB HĐ THỰC MỚI
+
+                </td>
+                @if (tuan1 != null)
+                {
+                    <td>@(tuan1.TBDSThucMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan1.TBDSThucMoi, null) : "0")</td>
+                    if (tuan1.TBDSThucMoi != null)
+                    {
+                        tr7 = tr7 + tuan1.TBDSThucMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan2 != null)
+                {
+                    <td>@(tuan2.TBDSThucMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan2.TBDSThucMoi, null) : "0")</td>
+                    if (tuan2.TBDSThucMoi != null)
+                    {
+                        tr7 = tr7 + tuan2.TBDSThucMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                @if (tuan3 != null)
+                {
+                    <td>@(tuan3.TBDSThucMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan3.TBDSThucMoi, null) : "0")</td>
+                    if (tuan3.TBDSThucMoi != null)
+                    {
+                        tr7 = tr7 + tuan3.TBDSThucMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+
+                @if (tuan4 != null)
+                {
+                    <td>@(tuan4.TBDSThucMoi != null ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tuan4.TBDSThucMoi, null) : "0")</td>
+                    if (tuan4.TBDSThucMoi != null)
+                    {
+                        tr7 = tr7 + tuan4.TBDSThucMoi;
+                    }
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td>@(tr7 != 0 ? Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(tr7, null) : null)</td>
+            </tr>
+            @*@if (Model.Count() > 0)
+        {
+            foreach (var item in Model)
+            {
+
+                <tr class="@(index%2==0?"alert-warning":"")">
+                    <td>@(index++)</td>
+                    <td> <span>@item.CompanyName</span></td>
+                    @if (!string.IsNullOrEmpty(item.Phone))
+                    {
+                        <td>@item.Phone</td>
+                    }
+                    else
+                    {
+                        <td>@item.Mobile</td>
+                    }
+
+                    <td>@item.Address</td>
+                    <td>@item.Email</td>
+                    <td>@item.ModifiedIsLock</td>
+
+                </tr>
+
+
+
+
+            }
+        }*@
+
+
+        </tbody>
+        <thead>
+            <tr>
+                @*<td colspan="5" style="text-align:right"><b>Tổng:</b></td>
+                    <td style="text-align:right"><b>@Model.Count()</b></td>*@
+                @*<td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalAmount), null))</b></td>
+
+                    <td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.PaidAmount), null))</b></td>*@
+            </tr>
+        </thead>
+    </table>
+
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="ExportTrangThaiNgungTheoDoiKH()">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+}
+@section Scripts {
+    <script>
+        function ExportTrangThaiNgungTheoDoiKH() {
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+
+            OpenPopup('/SaleReport/Export_BC_SLKHACHVADSMOITHEOTUAN?startDate=' + startDate + '&endDate=' + endDate + '&IsPopup=true', '', 0, 900);
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 200000);
+            HideLoading();
+        }
+    </script>
+}

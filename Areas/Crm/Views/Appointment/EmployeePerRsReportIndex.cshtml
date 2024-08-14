@@ -1,0 +1,883 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.Domain.Entities
+@using Erp.Domain.Staff.Entities
+@using Erp.BackOffice.Crm.Models
+@using Newtonsoft.Json;
+@using Erp.BackOffice.Filters;
+@{
+    ViewBag.Title = "Kết quả làm việc của nhân viên";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    var toDay = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+    //Tháng này
+    var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+    // Chuỗi format ngày để hiển thị trên giao diện
+    var dateFormat = "yyyy-MM-dd";
+
+    var Branchs = ViewBag.Branchs as IEnumerable<BranchVModel>;
+    var BoPhan = ViewBag.BoPhan as IEnumerable<BoPhanVModel>;
+    var BoPhanc = JsonConvert.SerializeObject(BoPhan);
+    var user = ViewBag.user as IEnumerable<Erp.Domain.Entities.User>;
+    var userc = JsonConvert.SerializeObject(user);
+    var TgOptions = ViewBag.Options as IEnumerable<TargetOptionModel>;
+}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+
+<style>
+    #TableKPICongViec > div {
+        overflow: unset !important;
+    }
+
+    .page-content {
+        overflow-y: scroll;
+        height: 100vh;
+    }
+
+    thead {
+        position: sticky;
+        top: 0;
+    }
+
+    .table > thead > tr {
+        color: #123d8c;
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        background: #fff;
+    }
+
+    .nav-pills > li.active > a {
+        background-color: #00ace6 !important;
+    }
+
+    .tab-content {
+        border: unset !important;
+    }
+
+    .checkbox-inline > input {
+/*        margin-top: 5px;*/
+        padding: 0px 4px 6px;
+    }
+
+    .btn-group + .btn, .btn-group > .btn, .checkbox-inline > input {
+        border: 1px solid #809dc9 !important;
+    }
+
+    label {
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        font-size: 15px !important;
+        color: #262f58;
+    }
+
+    #iDay, #ituNgaytk, #idenNgaytk, #iDatetk {
+        width: 100%
+    }
+
+    body {
+        /*margin-top: 20px;*/
+        color: #1a202c;
+        text-align: left;
+        background-color: #e2e8f0;
+    }
+
+    .main-body {
+        padding: 15px;
+    }
+
+    .card {
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+    }
+
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0 solid rgba(0,0,0,.125);
+        border-radius: .25rem;
+    }
+
+    .selectpicker {
+        background-color: #fff !important;
+        color: #333 !important;
+    }
+
+    .dropdown-toggle:hover {
+        background-color: #fff !important;
+    }
+
+    .btn.dropdown-toggle:active, .open {
+        background-color: #ffffff !important;
+        border-color: #bfc1c2;
+        border: 1px solid #bfc1c2 !important;
+    }
+
+    .btn-default, .btn-default.focus, .btn-default:focus, .btn.focus, .btn:focus {
+        background-color: #fff;
+    }
+
+    .btn-group > .btn > .caret {
+        border-top-color: #080808;
+    }
+
+    .gutters-sm {
+        margin-right: -8px;
+        margin-left: -8px;
+    }
+
+        .gutters-sm > .col, .gutters-sm > [class*=col-] {
+            padding-right: 8px;
+            padding-left: 8px;
+        }
+
+    .modal, .modal-backdrop {
+        right: 0;
+        bottom: auto;
+        left: 0;
+    }
+
+    .mb-3, .my-3 {
+        margin: 1rem 1rem !important;
+    }
+
+    .bg-gray-300 {
+        background-color: #e2e8f0;
+    }
+    /*
+    .h-100 {
+        height: 100% !important;
+    }*/
+
+    .custom-color-td {
+        text-align: left;
+    }
+
+    .ht_1sao {
+        text-align: right;
+    }
+
+    .custom-th1 {
+        text-align: center;
+    }
+
+    .custom-tbody {
+        text-align: right;
+        border-top: 1px solid #649ff0;
+    }
+
+    .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+        width: 100%;
+    }
+
+    .nav-list > li > a > .menu-icon {
+        filter: brightness(0) !important;
+        vertical-align: top;
+    }
+
+    .table-bordered {
+        border: 1px solid #004a9f;
+    }
+
+    .btn-statistical {
+        padding: .6rem 1.5rem;
+        border-radius: 3px;
+        border: none;
+        outline: none;
+        margin-top: 24px;
+        background: #499ce4 !important;
+    }
+
+        .btn-statistical:hover {
+            transition: .3s linear;
+        }
+
+    .btn-custom {
+        padding: .4rem 1.5rem !important;
+        margin: 0 1rem;
+    }
+
+        .btn-custom:nth-child(1) {
+            margin-left: 0
+        }
+
+    .btnchart {
+        padding: .6rem 1.5rem !important;
+        text-decoration: underline;
+    }
+
+
+    /* ----- chart & table----------- */
+    .table > thead > tr {
+        color: #333;
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        background: #fff;
+        text-transform: capitalize;
+    }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 9px 12px;
+        }
+
+    table {
+        margin-bottom: 0 !important;
+    }
+
+    .webkit::-webkit-scrollbar {
+        background: #dbdbdb;
+        border-radius: 10px;
+        display: none;
+    }
+
+    .webkit::-webkit-scrollbar-button {
+        width: 3px !important;
+    }
+
+    .webkit::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background: #999;
+    }
+
+    .table-bordered {
+        border: none;
+    }
+
+    #ibranch, #ibophan {
+        border: 1px solid #809dc9 !important;
+    }
+
+    .select2-container .select2-selection--single {
+        border: 1px solid #809dc9 !important;
+        background-color: white;
+        height: 30px;
+        width: 100%;
+    }
+</style>
+
+<div class="card">
+    <h5 class="card-title" style="background-color: white; color: #262f58; font-weight: bolder; margin-left: 1%;"> <i class="menu-icon fa fa-bar-chart" style="margin-right: 10px"></i>KẾT QUẢ LÀM VIỆC CỦA NHÂN VIÊN</h5>
+    <div class="card-body">
+        <div class="container" style="margin-left: 60px;">
+            <div class="row">
+                <div style="margin-left:-5%" class="col-md-12">
+                    <label class="checkbox-inline">
+                        Chọn chi nhánh:
+                    </label>
+                </div>
+                <div style="margin-left:-5%" class="col-md-12">
+                    <div class="col-sm-4 form-group">
+                        <label class="checkbox-inline" style="width:90%">
+                            Chi nhánh:
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="ibranch" name="ibranch" style="height: 30px;width:100%">
+                                @foreach (var item in Branchs)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-4 form-group">
+                        <label class="checkbox-inline" style="width:90%">
+                            Bộ phận:
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="ibophan" name="ibophan" style="height: 30px; width: 100%">
+                                <option value="-1">--Tất cả--</option>
+                                @foreach (var item in BoPhan)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-4 form-group">
+                        <label class="checkbox-inline" style="width:90%">
+                            Nhân viên:
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="iUser" name="iUser" style="height: 30px; width: 100%">
+                                <option value="-1">--Tất cả--</option>
+                                @foreach (var item in user)
+                                {
+                                    <option value="@item.Id">@item.FullName</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-left:-5%" class="col-md-12">
+                    <label class="checkbox-inline">
+                        Chọn thời gian:
+                    </label>
+                </div>
+
+                <div style="margin-left:-5%" class="col-md-12">
+                    <div class="col-sm-4 form-group">
+                        <label class="checkbox-inline" style="width:90%">
+                            Kiểu chọn:
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="iOptionDateTime" name="iOptionDateTime" style="height: 30px; width: 100%">
+                                <option value="0">Tháng/Năm</option>
+                                <option value="1">Tuần</option>
+                                <option value="2">Ngày</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-4 form-group" id="idoptionNam">
+                        <label class="checkbox-inline" style="width:90%">
+                            Năm:
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="iYear" name="iYear" style="height: 30px; width: 100%">
+                                @for (int i = DateTime.Now.Year - 10; i <= DateTime.Now.Year; i++)
+                                {
+                                    <option value="@i" @(i == DateTime.Now.Year ? "selected" : "")>Năm @i</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-4 form-group" id="idoptionThang">
+                        <label class="checkbox-inline" style="width:90%">
+                            Tháng:
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="iMonth" name="iMonth" style="height: 30px; width: 100%">
+                                @for (int i = 1; i < 13; i++)
+                                {
+                                    <option value="@i" @(i == DateTime.Now.Month ? "selected" : "")>Tháng @i</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="col-sm-4 form-group" id="idoptionTuan" hidden>
+                        <label class="checkbox-inline" style="width:90%">
+                            Tuần:
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="iWeek" name="iWeek" style="height: 30px; width: 100%">
+                                @for (int i = 1; i <= 53; i++)
+                                {
+                                    <option value="@i" @(i == FormatNumber.GetWeekNumber(DateTime.Now) ? "selected" : "")>Tuần @i</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-4 form-group" id="idoptionNgay" hidden>
+                        <label class="checkbox-inline">
+                            Ngày:
+                            <input type="date" value="@toDay.ToString(dateFormat)" id="iDay" class="change-icon" />
+                        </label>
+                    </div>
+                </div>
+                <div style="margin-left:-5%" class="col-md-12">
+                    <label class="checkbox-inline">
+                        Chọn chỉ số cần thống kê:
+                    </label>
+                </div>
+                <div style="margin-left:-5%" class="col-md-12">
+                    <div class="col-sm-3 form-group" id="idoptionChiSo">
+                        <label class="checkbox-inline" style="width:100%">
+                            Chỉ số:
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="iChiSo" name="iChiSo" style="height: 30px;width:100%">
+                                @foreach (var item in TgOptions)
+                                {
+                                    <option value="@item.Value">@item.Content</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label class="checkbox-inline" style="width:100%">
+                            Nguồn:
+                            <select data-val="true" id="ileadct" name="ileadct" style="width: 100%; border: 1px solid #809dc9 !important; height: 30px; margin-top: 5px; padding: 0px 4px 6px;">
+                                <option value="-1">Tất cả</option>
+                                <option value="1">Lead</option>
+                                <option value="0">Contact</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-2 form-group" id="tuNgayId">
+                        <label class="checkbox-inline">
+                            Từ ngày:
+                            <input type="date" value="@firstDayOfMonth.ToString(dateFormat)" id="ituNgaytk" class="change-icon" />
+                        </label>
+                    </div>
+                    <div class="col-sm-2 form-group" id="denNgayId">
+                        <label class="checkbox-inline">
+                            Đến ngày:
+                            <input type="date" value="@lastDayOfMonth.ToString(dateFormat)" id="idenNgaytk" class="change-icon" />
+                        </label>
+                    </div>
+                    <div class="col-sm-2 form-group">
+                        <button id="btn_thongKe" class=" btn-primary btn-statistical"><i class="fa fa-search" style="filter:brightness(3);"></i> Thống kê</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-sm-6" style="display: flex; justify-content: center; align-items: center;">
+                    <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 350px; width: 350px">
+                        <canvas id="chung_chart"></canvas>
+                    </div>
+                </div>
+                <div class="col-sm-6" style="display: flex; justify-content: center; align-items: center;">
+                    <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 350px; width: 350px">
+                        <canvas id="ketqua_chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12" id="detailitem_chart">
+                   
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#ibranch').select2();
+        $('#ibophan').select2();
+        $('#iUser').select2();
+        $('#iOptionDateTime').select2();
+        $('#iYear').select2();
+        $('#iMonth').select2();
+        $('#iWeek').select2();
+        $('#iChiSo').select2();
+        $('#ileadct').select2();
+        $("#iDay").datepicker({
+            showOn: "off"
+        });
+        $("#ituNgaytk").datepicker({
+            showOn: "off"
+        });
+        $("#idenNgaytk").datepicker({
+            showOn: "off"
+        });
+        
+        $('#iOptionDateTime').on('change', function () {
+            var vals = this.value;
+            if (vals == '0') {
+                $('#idoptionNam').show();
+                $('#idoptionThang').show();
+                $('#idoptionTuan').hide();
+                $('#idoptionNgay').hide();
+            } else if (vals == '1') {
+                $('#idoptionNam').show();
+                $('#idoptionThang').hide();
+                $('#idoptionTuan').show();
+                $('#idoptionNgay').hide();
+            } else {
+                $('#idoptionNam').hide();
+                $('#idoptionThang').hide();
+                $('#idoptionTuan').hide();
+                $('#idoptionNgay').show();
+            }
+        });
+        $('#iMonth').on('change', function () {
+            var sMonth = $(this).val();
+            var sYear = $('#iYear').val();
+            var firstdaym = getFirstDayOfMonth(sYear, sMonth);
+            var lastdaym = getLastDayOfMonth(sYear, sMonth);
+            $("#ituNgaytk").val(firstdaym);
+            $("#idenNgaytk").val(lastdaym);
+        });
+
+        $('#iWeek').on('change', function () {
+            var sWeek = $(this).val();
+            var sYear = $('#iYear').val();
+            var firstdayw = getFirstDayOfWeek(sYear, sWeek);
+            var lastdayw = getLastDayOfWeek(sYear, sWeek);
+            $("#ituNgaytk").val(firstdayw);
+            $("#idenNgaytk").val(lastdayw);
+        });
+        $('#iDay').on('change', function () {
+            var fday = $(this).val();
+            $("#ituNgaytk").val(fday);
+            $("#idenNgaytk").val(fday);
+        })
+        populateBoPhan(filterdataBp(1));
+        populateUserss(filterdataBranchUser(1));
+    });
+
+    function getFirstDayOfMonth(year, month) {
+        return moment({ year: year, month: month - 1 }).startOf('month').format('YYYY-MM-DD');
+    }
+
+    function getLastDayOfMonth(year, month) {
+        return moment({ year: year, month: month - 1 }).endOf('month').format('YYYY-MM-DD');
+    }
+    function getFirstDayOfWeek(year, weekNumber) {
+        const date = moment().year(year).startOf('year').add(weekNumber - 1, 'weeks').startOf('week').add(1, 'days');
+        return date.format('YYYY-MM-DD');
+    }
+
+    function getLastDayOfWeek(year, weekNumber) {
+        const date = moment().year(year).startOf('year').add(weekNumber - 1, 'weeks').endOf('week').add(1, 'days');
+        return date.format('YYYY-MM-DD');
+    }
+    // Hàm chuyển đổi ngày thành chuỗi yyyy-mm-dd
+    function formatDate(date) {
+        var year = date.getFullYear();
+        var month = (date.getMonth() + 1).toString().padStart(2, '0');
+        var day = date.getDate().toString().padStart(2, '0');
+        return year + '-' + month + '-' + day;
+    }
+    
+</script>
+
+<script>
+
+    function getFromToDate() {
+        debugger;
+        var result = true;
+        var strFromDate = "";
+        var strToDate = "";
+        var branchId = "";
+        var boPhanId = "";
+        var boPhanName = "";
+        var userId = "";
+        var targetId = "";
+        var targetName = "";
+        var islead = "";
+        if ($("#ituNgaytk").val() > $("#idenNgaytk").val()) {
+            alert("Không thể lấy dữ liệu.\nNgày bắt đầu không được lớn hơn ngày kết thúc.");
+            return false;
+        }
+        strFromDate = $("#ituNgaytk").datepicker({ dateFormat: 'yyyy-mm-dd' }).val();
+        strToDate = $("#idenNgaytk").datepicker({ dateFormat: 'yyyy-mm-dd' }).val();
+        branchId = $("#ibranch").val();
+        boPhanId = $("#ibophan").val();
+        boPhanName = $('#ibophan option:selected').text();
+        userId = $("#iUser").val();
+        targetId = $("#iChiSo").val();
+        targetName = $('#iChiSo option:selected').text();
+        islead = $('#ileadct').val();
+        return {
+            result: result,
+            strFromDate: strFromDate,
+            strToDate: strToDate,
+            branchId: branchId,
+            boPhanId: boPhanId,
+            boPhanName: boPhanName,
+            userId: userId,
+            targetId, targetId,
+            targetName, targetName,
+            islead: islead
+        };
+    }
+    var datalsv = [];
+    var btnThongKe = document.getElementById("btn_thongKe");
+    btnThongKe.addEventListener('click', function () {
+        debugger
+        var returnValue = getFromToDate();
+        if (!returnValue.result) return;
+        ShowLoading();
+        $.ajax({
+            url: "/Appointment/GetEmployeePerRsReport",
+            data: { strFromDate: returnValue.strFromDate, strToDate: returnValue.strToDate, branchId: returnValue.branchId, boPhanId: returnValue.boPhanId, userId: returnValue.userId, targetId: returnValue.targetId, isLead: returnValue.islead },
+            method: 'get',
+            dataType: 'json',
+            success: function (chart) {
+                if (chart.Success) {
+                    debugger
+                    for (let i = charts.length - 1; i >= 0; i--) {
+                        charts[i].destroy();
+                        charts.splice(i, 1);
+                    }
+                    datalsv = chart.datasp;
+                    console.log(chart.backgroundColor);
+                    DrawBarChart('chung_chart', chart.totaltg, chart.labels, 'chỉ số ' + returnValue.targetName);
+                    var labelchar2 = returnValue.boPhanId != -1 ? 'Biểu đồ kết quả ' + returnValue.targetName + ' của ' + returnValue.boPhanName + ' theo từng nhân viên' : 'Biểu đồ kết quả ' + returnValue.targetName + ' của tổng bộ phận theo từng nhân viên';
+                    DrawPieChart('ketqua_chart', chart.percentTotal, chart.labels, chart.backgroundColor, chart.totaltg, labelchar2);
+                    createCanvasItems();
+                    CreateChartItem();  
+                    HideLoading();
+                }
+                else {
+                    HideLoading();
+                    alert("Lỗi.\nKhông thể lấy dữ liệu báo cáo (Quá 1 tháng!).");
+                }
+            },
+            error: function () {
+                HideLoading();
+                alert("Lỗi.\nKhông thể lấy dữ liệu báo cáo (1).");
+            }
+        });
+    });
+    function createCanvasItems() {
+        const container = $('#detailitem_chart'); 
+        container.empty();
+        datalsv.forEach(function (x) {
+            const outerDiv = $('<div>', {
+                'class': 'col-sm-6',
+                'css': {
+                    'display': 'flex',
+                    'justify-content': 'center',
+                    'align-items': 'center'
+                }
+            });
+            const innerDiv = $('<div>', {
+                'css': {
+                    'overflow-x': 'auto',
+                    'max-height': '600px',
+                    'margin-bottom': '30px',
+                    'height': '350px',
+                    'width': '350px'
+                }
+            });
+            const canvas = $('<canvas>', {
+                'id': `item${x.AssignedUserId}_chart`
+            });
+            const innerDiv2 = $('<div>');
+            const error = $('<span>', {
+                'id': `item${x.AssignedUserId}_error`,
+                'css': {
+                    'color': 'red',
+                }
+            });
+            innerDiv2.append(error);
+            outerDiv.append(innerDiv2);
+            innerDiv.append(canvas);
+            outerDiv.append(innerDiv);
+            container.append(outerDiv);
+
+            
+        });
+    }
+    function CreateChartItem() {
+        var targetName = $('#iChiSo option:selected').text();
+        datalsv.forEach(function (x) {
+            var labels = [];
+            var data = [];
+            var title = '';
+            var color = [];
+            labels.push(targetName + ' đạt');
+            labels.push('Còn thiếu');
+            data.push(x.percentDat);
+            data.push(x.percentChuaDat);
+            color.push('Blue');
+            color.push('OrangeRed');
+            title = x.AssignedUserName;
+
+            
+            if (x.percentChuaDat == '100') {
+                $('#item' + x.AssignedUserId + '_error').text('Chưa thiết lập chỉ tiêu cho ' + title +' !');
+            } else {''
+                DrawPieChart2('item' + x.AssignedUserId + '_chart', data, labels, color, title);
+            }
+        })
+    }
+
+    Chart.register(ChartDataLabels)
+    var charts = []
+    function DrawPieChart(i, data, labels, backgroundColor, sums, title) {
+        debugger
+        const ctx = document.getElementById(i);
+        charts.push(new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels.map((label, index) => `${label}: ${sums[index]} (${data[index]}%)`),
+                datasets: [{
+                    data: data,
+                    backgroundColor: backgroundColor
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,  // Hiển thị chú giải
+                    },
+                    title: {
+                        display: true,
+                        text: title,
+                        font: {
+                            size: 17
+                        }
+                    },
+                    datalabels: {
+                        color: 'black',
+                        font: {
+                            size: 12,
+                            weight: 'normal'
+                        },
+                        formatter: function (value, context) {
+                            return context.chart.data.labels[context.dataIndex].split(":")[0] + ': ' + value + '%';
+                        }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        align: 'center',
+                        labels: {
+                            boxWidth: 20,
+                            padding: 5
+                        }
+                    }
+                },
+            }
+        })
+        );
+    }
+    function DrawPieChart2(i, data, labels, backgroundColor, title) {
+        debugger
+        const ctx = document.getElementById(i);
+        charts.push(new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: backgroundColor
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: true,
+                    },
+                    title: {
+                        display: true,
+                        text: title,
+                        font: {
+                            size: 17
+                        }
+                    }
+                },
+                datalabels: {
+                    color: 'black',
+                    font: {
+                        size: 12,
+                        weight: 'normal'
+                    },
+                    formatter: function (value, context) {
+                        return context.chart.data.labels[context.dataIndex].split(":")[0] + ': ' + value + '%';
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    align: 'center',
+                    labels: {
+                        boxWidth: 20,
+                        padding: 5
+                    }
+                }
+            }
+        })
+        );
+    }
+    function DrawBarChart(i, data, labels, labeltg) {
+        debugger
+        const ctx = document.getElementById(i);
+        charts.push(new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    borderWidth: 1,
+                    backgroundColor: 'Aqua',
+                    label: labeltg
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                },
+                indexAxis: 'y',
+                plugins: {
+                    legend: {
+                        display: true,  // Hiển thị chú giải
+                    },
+                    title: {
+                        display: true,
+                        text: 'Biểu đồ ' + labeltg,
+                        font: {
+                            size: 17
+                        }
+                    }
+                },
+
+            }
+        })
+        );
+    }
+
+    var BoPhan = @Html.Raw(BoPhanc);
+    var userj =  @Html.Raw(userc);
+    $('#ibranch').on('change', function () {
+        var selectedValue = this.value;
+        populateBoPhan(filterdataBp(selectedValue));
+        populateUserss(filterdataBranchUser(selectedValue));
+    });
+    $('#ibophan').on('change', function () {
+        var selectedValue = this.value;
+        populateUserss(filterdataBPUser(selectedValue));
+    })
+    function DestroyCharts(id) {
+        const canvas = document.querySelector(`canvas${id}`);
+        const matchingCharts = charts.filter(chart => chart.ctx.canvas != null ? chart.ctx.canvas === canvas : false);
+        matchingCharts.forEach(chart => {
+            chart.destroy();
+            const chartIndex = charts.indexOf(chart);
+            if (chartIndex > -1) {
+                charts.splice(chartIndex, 1);
+            }
+        });
+    }
+    function filterdataBp(value) {
+        return BoPhan.filter(x => x.BranchId == value);
+    }
+    function filterdataBranchUser(value) {
+        return userj.filter(x => x.BranchId == value);
+    }
+    function filterdataBPUser(value) {
+        return userj.filter(x => x.UserType_kd_id == value);
+    }
+
+    function populateBoPhan(bophans) {
+        var select = $('#ibophan');
+        select.find('option:not(:first)').remove();
+        bophans.forEach(function (x) {
+            var option = new Option(x.Name, x.Id);
+            select.append(option);
+        });
+    }
+    function populateUserss(users) {
+        var select = $('#iUser');
+        select.find('option:not(:first)').remove();
+        users.forEach(function (x) {
+            var option = new Option(x.FullName, x.Id);
+            select.append(option);
+        });
+    }
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+  
+</script>
+

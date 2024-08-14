@@ -1,0 +1,271 @@
+﻿@{
+    Layout = null;
+    string home_page = Common.GetSetting( "home_page");
+    //var day = Erp.BackOffice.Helpers.DateDifference.DateDifferences(Erp.BackOffice.Helpers.Common.CurrentUser.CooperationDay.Value, DateTime.Now);
+
+}
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+<style>
+
+</style>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8" />
+    <title>@(ViewBag.Title != "" ? ViewBag.Title + " - " : "")Quản lý FanPage</title>
+
+    <meta name="description" content="Erp.BackOffice.Helpers.Common form elements and layouts" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <!-- bootstrap & fontawesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    @*<link rel="stylesheet" href="/assets/font-awesome/4.7.0/css/font-awesome.min.css" />*@
+    <link rel="shortcut icon" type="image/ico" href="/assets/img/favicon.ico" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" integrity="sha256-gsmEoJAws/Kd3CjuOQzLie5Q3yshhvmo7YNtBG7aaEY=" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- page specific plugin styles -->
+    <link rel="stylesheet" href="/assets/css/jquery-ui.custom.min.css" />
+    <link rel="stylesheet" href="/assets/css/bootstrap-datetimepicker.min.css" />
+    <link rel="stylesheet" href="/assets/css/select2.min.css" />
+    <link rel="stylesheet" href="/assets/css/jquery.gritter.min.css" />
+    <!-- page zoom hinh anh -->
+    <link href="~/assets/css/colorbox.min.css" rel="stylesheet" />
+    @*<link href="~/assets/css/jquery-ui.custom.min.css" rel="stylesheet" />*@
+    <!-- text fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/fonts/fonts.googleapis.com.css" />
+
+    <!-- ace styles -->
+    <!--<link rel="stylesheet" href="/assets/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+    <link rel="stylesheet" href="/assets/css/style.css" />-->
+
+    <!-- ace settings handler -->
+    <script src="/assets/js/ace-extra.min.js"></script>
+    <!--AJAX POPUP FACEBOOK-->
+    @*<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js"></script>*@
+    <!--JQUERY Xóa dữ liệu trong popup-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <link rel="stylesheet" href="/assets/css/bootstraap-social.css" />
+    <!--[if lte IE 9]>
+        <link rel="stylesheet" href="/assets/css/ace-part2.min.css" class="ace-main-stylesheet" />
+    <![endif]-->
+    <!--[if lte IE 9]>
+      <link rel="stylesheet" href="/assets/css/ace-ie.min.css" />
+    <![endif]-->
+    <!-- inline styles related to this page -->
+    <!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+    <!--[if lte IE 8]>
+    <script src="/assets/js/html5shiv.min.js"></script>
+    <script src="/assets/js/respond.min.js"></script>
+    <![endif]-->
+    <!--[if !IE]> -->
+    <script src="/assets/js/jquery.2.1.1.min.js"></script>
+    <script src="/assets/js/jquery-ui.min.js"></script>
+    <!-- <![endif]-->
+    <!--[if IE]>
+    <script src="/assets/js/jquery.1.11.1.min.js"></script>
+    <![endif]-->
+    <!--[if !IE]> -->
+    <script type="text/javascript">
+        window.jQuery || document.write("<script src='/assets/js/jquery.min.js'>" + "<" + "/script>");
+    </script>
+
+    <!-- <![endif]-->
+    <!--[if IE]>
+    <script type="text/javascript">
+     window.jQuery || document.write("<script src='/assets/js/jquery1x.min.js'>"+"<"+"/script>");
+    </script>
+    <![endif]-->
+    @Scripts.Render("~/bundles/modernizr")
+
+    <script>
+        function getCookie(name) {
+            var dc = document.cookie;
+            var prefix = name + "=";
+            var begin = dc.indexOf("; " + prefix);
+            if (begin == -1) {
+                begin = dc.indexOf(prefix);
+                if (begin != 0) return null;
+            } else {
+                begin += 2;
+            }
+            var end = document.cookie.indexOf(";", begin);
+            if (end == -1) {
+                end = dc.length;
+            }
+            return unescape(dc.substring(begin + prefix.length, end));
+        }
+        //$(document).ready(function () {
+        //    $("#checkAll").change(function () {
+        //        $("input:checkbox").prop('checked', $(this).prop("checked"));
+        //    });
+
+
+        //    $("a[href='/ProductInvoice/CreateNT']").attr('target', '_blank');
+        //    $("a[href='/ProductInvoice/CreateInvoiceNormal']").attr('target', '_blank');
+
+        //});
+    </script>
+    @*<script type="text/javascript">
+        jQuery(function ($) {
+            var $overflow = '';
+            var colorbox_params = {
+                rel: 'colorbox',
+                reposition: true,
+                scalePhotos: true,
+                scrolling: false,
+                previous: '<i class="ace-icon fa fa-arrow-left"></i>',
+                next: '<i class="ace-icon fa fa-arrow-right"></i>',
+                close: '&times;',
+                current: '{current} of {total}',
+                maxWidth: '100%',
+                maxHeight: '100%',
+                onOpen: function () {
+                    $overflow = document.body.style.overflow;
+                    document.body.style.overflow = 'hidden';
+                },
+                onClosed: function () {
+                    document.body.style.overflow = $overflow;
+                },
+                onComplete: function () {
+                    $.colorbox.resize();
+                }
+            };
+
+            $('.ace-thumbnails [data-rel="colorbox"]').colorbox(colorbox_params);
+
+            $("#cboxLoadingGraphic").html("<i class='ace-icon fa fa-spinner orange fa-spin'></i>");//let's add a custom loading icon
+
+
+            $(document).one('ajaxloadstart.page', function (e) {
+                $('#colorbox, #cboxOverlay').remove();
+            });
+        })
+    </script>*@
+    <!--page specific plugin styles-->
+    @RenderSection("HeadOfPage", required: false)
+    @StackExchange.Profiling.MiniProfiler.RenderIncludes()
+</head>
+
+<body >
+    <div class="nav-header" style="width: 100%;background: #008ed7;height: 40px;position: absolute;display:flex;top:0;left:0;right:0;">
+        <div class="nav-header-left" style="position:relative;margin-top: 10px;">
+        </div>
+        <p id="page">Datviet Software</p>
+        <div class="logout">
+            <a onclick="logoutFB();" >Đăng xuất Facebook</a>
+        </div>
+    </div>
+
+
+    <div class="main-container" style="overflow-y:hidden;">
+
+
+        <!--PAGE CONTENT BEGINS HERE-->
+        @RenderBody()
+        <!--PAGE CONTENT ENDS HERE-->
+
+    </div>
+    <!--/.main-container-->
+
+    <footer>
+        @*@if (Erp.BackOffice.Filters.SecurityFilter.IsAdminDrugStore() || Erp.BackOffice.Filters.SecurityFilter.IsStaffDrugStore())
+        {
+            <span class="pull-left" style="color:#fff">
+                @Erp.BackOffice.Helpers.Common.CurrentUser.DrugStoreCode -
+                @Erp.BackOffice.Helpers.Common.CurrentUser.DrugStoreName :
+                @day
+            </span>
+        }
+        <div class="col-sm-3 pull-right text-right">
+            <div style="" href="#" target="_blank">Developed by FANCY Software</div>
+        </div>*@
+    </footer>
+
+
+    <!-- Modal -->
+    @*<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header Close-popup">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="iframe-container" style="height:100%"></div>
+                    <div class="img-loading-wrap">
+                        <div class="outer">
+                            <div class="middle">
+                                <div class="img-loading"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+            </div>
+        </div>
+    </div>*@
+
+    @*<div class="img-loading-wrap">
+        <div class="outer">
+            <div class="middle">
+                <div class="img-loading"></div>
+            </div>
+        </div>
+    </div>*@
+
+    @*<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-small btn-inverse">
+        <i class="ace-icon fa fa-angle-double-up icon-only bigger-110"></i>
+    </a>*@
+
+    <script type="text/javascript">
+        if ('ontouchstart' in document.documentElement) document.write("<script src='/assets/js/jquery.mobile.custom.min.js'>" + "<" + "/script>");
+    </script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+
+    <!-- page specific plugin scripts -->
+    <!--[if lte IE 8]>
+      <script src="/assets/js/excanvas.min.js"></script>
+    <![endif]-->
+    <script async src="/assets/js/jquery-ui.custom.min.js"></script>
+    <script async src="/assets/js/jquery.ui.touch-punch.min.js"></script>
+    <script async src="/assets/js/fuelux.spinner.min.js"></script>
+
+    <script src="/assets/js/moment.min.js"></script>
+    <script src="/assets/js/bootstrap-datetimepicker.min.js"></script>
+    <script async src="/assets/js/jquery.autosize.min.js"></script>
+    <script src="/assets/js/jquery.maskedinput.min.js"></script>
+    <script async src="/assets/js/jquery.gritter.min.js"></script>
+
+    <!-- ace scripts -->
+    <script src="/assets/js/ace-elements.min.js"></script>
+    <script src="/assets/js/ace.min.js"></script>
+
+    <script src="/Scripts/jquery.blockUI.js"></script>
+    <script src="/Scripts/jquery.priceformat.min.js"></script>
+
+    <script src="~/Scripts/numeral.js"></script>
+    <!-- basic scripts -->
+    <script src="/Scripts/script.js"></script>
+    <script src="/Scripts/script-ext.js?=vs1.01"></script>
+    <!-- scripts zoom hinh ảnh -->
+    <script src="~/assets/js/jquery.colorbox.min.js"></script>
+    <!--inline scripts related to this page-->
+    @RenderSection("Scripts", required: false)
+
+
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/ckfinder/ckfinder.js"></script>
+
+
+</body>
+</html>

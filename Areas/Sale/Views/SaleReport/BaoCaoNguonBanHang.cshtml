@@ -1,0 +1,237 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@model List<Sale_BaoCaoNguonBanHang>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+    @{
+        /**/
+
+        ViewBag.Title = "Báo cáo nguồn bán hàng";
+        if (Request["IsPopup"] == "true")
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            if (Request["IsPopup"] == "null")
+            {
+                Layout = null;
+            }
+            else
+            {
+                Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+            }
+        }
+        bool IsDisplaySearchPanel = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? false : true;
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "BaoCaoNguonBanHang",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = IsDisplaySearchPanel,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int index = 1;
+        //decimal sum = 0;
+        Calendar calendar = CultureInfo.InvariantCulture.Calendar;
+        //var weekdefault = calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        //string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        //string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        //string week = Request["week"] != null ? Request["week"] : weekdefault.ToString();
+        //string branchId = Request["branchId"] != null ? Request["branchId"] : "";
+        //if (Request["branchId"] == null)
+        //{
+        //    if (!Erp.BackOffice.Filters.SecurityFilter.IsAdmin())
+        //    {
+        //        branchId = Erp.BackOffice.Helpers.Common.CurrentUser.BranchId.Value.ToString();
+        //    }
+        //}
+        //ViewData["branchId"] = branchId;
+
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        // Cộng thêm 1 tháng và trừ đi một ngày.
+        DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+        string saleChanel = Request["saleChanel"] != null ? Request["saleChanel"] : "";
+    }
+    @helper GridColumnSelectProduct(int? status)
+    {
+        switch (status)
+        {
+            case 1:
+                <span class="label label-info">Trực tiếp</span>
+                break;
+            case 2:
+                <span class="label label-warning">Trang web</span>
+                break;
+            case 3:
+                <span class="label label-warning">App mobie</span>
+                break;
+            case 4:
+                <span class="label label-success">Facebook</span>
+                break;
+
+
+        }
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <p>
+            <span class="input-daterange input-group" style="z-index:1002">
+                @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : "", new { autocomplete = "off", placeholder = "Từ ngày" })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : "", new { autocomplete = "off", placeholder = "Đến ngày" })
+            </span>
+            <select name="saleChanel" id="saleChanel">
+                <option @(saleChanel == "" ? "selected" : "") value="">Kênh bán</option>
+                <option @(saleChanel == "1" ? "selected" : "") value="1">Trực tiếp</option>
+                <option @(saleChanel == "2" ? "selected" : "") value="2">Trang web</option>
+                <option @(saleChanel == "3" ? "selected" : "") value="3">App mobile</option>
+                <option @(saleChanel == "4" ? "selected" : "") value="4">Facebook</option>
+            </select>
+
+        </p>
+    }
+    <div class="table-responsive" id="BCDoanhthuSanPhamThang" style="margin-bottom:40px">
+        <table id="cTable" class="table table-bordered">
+            <thead>
+                @*<tr class="">
+                        <th class="" colspan="11" style="text-align:center"><h4>BÁO CÁO DOANH SỐ TỪ @startDate ĐẾN @endDate</h4></th>
+                    </tr>*@
+                <tr>
+                    <th style="width:40px;text-align:center">STT</th>
+                    <th style="min-width:100px;text-align:center">Nguồn hàng</th>
+                    <th style="min-width:100px;text-align:center">Số đơn</th>
+                    <th style="min-width:100px;text-align:center">Tương tác</th>
+                    <th style="text-align:center">Tỷ lệ chuyển đổi</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count() > 0)
+                {
+                    foreach (var item in Model)
+                    {
+                        if (item.SaleChanel != null)
+                        {
+                            <tr class="@(index%2==0?"alert-warning":"")">
+                                <td>@(index++)</td>
+                                <td> <span>@GridColumnSelectProduct(item.SaleChanel)</span></td>
+                                <td>@item.SoHoaDon</td>
+                                <td>
+                                    @if (item.SaleChanel == 4)
+                                    {
+                                        @item.TuongTac
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.SaleChanel == 4)
+                                    {@item.tyle}
+                                </td>
+
+                            </tr>
+                        }
+
+
+
+                    }
+                }
+
+
+            </tbody>
+            <thead>
+                <tr>
+                    <td colspan="2" style="text-align:right"><b>Tổng:</b></td>
+                    <td style="text-align:right"><b>@Model.Where(c => c.SaleChanel != null).Sum(x => x.SoHoaDon)</b></td>
+                    @*<td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalAmount), null))</b></td>
+
+                        <td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.PaidAmount), null))</b></td>*@
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportBaoCaoNguonHang()">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    }
+    @section Scripts {
+        <script>
+            $(function () {
+                $("#quarter").val(currentQuarter);
+
+                var single = "month";
+
+                $("#single1").change(function () {
+                    if ($(this).val() == 'month') {
+                        $("#month").show();
+                        $("#week").hide();
+                        $("#quarter").hide();
+                        single = "month";
+                    }
+                });
+
+                $("#single2").change(function () {
+                    if ($(this).val() == 'quarter') {
+                        $("#month").hide();
+                        $("#week").hide();
+                        $("#quarter").show();
+                        single = "quarter";
+                    }
+                });
+                $("#single3").change(function () {
+                    if ($(this).val() == 'week') {
+                        $("#month").hide();
+                        $("#quarter").hide();
+                        $("#week").show();
+                        single = "week";
+                    }
+                });
+            });
+
+            $(function () {
+                sum = 0;
+
+            });
+
+            function exportBaoCaoNguonHang() {
+                var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+                var saleChanel = $('#saleChanel').val();
+
+
+
+                OpenPopup('/SaleReport/ExportBaoCaoNguonBanHang?startDate=' + startDate + '&endDate=' + endDate + '&saleChanel=' + saleChanel + '&IsPopup=true', '', 0, 900);
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 200000);
+                HideLoading();
+            }
+            $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+
+            });
+            $('[name="search"]').click(function () {
+                startDate = $('#startDate').val();
+                endDate = $('#endDate').val();
+                if (startDate == '' || endDate == '') {
+                    alertPopup("Lỗi", "Vui lòng chọn ngày để tìm kiếm !", "warning");
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            });
+        </script>
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    }

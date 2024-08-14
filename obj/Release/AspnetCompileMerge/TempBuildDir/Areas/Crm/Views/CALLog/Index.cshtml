@@ -1,0 +1,210 @@
+﻿@model IEnumerable<CALLogViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = "Xem Log Cuộc Gọi";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CALLog",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"> </script>
+
+@helper GridColumnCommand(int id)
+{
+    <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+        <p>
+            <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+            </button>
+        </p>
+    </div>
+}
+
+@helper GridColumnName(string name, int id, bool isPopup)
+{
+if (isPopup)
+{
+        <a onclick="parent.selectBranchItem(@id)">@name</a>
+}
+else
+{
+    name = string.IsNullOrEmpty(name) ? "No Title" : name;
+        <a href="@Url.Action("Edit", "CALLog", new { Id = id })">@name</a>
+}
+}
+
+@helper GridColumnCategoryValue(object value)
+{
+var attr = Common.GetCategoryByValueOrId("value", value);
+    <span>@(attr != null ? attr.Name : "")</span>
+}
+
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+@helper LinkAudio(int id, string link)
+{
+    <article id="@id" class="audio">
+        <audio controls>
+            <source src="@link" type="audio/mp3" />
+            <p>Listen</p>
+        </audio>
+    </article>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+
+        Thời Gian:
+        <span class="input-daterange input-group">
+            @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : "", new { @class = "", autocomplete = "off", placeholder = "Từ ngày..." })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : "", new { @class = "", autocomplete = "off", placeholder = "đến..." })
+        </span>
+        @Html.TextBox("txtSogoi", Request["txtSogoi"], new { @class = "", autocomplete = "off", placeholder = "Nhập Số Gọi..." })
+        @Html.TextBox("txtSonhan", Request["txtSonhan"], new { @class = "", autocomplete = "off", placeholder = "Nhập Số Nhận..." })
+        @Html.TextBox("txtANSWER", Request["txtANSWER"], new { @class = "", autocomplete = "off", placeholder = "Trạng thái..." })
+        <div>
+            <a class="BookName" href="">Lấy Log</a>
+        </div>
+    </p>
+
+                                                                    }
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+<div>Tổng Số: @Model.Count().ToString()</div>
+@using (Html.BeginForm("LayLog", pageSetting.ModuleName, FormMethod.Post))
+{
+    <input type="hidden" value="@Request["startDate"]" name="startDate" />
+    @Html.Grid(Model).Columns(columns =>
+{
+    columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+    columns.Add(u => u.stt).Titled("STT").SetWidth(10).Sortable(true);
+    columns.Add(u => u.sogoidien).Titled("Số Gọi").SetWidth(250).Sortable(true);
+    columns.Add(u => u.dauso).Titled("Đầu Số").SetWidth(50).Sortable(true);
+    columns.Add(u => u.sonhan).Titled("Số Nhận").SetWidth(50).Sortable(true);
+    columns.Add(u => u.trangthai).Titled("Trạng Thái").SetWidth(50).Sortable(true);
+    columns.Add(u => u.tongthoigiangoi).Titled("Tổng TG").SetWidth(100);
+    columns.Add(u => u.thoigianthucgoi).Titled("Thời Gian Thực").SetWidth(100).Sortable(true);
+    columns.Add(u => u.ngaygoi).Titled("Ngày Gọi").SetWidth(100);
+    columns.Add(u => u.keylog).Titled("KeyLog").SetWidth(50);
+    columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+}).WithPaging(10)
+
+   
+}
+
+
+
+
+@section Scripts {
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+
+        $(".BookName").click(function (event) {
+            event.preventDefault();
+
+
+            if (($("#startDate").val() == "") || ($("#endDate").val() == "")) {
+                alert("Bạn phải nhập khoảng thời gian cần lấy log");
+                return false;
+            }
+            ShowLoading();
+
+            var url = '@Url.Action("LayLog", "CALLog", new { startDate = "startDate1",endDate = "endDate1" })';
+            url = url.replace("startDate1", $("#startDate").val());
+            url = url.replace("endDate1", $("#endDate").val());
+            url = url.replace("amp;", "");
+            
+            //alert(url); //just for debugging
+            window.location.href = url;
+        });
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+    </script>
+}
+@Html.ScriptBottom_DatePicker("dd/mm/yyyy")
+

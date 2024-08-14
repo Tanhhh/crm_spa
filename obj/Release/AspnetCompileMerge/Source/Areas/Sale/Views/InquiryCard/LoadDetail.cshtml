@@ -1,0 +1,28 @@
+﻿@model Erp.BackOffice.Sale.Models.InquiryCardViewModel
+
+@{
+}
+@for (int i = 0; i < Model.DetailList.Count(); i++)
+{
+    <tr role="@i">
+        <td>
+            <label style="margin-right:30px !important">
+                <input name="DetailList[@(i)].IsActived" id="DetailList_@(i)__IsActived" type="checkbox" class="ace is_actived" @(Model.DetailList[i].IsActived==true ? "checked" : "") value="@Model.DetailList[i].IsActived" />
+                <span class="lbl"></span>
+            </label>
+        </td>
+        <td>
+            @(i + 1)
+            <input class="id" type="text" id="DetailList_@(i)__Id" name="DetailList[@(i)].Id" value="@Model.DetailList[i].Id" hidden />
+        </td>
+        <td>
+            <input class="name" type="text" id="DetailList_@(i)__Name" name="DetailList[@(i)].Name" value="@Model.DetailList[i].Name" readonly="readonly" />
+        </td>
+        <td>
+            <input class="total_mitute" type="text" id="DetailList_@(i)__TotalMinute" name="DetailList[@(i)].TotalMinute" value="@Model.DetailList[i].TotalMinute" readonly="readonly" />
+        </td>
+        <td>
+            <input class="note" type="text" id="DetailList_@(i)__Note" name="DetailList[@(i)].Note" value="@Model.DetailList[i].Note" />
+        </td>
+    </tr>
+}

@@ -1,0 +1,398 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@model List<IndexViewModel>
+
+    @{
+        ViewBag.Title = "Báo cáo chỉ số nhân viên theo tuần";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "BC_ChiSoGiuaCacTuanTrongThang",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false,
+            SearchButtonText = "Xem báo cáo"
+        };
+        IEnumerable<SelectListItem> NguonKhach = Erp.BackOffice.Helpers.Common.GetSelectList_Category("NguonKhach", null, "value");
+        //DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        //// Cộng thêm 1 tháng và trừ đi một ngày.
+        //DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+        string MonthStared = Request["monthstard"] != null ? Request["monthstard"] : (int.Parse(DateTime.Now.Month.ToString()) - 1).ToString();
+        string YearStared = Request["yearstard"] != null ? Request["yearstard"] : DateTime.Now.Year.ToString();
+        string MonthEnd = Request["monthend"] != null ? Request["monthend"] : DateTime.Now.Month.ToString();
+        string yearEnd = Request["yearend"] != null ? Request["yearend"] : DateTime.Now.Year.ToString();
+        string WeekStared = Request["weekstard"] != null ? Request["weekstard"] : ViewBag.Tuan.ToString();
+        string WeekEnd = Request["weekend"] != null ? Request["weekend"] : ViewBag.Tuan.ToString();
+        int? KH = Request["nKHCU"] != null ? int.Parse(Request["nKHCU"]) : 2;
+
+
+    }
+    @section HeadOfPage {
+        <style type="text/css">
+            .cell-center {
+                text-align: center;
+            }
+
+            .tr-bold {
+                font-weight: 700;
+            }
+
+            .ctl {
+                position: relative;
+                /*float: left;*/
+                margin-right: 3px;
+            }
+
+                .ctl .error {
+                    position: absolute;
+                    background: #de2a2a;
+                    left: 0px;
+                    top: 28px;
+                    padding: 2px 5px;
+                    color: #fff;
+                    z-index: 999;
+                }
+
+                    .ctl .error:before {
+                        border-bottom: 7px solid #de2a2a;
+                        border-left: 7px solid transparent;
+                        border-right: 7px solid transparent;
+                        left: 9px;
+                        top: -6px;
+                        content: "";
+                        display: inline-block;
+                        position: absolute;
+                    }
+
+            .icon-add {
+                margin-top: 0px !important;
+            }
+
+            .combojax {
+                display: inline-block;
+                position: initial !important;
+                float: none !important;
+            }
+        </style>
+
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <select class="chzn-select" style="width:250px; float:left" id="UserId" name="UserId">
+            <option value="">- Nhân viên QL -</option>
+            @foreach (var item in SelectListHelper.GetSelectList_FullUserNameKD(null, null))
+                {
+                <option @(Request["UserId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <select name="weekstard" id="weekstard">
+            @for (int i = 1; i <= 4; i++)
+            {
+                <option @(WeekStared == i.ToString() ? "Selected" : "") value="@i">Tuần @i</option>
+            }
+        </select>
+        <select name="monthstard" id="monthstard">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(MonthStared == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+            }
+        </select>
+        <select name="yearstard" id="yearstard">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+            {
+                <option @(YearStared == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+            }
+        </select>
+        @Html.Label("So sánh với")
+        <select name="weekend" id="weekend">
+            @for (int i = 1; i <= 4; i++)
+            {
+                <option @(WeekEnd == i.ToString() ? "Selected" : "") value="@i">Tuần @i</option>
+            }
+        </select>
+        <select name="monthend" id="monthend">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(MonthEnd == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+            }
+        </select>
+        <select name="yearend" id="yearend">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+            {
+                <option @(yearEnd == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+            }
+        </select>
+        <label>
+            <input id="single4" name="nKHCU" type="checkbox" class="ace" value="1" @(Request["nKHCU"] == "1" ? "checked=checked" : "")>
+            <span class="lbl"> Khách hàng cũ</span>
+        </label>
+    }
+    <div class="table-responsive" id="BCChiSoGiuaCacTuanTrongThang" style="margin-bottom:40px">
+        <table id="bc_chisogiacactuantrongthang" class="table table-bordered">
+            <thead>
+                @*<tr class="">
+                        <th class="" colspan="11" style="text-align:center"><h4>BÁO CÁO DOANH SỐ TỪ @startDate ĐẾN @endDate</h4></th>
+                    </tr>*@
+                <tr>
+                    <th style="min-width:100px;text-align:center"></th>
+                    <th style="min-width:100px;text-align:center">Tuần @WeekStared tháng @MonthStared</th>
+                    <th style="min-width:100px;text-align:center">Tuần @WeekEnd tháng @MonthEnd</th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                @if (KH == 2)
+                {
+                    <tr>
+                        <td>SL TƯƠNG TÁC MỚI</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@item.TT</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>SỐ LƯỢNG KHÁCH MỚI HẸN</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@item.Hen</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>SỐ LƯỢNG KHÁCH MỚI LÊN</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@item.Len</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>SỐ LƯỢNG KHÁCH MỚI MUA</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@item.Mua</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>TỶ LỆ LÊN TRÊN HẸN</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@((float)((float)item.Len / (float)(item.Hen != null ? item.Hen : 1)) * 100) %</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>TỶ LỆ MUA TRÊN LÊN MỚI</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@((float)((float)item.Mua / (float)item.Len) * 100) %</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>DOANH SỐ ẢO MỚI</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.Ao)</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>DOANH SỐ THỰC MỚI</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.Thuc)</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>TB HĐ ẢO MỚI</td>
+                        @foreach (var item in Model)
+                        {
+                            var Tb = item.Ao / item.Mua;
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Tb) </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>TB HĐ THỰC MỚI</td>
+                        @foreach (var item in Model)
+                        {
+                            var Tb = item.Thuc / item.Mua;
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Tb) </td>
+                        }
+                    </tr>
+                }
+                else
+                {
+
+                    <tr>
+                        <td>SL TƯƠNG TÁC CŨ</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@item.TT</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>SỐ LƯỢNG KHÁCH CŨ HẸN</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@item.Hen</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>SỐ LƯỢNG KHÁCH CŨ LÊN</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@item.Len</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>SỐ LƯỢNG KHÁCH CŨ MUA</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@item.Mua</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>TỶ LỆ LÊN TRÊN HẸN</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@((float)((float)item.Len / (float)(item.Hen != null ? item.Hen : 1)) * 100) %</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>TỶ LỆ MUA TRÊN LÊN CŨ</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@((float)((float)item.Mua / (float)item.Len) * 100) %</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>DOANH SỐ ẢO CŨ</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.Ao)</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>DOANH SỐ THỰC CŨ</td>
+                        @foreach (var item in Model)
+                        {
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.Thuc)</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>TB HĐ ẢO CŨ</td>
+                        @foreach (var item in Model)
+                        {
+                            var Tb = item.Ao / item.Mua;
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Tb) </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>TB HĐ THỰC CŨ</td>
+                        @foreach (var item in Model)
+                        {
+                            var Tb = item.Thuc / item.Mua;
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Tb) </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>TỔNG ORLANE ẢO</td>
+                        @foreach (var item in Model)
+                        {
+
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.AoOrlane) </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>TỔNG ORLANE THỰC</td>
+                        @foreach (var item in Model)
+                        {
+
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.ThucOrlane) </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>DS ẢO ANNAYAKE</td>
+                        @foreach (var item in Model)
+                        {
+
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.AoAnna) </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>DS THỰC ANNAYAKE</td>
+                        @foreach (var item in Model)
+                        {
+
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.ThucAnna) </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>DS ẢO LEONOR GREYL</td>
+                        @foreach (var item in Model)
+                        {
+
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.AoLeo) </td>
+                        }
+                    </tr>
+                    <tr>
+                        <td>DS THỰC LEONOR GREYL</td>
+                        @foreach (var item in Model)
+                        {
+
+                            <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.ThucLeo) </td>
+                        }
+                    </tr>
+                }
+
+            </tbody>
+            <thead>
+                <tr>
+                    @*<td colspan="4" style="text-align:right"><b>Tổng:</b></td>
+                        <td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.DoanhSo), null))</b></td>*@
+                    @*<td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalAmount), null))</b></td>
+
+                        <td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.PaidAmount), null))</b></td>*@
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="tableToExcel('bc_chisogiacactuantrongthang','BaoCaoChiSoCacTuan')">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    }
+    @section Scripts {
+        @*<script>
+                function ExportTrangThaiNgungTheoDoiKH() {
+                    var startDate = $('#startDate').val();
+                    var endDate = $('#endDate').val();
+
+                    OpenPopup('/SaleReport/Export_BC_SLKHACHVADSMOITHEOTUAN?startDate=' + startDate + '&endDate=' + endDate + '&IsPopup=true', '', 0, 900);
+                    setTimeout(function () {
+                        $("#myModal .modal-body .iframe-container").html("");
+                        $('#myModal').modal('hide');
+                    }, 200000);
+                    HideLoading();
+                }
+            </script>*@
+        <script type="text/javascript">
+
+            var tableToExcel = (function () {
+                var uri = 'data:application/vnd.ms-excel;base64,'
+                    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                    , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                    , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+
+                return function (table, name) {
+                    if (!table.nodeType) table = document.getElementById(table)
+                    var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+                    window.location.href = uri + base64(format(template, ctx))
+                }
+            })()
+        </script>
+    }
+

@@ -1,0 +1,121 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@model List<Sale_Report_CustomerbuyProduct>
+
+    @{
+        ViewBag.Title = "Khách hàng mua sản phẩm";
+        if (Request["IsPopup"] == "true")
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            if (Request["IsPopup"] == "null")
+            {
+                Layout = null;
+            }
+            else
+            {
+                Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+            }
+        }
+        bool IsDisplaySearchPanel = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? false : true;
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "KhachHangMuaSanPham",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = IsDisplaySearchPanel,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int index = 1;
+        //decimal sum = 0;
+        Calendar calendar = CultureInfo.InvariantCulture.Calendar;
+        //var weekdefault = calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        //string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        //string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        //string week = Request["week"] != null ? Request["week"] : weekdefault.ToString();
+        //string branchId = Request["branchId"] != null ? Request["branchId"] : "";
+        //if (Request["branchId"] == null)
+        //{
+        //    if (!Erp.BackOffice.Filters.SecurityFilter.IsAdmin())
+        //    {
+        //        branchId = Erp.BackOffice.Helpers.Common.CurrentUser.BranchId.Value.ToString();
+        //    }
+        //}
+        //ViewData["branchId"] = branchId;
+
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        // Cộng thêm 1 tháng và trừ đi một ngày.
+        DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+    }
+    <div class="table-responsive" id="BCDoanhthuSanPhamThang" style="margin-bottom:40px">
+        <table id="cTable" class="table table-bordered">
+            <thead>
+                @*<tr class="">
+                        <th class="" colspan="11" style="text-align:center"><h4>BÁO CÁO DOANH SỐ TỪ @startDate ĐẾN @endDate</h4></th>
+                    </tr>*@
+                <tr>
+                    <th style="width:40px;text-align:center">STT</th>
+                    <th style="min-width:100px;text-align:center">Mã khách hàng</th>
+                    <th style="min-width:100px;text-align:center">Tên khách hàng</th>
+                    <th style="min-width:100px;text-align:center">Số điện thoại</th>
+                    <th style="min-width:100px;text-align:center">Địa chỉ</th>
+                    <th style="min-width:100px;text-align:center">Email</th>
+                    <th style="min-width:100px;text-align:center">Nhóm QL</th>
+                    <th style="min-width:100px;text-align:center">Nhóm hưởng DS</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="@(index%2==0?"alert-warning":"")">
+                        <td> <span>@(index++)</span></td>
+                        <td>@item.Code</td>
+                        <td>@item.CompanyName</td>
+
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.Phone))
+                            {@item.Phone}
+                        else
+                        {@item.Mobile}
+                        </td>
+                        <td>@item.Address</td>
+                        <td>@item.Email</td>
+                        <td>@item.ManagerStaffName</td>
+                        <td>@item.NhomNVKD</td>
+                    </tr>
+                }
+
+
+
+
+            </tbody>
+
+        </table>
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportSpThang()">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    </div>
+    @section Scripts {
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.5/xlsx.full.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.5/jszip.js"></script>
+        <script>
+            function exportSpThang(type, fn, dl) {
+                var elt = document.getElementById('BCDoanhthuSanPhamThang');
+                var wb = XLSX.utils.table_to_book(elt, { sheet: "skills" });
+                return dl ?
+                    XLSX.write(wb, { bookType: type, bookSST: true, type: 'base64' }) :
+                    XLSX.writeFile(wb, fn || ('Skills.' + (type || 'xlsx')));
+            }
+        </script>
+
+    }

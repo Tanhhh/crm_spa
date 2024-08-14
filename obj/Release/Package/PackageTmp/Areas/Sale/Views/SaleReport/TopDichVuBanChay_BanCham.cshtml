@@ -1,0 +1,195 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@using GridMvc.Html
+@using Erp.BackOffice.Areas.Cms.Models
+@model IEnumerable<ChartItem>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+@{
+    ViewBag.Title = "Top dịch vụ bán chạy/bán chậm";
+    if (Request["IsPopup"] == "true")
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        if (Request["IsPopup"] == "null")
+        {
+            Layout = null;
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+    }
+    bool IsDisplaySearchPanel = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? false : true;
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "TopDichVuBanChay_BanCham",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = IsDisplaySearchPanel,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int index = 1;
+
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.category;
+    string Brand = Request["Brand"];
+    
+    int _SortBy = ViewBag.SortBy;
+    decimal _TongSLB = ViewBag.total_slb;
+    decimal _TongDS = ViewBag.total_ds;
+}
+
+
+<script type="text/javascript">
+    var exportThis = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function () {
+            var ctx = { worksheet: '@ViewBag.Title' || 'Worksheet', table: document.getElementById("cTable").innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+
+    var exportThisWithParameter = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function (tableID, excelName) {
+            tableID = document.getElementById(tableID)
+            var ctx = { worksheet: excelName || 'Worksheet', table: tableID.innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+</script>
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+        <span class="input-daterange input-group" style="z-index:1002">
+            @Html.TextBox("StartDate", Request["StartDate"] != null ? Request["StartDate"] : "", new { autocomplete = "off", placeholder = "Từ ngày" })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("EndDate", Request["EndDate"] != null ? Request["EndDate"] : "", new { autocomplete = "off", placeholder = "Đến ngày" })
+        </span>
+        <select style="text-align-last:center; width:125px" class="item_countForBrand" id="Brand" name="Brand">
+            <option value=""> Chọn nhãn hàng</option>
+            @foreach (var item in origin)
+            {
+                <option @(Brand == item.Value ? "Selected" : "") value="@item.Value"> @item.Name </option>
+            }
+        </select>
+
+        <select name="SortBy" id="SortBy">
+            <option @((_SortBy == 1 || _SortBy == null) ? "selected" : "") value="1">Top dịch vụ bán chạy</option>
+            <option @(_SortBy == 2 ? "selected" : "") value="2">Top dịch vụ bán chậm</option>
+        </select>
+    </p>
+
+}
+
+<div class="table-responsive" id="TopDichVu" style="margin-bottom:40px">
+    @*@Html.Grid(Model).Columns(columns =>
+        {
+            columns.Add().Titled("Mã DV").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => n.label);
+            columns.Add().Titled("Tên DV").SetWidth(150).Sanitized(false).Encoded(false).RenderValueAs(n => n.label2);
+            columns.Add().Titled("Số lượng bán").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => CommonSatic.ToCurrencyStr(Convert.ToDecimal(n.data2), null));
+            columns.Add().Titled("Doanh số").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => CommonSatic.ToCurrencyStr(Convert.ToDecimal(n.data), null));
+            columns.Add().Titled("Nhãn hàng").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => n.id);
+        }).WithPaging(20)*@
+
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th style="text-align: center">Mã dịch vụ</th>
+                <th style="text-align:center">Tên dịch vụ</th>
+                <th style="width: 300px; text-align: center; ">Số lượng bán</th>
+                <th style="width: 300px; text-align: center; ">Doanh số</th>
+                <th style="text-align:center">Nhãn hàng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(index%2==0?"alert-warning":"")">
+                    <td>
+                        <span>@(index++)</span>
+                    </td>
+                    <td>@(item.label)</td>
+                    <td>@(item.label2)</td>
+                    <td style="text-align:right">@(CommonSatic.ToCurrencyStr(Convert.ToDecimal(item.data2), null))</td>
+                    <td style="text-align:right">@(CommonSatic.ToCurrencyStr(Convert.ToDecimal(item.data), null))</td>
+                    <td>@(item.id)</td>
+                </tr>
+            }
+        </tbody>
+        <thead>
+            <tr>
+                <td colspan="3" style="text-align:right"><b>Tổng:</b></td>
+                <td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(_TongSLB, null))</b></td>
+                <td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(_TongDS, null))</b></td>
+                <td></td>
+            </tr>
+        </thead>
+    </table>
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportThis()">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+}
+
+<script src="~/Scripts/jquery.floatThead.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#cTable").floatThead({ top: 30 });
+    });
+</script>
+
+
+@section Scripts {
+    <script>
+        function exportThis() {
+            var StartDate = $('#StartDate').val();
+            var EndDate = $('#EndDate').val();
+            var Brand = $('#Brand').val();
+            var SortBy = $('#SortBy').val();
+
+            OpenPopup('/SaleReport/ExportTopDichVuBanChay_BanCham?StartDate=' + StartDate + '&EndDate=' + EndDate + '&Brand=' + Brand + '&SortBy=' + SortBy + '&IsPopup=true', '', 0, 900);
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 200000);
+            HideLoading();
+        }
+        $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+
+        });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

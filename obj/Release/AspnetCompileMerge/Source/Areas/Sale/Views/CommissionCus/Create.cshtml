@@ -1,0 +1,681 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Staff.Models
+@model CommissionCusViewModel
+
+@{
+    ViewBag.Title = Wording.PageIndex_CommisionDetail;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CommissionCus",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    //IEnumerable<SelectListItem> CategoryList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("product", null, "value");
+    IEnumerable<SelectListItem> typeList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("TypeCommission", null, null);
+    //IEnumerable<SelectListItem> BranchList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_BranchAllNew(null, Wording.Empty);
+    List<BranchViewModel> departmentList = (List<BranchViewModel>)ViewBag.departmentList;
+    IEnumerable<SelectListItem> categoryList = (IEnumerable<SelectListItem>)ViewBag.categoryList;
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <style>
+        .box {
+        padding-top:0px!important;
+        padding-bottom:0px!important;
+        margin-top:0px!important;
+        }
+        .popover {
+            width: 100% !important;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+    </style>
+    <style type="text/css">
+        .table-detail {
+            display: none;
+        }
+
+        .open {
+            display: block;
+        }
+
+        .show-details-btn {
+            cursor: pointer;
+        }
+
+        table > tbody > tr > td.cell-has-table {
+            padding: 0!important;
+        }
+
+            table > tbody > tr > td.cell-has-table.open {
+                padding: 8px;
+                display: table-cell;
+            }
+    </style>
+
+}
+
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "CreateCommissionCus", @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    <div class="row">
+        <div class="col-sm-7">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home1" aria-expanded="true"><i class="fa fa-cubes"></i> Khuyến mãi theo sản phẩm/dịch vụ</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#home2" aria-expanded="false"><i class="fa fa-list-alt"></i> Khuyến mãi theo hóa đơn</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#home3" aria-expanded="false"><i class="fa fa-list-alt"></i> Khuyến mãi khác</a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home1" class="tab-pane active clearfix">
+                                    <div class="product-search-box clearfix " style="margin-bottom:10px">
+                                        <span class="label label-warning" style="padding: 6px; float: left; height: 26px;margin-left:0px">[F4]</span>
+                                        <div id="product_search_control">
+                                            <span class="ctl">
+                                                @Html.TextBox("ProductName", "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "off", style = "width:300px; margin-right:0px" })
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                                        <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                                            <div class="widget-header widget-header-small">
+                                                <div class="widget-toolbar no-border pull-left">
+                                                    <ul class="nav nav-tabs" id="myTab">
+
+                                                        <li class="active">
+                                                            <a data-toggle="tab" href="#discount" aria-expanded="true"><i class="fa fa-percent"></i> Chiết khấu sản phẩm/dịch vụ</a>
+                                                        </li>
+                                                        <li class="">
+                                                            <a data-toggle="tab" href="#donate" aria-expanded="false"><i class="fa fa-plus"></i> Tặng sản phẩm/dịch vụ</a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="widget-body">
+                                                <div class="widget-main padding-6">
+                                                    <div class="tab-content">
+                                                        <div id="discount" class="tab-pane active table-responsive clearfix">
+                                                            <table class="table table-bordered grid-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="grid-header" width="30">STT</th>
+                                                                        <th class="grid-header">Sản phẩm/Dịch vụ</th>
+                                                                        <th class="grid-header">Giá bán</th>
+                                                                        <th class="grid-header" width="115">Số lượng</th>
+                                                                        <th class="grid-header">HSD (tháng)</th>
+                                                                        <th class="grid-header" width="150">Giá trị (% hoặc số tiền)</th>
+                                                                        <th class="grid-header">CK số tiền</th>
+                                                                        <th class="grid-header">Xóa</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="detailList">
+                                                                    @if (Model.DetailList.Count > 0)
+                                                                    {
+                                                                        var index = 0;
+                                                                        foreach (var item in Model.DetailList.Where(x => x.Type == "discount"))
+                                                                        {
+                                                                            item.OrderNo = index;
+                                                                            @Html.Partial("LoadProduct", item);
+                                                                           
+                                                                            index++;
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+
+                                                        </div>
+                                                        <div id="donate" class="tab-pane">
+                                                            <table class="table table-bordered grid-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="grid-header" width="30">STT</th>
+                                                                        <th class="grid-header">Sản phẩm/Dịch vụ</th>
+                                                                        <th class="grid-header" width="100">Giá bán</th>
+                                                                        <th class="grid-header" width="115">Số lượng</th>
+                                                                        <th class="grid-header" width="100">HSD (tháng)</th>
+                                                                        <th class="grid-header">Xóa</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="detailListDonate">
+                                                                    @if (Model.DetailList.Count > 0)
+                                                                    {
+                                                                        var index = 0;
+                                                                        foreach (var item in Model.DetailList.Where(x => x.Type == "donate"))
+                                                                        {
+                                                                            item.OrderNo = index;
+                                                                            @Html.Partial("LoadProductDonate", item);
+                                                                            index++;
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div id="home2" class="tab-pane">
+                                    <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                                        <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                                            <div class="widget-header widget-header-small">
+                                                <div class="widget-toolbar no-border pull-left">
+                                                    <ul class="nav nav-tabs" id="myTab">
+
+                                                        <li class="active">
+                                                            <a data-toggle="tab" href="#discount2" aria-expanded="true"><i class="fa fa-percent"></i> Chiết khấu hóa đơn</a>
+                                                        </li>
+                                                        <li class="">
+                                                            <a data-toggle="tab" href="#donate2" aria-expanded="false"><i class="fa fa-plus"></i> Tặng sản phẩm/dịch vụ</a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="widget-body">
+                                                <div class="widget-main padding-6">
+                                                    <div class="tab-content">
+                                                        <div id="discount2" class="tab-pane active table-responsive clearfix">
+                                                            <table class="table table-bordered grid-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="grid-header" width="30">STT</th>
+                                                                        <th class="grid-header">Số tiền hóa đơn từ...đến...</th>
+                                                                        <th class="grid-header" width="150">Giá trị (% hoặc số tiền)</th>
+                                                                        <th class="grid-header">CK số tiền</th>
+                                                                        <th>Xóa</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="InvoicedetailList">
+                                                                    @if (Model.InvoiceDetailList.Count > 0)
+                                                                    {
+                                                                        var index = 0;
+                                                                        foreach (var item in Model.InvoiceDetailList.Where(x => x.Type == "discount"))
+                                                                        {
+                                                                            item.OrderNo = index;
+                                                                            @Html.Partial("LoadInvoice", item);
+                                                                            index++;
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td colspan="4">
+                                                                            <a class="btn btn-xs btn-primary btn-white" style="border-width:0px;width:100%" onclick="AddRow('discount')"><i class="ace fa fa-plus"></i> Thêm dòng mới</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+
+                                                        </div>
+                                                        <div id="donate2" class="tab-pane">
+                                                            <table class="table table-bordered grid-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="grid-header" width="30">STT</th>
+                                                                        <th class="grid-header" width="30"></th>
+                                                                        <th class="grid-header">Số tiền hóa đơn từ...đến...</th>
+                                                                        <th>Xóa</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="InvoicedetailListDonate">
+                                                                    @if (Model.InvoiceDetailList.Count > 0)
+                                                                    {
+                                                                        var index = 0;
+                                                                        foreach (var item in Model.InvoiceDetailList.Where(x => x.Type == "donate"))
+                                                                        {
+                                                                            item.OrderNo = index;
+                                                                            @Html.Partial("LoadInvoiceDonate", item);
+                                                                            index++;
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td colspan="3">
+                                                                            <a class="btn btn-xs btn-primary btn-white" style="border-width:0px;width:100%" onclick="AddRow('donate')"><i class="ace fa fa-plus"></i> Thêm dòng mới</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div id="home3" class="tab-pane">
+                                    <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                                        <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                                            <div class="widget-header widget-header-small">
+                                                <div class="widget-toolbar no-border pull-left">
+                                                    <ul class="nav nav-tabs" id="myTab">
+
+                                                        <li class="active">
+                                                            <a data-toggle="tab" href="#discount3" aria-expanded="true"><i class="fa fa-percent"></i> Chiết khấu hóa đơn</a>
+                                                        </li>
+                                                        
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="widget-body">
+                                                <div class="widget-main padding-6">
+                                                    <div class="tab-content">
+                                                        <div id="discount3" class="tab-pane active table-responsive clearfix">
+                                                            <table class="table table-bordered grid-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="grid-header" width="30">STT</th>
+                                                                        <th class="grid-header">Tên chương trình KM</th>
+                                                                        <th class="grid-header" width="150">Giá trị (% hoặc số tiền)</th>
+                                                                        <th class="grid-header">CK số tiền</th>
+                                                                        <th>Xóa</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="InvoicedetailListDif">
+                                                                    @if (Model.InvoiceDetailList.Count > 0)
+                                                                    {
+                                                                        var index = 0;
+                                                                        foreach (var item in Model.InvoiceDetailList.Where(x => x.Type == "discountdif"))
+                                                                        {
+                                                                            item.OrderNo = index;
+                                                                            @Html.Partial("LoadInvoiceDif", item);
+                                                                            index++;
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td colspan="4">
+                                                                            <a class="btn btn-xs btn-primary btn-white" style="border-width:0px;width:100%" onclick="AddRow('discountdif')"><i class="ace fa fa-plus"></i> Thêm dòng mới</a>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+
+                                                        </div>
+                                                        
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title">Thông tin chiết khấu</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+                        <input type="hidden" name="UrlReferrer" value="@Request.UrlReferrer" />
+                        @Html.HiddenFor(model => model.Id)
+                        @*@Html.HiddenFor(model => model.ApplyFor)*@
+                        @Html.HiddenFor(model => model.CreatedUserId)
+                        @Html.HiddenFor(model => model.CreatedDate)
+                        @Html.HiddenFor(model => model.IsDeleted)
+
+                        @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span12)
+                        @Html.DatePicker(model => model.StartDate, "dd/MM/yyyy", "99/99/9999", true, false, "control-label col-lg-5 col-md-4 col-sm-4", "col-lg-7 col-md-8 col-sm-8", "col-xs-12")
+                        @Html.DatePicker(model => model.EndDate, "dd/MM/yyyy", "99/99/9999", true, false, "control-label col-lg-5 col-md-4 col-sm-4", "col-lg-7 col-md-8 col-sm-8", "col-xs-12")
+                        @Html.CustomTextAreaFor(model => model.Note, null, WidthType.span12)
+                        @*@Html.CustomTextboxFor(model => model.TyleHuong, null, null, WidthType.span12)*@
+                        <div class="row control-group">
+                            <div class="col-xs-4 control-label"><label for="PurchaseOrderCode">Hưởng doanh thu (%)</label></div><div class="col-xs-8 control-value" style="">
+                            <input type="text" name="TyleHuong" value="@Model.TyleHuong"/>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <p></p>
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title">
+                        <i class="ace-icon fa fa-list"></i> Danh sách chi nhánh
+                    </h5>
+
+                    <div class="widget-toolbar">
+                        <a href="#" data-action="collapse">
+                            <i class="ace-icon fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main clearfix">
+                        <div class="box box-height-max">
+                            <h4><span>Chọn chi nhánh được áp dụng chiết khấu:</span></h4>
+                            <div class="product-cate">
+                                <div class="products-by-cate clearfix">
+                                    @{ var listDepartmentNoneChoose = departmentList.Where(x => ("," + Model.ApplyFor + ",").Contains("," + x.Id + ",") == false).OrderBy(x => x.ParentId).ToList(); }
+                                    @for (int i = 0; i < listDepartmentNoneChoose.Count; i++)
+                                    {
+                                        <label class="product-item" data-category="@listDepartmentNoneChoose[i].ParentId">
+                                            <i class="fa fa-plus"></i>
+                                            <input type="checkbox" name="ApplyFor" class="" value="@listDepartmentNoneChoose[i].Id" />
+                                            <span class="">@listDepartmentNoneChoose[i].Name</span>
+                                        </label>
+                                    }
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="box box-height-max" style="margin-top:10px">
+                            <h4><span>Chi nhánh áp dụng chiết khấu:</span></h4>
+                            <div class="product-chosen">
+                                @{ var listDepartmentChoose = departmentList.Where(x => ("," + Model.ApplyFor + ",").Contains("," + x.Id + ",") == true).OrderBy(x => x.ParentId).ToList(); }
+                                @for (int i = 0; i < listDepartmentChoose.Count; i++)
+                                {
+                                    <label class="product-item" data-category="@listDepartmentChoose[i].ParentId">
+                                        <i class="fa fa-minus"></i>
+                                        <input checked type="checkbox" name="ApplyFor" class="" value="@listDepartmentChoose[i].Id" />
+                                        <span class="">@listDepartmentChoose[i].Name</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+@section Scripts {
+
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script src="/Scripts/combojax.js?=vs1.01"></script>
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <script>
+        $(document).ready(function () {
+            $('#Save').click(function () {
+                ShowLoading();
+                ClearFormatBeforeSubmit($("#CreateCommissionCus"));
+                $("#CreateCommissionCus").submit();
+                HideLoading();
+            });
+            $(".group_choice").change(function () {
+                ShowLoading();
+                $(".group_choice_wrap").css('height', 'initial');
+                if ($(this).is(":checked")) {
+                    $(".group_choice_wrap").hide();
+                    $($(this).data("target")).show();
+                }
+                HideLoading();
+            });
+
+            $('#CreateCommissionCus .product-item input').change(function () {
+                var $this = $(this);
+                $parent = $this.closest('label');
+
+                if ($parent.find('i.fa-plus').length > 0) { //thêm
+                    $parent.find('input').prop('checked', true);
+                    $parent.find('i').removeClass('fa-plus').addClass('fa-minus');
+
+                    $parent.prependTo('.product-chosen');
+                    console.log('.product-chosen');
+                } else { // xóa
+                    $parent.find('input').prop('checked', false);
+                    $parent.find('i').removeClass('fa-minus').addClass('fa-plus');
+
+                    //if ($('#productCategory').val() != $parent.data('category'))
+                    //    $parent.hide();
+
+                    $parent.prependTo('.products-by-cate');
+                    console.log('.products-by-cate');
+                }
+            });
+
+            //$('.accordion-section-content').hide();
+            $('.accordion-section-title').click(function () {
+                var $i = $(this).find('i');
+                if ($i.hasClass('fa-angle-double-right')) {
+                    $i.removeClass('fa-angle-double-right').addClass('fa-angle-double-down');
+                } else {
+                    $i.removeClass('fa-angle-double-down').addClass('fa-angle-double-right');
+                }
+
+                var $nextDiv = $(this).next();
+                var $visibleSiblings = $nextDiv.siblings('div:visible');
+
+                if ($visibleSiblings.length) {
+                    $visibleSiblings.slideUp('fast', function () {
+                        $nextDiv.slideToggle('fast');
+                    });
+                } else {
+                    $nextDiv.slideToggle('fast');
+                }
+            });
+            $('#discount').on('click', '.btn-delete-item', function () {
+                //$(this).closest('tr').next('tr.template_location').remove();
+                $(this).closest('tr').remove();
+
+                var countItem = $('.detailList tr').length;
+                $('#ProductItemCount').val(countItem);
+
+                if (countItem == 0) {
+                    $('#ProductItemCount').val('');
+                    $('#TongSoLuong').text('');
+                    $('#TongThanhTien').text('');
+                }
+                calcTotalAmount();
+
+                $('.detailList tr').each(function (index, tr) {
+                    $(tr).attr('role', index).attr("id", "product_item_" + index).data("id", index);
+                    $(tr).find('td:first-child').text(index + 1);
+
+                    $(tr).find('.detail_item_id input').attr('name', 'DetailList[' + index + '].ProductId').attr('id', 'DetailList_' + index + '__ProductId');
+                    $(tr).find('.numberinput2').attr('name', 'DetailList[' + index + '].Quantity').attr('id', 'DetailList_' + index + '__Quantity');
+                    $(tr).find('.numberinput2').attr('name', 'DetailList[' + index + '].ExpiryMonth').attr('id', 'DetailList_' + index + '__ExpiryMonth');
+                    $(tr).find('.input-price numberinput2').attr('name', 'DetailList[' + index + '].CommissionValue').attr('id', 'DetailList_' + index + '__CommissionValue');
+                    $(tr).find('.detail_item_price').last().attr('name', 'DetailList[' + index + '].Price').attr('id', 'DetailList_' + index + '__Price');
+                    $(tr).find('.detail_item_price').first().attr('id', 'mask-DetailList_' + index + '__Price');
+                    $(tr).find('.detail_item_discount').attr('name', 'DetailList[' + index + '].DisCount').attr('id', 'DetailList_' + index + '__DisCount');
+                    $(tr).find('.detail_item_discount_amount').attr('name', 'DetailList[' + index + '].DisCountAmount1').attr('id', 'DetailList_' + index + '__DisCountAmount1');
+                });
+            });
+            $('#discount2').on('click', '.btn-delete-item', function () {
+                //$(this).closest('tr').next('tr.template_location').remove();
+                $(this).closest('tr').remove();
+
+                var countItem = $('.InvoicedetailList tr').length;
+                $('#ProductItemCount').val(countItem);
+
+                if (countItem == 0) {
+                    $('#ProductItemCount').val('');
+                    $('#TongSoLuong').text('');
+                    $('#TongThanhTien').text('');
+                }
+                calcTotalAmount();
+
+                $('.InvoicedetailList tr').each(function (index, tr) {
+                    $(tr).attr('role', index).attr("id", "product_item_" + index).data("id", index);
+                    $(tr).find('td:first-child').text(index + 1);
+
+                    $(tr).find('.numberinput2').attr('name', 'InvoicedetailList[' + index + '].StartAmount').attr('id', 'InvoicedetailList_' + index + '__StartAmount');
+                    $(tr).find('.numberinput2').attr('name', 'InvoicedetailList[' + index + '].EndAmount').attr('id', 'InvoicedetailList_' + index + '__EndAmount');
+                    $(tr).find('.input-price numberinput2').attr('name', 'InvoicedetailList[' + index + '].CommissionValue').attr('id', 'InvoicedetailList_' + index + '__CommissionValue');
+                    $(tr).find('.numberinput2').attr('name', 'InvoicedetailList[' + index + '].CommissionValueText').attr('id', 'InvoicedetailList_' + index + '__CommissionValueText');
+                    $(tr).find('.input-price numberinput2').attr('name', 'InvoicedetailList[' + index + '].CommissionValue').attr('id', 'InvoicedetailList_' + index + '__CommissionValue');
+                    $(tr).find('.detail_item_price').last().attr('name', 'InvoicedetailList[' + index + '].Price').attr('id', 'InvoicedetailList_' + index + '__Price');
+                    $(tr).find('.detail_item_price').first().attr('id', 'mask-DetailList_' + index + '__Price');
+                    $(tr).find('.detail_item_discount').attr('name', 'InvoicedetailList[' + index + '].DisCount').attr('id', 'InvoicedetailList_' + index + '__DisCount');
+                    $(tr).find('.detail_item_discount_amount').attr('name', 'InvoicedetailList[' + index + '].DisCountAmount1').attr('id', 'InvoicedetailList_' + index + '__DisCountAmount1');
+                });
+            });
+            $('#discount3').on('click', '.btn-delete-item', function () {
+                //$(this).closest('tr').next('tr.template_location').remove();
+                $(this).closest('tr').remove();
+
+                var countItem = $('.InvoicedetailListDif tr').length;
+                $('#ProductItemCount').val(countItem);
+
+                if (countItem == 0) {
+                    $('#ProductItemCount').val('');
+                    $('#TongSoLuong').text('');
+                    $('#TongThanhTien').text('');
+                }
+                calcTotalAmount();
+
+                $('.InvoicedetailListDif tr').each(function (index, tr) {
+                    $(tr).attr('role', index).attr("id", "product_item_" + index).data("id", index);
+                    $(tr).find('td:first-child').text(index + 1);
+
+                    $(tr).find('.numberinput2').attr('name', 'InvoicedetailList[' + index + '].StartAmount').attr('id', 'InvoicedetailList_' + index + '__StartAmount');
+                    $(tr).find('.numberinput2').attr('name', 'InvoicedetailList[' + index + '].EndAmount').attr('id', 'InvoicedetailList_' + index + '__EndAmount');
+                    $(tr).find('.input-price numberinput2').attr('name', 'InvoicedetailList[' + index + '].CommissionValue').attr('id', 'InvoicedetailList_' + index + '__CommissionValue');
+                    $(tr).find('.numberinput2').attr('name', 'InvoicedetailList[' + index + '].CommissionValueText').attr('id', 'InvoicedetailList_' + index + '__CommissionValueText');
+                    $(tr).find('.input-price numberinput2').attr('name', 'InvoicedetailList[' + index + '].CommissionValue').attr('id', 'InvoicedetailList_' + index + '__CommissionValue');
+                    $(tr).find('.detail_item_price').last().attr('name', 'InvoicedetailList[' + index + '].Price').attr('id', 'InvoicedetailList_' + index + '__Price');
+                    $(tr).find('.detail_item_price').first().attr('id', 'mask-InvoicedetailList' + index + '__Price');
+                    $(tr).find('.detail_item_discount').attr('name', 'InvoicedetailList[' + index + '].DisCount').attr('id', 'InvoicedetailList_' + index + '__DisCount');
+                    $(tr).find('.detail_item_discount_amount').attr('name', 'InvoicedetailList[' + index + '].DisCountAmount1').attr('id', 'InvoicedetailList_' + index + '__DisCountAmount1');
+                });
+            });
+
+            $('#donate').on('click', '.btn-delete-item', function () {
+                //$(this).closest('tr').next('tr.template_location').remove();
+                $(this).closest('tr').remove();
+
+                var countItem = $('.detailList tr').length;
+                $('#ProductItemCount').val(countItem);
+
+                if (countItem == 0) {
+                    $('#ProductItemCount').val('');
+                    $('#TongSoLuong').text('');
+                    $('#TongThanhTien').text('');
+                }
+                calcTotalAmount();
+
+                $('.detailList tr').each(function (index, tr) {
+                    $(tr).attr('role', index).attr("id", "product_item_" + index).data("id", index);
+                    $(tr).find('td:first-child').text(index + 1);
+
+                    $(tr).find('.detail_item_id input').attr('name', 'DetailList[' + index + '].ProductId').attr('id', 'DetailList_' + index + '__ProductId');
+                    $(tr).find('.numberinput2').attr('name', 'DetailList[' + index + '].Quantity').attr('id', 'DetailList_' + index + '__Quantity');
+                    $(tr).find('.numberinput2').attr('name', 'DetailList[' + index + '].ExpiryMonth').attr('id', 'DetailList_' + index + '__ExpiryMonth');
+                    $(tr).find('.input-price numberinput2').attr('name', 'DetailList[' + index + '].CommissionValue').attr('id', 'DetailList_' + index + '__CommissionValue');
+                    $(tr).find('.detail_item_price').last().attr('name', 'DetailList[' + index + '].Price').attr('id', 'DetailList_' + index + '__Price');
+                    $(tr).find('.detail_item_price').first().attr('id', 'mask-DetailList_' + index + '__Price');
+                    $(tr).find('.detail_item_discount').attr('name', 'DetailList[' + index + '].DisCount').attr('id', 'DetailList_' + index + '__DisCount');
+                    $(tr).find('.detail_item_discount_amount').attr('name', 'DetailList[' + index + '].DisCountAmount1').attr('id', 'DetailList_' + index + '__DisCountAmount1');
+                });
+            });
+            $('#donate2').on('click', '.btn-delete-item', function () {
+                //$(this).closest('tr').next('tr.template_location').remove();
+                $(this).closest('tr').remove();
+
+                var countItem = $('.InvoicedetailListDonate tr').length;
+                $('#ProductItemCount').val(countItem);
+
+                if (countItem == 0) {
+                    $('#ProductItemCount').val('');
+                    $('#TongSoLuong').text('');
+                    $('#TongThanhTien').text('');
+                }
+                calcTotalAmount();
+
+                $('.InvoicedetailListDonate tr').each(function (index, tr) {
+                    $(tr).attr('role', index).attr("id", "product_item_" + index).data("id", index);
+                    $(tr).find('td:first-child').text(index + 1);
+
+                    $(tr).find('.detail_item_id input').attr('name', 'InvoicedetailListDonate[' + index + '].ProductId').attr('id', 'InvoicedetailListDonate_' + index + '__ProductId');
+                    $(tr).find('.numberinput2').attr('name', 'InvoicedetailListDonate[' + index + '].StartAmount').attr('id', 'DInvoicedetailListDonate_' + index + '__StartAmount');
+                    $(tr).find('.numberinput2').attr('name', 'InvoicedetailListDonate[' + index + '].EndAmount').attr('id', 'InvoicedetailListDonate_' + index + '__EndAmount');
+                    $(tr).find('.input-price numberinput2').attr('name', 'InvoicedetailListDonate[' + index + '].CommissionValue').attr('id', 'InvoicedetailListDonate_' + index + '__CommissionValue');
+                    $(tr).find('.detail_item_price').last().attr('name', 'InvoicedetailListDonate[' + index + '].Price').attr('id', 'InvoicedetailListDonate_' + index + '__Price');
+                    $(tr).find('.detail_item_price').first().attr('id', 'mask-DetailList_' + index + '__Price');
+                    $(tr).find('.detail_item_discount').attr('name', 'InvoicedetailListDonate[' + index + '].DisCount').attr('id', 'InvoicedetailListDonate_' + index + '__DisCount');
+                    $(tr).find('.detail_item_discount_amount').attr('name', 'InvoicedetailListDonate[' + index + '].DisCountAmount1').attr('id', 'InvoicedetailListDonate_' + index + '__DisCountAmount1');
+                });
+            });
+            setTimeout(function () {
+                //$('.accordion-section:first-child .accordion-section-title').trigger('click');
+            }, 500);
+        });
+    </script>
+    <script src="~/Scripts/area_sale/CommissionCus.js?=vs1.111"></script>
+}

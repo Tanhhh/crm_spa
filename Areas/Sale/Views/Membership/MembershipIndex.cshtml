@@ -1,0 +1,456 @@
+﻿@model List<MembershipViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        List<MembershipThuGonViewModel> get = (List<MembershipThuGonViewModel>)ViewBag.Thugon;
+        ViewBag.Title = Wording.PageIndex_Membership;
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Membership",
+            ActionName = "MembershipIndex",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        string type = (Request["type"] == null || Request["type"] == "SkinScan") ? "SkinScan" : "CheckingHair";
+        int rowNumber = 0;
+        int numberOfItem = 30;
+        int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+        var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+        string status = Request["Status"] == null ? "pending" : Request["Status"];
+        //string branch = Request["BranchId"] == null ? Erp.BackOffice.Helpers.Common.CurrentUser.BranchId.Value.ToString() : Request["BranchId"];
+        string manager = Request["ManagerId"] == null ? "" : Request["ManagerId"];
+
+    }
+    <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    @section HeadOfPage {
+        <style>
+            .ui-ribbon {
+                position: relative;
+                display: block;
+                text-align: center;
+                font-size: 15px;
+                font-weight: 600;
+                color: #fff;
+                transform: rotate(43deg);
+                padding: 7px 0;
+                left: -2px;
+                top: 19px;
+                width: 140px;
+                line-height: 20px;
+                box-shadow: 0 0 3px rgba(0,0,0,.3);
+            }
+
+            .ui-ribbon-wrapper {
+                position: absolute;
+                overflow: hidden;
+                width: 108px;
+                height: 103px;
+                top: 0px;
+                right: 12px;
+                z-index: 1;
+            }
+
+            #myImg {
+                height: 70px !important;
+                width: 70px !important;
+            }
+
+            .search-media .search-actions {
+                width: 30% !important;
+                max-width: 250px !important;
+                min-width: 150px !important;
+            }
+
+            .fa-150 {
+                font-size: 1.5em;
+            }
+        </style>
+    }
+    @helper GridColumnCommand(int id)
+    {
+        <p>
+            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Edit", "Membership", "Sale"))
+            {
+                <a class="btn btn-mini btn-success" onclick="OpenPopup('@Url.Action("Edit", "Membership", new { Id = id, IsPopup = true })', '@Wording.PageEdit_InquiryCard', 0, 0)"><i class="fa fa-edit"></i></a>
+            }
+            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "Membership", "Sale"))
+            {
+                <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                </button>
+            }
+        </p>
+    }
+
+    @helper GridColumnName(string name, Int64 id, bool isPopup = false, string jsCallback = null)
+    {
+        if (isPopup)
+        {
+            <a onclick="parent.@(jsCallback)(@id, '@name')">@name</a>
+        }
+        else
+        {
+            name = string.IsNullOrEmpty(name) ? "No Title" : name;
+            <a onclick="OpenPopup('@Url.Action("Detail", "Membership", new { Id = id, IsPopup = true })', '@Wording.PageDetail_Membership', 0, 0)">@name</a>
+        }
+    }
+
+    @helper GridColumnCategoryValue(object value)
+    {
+        var attr = Common.GetCategoryByValueOrId("value", value);
+        <span>@(attr != null ? attr.Name : "")</span>
+    }
+
+    @helper CheckDeleteColumns(int Id)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+    }
+    @helper GridColumnTypeName(string type)
+    {
+        switch (type)
+        {
+            case "SkinScan":
+                <span style="color:red">@Wording.AdviseType_SkinScan</span>
+                break;
+            case "CheckingHair":
+                <span style="color:red">@Wording.AdviseType_CheckingHair</span>
+                break;
+
+        }
+    }
+    @helper GridColumnStatusName(string status)
+    {
+        switch (status)
+        {
+            case "pending":
+                <a class="btn-info search-btn-action btn btn-sm btn-block">@Wording.Membership_Pending</a>
+                break;
+            case "tranfer":
+                <a class="btn-danger search-btn-action btn btn-sm btn-block">@Wording.Membership_Tranfer</a>
+                break;
+            case "complete":
+                <a class="btn-danger search-btn-action btn btn-sm btn-block">@Wording.Membership_Complete</a>
+                break;
+            case "expired":
+                <a class="btn-default search-btn-action btn btn-sm btn-block">@Wording.Membership_Expired</a>
+                break;
+            case "inprocess":
+                <a class="btn-warning search-btn-action btn btn-sm btn-block">@Wording.Membership_Inprocess</a>
+                break;
+            case "TraHang":
+                <a class="btn-warning search-btn-action btn btn-sm btn-block">@Wording.TraHang</a>
+                break;
+            case "receive":
+                <a class="btn-warning search-btn-action btn btn-sm btn-block">Được Chuyển</a>
+                break;
+            case "usereceive":
+                <a class="btn-warning search-btn-action btn btn-sm btn-block">Được Chuyển</a>
+                break;
+        }
+    }
+
+
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+    @helper GridColumnImage(string customercode, string name, string Image, string Code)
+    {
+        <div class="itemdiv commentdiv" style="height:72px!important;width:100%!important">
+            <div class="user" style="height:72px;width:100%!important;">
+                <div class="ace-thumbnails">
+                    <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))" title="@name" data-rel="colorbox" class="cboxElement">
+                        <img id="myImg" alt="@name" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))">
+                    </a>
+                </div>
+            </div>
+            <div class="body">
+                <div class="name" data-toggle="tooltip" title="Tên khách hàng">
+                    @name
+                </div>
+                <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+                    @customercode
+                </div>
+                <div class="text" data-toggle="tooltip" title="Code MBS">
+                    @Code
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (isPopup)
+    {
+        <div class="row" style="margin-bottom:0px" id="default">
+            <font size="6" color="red">&nbsp;&nbsp;&nbsp;&nbspSố tiền còn nợ!&nbsp;@Erp.BackOffice.Helpers.Common.MoneyToString(ViewBag.tienconno)</font>
+        </div>
+        <div class="row" style="margin-bottom:50px" id="default">
+            <div class="col-sm-12">
+                @foreach (var item in Model)
+                {
+                    <div class="media search-media" id="delete_@item.Id">
+
+                        <div class="media-body">
+
+                            <div>
+                                <h4 class="media-heading">
+                                    <a onclick="OpenPopup('@Url.Action("Detail", "Membership", new { Id = item.Id, IsPopup = true })', '@Wording.PageDetail_Membership', 0, 0)" class="blue">@item.Code</a>
+                                    <i style="font-size:13px;">(@item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm") - @(item.ExpiryDate == null ? "" : item.ExpiryDate.Value.ToString("dd/MM/yyyy HH:mm")))</i>
+                                </h4>
+                            </div>
+                            <p>Dịch vụ: <b>@item.ProductCode - @item.ProductName</b></p>
+                            <p>
+                                @if (item.TargetModule == "ProductInvoiceDetail")
+                                {
+                                    <span>Mã chứng từ liên quan: <a onclick="OpenPopup('@Url.Action("Detail", "ProductInvoice", new { Code = item.TargetCode, IsPopup = true })', '', 0, 0)">@item.TargetCode</a></span>
+                                }
+                                else
+                                {
+                                    <span>Mã chứng từ liên quan: <a onclick="OpenPopup('@Url.Action("Detail",item.TargetModule, new { Id = item.TargetId, IsPopup = true })', '', 0, 0)">@item.TargetCode</a></span>
+                                }
+                                <span> - Loại phiếu: @GridColumnTypeName(item.Type)</span>
+                                <span id="ngaylap"> -  Ngày lập phiếu:@item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                            </p>
+                            <p><span>Người quản lý: <b>@item.ManagerName</b></span><span> - Người lập phiếu: <b>@item.CreatedUserName</b></span></p>
+
+                            <div class="search-actions text-center">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        @GridColumnImage(item.CustomerCode, item.CustomerName, item.CustomerImage, item.Code)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="action-buttons bigger-125">
+                                            @if (item.Status == "pending" || item.Status == "receive")
+                                            {
+                                                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "InquiryCard", "Sale"))
+                                                {
+                                                    bool choPhep = false;
+                                                    if (ViewBag.choPhep == true)
+                                                    {
+                                                        choPhep = true;
+                                                    }
+                                                    if (item.Status == "receive")
+                                                    {
+                                                        choPhep = true;
+                                                    }
+                                                    if (choPhep == true)
+                                                    {
+                                                        <a onclick="OpenPopup('@Url.Action("Create", "InquiryCard", new { area = "Sale", TargetId = item.Id, TargetModule = "Membership", IsPopup = true })', '', 0, 500)" title="Sử dụng phiếu"><i class="ace-icon fa fa-plus blue"></i></a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fa fa-times" aria-hidden="true"></i>
+                                                    }
+
+                                                }
+                                                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "Membership", "Sale"))
+                                                {
+                                                    <a onclick="OpenPopup('@Url.Action("Create", "Membership", new { area = "Sale", TargetId = item.Id, TargetModule = "Membership", IsPopup = true })', 'Chuyển đổi khách hàng sử dụng', 0, 500)" title="Chuyển phiếu cho khách hàng khác">
+                                                        <i class="ace-icon fa fa-refresh green"></i>
+                                                    </a>
+                                                }
+                                                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Edit", "Membership", "Sale"))
+                                                {
+                                                    <a onclick="OpenPopup('@Url.Action("Edit", "Membership", new { area = "Sale", Id = item.Id, IsPopup = true })', 'Gia hạn phiếu', 0, 500)" title="Gia hạn phiếu">
+                                                        <i class="ace-icon fa fa-clock-o orange2"></i>
+                                                    </a>
+                                                }
+                                                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "Membership", "Sale"))
+                                                {
+                                                    <a onclick="MembershipDelete(@item.Id)" title="Xóa phiếu">
+                                                        <i class="ace-icon fa fa-trash red"></i>
+                                                    </a>
+                                                }
+                                                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("ExchangeAllMBS", "Membership", "Sale"))
+                                                {
+                                                    <a onclick="OpenPopup('@Url.Action("ExchangeAllMBS", "Membership", new { area = "Sale", TargetId = item.Id, TargetModule = "Membership", IsPopup = true })', 'Quy đổi thành dịch vụ khác', 0, 500)" title="Quy đổi thành dịch vụ khác">
+                                                        <i class="ace-icon fa fa-refresh blue"></i>
+                                                    </a>
+                                                }
+                                            }
+                                            @if (item.Status == "inprocess")
+                                            {
+                                                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Revert", "Membership", "Sale"))
+                                                {
+                                                    <a onclick="OpenPopup('@Url.Action("Revert", "Membership", new {Id = item.Id,IsPopup = true })', '', 0, 500)" title="Hoàn phiếu"><i class="fa fa-history" aria-hidden="true"></i></a>
+
+                                                }
+
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                @GridColumnStatusName(item.Status)
+
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            </div>
+            <div class="col-md=12 text-center">
+            </div>
+        </div>
+        @*<div hidden class="row" style="margin-bottom:50px" id="collapse">
+                <div class="col-sm-12">
+                    @foreach (var item in get)
+                    {
+                        <div class="media search-media" id="delete_@item.Id">
+
+                            <div class="media-body">
+
+                                <h4>
+                                    @Html.ActionLink(@item.ProductInvoiceCode, "Index", new { controller = "Membership", TargetCode = item.ProductInvoiceCode }, new { @class = "code", target = "_blank" })
+                                </h4>
+                                <p><span id="ProductName"> Dịch vụ: <b>@item.ProductName</b></span></p>
+                                <p><span id="CustomerName"> Tên khách hàng:<b>@item.CustomerName</b></span><span id="ngaylap"> -  Ngày lập phiếu:<b>@item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm")</b></span></p>
+                                <p><span id="Soluong"> Tổng số lần chăm sóc da: <b>@item.SOLUONG</b></span></p>
+                                <p>
+                                    <span id="soluongdung"> Số lần sử dụng:<b>@item.soluongdung</b></span>
+                                    <span id="soluongtra"> - Số lần trả:<b>@item.soluongtra</b></span>
+                                    <span id="soluongchuyen"> - Số lần chuyển:<b>@item.soluongchuyen</b></span>
+                                    <span id="soluongconlai"> - Số lần còn lại:<b>@item.soluongconlai</b></span>
+                                </p>
+
+
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="col-md=12 text-center">
+                </div>
+            </div>*@
+
+    }
+
+    else
+    {
+        <div class="table table-responsive">
+            @Html.Grid(Model).Columns(columns =>
+                               {
+                                   columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+                       {
+                           rowNumber++;
+
+                           return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+});
+columns.Add().Titled(Wording.InquiryType).SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnTypeName(u.Type));
+columns.Add().Titled(Html.DisplayNameFor(u => u.FirstOrDefault().Code).ToString()).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Id, true, jsCallback));
+columns.Add(u => u.TargetCode).Titled(Wording.MaChungTu).RenderValueAs(u => u.TargetCode);
+columns.Add(u => u.CustomerCode).Titled(Wording.CustomerCode).RenderValueAs(u => u.CustomerCode);
+columns.Add(u => u.CustomerName).Titled(Wording.CustomerName).RenderValueAs(u => u.CustomerName);
+columns.Add(u => u.ManagerName).Titled(Wording.ManagerStaff).RenderValueAs(u => u.ManagerName);
+columns.Add(u => u.CreatedUserName).Titled(Wording.CreateStaffName).RenderValueAs(u => u.CreatedUserName);
+columns.Add(u => u.ExpiryDate).Titled(Wording.ExpiryDate).SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+}).WithPaging(30)
+        </div>
+    }
+
+
+
+    @section Scripts {
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+        <script type="text/javascript">
+
+        function MembershipDelete(id) {
+            if (confirm('Bạn có chắc muốn xóa item đã chọn ?')) {
+                ShowLoading();
+                $.post("@Url.Action("Delete", "Membership", new { area = "Sale" })", { id: id })
+            .done(function (data) {
+                $("#delete_" + id).closest('div').remove();
+                HideLoading();
+            });
+                return false;
+            }
+            else {
+                return false;
+            }
+        };
+        function MembershipRevert(id) {
+            if (confirm('Bạn có chắc muốn hoàn lại phiếu đã chọn ?')) {
+                ShowLoading();
+                $.post("@Url.Action("Revert", "Membership", new { area = "Sale" })", { id: id });
+                return false;
+            }
+            else {
+                return false;
+            }
+        };
+        </script>
+
+        <script>
+
+        $(function () {
+        });
+        $("#checkbox").on("click", function (e) {
+
+            var arr = [];
+
+            $(':checkbox:checked').each(function (i) {
+                $('#default').attr("hidden", "hidden");
+                $('#collapse').removeAttr("hidden");
+            });
+            $(':checkbox:unchecked').each(function (i) {
+                $('#default').removeAttr("hidden");
+                $('#collapse').attr("hidden", "hidden");
+            });
+
+        });
+
+        $('#Button1').click(function (e) {
+            var url = '@Url.Action("Action123", "Membership")';
+            window.location = url;
+        });
+        </script>
+    }
+

@@ -1,0 +1,355 @@
+﻿
+@using GridMvc.Html
+@using Erp.BackOffice.Helpers
+@model List<Erp.Domain.Entities.Location>
+@{    
+    ViewBag.Title = "Danh sách Tỉnh/Thành phố => Quận/Huyện => Xã/Phường";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Branch",
+        ActionName = "ListLocation",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+}
+
+<style type="text/css">
+    .input-edit-inline {
+        height: 23px;
+        line-height: 23px;
+        font-size: 10px;
+    }
+
+    .subItem2 {
+        border: 1px solid #ddd;
+        margin-left: -8px;
+        margin-right: -8px;
+        padding: 8px;
+        border-width: 1px 0px 0px 0px;
+        height: 39px;
+    }
+
+    .subItem {
+        height: 22px;
+    }
+
+    @@media only screen and (max-device-width: 414px) {
+        * {
+
+        }
+
+        .subItem2 {
+            font-size: 11px;
+        }
+
+        div.subItem > i > b {
+            font-size: 11px;
+        }
+
+        div.subItem > i.bigger {
+            font-size: 75% !important;
+            padding-top: 5px;
+        }
+
+        .widget-header .widget-title {
+            font-size: 11.5px;
+        }
+
+        #navbar-container .logo-big {
+            width: 25% !important;
+        }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 5px;
+            padding-bottom: 0;
+        }
+
+        .bigger-120 {
+            font-size: 75% !important;
+            padding-top: 5px;
+        }
+
+        td > i.fa.btn-group.fa-plus-square-o.bigger-120 > b {
+           font-size: 11px;
+        }
+
+       .btn.btn-mini.btn-primary, .btn.btn-mini.btn-success, .btn.btn-mini.btn-danger {
+           font-size: 6px;
+       }
+    }
+
+    @@media only screen and (max-device-width: 375px) {
+        * {
+
+        }
+
+        .subItem2 {
+            font-size: 11px;
+        }
+
+        div.subItem > i > b {
+            font-size: 11px;
+        }
+
+        div.subItem > i.bigger {
+            font-size: 75% !important;
+            padding-top: 5px;
+        }
+
+        .table.table-striped.table-bordered.table-hover > td > i.fa.btn-group.fa-plus-square-o.bigger-120 > b {
+            font-size: 11px;
+        }
+
+        .bigger-120 {
+            font-size: 80% !important;
+        }
+
+        .widget-header .widget-title {
+            font-size: 10px;
+        }
+
+        #navbar-container .logo-big {
+            width: 26% !important;
+        }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 5px;
+            padding-bottom: 0;
+        }
+
+        .bigger-120 {
+           font-size: 75% !important;
+           padding-top: 5px;
+        }
+
+        td > i.fa.btn-group.fa-plus-square-o.bigger-120 > b {
+           font-size: 11px;
+        }
+
+       .btn.btn-mini.btn-primary, .btn.btn-mini.btn-success, .btn.btn-mini.btn-danger {
+           font-size: 6px;
+       }
+    }
+
+    @@media only screen and (max-device-width: 360px) {
+        * {
+
+        }
+
+        .subItem2 {
+            font-size: 11px;
+        }
+
+        div.subItem > i > b {
+            font-size: 11px;
+        }
+
+        div.subItem > i.bigger {
+            font-size: 75% !important;
+            padding-top: 5px;
+        }
+
+        .table.table-striped.table-bordered.table-hover > td > i.fa.btn-group.fa-plus-square-o.bigger-120 > b {
+            font-size: 11px;
+        }
+
+        .bigger-120 {
+            font-size: 80% !important;
+        }
+
+        .widget-header .widget-title {
+            font-size: 9.5px;
+        }
+
+        #navbar-container .logo-big {
+            width: 60% !important;
+            font-size: 20px;
+            margin-left: -70px;
+        }
+
+        .navbar-buttons.navbar-header.pull-right {
+            width: 80%;
+            position: absolute;
+            right: -8;
+            top: 7px;
+        }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 5px;
+            padding-bottom: 0;
+        }
+
+        .bigger-120 {
+           font-size: 75% !important;
+           padding-top: 5px;
+        }
+
+        td > i.fa.btn-group.fa-plus-square-o.bigger-120 > b {
+           font-size: 11px;
+        }
+
+       .btn.btn-mini.btn-primary, .btn.btn-mini.btn-success, .btn.btn-mini.btn-danger {
+           font-size: 6px;
+       }
+    }
+</style>
+
+@if (ViewBag.AlertMessage != null && ViewBag.AlertMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="icon-remove"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.AlertMessage
+    </div>
+}
+
+@using(Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@if (Model.Any(x => x.Group == "Province"))
+{
+    <table class="table table-striped table-bordered table-hover">
+        <tbody>
+            @foreach (var item in Model.Where(x => x.Group == "Province"))
+            {
+                
+                var subList = Model.Where(x => x.Group == "District" && x.ParentId == item.Id);
+               
+                <tr id="delete_@item.Id">
+                    <td>
+                        <i style="cursor:pointer" class="fa @(subList.Count() > 0 ? "btn-group fa-plus-square-o" : "") bigger-120" data-id="@item.Id">
+                            <b id="label_name_@item.Id" style="font-family:'Open Sans'">@item.Name</b>
+                        </i>
+                        <p class="pull-right">
+                            <a class="btn btn-mini btn-primary" style="margin-right:5px"
+                               onclick="OpenPopup('@Url.Action("CreateLocation", "Branch", new { ParentId = item.Id, Group = "District", IsPopup = true })','', 0, 0)">
+                                <i class="fa fa-plus"></i>
+                                Thêm quận/huyện
+                            </a>
+                            <a class="btn btn-mini btn-success"
+                               onclick="OpenPopup('@Url.Action("CreateLocation", "Branch", new { Id = item.Id, Group = item.Group, IsPopup = true })','', 0, 0)">
+                                <i class="fa fa-edit"></i>
+                                Cập nhật
+                            </a>
+                            <a class="btn btn-mini btn-danger" onclick="Delete('@item.Id','@item.Group')">
+                                <i class="fa fa-trash"></i>
+                                Xóa
+                            </a>
+                        </p>
+                    </td>
+                    @*<td>@RenderEditItem(item)</td>*@
+                </tr>
+                foreach (var subItem in subList)
+                {
+                    var subList2 = Model.Where(x => x.Group == "Ward" && x.ParentId == subItem.Id);
+
+                    <tr class="item_of_@item.Id" id="delete_@subItem.Id" style="display: none;">
+                        <td style="@(subList2.Count() > 0 ? "padding-bottom:0px" : "")">
+                            <div class="subItem" style="padding-left:17px; @(subList2.Count() > 0 ? "margin-bottom:8px" : "")">
+                                <i style="cursor:pointer" class="fa @(subList2.Count() > 0 ? "btn-group fa-plus-square-o" : "") bigger" data-id="@subItem.Id">
+                                    <b id="label_name_@subItem.Id" style="font-family:'Open Sans'"> @subItem.Name</b>
+                                </i>
+                                <p class="pull-right">
+                                    <a class="btn btn-mini btn-primary " style="margin-right:5px"
+                                       onclick="OpenPopup('@Url.Action("CreateLocation", "Branch", new { ParentId = subItem.Id, Group = "Ward", IsPopup = true })','', 0, 0)">
+                                        <i class="fa fa-plus"></i>
+                                        Thêm xã/phường
+                                    </a>
+                                    <a class="btn btn-mini btn-success"
+                                       onclick="OpenPopup('@Url.Action("CreateLocation", "Branch", new { Id = subItem.Id, Group = subItem.Group, IsPopup = true })','', 0, 0)">
+                                        <i class="fa fa-edit"></i>
+                                        Cập nhật
+                                    </a>
+                                    <a class="btn btn-mini btn-danger" onclick="Delete('@subItem.Id','@subItem.Group')">
+                                        <i class="fa fa-trash"></i>
+                                        Xóa
+                                    </a>
+                                </p>
+                            </div>
+
+                            @foreach (var subItem2 in subList2)
+                            {
+                                <div class="subItem2 item_of_@subItem.Id" id="delete_@subItem2.Id" style="padding-left: 40px; display: none">
+                                    @subItem2.Name
+                                    <p class="pull-right">
+                                        <a class="btn btn-mini btn-success"
+                                           onclick="OpenPopup('@Url.Action("CreateLocation", "Branch", new { Id = subItem2.Id, Group = subItem2.Group, IsPopup = true })','', 0, 0)">
+                                            <i class="fa fa-edit"></i>
+                                            Cập nhật
+                                        </a>
+                                        <a class="btn btn-mini btn-danger" onclick="Delete('@subItem2.Id','@subItem2.Group')">
+                                            <i class="fa fa-trash"></i>
+                                            Xóa
+                                        </a>
+                                    </p>
+                                </div>
+                            }
+                        </td>
+
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <a class="btn btn-mini btn-primary"
+       onclick="OpenPopup('@Url.Action("CreateLocation", "Branch", new { ParentId = "0", Group = "Province",IsPopup=true })','', 0, 0)">
+        <i class="fa fa-plus"></i>
+        Thêm tỉnh/thành phố
+    </a>
+}
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $(".btn-group").click(function () {
+                var id = $(this).data("id");
+                var on = $(this).hasClass("on");
+                if (on) {
+                    $(".item_of_" + id).hide();
+                    $(this).removeClass("on");
+                    $(this).removeClass("fa-minus-square-o");
+                    $(this).addClass("fa-plus-square-o");
+                }
+                else {
+                    $(".item_of_" + id).show();
+                    $(this).addClass("on");
+                    $(this).removeClass("fa-plus-square-o");
+                    $(this).addClass("fa-minus-square-o");
+                }
+            });
+        });
+        function Delete(id,group) {
+            if (confirm('Bạn có chắc muốn xóa item đã chọn ?')) {
+                ShowLoading();
+                $.post("@Url.Action("DeleteLocation", "Branch", new { area = "Sale" })", { id: id, group: group })
+            .done(function (data) {
+                if (data == "Success") {
+                    //   location.reload();
+                    if (group == "Ward")
+                        $("#delete_" + id).closest('div').remove();
+                    else
+                        $("#delete_" + id).closest('tr').remove();
+                }
+                else {
+                    alert("Lỗi! Không thể xóa.");
+                }
+                HideLoading();
+            });
+            return false;
+        }
+        else {
+                return false;
+        }
+        };
+    </script>
+}

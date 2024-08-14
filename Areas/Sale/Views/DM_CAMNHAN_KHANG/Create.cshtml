@@ -1,0 +1,150 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model DM_CAMNHAN_KHANGViewModel
+
+@{
+    ViewBag.Title = "Tạo Cảm Nhận";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "DM_CAMNHAN_KHANG",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    List<DM_CAMNHAN_KHANGViewModel> nhomtinList = (List<DM_CAMNHAN_KHANGViewModel>)ViewBag.DM_CAMNHAN_KHANG;
+
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Create", "DM_CAMNHAN_KHANG", null, FormMethod.Post, new { id = "CreateTinTuc", @class = "form-horizontal clearfix", enctype = "multipart/form-data" }))
+{
+    //@Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+    <input type="hidden" name="Type" value="product" />
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-info-circle"></i> Tổng quan</a>
+                                </li>
+                                
+
+
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane active">
+                                    
+                                    @Html.CustomTextboxFor(model => model.STT, null, null, WidthType.span12)
+                                    @Html.CustomTextboxFor(model => model.TIEUDE, null, null, WidthType.span12)
+                                    @Html.CustomTextboxFor(model => model.LINK_VIDEO, null, null, WidthType.span12)
+                                    <div class="control-group form-group">
+                                        <label class="control-label col-lg-5 col-md-4 col-sm-4">Hiện</label>
+                                        <label>
+                                            <input id=" is_show" class="ace class-is-show text-center" type="checkbox" name="is-show-checkbox" value="1" checked="checked">
+                                            <span class="lbl"></span>
+                                        </label>
+                                    </div>
+                                   
+
+                                </div>
+                                
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+
+}
+
+@section Scripts {
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            resetLableRequired('#CreateProduct');
+            //parseValidatorForm('#ProductInBound');
+            $('#Save').click(function () {
+                ShowLoading();
+
+                $.get('/DM_CAMNHAN_KHANG/CheckSTTExsist/', { id: @Model.CAMNHAN_KHANG_ID, stt: $("#STT").val() }, function (rs) {
+                    if (rs != '') {
+                        alert(rs);
+                        HideLoading();
+                    }
+                    else{
+                        ClearFormatBeforeSubmit($("#CreateTinTuc"));
+                        $("#CreateTinTuc").submit();
+                    }
+                });
+
+                // HideLoading();
+            });
+
+
+        });
+
+       
+
+        var $tr_template = $('#detailList tr:first-child');
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.CAMNHAN_KHANG_ID" >@Model.TIEUDE</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+
+        });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

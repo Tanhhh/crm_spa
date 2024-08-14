@@ -1,0 +1,349 @@
+﻿@model Erp.BackOffice.Crm.Models.CRM_BH_DOANHSOViewModel
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@{
+    int index = 1;
+    IEnumerable<CRM_BH_DOANHSO_CTViewModel> vwCRM_BH_DOANHSO_CT = (IEnumerable<CRM_BH_DOANHSO_CTViewModel>)ViewBag.vwCRM_BH_DOANHSO_CT;
+    string MonthTapORLANEPARIS = Request["month"] != null ? Request["month"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("MM/yyyy");
+    string YearTapORLANEPARIS = Request["year"] != null ? Request["year"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("MM/yyyy");
+    decimal? sum = 0;
+
+}
+<div class="tab-content clear-fix">
+    @Html.HiddenFor(model => model.ID_ORLANEPARIS)
+    <p>
+        <label>Tháng/năm</label>
+        @Html.TextBox("month2", Request["month"] != null ? Request["month"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("MM/yyyy"), new { autocomplete = "off", style = "width:110px", disabled = "true" })
+        &nbsp;
+        <label>Người lập</label>
+        @Html.TextBox("NGUOILAP_ID", Request["NGUOILAP_ID"], new { @class = "hidden", autocomplete = "off", placeholder = "Người lập", style = "width:110px" })
+
+        @Html.TextBox("FullName", Request["FullName"], new { @class = "", disabled = "disabled", autocomplete = "off", placeholder = "Người lập", style = "width:110px" })
+        &nbsp;
+        <label>Nhãn hàng</label>
+        <input type="text" value="ORLANEPARIS" style="width:200px" readonly="readonly" />
+    </p>
+    <p>
+        <label>Taget(VNĐ)</label>
+        @*<input type="text" name="ORLANEPARIS" class="ORLANEPARIS" value="@CommonSatic.ToCurrencyStr(ViewBag.ORLANEPARIS,null)" style="width:120px" />*@
+        <input type="text" name="ORLANEPARIS" id="ORLANEPARIS" class="ORLANEPARIS" value="@ViewBag.ORLANEPARIS" style="width:120px" />
+        &nbsp;
+        <label style="padding-left:10px">Kế hoạch đã lập</label>
+        <input type="text" name="TotalAmountORLANEPARIS" id="TotalAmountORLANEPARIS" style="width:200px" readonly="readonly" />
+        &nbsp;
+        <label>Đạt (%)</label>
+        <input type="text" name="DATORLANEPARIS" id="DATORLANEPARIS" readonly style="width:120px" />
+    </p>
+    <p>
+        <label>Ghi chú</label>
+        <input type="text" name="GHICHU_ORLANEPARIS" class="GHICHU_LEONORGREYL" value="@ViewBag.GHICHU_ORLANEPARIS" style="width:400px" />
+
+        @if (@ViewBag.ID_ORLANEPARIS == null)
+        {
+            <a class="btn btn-mini" onclick="OpenPopup('@Url.Action("Create","BH_DOANHSO", new {CountForBrand="ORLANE PARIS" })','',0,0)">
+                Lập kế hoạch mới
+            </a>
+        }
+        else
+        {
+            <a class="btn btn-mini" onclick="OpenPopup('@Url.Action("CreateKH", "BH_DOANHSO", new { KH_BANHANG_DOANHSO_ID = @ViewBag.ID_ORLANEPARIS, item_origin = "ORLANE PARIS" })','',0,0)">
+            Thêm mới Đơn hàng
+            </a>
+        }
+        <button id="btnKETHUA2" class="btn btn-mini btn-primary">
+            Kế thừa tháng trước
+        </button>
+    </p>
+    <div id="listOrderDetail2" class="table-responsive top-10 ">
+        <table id="CTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                    <th rowspan="2" style="text-align:center">Tên KH</th>
+                    <th rowspan="2" style="text-align:center">Mã KH</th>
+                    <th rowspan="2" style="text-align:center">Điện thoại</th>
+                    <th colspan="4" style="text-align:center">Đơn hàng </th>
+                    <th rowspan="2" style="width: 150px; text-align: center">Tỷ lệ thành công(%)</th>
+                    <th rowspan="2" style="text-align:center">Ghi chú</th>
+                    <th rowspan="2" style="text-align:center">Có đơn hàng</th>
+                    <th rowspan="2" style="width: 150px; text-align: center">Đánh giá lại(%)</th>
+                    <th rowspan="2" style="text-align:center"></th>
+                </tr>
+
+                <tr>
+                    <th style="text-align:center">Đơn hàng</th>
+                    <th style="text-align:center">Số tiền</th>
+                    <th style="text-align:center">Đã trả</th>
+                    <th style="text-align:center">Còn lại</th>
+                </tr>
+            </thead>
+            <tbody class="productInvoiceList3">
+                @if (Model.CRM_BH_DOANHSO_CTList.Count > 0)
+                {
+                    int w = 0;
+                    for (int i = 0; i < Model.CRM_BH_DOANHSO_CTList.Count(); i++)
+                    {
+                        if (Model.CRM_BH_DOANHSO_CTList[i].KH_BANHANG_DOANHSO_ID == @ViewBag.ID_ORLANEPARIS)
+                        {
+
+                            <tr role="@(i+1)" id="@(i+1)">
+                                <td class="text-center">
+                                    @(w += 1)
+                                </td>
+                                <td>
+                                    <input class="KH_BANHANG_DOANHSO_CTIET_ID" type="hidden" id="CRM_BH_DOANHSO_CTList_@(i)__KH_BANHANG_DOANHSO_CTIET_ID" name="CRM_BH_DOANHSO_CTList[@(i)].KH_BANHANG_DOANHSO_CTIET_ID" value="@Model.CRM_BH_DOANHSO_CTList[i].KH_BANHANG_DOANHSO_CTIET_ID" />
+                                    <input class="id" type="hidden" id="CRM_BH_DOANHSO_CTList_@(i)__KHACHHANG_ID" name="CRM_BH_DOANHSO_CTList[@(i)].KHACHHANG_ID" value="@Model.CRM_BH_DOANHSO_CTList[i].KHACHHANG_ID" />
+                                    <span>@Model.CRM_BH_DOANHSO_CTList[i].CustomerName</span>
+                                </td>
+                                <td>
+                                    <input class="name" type="hidden" id="CRM_BH_DOANHSO_CTList@(i)__CustomerCode" name="CRM_BH_DOANHSO_CTList[@(i)].CustomerCode" value="@Model.CRM_BH_DOANHSO_CTList[i].CustomerCode" readonly="readonly" />
+                                    <span class="code" id="CRM_BH_DOANHSO_CTList@(i)__CustomerCode" name="CRM_BH_DOANHSO_CTList[@(i)].CustomerCode" value="@Model.CRM_BH_DOANHSO_CTList[i].CustomerCode">@Model.CRM_BH_DOANHSO_CTList[i].CustomerCode</span>
+                                </td>
+                                <td>
+                                    <input class="phone" type="hidden" id="CRM_BH_DOANHSO_CTList@(i)__Phone" name="CRM_BH_DOANHSO_CTList[@(i)].Phone" value="@Model.CRM_BH_DOANHSO_CTList[i].Phone" readonly="readonly" />
+                                    <span>@Model.CRM_BH_DOANHSO_CTList[i].Phone</span>
+                                </td>
+                                <td>
+                                    <input class="phone" type="hidden" id="CRM_BH_DOANHSO_CTList@(i)__MA_DONHANG" name="CRM_BH_DOANHSO_CTList[@(i)].MA_DONHANG" value="@Model.CRM_BH_DOANHSO_CTList[i].MA_DONHANG" readonly="readonly" />
+                                    <span style="text-decoration: underline;"><a onclick="OpenPopup('@Url.Action("#", "#", new {area = "CRM",Id = @Model.CRM_BH_DOANHSO_CTList[i].KHACHHANG_ID, IsPopup = "true" })', 'Trang chi tiết doanh số', 0, 500)">@Model.CRM_BH_DOANHSO_CTList[i].MA_DONHANG</a><br></span>
+                                    <input class="phone" type="hidden" id="CRM_BH_DOANHSO_CTList@(i)__CreatedDate" name="CRM_BH_DOANHSO_CTList[@(i)].CreatedDate" value="@Model.CRM_BH_DOANHSO_CTList[i].CreatedDate" readonly="readonly" />
+                                    <span style="color: #ff0000; text-decoration: underline;">(@Model.CRM_BH_DOANHSO_CTList[i].CreatedDate.Value.ToString("dd/MM/yyyy"))</span>
+                                </td>
+
+                                <td>
+                                    <input class="phone" type="hidden" id="CRM_BH_DOANHSO_CTList@(i)__TONG_TIEN" name="CRM_BH_DOANHSO_CTList[@(i)].TONG_TIEN" value="@Model.CRM_BH_DOANHSO_CTList[i].TONG_TIEN" readonly="readonly" />
+                                    <span>@Model.CRM_BH_DOANHSO_CTList[i].TONG_TIEN</span>
+                                </td>
+                                <td>
+                                    <input class="phone" type="hidden" id="CRM_BH_DOANHSO_CTList@(i)__DA_TRA" name="CRM_BH_DOANHSO_CTList[@(i)].DA_TRA" value="@Model.CRM_BH_DOANHSO_CTList[i].DA_TRA" readonly="readonly" />
+                                    <span>@Model.CRM_BH_DOANHSO_CTList[i].DA_TRA</span>
+                                </td>
+                                <td>
+                                    <input class="phone" type="hidden" id="CRM_BH_DOANHSO_CTList@(i)__CON_NO" name="CRM_BH_DOANHSO_CTList[@(i)].CON_NO" value="@Model.CRM_BH_DOANHSO_CTList[i].CON_NO" readonly="readonly" />
+                                    <span style="color:#ff0000">@Model.CRM_BH_DOANHSO_CTList[i].CON_NO</span>
+                                </td>
+
+                                <td>
+                                    <input style="width:50px" class="nr-Tap2" type="text" id="CRM_BH_DOANHSO_CTList@(i)__TYLE_THANHCONG" name="CRM_BH_DOANHSO_CTList[@(i)].TYLE_THANHCONG" value="@Model.CRM_BH_DOANHSO_CTList[i].TYLE_THANHCONG" readonly="readonly" />
+                                    <input style="width:30px" class="btn-mini btn-CONG-Tap2" type="button" value="+" />
+                                    <input style="width:30px" class="btn-mini btn-TRU-Tap2" type="button" value="-" />
+                                </td>
+                                <td></td>
+                                <td>
+                                    <input class="phone" type="hidden" id="CRM_BH_DOANHSO_CTList@(i)__MA_DONHANG" name="CRM_BH_DOANHSO_CTList[@(i)].MA_DONHANG" value="@Model.CRM_BH_DOANHSO_CTList[i].MA_DONHANG" readonly="readonly" />
+                                    <span style="text-decoration: underline;"><a onclick="OpenPopup('@Url.Action("#", "#", new {area = "CRM",Id = @Model.CRM_BH_DOANHSO_CTList[i].KHACHHANG_ID, IsPopup = "true" })', 'Trang chi tiết doanh số', 0, 500)">@Model.CRM_BH_DOANHSO_CTList[i].MA_DONHANG</a><br></span>
+                                </td>
+                                <td>
+                                    <input style="width:50px" class="nr-REVIEW-Tap2" type="text" id="CRM_BH_DOANHSO_CTList@(i)__TYLE_THANHCONG_REVIEW" name="CRM_BH_DOANHSO_CTList[@(i)].TYLE_THANHCONG_REVIEW" value="@Model.CRM_BH_DOANHSO_CTList[i].TYLE_THANHCONG_REVIEW" readonly="readonly" />
+                                    <input style="width:30px" class="btn-mini btn-CONG-REVIEW-Tap2" type="button" value="+" />
+                                    <input style="width:30px" class="btn-mini btn-TRU-REVIEW-Tap2" type="button" value="-" />
+                                </td>
+                                <td>
+                                    <a onclick="DeleteData2(@Model.CRM_BH_DOANHSO_CTList[i].KH_BANHANG_DOANHSO_CTIET_ID)" class="Delete" style="float:right">
+                                        <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+
+                    }
+
+                }
+            </tbody>
+            <thead>
+                <tr hidden>
+                    <td colspan="10"></td>
+                    @if (vwCRM_BH_DOANHSO_CT.Where(x => x.CountForBrand == "ORLANE PARIS") != null)
+                    {
+                        <td id="Total2">
+                            @CommonSatic.ToCurrencyStr(vwCRM_BH_DOANHSO_CT.Where(x => x.CountForBrand == "ORLANE PARIS").Sum(x => x.CON_NO), null)
+
+                            @*@CommonSatic.ToCurrencyStr(vwCRM_BH_DOANHSO_CT.Where(x => x.CountForBrand == "ORLANE PARIS").Sum(x => x.TONG_TIEN), null)*@
+                        </td>
+                    }
+                    <td></td>
+                    <td></td>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    @for (int i = 0; i <= 100; i += 10)
+    {
+        decimal? sum1 = 0;
+        <label style="color:blue;padding-left:20px">
+            @foreach (var item in Model.CRM_BH_DOANHSO_CTList.Where(x => x.CountForBrand == "ORLANE PARIS" && x.NGUOILAP_ID == Model.NGUOILAP_ID))
+            {
+                if (item.TYLE_THANHCONG == i)
+                {
+                    if (item.CON_NO == null)
+                    {
+                        item.CON_NO = 0;
+                    }
+                    sum1 += item.CON_NO;
+                }
+                sum = sum1;
+            }
+            @i%:( @(sum == null ? Convert.ToString(0) : CommonSatic.ToCurrencyStr(sum, null)) )
+        </label>
+    }
+
+</div>
+<script>
+    $('#btnKETHUA2').click(function () {
+        if (confirm('Bạn có muốn kế thừa tháng trước không ?')) {
+            PostData2();
+        }
+        else {
+            return false;
+        }
+    });
+    function DeleteData2(KH_BANHANG_DOANHSO_CTIET_ID) {
+        if (confirm('Bạn có muốn xóa item đã chọn ?')) {
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Delete", "BH_DOANHSO")',
+                data: JSON.stringify({ KH_BANHANG_DOANHSO_CTIET_ID: KH_BANHANG_DOANHSO_CTIET_ID }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    //alert(result);
+                    window.locationre = result.url;
+                }
+            });
+            location.reload();
+        }
+        else {
+            return false;
+        }
+
+    }
+    function PostData2() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("KETHUA", "BH_DOANHSO", new { KH_BANHANG_DOANHSO_ID = @ViewBag.ID_ORLANEPARIS })',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({ model: { CountForBrand: 'ORLANE PARIS', NGUOILAP_ID:@Model.NGUOILAP_ID, month:@MonthTapORLANEPARIS+"/"+@YearTapORLANEPARIS} }),
+            dataType: "json",
+            success: function (result) {
+                //alert(result);
+                window.locationre = result.url;
+            }
+        });
+        location.reload();
+    }
+    $(document).ready(function () {
+        var ORLANEPARIS = 0;
+        var DAT = 0;
+        var Total = $('#Total2').text();
+        ORLANEPARIS = $('.ORLANEPARIS').val();
+        $('#TotalAmountORLANEPARIS').val($.trim(Total));
+        var q = (parseFloat(removeComma(Total) / parseFloat(removeComma(ORLANEPARIS))) * 100).toFixed(1);
+        $('#DATORLANEPARIS').val(q)
+        //$('#DAT').val(numeral(q).format('0,0'));
+        if (isNaN(($('#DATORLANEPARIS').val()))) {
+            $('#DATORLANEPARIS').val(0);
+        } else {
+            $('#DATORLANEPARIS').val(numeral(q).format('0,0.0'));
+        }
+    });
+    //var Total = $('#Total2').text();
+    //$('#TotalAmount2').val($.trim(Total));
+
+    $('#listOrderDetail2').on('click', '.btn-delete-item', function () {
+        $(this).closest('tr').remove();
+        $('.productInvoiceList2 tr').each(function (index, tr) {
+            $(tr).attr('role', index);
+            $(tr).find('td:first-child').text(index);
+            $(tr).find('.KH_BANHANG_DOANHSO_CTIET_ID').attr('name', 'CRM_BH_DOANHSO_CTList[' + index + '].KH_BANHANG_DOANHSO_CTIET_ID').attr('id', 'CRM_BH_DOANHSO_CTList' + index + '__KH_BANHANG_DOANHSO_CTIET_ID');
+            $(tr).find('.CustomerCode').attr('name', 'CRM_BH_DOANHSO_CTList[' + index + '].CustomerCode').attr('id', 'CRM_BH_DOANHSO_CTList' + index + '__CustomerCode');
+            $(tr).find('.phone').attr('name', 'CRM_BH_DOANHSO_CTList[' + index + '].Phone').attr('id', 'CRM_BH_DOANHSO_CTList' + index + '__Phone');
+            $(tr).find('.code').attr('name', 'CRM_BH_DOANHSO_CTList[' + index + '].code').attr('id', 'CRM_BH_DOANHSO_CTList' + index + '__code');
+            $(tr).find('.MA_DONHANG').attr('name', 'CRM_BH_DOANHSO_CTList[' + index + '].MA_DONHANG').attr('id', 'CRM_BH_DOANHSO_CTList' + index + '__MA_DONHANG');
+            $(tr).find('.CreatedDate').attr('name', 'CRM_BH_DOANHSO_CTList[' + index + '].CreatedDate').attr('id', 'CRM_BH_DOANHSO_CTList' + index + '__CreatedDate');
+            $(tr).find('.TONG_TIEN').attr('name', 'CRM_BH_DOANHSO_CTList[' + index + '].TONG_TIEN').attr('id', 'CRM_BH_DOANHSO_CTList' + index + '__TONG_TIEN');
+            $(tr).find('.DA_TRA').attr('name', 'CRM_BH_DOANHSO_CTList[' + index + '].DA_TRA').attr('id', 'CRM_BH_DOANHSO_CTList' + index + '__DA_TRA');
+            $(tr).find('.CON_NO').attr('name', 'CRM_BH_DOANHSO_CTList[' + index + '].CON_NO').attr('id', 'CRM_BH_DOANHSO_CTList' + index + '__CON_NO');
+            $(tr).find('.nr-REVIEW-Tap2').attr('name', 'CRM_BH_DOANHSO_CTList[' + index + '].TYLE_THANHCONG_REVIEW').attr('id', 'CRM_BH_DOANHSO_CTList' + index + '__TYLE_THANHCONG_REVIEW');
+        });
+    });
+    $('#listOrderDetail2').on('click', '.btn-CONG-Tap2', function () {
+        var $row = $(this).closest("tr");    // Find the row
+        var $text = $row.find(".nr-Tap2").val(); // Find the text
+        var w = parseFloat($text);
+        if (w < 0) {
+            w = -1;
+        }
+        if (w > 0) {
+            w += 10;
+        } if (w == 0) {
+            w += 10;
+        }
+        if (w == -1) {
+            w = 0;
+        }
+        if (w > 100) {
+            w = 100;
+            alert('Tỷ lệ thành công không được quá 100%');
+        }
+        $row.find(".nr-Tap2").val(w);
+    });
+    $('#listOrderDetail2').on('click', '.btn-TRU-Tap2', function () {
+        var $row = $(this).closest("tr");    // Find the row
+        var $text = $row.find(".nr-Tap2").val(); // Find the text
+        var w = parseFloat($text);
+        if (w == 0) {
+            w = -1;
+        }
+        if (w < 0) {
+            w = -1;
+        } if (w == -1) {
+            w = -1;
+        } if (w > 0) {
+            w += -10;
+        }
+        $row.find(".nr-Tap2").val(w);
+    });
+    $('#listOrderDetail2').on('click', '.btn-CONG-REVIEW-Tap2', function () {
+        var $row = $(this).closest("tr");    // Find the row
+        var $text = $row.find(".nr-REVIEW-Tap2").val(); // Find the text
+        var w = parseFloat($text);
+        if (w < 0) {
+            w = -1;
+        }
+        if (w > 0) {
+            w += 10;
+        } if (w == 0) {
+            w += 10;
+        }
+        if (w == -1) {
+            w = 0;
+        }
+        if (w > 100) {
+            w = 100;
+            alert('Tỷ lệ thành công không được quá 100%');
+        }
+        $row.find(".nr-REVIEW-Tap2").val(w);
+    });
+    $('#listOrderDetail2').on('click', '.btn-TRU-REVIEW-Tap2', function () {
+        var $row = $(this).closest("tr");    // Find the row
+        var $text = $row.find(".nr-REVIEW-Tap2").val(); // Find the text
+        var w = parseFloat($text);
+        if (w == 0) {
+            w = -1;
+        }
+        if (w < 0) {
+            w = -1;
+        } if (w == -1) {
+            w = -1;
+        } if (w > 0) {
+            w += -10;
+        }
+        $row.find(".nr-REVIEW-Tap2").val(w);
+    });
+</script>

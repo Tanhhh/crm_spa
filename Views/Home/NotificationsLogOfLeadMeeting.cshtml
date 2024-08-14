@@ -1,0 +1,193 @@
+﻿<style>
+    .delete-notificationLogLeadMeeting-btn {
+        background-color: transparent;
+        border: none;
+        border-radius: 5rem;
+        font-size: 18px;
+        height: 30px;
+        color: #ed7070;
+        cursor: pointer;
+        line-height: 0;
+        transition: color 0.3s;
+    }
+
+    .delete-notificationLogLeadMeeting-btn:hover {
+        color: #f00;
+    }
+
+    .delete-notificationLogLeadMeeting-btn:focus {
+        outline: none;
+    }
+
+    .wrapper-Over {
+        width: 30rem !important;
+    }
+
+</style>
+@model List<Erp.BackOffice.Crm.Models.TaskMeetingViewModel>
+
+
+    @foreach (var item in Model)
+    {
+
+
+        <li style="display: flex; justify-content: space-between;">
+            <a data-lead-id="@item.LeadId" data-is-send-notifications="@item.IsSendNotifications" data-id="@item.Id" data-typelead="@item.TypeLead" class="clickLead">
+                <span class="msg-photo">
+                    @if (item.Action == "MEETING")
+                    {
+                        <img src="~/assets/img/meeting.png" alt="User Avatar" class="msg-photo" style="width: 35px !important">
+                    }
+                    else if (item.Action == "TASK")
+                    {
+                        <img src="~/assets/img/task.png" alt="User Avatar" class="msg-photo" style="width: 28px !important">
+                    }
+                    else if (item.Action == "LEADCREATEFACEBOOK")
+                    {
+                        <img src="~/assets/img/create.png" alt="User Avatar" class="msg-photo">
+                    }
+                    else if (item.Action == "CALL")
+                    {
+                        <img src="~/assets/img/call.png" alt="User Avatar" class="msg-photo" style="width: 30px !important">
+                    }
+                    else if (item.Action == "LEADCREATEZALO")
+                    {
+                        <img src="~/assets/images/zalo-icon.png" alt="User Avatar" style="width:35px;height:35px;margin-top:10px">
+                    }
+                    else
+                    {
+                        <img src="https://img.icons8.com/?size=256&id=S2nXC8Z2nl3J&format=png" alt="User Avatar" class="msg-photo">
+                    }
+                </span>
+                @{
+                    string shortMeetingTitle = item.MeetingTitle.Length > 20 ? item.MeetingTitle.Substring(0, 20) + "..." : item.MeetingTitle;
+                }
+                <div class="msg-body">
+                    @if (item.Action == "LEADCREATEFACEBOOK")
+                    {
+                        <span class="msg-title-leadmeeting"><strong>FACEBOOK</strong></span>
+                        <br>
+                        <div>
+                            <span class="msg-title-leadmeeting wrapper-Over">Bình luận: @item.MeetingTitle</span>
+                            <span class="msg-time">
+                                <i class="ace-icon fa fa-clock-o" style="margin: 3px 4px 0 0;"></i>
+                                @item.CreatedDate.Value.ToString("HH:mm dd/MM/yyyy")
+                            </span>
+                        </div>
+                    }
+                    else if (item.Action == "SENDZALO")
+                    {
+                        <span class="msg-title-leadmeeting"><strong style="font-weight: bold; font-size: 16px;">Zalo ZNS</strong></span>
+                        <br />
+                        <span class="msg-title-leadmeeting" style="display: block; color: #808080;font-size: 14px;">Khách hàng: <span>@item.LeadName</span></span>
+                        <span class="msg-title-leadmeeting wrapper-Over" style="font-size: 14px;margin-top:5px">Nội dung: <span style="color: #333;">@shortMeetingTitle</span></span>
+                        <br />
+                        <span class="msg-time" style="font-size: 12px;">
+                            <i class="ace-icon fa fa-clock-o"></i>
+                            <span style="color: #777;">@item.CreatedDate.Value.ToString("HH:mm dd/MM/yyyy")</span>
+                        </span>
+                    }
+
+                    else if (item.Action == "LEADCREATEZALO")
+                    {
+                        <span class="msg-title-leadmeeting"><strong style="font-weight: bold; font-size: 16px;">Zalo</strong></span>
+                        <br />
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span class="msg-title-leadmeeting" style="display: block; color: #808080;font-size: 14px;">Khách hàng: <span>@item.LeadName</span></span>
+                            <span class="msg-time" style="font-size: 12px;">
+                                <i class="ace-icon fa fa-clock-o"></i>
+                                <span style="color: #777;">@item.CreatedDate.Value.ToString("HH:mm dd/MM/yyyy")</span>
+                            </span>
+                        </div>
+                        <span class="msg-title-leadmeeting" style="font-size: 14px;margin-top:5px">Nội dung: <span style="color: #333;">@shortMeetingTitle</span></span>
+                        <br />
+
+                    }
+                    else
+                    {
+                        <span class="msg-title-leadmeeting"><strong>@item.Action</strong></span>
+                        <br>
+                        <div>
+                            <span class="msg-title-leadmeeting wrapper-Over">@item.MeetingTitle (Thời lượng: @item.MeetingTime phút) </span>
+                            @*<span class="msg-location" style="display: block;">Địa chỉ: @item.MeetingLocation</span>*@
+                            <span class="msg-time" style="display: flex; align-items: center;">
+                                <i class="ace-icon fa fa-clock-o" style="margin: 3px 4px 0 0;"></i>
+                                @item.CreatedDate.Value.ToString("HH:mm dd/MM/yyyy")
+                            </span>
+                        </div>
+                    }
+
+                </div>
+            </a>
+            <button class="delete-notificationLogLeadMeeting-btn">×</button>
+
+        </li>
+    }
+
+
+<script>
+
+    $(document).ready(function () {
+        debugger
+        // click chuyển hướng
+        $(document).on('click', '.clickLead', function (e) {
+            e.preventDefault();
+            var leadId = $(this).data('lead-id');
+            var itemId = $(this).data('id');
+            var typeLead = $(this).data('typelead');
+            // Gửi yêu cầu AJAX đến controller để cập nhật IsSendNotifications
+            $.ajax({
+                url: '/LeadMeeting/UpdateIsSendNotifications',
+                method: 'POST',
+                data: { idTaskNew: itemId },
+                success: function (data) {
+                    // Xử lý kết quả nếu cần
+                    console.log(data);
+                    console.log('Cập nhật thành công');
+                },
+                error: function () {
+                    console.log('Đã xảy ra lỗi khi cập nhật');
+                }
+            });
+
+            if (typeLead === 0)
+                redirectToCustomerDetail(leadId);
+            else
+                redirectToLeadDetail(leadId);
+        });
+        // kiểm tra seen chưa
+        $('.clickLead').each(function () {
+            var isSendNotifications = $(this).data('is-send-notifications');
+            if (isSendNotifications === 0) {
+                $(this).closest('li').addClass('sent-notification');
+                $(this).find('.msg-body').css('font-weight', 'bold');
+            } else {
+                $(this).closest('li').removeClass('sent-notification');
+                $(this).find('.msg-body').css('font-weight', '');
+            }
+        });
+        // tính số thông báo chưa xem
+        var count = $('.clickLead[data-is-send-notifications="0"]').length;
+
+        // Nếu số lượng là 0, ẩn phần tử .button__badge-leadMeeting, ngược lại hiển thị
+        if (count === 0) {
+            $('.button__badge-leadMeeting').hide();
+        } else {
+            $('.button__badge-leadMeeting').text(count).show();
+        }
+
+    });
+
+    function redirectToLeadDetail(leadId) {
+        // Kiểm tra xem window.location.href có đang ở AdviseCard/LeadIndex hay không
+        if (window.location.href.indexOf('/AdviseCard/LeadIndex') !== -1) {
+            // Nếu đang ở AdviseCard/LeadIndex, gọi trực tiếp hàm DetailLead(leadId)
+            DetailLead(leadId, -1);
+        } else {
+            // Nếu không, chuyển hướng đến AdviseCard/LeadIndex và gọi hàm DetailLead(leadId) sau khi chuyển hướng
+            /*window.location.href = '/AdviseCard/LeadIndex?detailLeadId=' + leadId;*/
+            window.open('/AdviseCard/LeadIndex?detailLeadId=' + leadId, '_blank');
+        }
+    }
+
+</script>

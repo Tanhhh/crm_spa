@@ -1,0 +1,377 @@
+﻿<error errorId="e2d67acf-7914-4b0b-b1bf-69ca47b44e7f" application="/LM/W3SVC/2/ROOT" host="PCHOA" type="System.ArgumentOutOfRangeException" message="The added or subtracted value results in an un-representable DateTime.&#xD;&#xA;Parameter name: value" source="mscorlib" detail="System.ArgumentOutOfRangeException: The added or subtracted value results in an un-representable DateTime.&#xD;&#xA;Parameter name: value&#xD;&#xA;   at System.DateTime.AddTicks(Int64 value)&#xD;&#xA;   at Erp.BackOffice.Account.Controllers.CustomerController.InsertCusUser(Nullable`1 Id, Int32 CustomerId, Nullable`1 StartDate) in D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Areas\Account\Controllers\CustomerController.cs:line 2583&#xD;&#xA;   at Erp.BackOffice.Account.Controllers.CustomerController.EditNT(CustomerViewModel model) in D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Areas\Account\Controllers\CustomerController.cs:line 2407&#xD;&#xA;   at lambda_method(Closure , ControllerBase , Object[] )&#xD;&#xA;   at System.Web.Mvc.ReflectedActionDescriptor.Execute(ControllerContext controllerContext, IDictionary`2 parameters)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionMethod(ControllerContext controllerContext, ActionDescriptor actionDescriptor, IDictionary`2 parameters)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass42.&lt;BeginInvokeSynchronousActionMethod&gt;b__41()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethod(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass37.&lt;&gt;c__DisplayClass39.&lt;BeginInvokeActionMethodWithFilters&gt;b__33()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethodWithFilters(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;&gt;c__DisplayClass2a.&lt;BeginInvokeAction&gt;b__20()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;BeginInvokeAction&gt;b__22(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeAction(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.&lt;&gt;c__DisplayClass1d.&lt;BeginExecuteCore&gt;b__18(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.&lt;&gt;c__DisplayClass8.&lt;BeginProcessRequest&gt;b__3(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="admin" time="2024-04-17T03:12:55.7911731Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CACHE_CONTROL:max-age=0&#xD;&#xA;HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_CONTENT_LENGTH:6498&#xD;&#xA;HTTP_CONTENT_TYPE:multipart/form-data; boundary=----WebKitFormBoundaryEBbtukHOfupn2uyK&#xD;&#xA;HTTP_ACCEPT:text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br, zstd&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:en-US,en;q=0.9&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=u01eyvyafn3abmpgpjzznvch; __RequestVerificationToken=iWsQ9IKUT_fJdx6SXnI-waR80-6-dOYbBV6IbsCUiIuZXjB6wfd8b3W78FJo9AskknWhaHEFPnIP0Jv58QfUl-jswOdRIsLqDUnnGx8rZ7s1; BRANCH_ID_SPA_CookieName=2; BO=D0B10C5347FBB4AEA53EE6C6E63C15D743333DEC9490C0865E94B9FDEA06B75471507C6E8FA9EC4D42CF7607DA2DA4D7F32E5D88C3455261C0341C46F8648825D379EAF41E40BB06E39DDB5419AD2CE2A601F3D3278B74454AD417C3B5795DA8&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/Customer/Detail/724632&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36&#xD;&#xA;HTTP_SEC_CH_UA:&quot;Google Chrome&quot;;v=&quot;123&quot;, &quot;Not:A-Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;123&quot;&#xD;&#xA;HTTP_SEC_CH_UA_MOBILE:?0&#xD;&#xA;HTTP_SEC_CH_UA_PLATFORM:&quot;Windows&quot;&#xD;&#xA;HTTP_UPGRADE_INSECURE_REQUESTS:1&#xD;&#xA;HTTP_ORIGIN:http://localhost:53200&#xD;&#xA;HTTP_SEC_FETCH_SITE:same-origin&#xD;&#xA;HTTP_SEC_FETCH_MODE:navigate&#xD;&#xA;HTTP_SEC_FETCH_USER:?1&#xD;&#xA;HTTP_SEC_FETCH_DEST:document&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Cache-Control: max-age=0&#xD;&#xA;Connection: keep-alive&#xD;&#xA;Content-Length: 6498&#xD;&#xA;Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryEBbtukHOfupn2uyK&#xD;&#xA;Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7&#xD;&#xA;Accept-Encoding: gzip, deflate, br, zstd&#xD;&#xA;Accept-Language: en-US,en;q=0.9&#xD;&#xA;Cookie: ASP.NET_SessionId=u01eyvyafn3abmpgpjzznvch; __RequestVerificationToken=iWsQ9IKUT_fJdx6SXnI-waR80-6-dOYbBV6IbsCUiIuZXjB6wfd8b3W78FJo9AskknWhaHEFPnIP0Jv58QfUl-jswOdRIsLqDUnnGx8rZ7s1; BRANCH_ID_SPA_CookieName=2; BO=D0B10C5347FBB4AEA53EE6C6E63C15D743333DEC9490C0865E94B9FDEA06B75471507C6E8FA9EC4D42CF7607DA2DA4D7F32E5D88C3455261C0341C46F8648825D379EAF41E40BB06E39DDB5419AD2CE2A601F3D3278B74454AD417C3B5795DA8&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/Customer/Detail/724632&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36&#xD;&#xA;sec-ch-ua: &quot;Google Chrome&quot;;v=&quot;123&quot;, &quot;Not:A-Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;123&quot;&#xD;&#xA;sec-ch-ua-mobile: ?0&#xD;&#xA;sec-ch-ua-platform: &quot;Windows&quot;&#xD;&#xA;Upgrade-Insecure-Requests: 1&#xD;&#xA;Origin: http://localhost:53200&#xD;&#xA;Sec-Fetch-Site: same-origin&#xD;&#xA;Sec-Fetch-Mode: navigate&#xD;&#xA;Sec-Fetch-User: ?1&#xD;&#xA;Sec-Fetch-Dest: document&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="admin" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="admin" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="admin" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="6498" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="multipart/form-data; boundary=----WebKitFormBoundaryEBbtukHOfupn2uyK" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/Customer/EditNT" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Customer\EditNT" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="42569" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="POST" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/Customer/EditNT" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/Customer/EditNT" />
+    </item>
+    <item name="HTTP_CACHE_CONTROL">
+      <value string="max-age=0" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_CONTENT_LENGTH">
+      <value string="6498" />
+    </item>
+    <item name="HTTP_CONTENT_TYPE">
+      <value string="multipart/form-data; boundary=----WebKitFormBoundaryEBbtukHOfupn2uyK" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br, zstd" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="en-US,en;q=0.9" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=u01eyvyafn3abmpgpjzznvch; __RequestVerificationToken=iWsQ9IKUT_fJdx6SXnI-waR80-6-dOYbBV6IbsCUiIuZXjB6wfd8b3W78FJo9AskknWhaHEFPnIP0Jv58QfUl-jswOdRIsLqDUnnGx8rZ7s1; BRANCH_ID_SPA_CookieName=2; BO=D0B10C5347FBB4AEA53EE6C6E63C15D743333DEC9490C0865E94B9FDEA06B75471507C6E8FA9EC4D42CF7607DA2DA4D7F32E5D88C3455261C0341C46F8648825D379EAF41E40BB06E39DDB5419AD2CE2A601F3D3278B74454AD417C3B5795DA8" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/Customer/Detail/724632" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" />
+    </item>
+    <item name="HTTP_SEC_CH_UA">
+      <value string="&quot;Google Chrome&quot;;v=&quot;123&quot;, &quot;Not:A-Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;123&quot;" />
+    </item>
+    <item name="HTTP_SEC_CH_UA_MOBILE">
+      <value string="?0" />
+    </item>
+    <item name="HTTP_SEC_CH_UA_PLATFORM">
+      <value string="&quot;Windows&quot;" />
+    </item>
+    <item name="HTTP_UPGRADE_INSECURE_REQUESTS">
+      <value string="1" />
+    </item>
+    <item name="HTTP_ORIGIN">
+      <value string="http://localhost:53200" />
+    </item>
+    <item name="HTTP_SEC_FETCH_SITE">
+      <value string="same-origin" />
+    </item>
+    <item name="HTTP_SEC_FETCH_MODE">
+      <value string="navigate" />
+    </item>
+    <item name="HTTP_SEC_FETCH_USER">
+      <value string="?1" />
+    </item>
+    <item name="HTTP_SEC_FETCH_DEST">
+      <value string="document" />
+    </item>
+  </serverVariables>
+  <form>
+    <item name="Id">
+      <value string="724632" />
+    </item>
+    <item name="CreatedUserId">
+      <value string="14859" />
+    </item>
+    <item name="CreatedDate">
+      <value string="04/02/2024 5:37:52 CH" />
+    </item>
+    <item name="IsDeleted">
+      <value string="False" />
+    </item>
+    <item name="Image">
+      <value string="" />
+    </item>
+    <item name="Code">
+      <value string="KH8007921" />
+    </item>
+    <item name="FacebookId">
+      <value string="" />
+    </item>
+    <item name="PlayId">
+      <value string="" />
+    </item>
+    <item name="IsPopup">
+      <value string="" />
+    </item>
+    <item name="defaultValueBranchId">
+      <value string="2" />
+    </item>
+    <item name="defaultValuetenNguonkhach">
+      <value string="khachsalemoi" />
+    </item>
+    <item name="defaultValueManagerStaffId">
+      <value string="14527" />
+    </item>
+    <item name="defaultValueNhomHuongDS">
+      <value string="" />
+    </item>
+    <item name="defaultValueGender">
+      <value string="True" />
+    </item>
+    <item name="listSMS">
+      <value string="0" />
+    </item>
+    <item name="txterrorMessageSendSMS">
+      <value string="" />
+    </item>
+    <item name="listZNS">
+      <value string="0" />
+    </item>
+    <item name="khoption">
+      <value string="new" />
+    </item>
+    <item name="CustomerId">
+      <value string="0" />
+    </item>
+    <item name="CustomerId_DisplayText">
+      <value string="" />
+    </item>
+    <item name="BranchId">
+      <value string="2" />
+    </item>
+    <item name="tenNguonkhach">
+      <value string="khachsalemoi" />
+    </item>
+    <item name="FirstName">
+      <value string="NGUYỄN THỊ NGỌC" />
+    </item>
+    <item name="LastName">
+      <value string="DIEU" />
+    </item>
+    <item name="NhomHuongDS">
+      <value string="" />
+    </item>
+    <item name="Birthday">
+      <value string="07/08/1976" />
+    </item>
+    <item name="Gender">
+      <value string="true" />
+    </item>
+    <item name="Note">
+      <value string="SALE MỜI,kte tầm C, từng là khách cũ mua sp kem cổ, soi da mòn nhiều, nhờn, khô và bề mặt sẹo rỗ. Tư vấn hợp lí, khoa học, thuyết phục sẽ mua. Tư vấn mua 10 tặng 1 deluxe 11tr nhưng chị nói còn nhiều phiếu CSD ở chỗ khác mà chị cũng ít khi đi lắm nên đổi qua hướng mua 1 lần PRP trải nghiệm giảm 40% còn 10tr800 chị đồng ý mua, hẹn sau Tết sẽ đi, chăm sóc bên pm" />
+    </item>
+    <item name="CityId">
+      <value string="10" />
+    </item>
+    <item name="DistrictId">
+      <value string="" />
+    </item>
+    <item name="WardId">
+      <value string="" />
+    </item>
+    <item name="Address">
+      <value string="06 Ấp Bình Lợi, Xã Đức Tân, Huyện Tân Trụ, Long An" />
+    </item>
+    <item name="Phone">
+      <value string="0963456715" />
+    </item>
+    <item name="Mobile">
+      <value string="" />
+    </item>
+    <item name="Email">
+      <value string="" />
+    </item>
+    <item name="CustomerGroup">
+      <value string="200" />
+    </item>
+    <item name="CustomerType">
+      <value string="Khách hàng mua dịch vụ" />
+    </item>
+    <item name="EconomicStatus">
+      <value string="Kinh tế C" />
+    </item>
+    <item name="SkinSkinLevel">
+      <value string="mức da 1" />
+    </item>
+    <item name="HairlLevel">
+      <value string="mức độ tóc 1" />
+    </item>
+    <item name="GladLevel">
+      <value string="Muc do 3" />
+    </item>
+    <item name="KhCuMuonBo">
+      <value string="false" />
+    </item>
+    <item name="KhCuThanPhien">
+      <value string="false" />
+    </item>
+    <item name="KhLauNgayKhongTuongTac">
+      <value string="false" />
+    </item>
+    <item name="KhMoiDenVaHuaQuaiLai">
+      <value string="false" />
+    </item>
+    <item name="KhMoiDenVaKinhTeYeu">
+      <value string="false" />
+    </item>
+    <item name="IsBonusSales">
+      <value string="false" />
+    </item>
+    <item name="isLock">
+      <value string="false" />
+    </item>
+    <item name="ManagerStaffId">
+      <value string="14527" />
+    </item>
+    <item name="StartDate">
+      <value string="" />
+    </item>
+    <item name="Create">
+      <value string="CreateCusUser" />
+    </item>
+    <item name="IdCustomer_Gioithieu">
+      <value string="0" />
+    </item>
+    <item name="productSelectList">
+      <value string="" />
+    </item>
+    <item name="_StartDate">
+      <value string="" />
+    </item>
+    <item name="LeadId">
+      <value string="704" />
+    </item>
+    <item name="isLead">
+      <value string="False" />
+    </item>
+  </form>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="u01eyvyafn3abmpgpjzznvch" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="iWsQ9IKUT_fJdx6SXnI-waR80-6-dOYbBV6IbsCUiIuZXjB6wfd8b3W78FJo9AskknWhaHEFPnIP0Jv58QfUl-jswOdRIsLqDUnnGx8rZ7s1" />
+    </item>
+    <item name="BRANCH_ID_SPA_CookieName">
+      <value string="2" />
+    </item>
+    <item name="BO">
+      <value string="D0B10C5347FBB4AEA53EE6C6E63C15D743333DEC9490C0865E94B9FDEA06B75471507C6E8FA9EC4D42CF7607DA2DA4D7F32E5D88C3455261C0341C46F8648825D379EAF41E40BB06E39DDB5419AD2CE2A601F3D3278B74454AD417C3B5795DA8" />
+    </item>
+  </cookies>
+</error>

@@ -1,0 +1,209 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Helpers
+@model List<Crm_KhachHenBitrixModel>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+
+@{
+    ViewBag.Title = "Cập nhật khách hẹn từ Bitrix";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CRM_KH_BANHANG",
+        ActionName = "CreateKhachBitrix",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    List<Erp.BackOffice.Areas.Administration.Models.UserViewModel> branchList = (List<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    int index = 0;
+    //string branchId = Request["branchId"] != null ? Request["branchId"] : "";
+    //if (Request["branchId"] == null)
+    //{
+    //    branchId = Erp.BackOffice.Helpers.Common.CurrentUser.BranchId.Value.ToString();
+    //}
+    //ViewData["branchId"] = branchId;
+    IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;    //IEnumerable<SelectListItem> Origin = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin", null, "value");
+    var nguoilap = ViewBag.NguoiLap;
+}
+
+<style>
+    #cTable table tbody, #cTable table thead {
+        display: block !important;
+    }
+
+    #cTable table tbody {
+        overflow: auto;
+        height: calc(100vh - 360px) !important;
+    }
+
+    #cTable table {
+        width: 1520px !important; /* can be dynamic */
+    }
+
+    #cTable th {
+        width: 100px;
+    }
+
+    #cTable td {
+        width: 100px;
+    }
+
+    #cTable > thead > tr > th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+
+    #cTable > tbody > tr > td {
+        vertical-align: middle;
+        /*text-align: center;*/
+    }
+</style>
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    @*@Html.Partial("_PartialSearchDrugStore", ViewData["branchId"])*@
+    <p>
+        <span class="input-daterange input-group">
+            @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : aDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Từ ngày" })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : retDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Đến ngày" })
+        </span>
+        <select id="NguoiLap" name="NguoiLap" style="width:200px">
+            <option value="0">-Người quản lý</option>
+            @foreach (var item in SelectListHelper.GetSelectList_FullUserNameKD(null, null))
+            {
+                <option value="@item.Value" @(nguoilap.ToString() == item.Value ? "selected" : "") data-selected="0">@item.Text</option>
+            }
+        </select>
+
+    </p>
+
+
+
+}
+
+
+<div class="table-responsive" id="BaoCaoDoanhThu">
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            <tr class="">
+
+                @*<th class="grid-header text-center" style="width:100px;">Ngày</th>*@
+                <th style="position: sticky;left: 0;min-width:100px;background-color:#eee" class="text-center">Nhân viên</th>
+                @for (DateTime dt = ViewBag.aDateTime; dt <= ViewBag.retDateTime; dt = dt.AddDays(1))
+                {
+                    <th class="text-center" style="width:100px;">@dt.ToString("dd/MM/yyyy")</th>
+                }
+
+            </tr>
+
+        </thead>
+        <tbody>
+            @foreach (var item in branchList)
+            {
+                var check = false;
+                index++;
+
+                <tr class="@(index%2==0?"alert-warning":"")">
+
+                    <td style="position: sticky;left: 0;background-color:#fff">@(item.FullName)</td>
+
+                    @for (DateTime dt = ViewBag.aDateTime; dt <= ViewBag.retDateTime; dt = dt.AddDays(1))
+                    {
+                        var date = dt.ToString("dd/MM/yyyy");
+                        var sl = Model.Where(x => x.Date.ToString("dd/MM/yyyy") == date && x.UserId == item.Id).FirstOrDefault();
+                        int? amount = 0;
+                        if (sl != null)
+                        {
+                            amount = sl.Amount;
+                        }
+
+                        <td>
+                            <input hidden class="iduser" value="@item.Id" />
+                            @if (date == DateTime.Now.ToString("dd/MM/yyyy") || check == true)
+                            {
+                                <input class="ace onhap" type="number" value="@amount" />
+                                check = true;
+                            }
+                            else
+                            {<input class="ace onhap" type="number" value="@amount" disabled />
+                            }
+
+
+                            <input hidden class="date" value="@date" />
+                        </td>
+                    }
+
+                </tr>
+            }
+
+        </tbody>
+        <thead>
+            <tr class=""></tr>
+        </thead>
+    </table>
+
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button onclick="exportThis()" class="btn btn-primary btn-sm btn-white btn-success">
+        <i class="ace-icon fa fa-save"></i>
+        Lưu lại
+    </button>
+}
+@section Scripts {
+    <script type="text/javascript">
+
+        function exportThis() {
+
+            alert("Cập nhật thành công !");
+        }
+
+        $('.onhap').change(function () {
+            var sl = $(this).val();
+            var user = $(this).closest("td").find("input:nth-child(1)").val();
+            var date = $(this).closest("td").find("input:nth-child(3)").val();
+            //alert(user);
+            $.ajax({
+                type: "POST",
+                url: "/CRM_KH_BANHANG/UpdateBitrix",
+                data: JSON.stringify({ user: user, date: date, amount: sl }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (r) { }
+            });
+        });
+
+        $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+
+        });
+        $('[name="search"]').click(function () {
+            startDate = $('#startDate').val();
+            endDate = $('#endDate').val();
+            if (startDate == '' || endDate == '') {
+                alertPopup("Lỗi", "Vui lòng chọn ngày để tìm kiếm !", "warning");
+                return false;
+            }
+            else {
+                return true;
+            }
+        });
+    </script>
+
+
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

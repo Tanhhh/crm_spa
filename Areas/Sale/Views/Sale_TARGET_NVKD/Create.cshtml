@@ -1,0 +1,101 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model HoaHongChiNhanhViewModel
+
+@{
+    ViewBag.Title = "Tạo Target doanh thu";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Sale_TARGET_NVKD",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+
+    @*@Html.CustomTextboxFor(model => model.BranchId, null, null, WidthType.span12)*@
+    <div class="control-group form-group">
+
+        <label class="control-label col-lg-5 col-md-4 col-sm-4" for="BranchId">Chi Nhánh</label>
+
+
+        <div class="control-value col-lg-7 col-md-8 col-sm-8">
+            @Html.DropDownListFor(model => model.BranchId, Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Model.BranchId, "Chi nhánh"), WidthType.span12)
+        </div>
+    </div>
+    @Html.CustomTextboxFor(model => model.month, null, null, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.year, null, null, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.NewOrlane, null, null, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.OldOrlane, null, null, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.Annayake, null, null, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.LennorGreyl, null, null, WidthType.span12)
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    <script>
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.BranchName" >@Model.BranchId</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+        });
+
+        $(document).ready(function () {
+            $('#month').change(function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(1);
+                }
+                else if (ralVal > 12) {
+                    $(this).val(12);
+                }
+            });
+            $('#year').change(function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(1);
+                }
+            });
+        });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

@@ -1,0 +1,194 @@
+﻿<error errorId="26d7ef6b-3797-4bc0-81a1-59eccaa3abe3" application="/LM/W3SVC/2/ROOT" host="DESKTOP-H6FQOND" type="System.Web.Mvc.HttpAntiForgeryException" message="The provided anti-forgery token was meant for user &quot;&quot;, but the current user is &quot;ttphuong&quot;." source="System.Web.WebPages" detail="System.Web.Mvc.HttpAntiForgeryException (0x80004005): The provided anti-forgery token was meant for user &quot;&quot;, but the current user is &quot;ttphuong&quot;.&#xD;&#xA;   at System.Web.Helpers.AntiXsrf.TokenValidator.ValidateTokens(HttpContextBase httpContext, IIdentity identity, AntiForgeryToken sessionToken, AntiForgeryToken fieldToken)&#xD;&#xA;   at System.Web.Helpers.AntiXsrf.AntiForgeryWorker.Validate(HttpContextBase httpContext)&#xD;&#xA;   at System.Web.Helpers.AntiForgery.Validate()&#xD;&#xA;   at System.Web.Mvc.ValidateAntiForgeryTokenAttribute.OnAuthorization(AuthorizationContext filterContext)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeAuthorizationFilters(ControllerContext controllerContext, IList`1 filters, ActionDescriptor actionDescriptor)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;BeginInvokeAction&gt;b__1e(AsyncCallback asyncCallback, Object asyncState)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.Begin(AsyncCallback callback, Object state, Int32 timeout)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.Controller.&lt;&gt;c__DisplayClass1d.&lt;BeginExecuteCore&gt;b__17(AsyncCallback asyncCallback, Object asyncState)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.Begin(AsyncCallback callback, Object state, Int32 timeout)&#xD;&#xA;   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.Begin(AsyncCallback callback, Object state, Int32 timeout)&#xD;&#xA;   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.Controller.System.Web.Mvc.Async.IAsyncController.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.&lt;&gt;c__DisplayClass8.&lt;BeginProcessRequest&gt;b__2(AsyncCallback asyncCallback, Object asyncState)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.Begin(AsyncCallback callback, Object state, Int32 timeout)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContext httpContext, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.System.Web.IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCallback cb, Object extraData)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="ttphuong" time="2019-02-15T08:51:38.9346506Z" statusCode="500">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CACHE_CONTROL:max-age=0&#xD;&#xA;HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_CONTENT_LENGTH:170&#xD;&#xA;HTTP_CONTENT_TYPE:application/x-www-form-urlencoded&#xD;&#xA;HTTP_ACCEPT:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:en-US,en;q=0.9,vi;q=0.8&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=dzhwxenodfvc4jsfgcn4tf3a; __RequestVerificationToken=vj38QnJ4kuRLbFCs7Vq_0ws_5wsUJBgeIhLhIPmXOYwxVnvkQnv3rVh2VNFCZ35qwr9kYa_12EUMqDgxyFz5E3NrbjzsB2RF14-YM2-mzEA1; BO=931C369F6EAA4E45A544CFE32E0AF6B3C2522DCCF273098E454447798DE9B452D48BEC1F6A4CFFB3680B0AFDD3750F54C260AFFEC15E658FBF8EE2CF3A9BAA57BB1E7375FA0E3A42F1FEF9FF19F2DA09873817A0A425D4E8A3E9B0C86A89C69E&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/User/Login&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36&#xD;&#xA;HTTP_UPGRADE_INSECURE_REQUESTS:1&#xD;&#xA;HTTP_ORIGIN:http://localhost:53200&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Cache-Control: max-age=0&#xD;&#xA;Connection: keep-alive&#xD;&#xA;Content-Length: 170&#xD;&#xA;Content-Type: application/x-www-form-urlencoded&#xD;&#xA;Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8&#xD;&#xA;Accept-Encoding: gzip, deflate, br&#xD;&#xA;Accept-Language: en-US,en;q=0.9,vi;q=0.8&#xD;&#xA;Cookie: ASP.NET_SessionId=dzhwxenodfvc4jsfgcn4tf3a; __RequestVerificationToken=vj38QnJ4kuRLbFCs7Vq_0ws_5wsUJBgeIhLhIPmXOYwxVnvkQnv3rVh2VNFCZ35qwr9kYa_12EUMqDgxyFz5E3NrbjzsB2RF14-YM2-mzEA1; BO=931C369F6EAA4E45A544CFE32E0AF6B3C2522DCCF273098E454447798DE9B452D48BEC1F6A4CFFB3680B0AFDD3750F54C260AFFEC15E658FBF8EE2CF3A9BAA57BB1E7375FA0E3A42F1FEF9FF19F2DA09873817A0A425D4E8A3E9B0C86A89C69E&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/User/Login&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36&#xD;&#xA;Upgrade-Insecure-Requests: 1&#xD;&#xA;Origin: http://localhost:53200&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="ttphuong" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="ttphuong" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="ttphuong" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="170" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="application/x-www-form-urlencoded" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/User/Login" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\User\Login" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="25127" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="POST" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/User/Login" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/User/Login" />
+    </item>
+    <item name="HTTP_CACHE_CONTROL">
+      <value string="max-age=0" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_CONTENT_LENGTH">
+      <value string="170" />
+    </item>
+    <item name="HTTP_CONTENT_TYPE">
+      <value string="application/x-www-form-urlencoded" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="en-US,en;q=0.9,vi;q=0.8" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=dzhwxenodfvc4jsfgcn4tf3a; __RequestVerificationToken=vj38QnJ4kuRLbFCs7Vq_0ws_5wsUJBgeIhLhIPmXOYwxVnvkQnv3rVh2VNFCZ35qwr9kYa_12EUMqDgxyFz5E3NrbjzsB2RF14-YM2-mzEA1; BO=931C369F6EAA4E45A544CFE32E0AF6B3C2522DCCF273098E454447798DE9B452D48BEC1F6A4CFFB3680B0AFDD3750F54C260AFFEC15E658FBF8EE2CF3A9BAA57BB1E7375FA0E3A42F1FEF9FF19F2DA09873817A0A425D4E8A3E9B0C86A89C69E" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/User/Login" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36" />
+    </item>
+    <item name="HTTP_UPGRADE_INSECURE_REQUESTS">
+      <value string="1" />
+    </item>
+    <item name="HTTP_ORIGIN">
+      <value string="http://localhost:53200" />
+    </item>
+  </serverVariables>
+  <form>
+    <item name="__RequestVerificationToken">
+      <value string="1MP-QslQgi1MnXbYr0dVA11wW7BJthx-VHNfycZ3way_5w1-OOFq-XQKcNjlSic8hNR8d3ZPqmqjuRybXjY0wxPF_HUW3Te5vmJV5AC9Rh01" />
+    </item>
+    <item name="UserName">
+      <value string="TTPHUONG" />
+    </item>
+    <item name="Password">
+      <value string="1234564" />
+    </item>
+  </form>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="dzhwxenodfvc4jsfgcn4tf3a" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="vj38QnJ4kuRLbFCs7Vq_0ws_5wsUJBgeIhLhIPmXOYwxVnvkQnv3rVh2VNFCZ35qwr9kYa_12EUMqDgxyFz5E3NrbjzsB2RF14-YM2-mzEA1" />
+    </item>
+    <item name="BO">
+      <value string="931C369F6EAA4E45A544CFE32E0AF6B3C2522DCCF273098E454447798DE9B452D48BEC1F6A4CFFB3680B0AFDD3750F54C260AFFEC15E658FBF8EE2CF3A9BAA57BB1E7375FA0E3A42F1FEF9FF19F2DA09873817A0A425D4E8A3E9B0C86A89C69E" />
+    </item>
+  </cookies>
+</error>

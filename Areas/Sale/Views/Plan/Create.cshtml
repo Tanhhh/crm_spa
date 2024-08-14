@@ -1,0 +1,779 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Sale.Models
+@model KH_TUONGTACViewModel
+
+@{
+    ViewBag.Title = "Cập nhật tương tác";
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Plan",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    int index = 0;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    //DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    string MUCDO_TUONGTAC = Request["MUCDO_TUONGTAC"] != null ? Request["MUCDO_TUONGTAC"] : "";
+    string MUCCANHBAO_TUONGTAC = Request["MUCCANHBAO_TUONGTAC"] != null ? Request["MUCCANHBAO_TUONGTAC"] : "";
+    string NGAYLAP = Request["NGAYLAP"] != null ? Request["NGAYLAP"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("dd/MM/yyyy");
+    IEnumerable<KH_TUONGTACViewModel> KH_TUONGTAC = (IEnumerable<KH_TUONGTACViewModel>)ViewBag.KH_TUONGTAC;
+    IEnumerable<CustomerViewModel> customerList = (IEnumerable<CustomerViewModel>)ViewBag.CustomerList;
+
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <style type="text/css">
+        #rcb_1_rcbSlide {
+            left: -100px !important;
+        }
+        .edit-view select {
+            border: 1px solid #03295c40;
+        }
+
+        .edit-view select, .edit-view input {
+            width: 60%;
+        }
+        .div-chung{
+            text-align:right;
+            width:32%;
+        }
+            .div-chung span {
+                margin-bottom: 10px;
+                white-space: nowrap;
+            }
+
+            .div-chung label {
+                color: #0555be;
+                font-weight: bold;
+            }
+
+        .has_error {
+            border: 1px #f2a696 solid !important;
+            color: #D68273;
+        }
+
+        .mini-popup {
+            position: relative;
+            display: inline;
+        }
+
+        #popup_archive {
+            position: absolute;
+            bottom: 34px;
+            left: -154px;
+            width: 410px;
+            height: 235px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+
+        #header-content {
+            position: relative;
+            bottom: 50px;
+            right: 5px;
+        }
+
+        #myImg {
+            outline: none;
+        }
+
+        .remove-all-styles {
+            all: revert;
+        }
+
+        #label {
+            width: 100px;
+            float: left;
+            text-align: left;
+        }
+        #rcb_1_rcbSlide {
+            margin-top:0 !important;
+        }
+    </style>
+}
+@helper CheckDeleteColumns(int? KH_TUONGTAC_ID)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_TUONGTAC_ID">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper GridColumnCommand(int? KH_TUONGTAC_ID)
+{
+    <p>
+        <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+            <i class="ace-icon fa fa-trash bigger-120"></i>
+        </button>
+    </p>
+
+}
+@helper GridColumnName(string HINH_ANH)
+{
+var fileurl = Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(HINH_ANH, "Plan", "user");
+    <div class="itemdiv commentdiv">
+        <div class="user">
+            <div class="ace-thumbnails">
+                <a href="@fileurl" data-rel="colorbox" class="cboxElement">
+                    <img id="myImg" style="text-align:center" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(HINH_ANH, "Plan", "user"))">
+                </a>
+            </div>
+        </div>
+    </div>
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+@if (TempData["Seccess"] != null && TempData["Seccess"] != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @TempData["Seccess"]
+    </div>
+}
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "CreatePlan", @class = "form-horizontal clearfix", enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" name="Type" value="plan" />
+    <input type="hidden" name="NGUOILAP_ID" value="@ViewBag.NGUOI_LAP" />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 50%;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-info-circle"></i> Tổng quan</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#image" aria-expanded="false"><i class="fa fa-image"></i> Ảnh minh họa</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane active">
+                                    <div class="input-daterange" style="width: 100%; margin-left: 59px;">  
+                                     @*   <label style="color: #0555be; font-weight: bold;">Khách hàng<label style="color:red;">*</label></label>
+                                        @Html.TextBox("KHACHHANG_ID", Request["KHACHHANG_ID"], new { @class = "hide", autocomplete = "off", placeholder = "Khách hàng", style = "width:15%;margin-right:5% ; margin-bottom: 10px;" })
+                                        <input id="product_barcode" type="text" placeholder="Tên khách hàng" autocomplete="off" style="width: 20.8%; border: 1px solid #03295c85;" />
+                                        <select id="productSelectList" name="productSelectList" style="width: 25%; border: 1px solid #03295c85;">
+                                            <option value="">- Tìm khách hàng -</option>
+                                            @foreach (var item in customerList)
+                                            {
+                                                <option value="@item.Id" data-selected="0" data-value="@item.Id | @(Common.KiemTraTonTaiHinhAnh(item.Image, "product-image-folder", "product"))  | @(item.Code + " - " + item.CompanyName )">@item.Code - @item.CompanyName</option>
+                                            }
+                                        </select>*@
+                                    </div>
+
+
+                                    <div style="display:flex">
+                                        <div class="div-chung div1">
+                                            <span>
+                                                <label style="color: #0555be; font-weight: bold;">Ngày KH</label>
+                                                @Html.TextBox("NGAYLAP", Request["NGAYLAP"] != null ? Request["NGAYLAP"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("dd/MM/yyyy"), new { @readonly = "readonly", autocomplete = "off", placeholder = "Ngày lập", style = "width: 60%;  margin-bottom: 10px;border: 1px solid #03295c40;" })
+
+                                            </span>
+                                            <span>
+                                                <label>Hình thức
+                                                    <label style="color:red;">*</label>
+                                                </label>
+                                                    @Html.DropDownList("HINHTHUC_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("HINHTHUC_GIOITHIEU", Request["HINHTHUC_TUONGTAC"], "-Rỗng-"), new { style = " margin-bottom: 10px;" })
+                                            </span>
+                                            <span>
+                                                <label style="padding-left:0px;">Thông tin loại<label style="color:red;">*</label></label>
+                                                @Html.DropDownList("LOAI_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("LOAI_TUONGTAC", Request["LOAI_TUONGTAC"], "-Rỗng-"), new { style = " margin-bottom: 10px;" })
+                                            </span>
+                                            <span>
+                                                <label style="padding-left:0px;">Mức độ đánh giá </label>
+                                                @Html.DropDownList("MUCDO_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("MUCDO_DANHGIA", Request["MUCDO_TUONGTAC"], "-Rỗng-"), new { style = " margin-bottom: 10px;" })
+                                            </span>
+                                        </div>
+                                        <div class="div-chung div2">
+                                            <span>
+                                                <label style="color: #0555be; font-weight: bold;">Khách hàng<label style="color:red;">*</label></label>
+                                                @Html.TextBox("KHACHHANG_ID", Request["KHACHHANG_ID"], new { @class = "hide", autocomplete = "off", placeholder = "Khách hàng", style = "width:15%;margin-right:5% ; margin-bottom: 10px;" })
+                                                <input id="product_barcode" type="text" placeholder="Tên khách hàng" autocomplete="off" style="width: 60%; margin-right: 5%; margin-bottom: 10px; border: 1px solid #03295c40; " />
+                                                <select id="productSelectList" name="productSelectList" style="width: 25%; border: 1px solid #03295c85;">
+                                                    <option value="">- Tìm khách hàng -</option>
+                                                    @foreach (var item in customerList)
+                                                    {
+                                                        <option value="@item.Id" data-selected="0" data-value="@item.Id | @(Common.KiemTraTonTaiHinhAnh(item.Image, "product-image-folder", "product"))  | @(item.Code + " - " + item.CompanyName )">@item.Code - @item.CompanyName</option>
+                                                    }
+                                                </select>
+                                            </span>
+
+                                            <span>
+                                                <label>Giờ tương tác</label>
+                                                @Html.TextBox("GIO_TUONGTAC", Request["GIO_TUONGTAC"] != null ? Request["GIO_TUONGTAC"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("HH:mm"), new { autocomplete = "off", placeholder = "Từ ngày", style = "margin-right: 5%; margin-bottom: 10px;border: 1px solid #03295c40;" })
+                                            </span>
+                                            <span>
+                                                <label>Phân loại</label>
+                                                @Html.DropDownList("PHANLOAI_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("TOC", Request["PHANLOAI_TUONGTAC"], "-Rỗng-"), new { style = "margin-right: 5%; margin-bottom: 10px;" })
+                                            </span>
+                                            <span>
+                                                <label>Giải pháp</label>
+                                                @Html.DropDownList("GIAIPHAP_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("GIAIPHAP_TUONGTAC", Request["GIAIPHAP_TUONGTAC"], "-Rỗng-"), new { style = "margin-right: 5%; margin-bottom: 10px;" })
+                                            </span>
+                                        </div>
+                                        <div class="div-chung div3">
+                                            <span>
+                                                <label>Lịch tiếp theo</label>
+                                                @*@Html.TextBox("NGAYTUONGTAC_TIEP", Request["NGAYTUONGTAC_TIEP"] != null ? Request["NGAYTUONGTAC_TIEP"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("dd/MM/yyyy "), new { id = "NGAYTUONGTAC_TIEP",name= "NGAYTUONGTAC_TIEP", autocomplete = "off", placeholder = "Từ ngày", style = "width:150px;"})*@
+                                                @Html.TextBox("NGAYTUONGTAC_TIEP", Request["NGAYTUONGTAC_TIEP"], new { id = "NGAYTUONGTAC_TIEP", name = "NGAYTUONGTAC_TIEP", autocomplete = "off", placeholder = "Từ ngày", style = "margin-right: 5%; margin-bottom: 10px;border: 1px solid #03295c40;" })
+                                            </span>
+                                            <span>
+                                                <label>Tình trạng</label>
+                                                <select style="margin-right: 5%; margin-bottom: 10px;" id="TINHTRANG_TUONGTAC" name="TINHTRANG_TUONGTAC">
+                                                    <option value="">-Rỗng-</option>
+                                                    @foreach (var item in ViewBag.DODAITOC)
+                                                    {
+                                                        <option class="TINHTRANG" id="@item.Code" value="@item.Value">@item.Name</option>
+                                                    }
+                                                    @foreach (var item1 in ViewBag.DUOITOC)
+                                                    {
+                                                        <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                    }
+                                                    @foreach (var item1 in ViewBag.DADAU)
+                                                    {
+                                                        <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                    }
+                                                    @foreach (var item1 in ViewBag.MAMTOC)
+                                                    {
+                                                        <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                    }
+                                                    @foreach (var item1 in ViewBag.THANTOC)
+                                                    {
+                                                        <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                    }
+                                                    @foreach (var item1 in ViewBag.CO)
+                                                    {
+                                                        <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                    }
+                                                    @foreach (var item1 in ViewBag.MAT)
+                                                    {
+                                                        <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                    }
+                                                    @foreach (var item1 in ViewBag.BODY)
+                                                    {
+                                                        <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                    }
+                                                    @foreach (var item1 in ViewBag.DAMAT)
+                                                    {
+                                                        <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                    }
+                                                </select>
+                                            </span>
+                                            <span>
+                                                <label style="padding-left:0px;">Mức cảnh báo</label>
+                                                @Html.DropDownList("MUCCANHBAO_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("MUCCANHBAO", Request["MUCCANHBAO_TUONGTAC"], "-Rỗng-"), new { style = "margin-right: 5%; margin-bottom: 10px;" })
+                                            </span>
+                                        </div>
+                                    </div>
+                         
+                                        <span class="note input-daterange">
+
+
+                                            @Html.TextArea("GHI_CHU", Request["GHI_CHU"], new { @class = "", autocomplete = "off", placeholder = "Ghi chú", style = "width: 98.5%;" })
+                                        </span>
+                                </div>
+                                <div id="image" class="tab-pane">
+                                    <div class="wrap-btn-upload">
+                                        <a class="btn btn-primary btn-sm btn-white"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                                        <input type="file" id="file-image" name="file-image" class="file-image" accept="image/*" onchange="previewFileImage(event, '#display-image img')" />
+                                    </div>
+                                    <div class="text-center" id="display-image">
+                                        <img src="/assets/css/images/noimage.gif" id="imgAvt" style="max-height:250px;max-width:300px" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <table style="width:100%">
+            <tr style="width:600px">
+                <td width="20%">
+                    <button id="Save" class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+                        <i class="ace-icon fa fa-save"></i>
+                        @Wording.Save
+                    </button>
+                </td>
+                @*<span style="width:500px; float:right; bottom:500px;top:400px;height:110px;position:absolute">*@
+                @*<button class="btn btn-mini btn-primary" onclick="PostData(@Request["NGAYLAP"])" value="KETHUA">
+                        <i class="ace-icon fa"></i>
+                        Lấy KH dự kiến
+                    </button>*@
+                <td width="40%">
+                    <a onclick="KETHUA()" id="btnKETHUA" class="btn btn-mini btn-primary">
+                        Lấy KH dự kiến
+                    </a>
+                </td>
+                <td width="80%">
+
+                    <a class="btn btn-mini btn-primary" onclick="OpenPopup('@Url.Action("EditView", "Plan",new { NGUOILAP_ID= @Request["NGUOILAP_ID"],IsPopup = true})','',0,0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                        Xem tình trạng KH
+                    </a>
+
+                </td>
+            </tr>
+        </table>
+
+        @*</span>*@
+    }
+}
+
+@section Scripts {
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @*@Html.ScriptBottom_DatePicker("dd/MM/yyyy HH:mm")*@
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+
+    <script type="text/javascript">
+        function KETHUA() {
+            var NGUOILAP_ID= @Request["NGUOILAP_ID"];
+            var NGAYLAP = "@Request["NGAYLAP"]";
+           $.ajax({
+                    type: "POST",
+                    url: "/Plan/ViewKeThua",
+                    data: JSON.stringify({ NGUOILAP_ID: NGUOILAP_ID, NGAYLAP: NGAYLAP}),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if(result == 1){
+                            alert("Lấy khách hàng dự kiến thành công.");
+                            //window.location.reload();
+                            window.location = "/Plan/Index"
+                            //window.location.href = '@Url.Action("Index", "Plan")';
+                        }
+
+                    }
+                });
+
+        }
+
+
+
+        function XEMTINHTRANG() {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ViewKeThua", "Plan",new { NGAYLAP = @NGAYLAP })',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    window.locationre = result.url;
+                }
+            });
+
+        }
+
+
+        $(function () {
+            $('#PHANLOAI_TUONGTAC').attr("disabled", "disabled");
+            $('#TINHTRANG_TUONGTAC').attr("disabled", "disabled");
+
+            $('#LOAI_TUONGTAC').change(function () {
+                var selectedEventType = this.options[this.selectedIndex].value;
+                if (selectedEventType != "TOC") {
+                    $('.TINHTRANG').hide().filter('#' + selectedEventType).show();
+                    $('#PHANLOAI_TUONGTAC').attr("disabled", "disabled");
+                    $('#TINHTRANG_TUONGTAC').removeAttr('disabled');
+                    $('#PHANLOAI_TUONGTAC').val("");
+                    $('#TINHTRANG_TUONGTAC').val("");
+                }
+                else {
+                    $('.TINHTRANG').hide().filter('#' + selectedEventType).show();
+                    $('#PHANLOAI_TUONGTAC').removeAttr('disabled');
+                }
+            });
+            $('#PHANLOAI_TUONGTAC').change(function () {
+                var selectedEventType = this.options[this.selectedIndex].value;
+                if (selectedEventType != null) {
+                    $('.TINHTRANG').hide().filter('#' + selectedEventType).show();
+                    $('#TINHTRANG_TUONGTAC').removeAttr("disabled");
+                } else {
+                    $('#TINHTRANG_TUONGTAC').attr("disabled", "disabled");
+                }
+            });
+
+            //$('#NGAYTUONGTAC_TIEP').datetimepicker({
+            //    format: 'DD/MM/YYYY HH:mm'
+            //});
+
+            $('#NGAYLAP').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+            $('#GIO_TUONGTAC').datetimepicker({
+                format: 'HH:mm'
+            });
+        });
+        //upload image file
+        $(document).ready(function () {
+            $('[type="file"]').change(function () {
+                var fileInput = $(this);
+                if (fileInput.length && fileInput[0].files && fileInput[0].files.length) {
+                    var url = window.URL || window.webkitURL;
+                    var image = new Image();
+                    image.onerror = function () {
+                        alert("File tải lên bắt buộc phải là hình ảnh (.png, .jpg, .jpeg,...)");
+                        $("#imgAvt").attr("src", "/assets/css/images/noimage.gif");
+                    };
+                    image.src = url.createObjectURL(fileInput[0].files[0]);
+                }
+            });
+        });
+        //
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+        function initCkeditor() {
+            $('.ckeditor').ckeditor({
+                "extraPlugins": 'imagebrowser',
+                "imageBrowser_listUrl": "@Url.Action("ListJson","Images")",
+                // Define the toolbar groups as it is a more accessible solution.
+                toolbarGroups: [
+                    { "name": "document", "groups": ["mode", "document", "doctools"] },
+                    { "name": "editing", "groups": ["find", "selection", "spellchecker"] },
+                    { "name": "forms" },
+                    { "name": "tools" },
+                    { "name": "basicstyles", "groups": ["basicstyles", "cleanup"] },
+                    { "name": "clipboard", "groups": ["clipboar", "undo"] },
+                    { "name": "links", "groups": ["links"] },
+                    { "name": "paragraph", "groups": ["list", "blocks"] },
+                    { "name": "insert", "groups": ["insert"] },
+                    { "name": "styles", "groups": ["styles"] },
+                    //{ "name": "about", "groups": ["about"] },
+                    { "name": "styles" },
+                    { "name": "colors" },
+                    { "name": "align", "groups": ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+
+                ],
+                // Remove the redundant buttons from toolbar groups defined above.
+                removeButtons: 'Underline,Strike,Subscript,Superscript,Anchor,Styles,Specialchar'
+            });
+        }
+
+        $(document).ready(function () {
+            //init rcb chọn sản phẩm
+            $('#productSelectList').radComboBox({
+                colTitle: 'ID, Hình, Tên khách hàng',
+                colValue: 1,
+                colImage: 2,
+                colHide: '1',
+                colSize: '0px,50px,',
+                colClass: ',,',
+                //width: 600,
+                height: 300,
+                boxSearch: true,
+                colSearch: 2
+            });
+            //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+            $('#productSelectList').on('change', function () {
+                var $this = $(this);
+                var selected = $this.find("option:selected");
+
+                if (selected.val() == '' || $('#product_item_' + selected.val()).length > 0)
+                    return;
+                $('#KHACHHANG_ID').val(selected.val());
+                //$('#CustomerName').val(selected.text());
+                $('#product_barcode').val(selected.text());
+
+            });
+            $('#product_barcode').keypress(function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $('#product_barcode').trigger('change');
+                }
+            });
+
+            //khi nhập barcode
+            $('#product_barcode').change(function () {
+                var $this = $(this);
+                if ($this.val() != '') {
+
+                    var barcode = $this.val();
+                    //đặt lại giá trị rỗng
+                    $this.val('').focus();
+
+                    var valueSearch = searchProductByBarCodeContain(barcode);
+                    if (valueSearch == undefined) {
+                        alert('Không tìm thấy khách hàng với mã code trên!');
+                        return;
+                    }
+
+                    $('#productSelectList').val(valueSearch).trigger("change");
+                }
+            });
+        });
+        function searchProductByBarCodeContain(barcode) {
+            barcode = barcode.toLowerCase();
+            //var $productSelect = $('.detail_item_id').first();
+
+            var $optionList = $("#productSelectList").find('option');
+
+            var arrResulft = [];
+            for (var i = 0; i < $optionList.length; i++) {
+                var data_code = $($optionList[i]).data('code') != undefined ? $($optionList[i]).data('code').toString().toLowerCase() : undefined;
+                if (barcode.indexOf(data_code) != -1)
+                    arrResulft.push($($optionList[i]).attr('value'));
+
+                if (arrResulft.length == 1) {
+                    return arrResulft[0];
+                }
+            }
+
+            return arrResulft[0];
+        };
+
+        // $("#Save").on('click',function() {
+
+        //var endDate = new Date();
+        //var startDate = document.getElementById("NGAYLAP").value;
+        //$('#NGAYTUONGTAC_TIEP').datetimepicker({
+        //format: 'DD/MM/YYYY HH:mm'
+        //}).on('dp.change', function () {
+        //    //var endDate = new Date();
+        //    //var startDate = document.getElementById("NGAYLAP").value;
+        //    endDate = document.getElementById("NGAYTUONGTAC_TIEP").value;
+        //});
+        // endDate = document.getElementById("NGAYTUONGTAC_TIEP").value;
+        //var date = Date.now();
+        //var today = new Date(Date.now());
+        //var dd = String(today.getDate()).padStart(2, '0');
+        //var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        //var yyyy = today.getFullYear();
+        //var hh = today.getHours();
+        //var MM = today.getMinutes();
+        //today = dd + '/' + mm + '/' + yyyy ;
+
+        //var today = new Date();
+        //var dd = today.getDate();
+        //var mm = today.getMonth() + 1; //January is 0!
+        //var yyyy = today.getFullYear();
+        //if (dd < 10) {
+        //    dd = '0' + dd
+        //}
+        //if (mm < 10) {
+        //    mm = '0' + mm
+        //}
+        //var hh = today.getHours();
+        //var MM = today.getMinutes();
+        //today = dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + MM;
+        //var endDate = document.getElementById("NGAYTUONGTAC_TIEP").value;
+        $('#NGAYTUONGTAC_TIEP').datetimepicker({
+            format: 'DD/MM/YYYY HH:mm'
+
+        });
+        $("#Save").click(function () {
+
+            var endDate = new Date();
+            debugger
+            endDate = document.getElementById("NGAYTUONGTAC_TIEP").value;
+
+            //var today = new Date();
+            //var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+            //var time = today.getHours() + ":" + today.getMinutes();
+            //var dateTime = date + ' ' + time;
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+            if (mm < 10) {
+                mm = '0' + mm
+            }
+            var hh = today.getHours();
+            var MM = today.getMinutes();
+            today = dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + MM;
+
+            //const now = new Date();
+            if (endDate == "") {
+                return true;
+            }
+            else {
+                if (($.datepicker.parseDate('dd/mm/yy', endDate) < $.datepicker.parseDate('dd/mm/yy', today))) {
+                    alert("Ngày tương tác tiếp phải lớn hơn ngày hiện tại");
+                    document.getElementById("NGAYTUONGTAC_TIEP").value = "";
+                    return false;
+                }
+            }
+            var startDate = document.getElementById("NGAYLAP").value;
+
+
+            if ($.datepicker.parseDate('dd/mm/yy', endDate) < $.datepicker.parseDate('dd/mm/yy', startDate)) {
+                alert("Ngày kế tiếp phải lớn hơn ngày lập");
+                document.getElementById("NGAYTUONGTAC_TIEP").value = "";
+                return false;
+            }
+            return true;
+        });
+        //  });
+
+
+        //$(function () {
+        //    $("#NGAYTUONGTAC_TIEP").datepicker({ dateFormat: "dd-mm-yy" }).val()
+        //});
+
+
+        //$('#NGAYTUONGTAC_TIEP').datetimepicker({
+        //    format: 'DD/MM/YYYY HH:mm'
+        //});
+        //$('#NGAYTUONGTAC_TIEP').datetimepicker({
+        //    format: 'DD/MM/YYYY HH:mm'
+
+        //});
+        //$(function () {
+        //    $("#NGAYTUONGTAC_TIEP").datetimepicker({ format: 'DD/MM/YYYY HH:mm' }).val()
+        //});
+
+        //$("#NGAYLAP").click(function () {
+        //    var startDay = new Date();
+        //    startDay = document.getElementById("NGAYLAP").value;
+
+        //    var today = new Date();
+        //    var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+        //    var time = today.getHours() + ":" + today.getMinutes();
+        //    var dateTime = date + ' ' + time;
+
+
+        //   if ((startDay < dateTime)) {
+        //            alert("Ngày lập phải lớn hơn hoặc bằng ngày hiện tại");
+        //            //document.getElementById("NGAYTUONGTAC_TIEP").value = "";
+        //            return false;
+        //        }
+
+        //    return true;
+        //});
+        $("#Save").click(function () {
+            var KHACHHANG_ID = $("#KHACHHANG_ID").val();
+            var HINHTHUC_TUONGTAC = $("#HINHTHUC_TUONGTAC").val();
+            var LOAI_TUONGTAC = $("#LOAI_TUONGTAC").val();
+
+            var messagge = "";
+            if (KHACHHANG_ID == '') {
+                messagge += "Chưa chọn khách hàng<br>";
+            } if (HINHTHUC_TUONGTAC == '') {
+                messagge += "Chưa chọn hình thức tương tác";
+            }
+            if (LOAI_TUONGTAC == '') {
+                messagge += "Chưa chọn loại tương tác";
+            }
+            if (messagge != '') {
+                alertPopup('Lỗi!', messagge, 'error');
+                return false;
+
+            }
+        });
+
+
+        //$("#Save").click(function () {
+        //    var startDate = document.getElementById("NGAYLAP").value;
+        //    var endDate = document.getElementById("NGAYTUONGTAC_TIEP").value;
+
+        //    if (endDate < startDate) {
+        //        alert("End date should be greater than Start date");
+        //        document.getElementById("NGAYTUONGTAC_TIEP").value = "";
+        //        return false;
+        //    }
+        //});
+        @*$('#SubmitKETHUA').click(function () {
+                     if (confirm('Bạn có muốn kế thừa tháng trước không ?')) {
+                         PostDataDV();
+                     }
+                     else {
+                         return false;
+                     }
+                 });
+                 function PostDataDV() {
+                     $.ajax({
+                         type: "POST",
+                         url: '@Url.Action("ViewKeThua", "Plan", new { KH_TUONGTAC_ID = @ViewBag.ID_DV })',
+                         contentType: "application/json; charset=utf-8",
+                         data: JSON.stringify({ model: {} }),
+                         dataType: "json",
+                         success: function (result) {
+                             //alert(result);
+                             window.locationre = result.url;
+                         }
+                     });
+                     location.reload();
+                 }*@
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

@@ -1,0 +1,28 @@
+﻿@model Erp.BackOffice.Sale.Models.ProductInSkinCareViewModel
+@using Erp.BackOffice.Helpers
+@{
+    
+}
+<tr role="role_@(Model.OrderNo)" id="product_item_@Model.OrderNo" data-id="@Model.OrderNo">
+    <td class="text-center">
+        <span>@(Model.OrderNo)</span>
+       </td>
+    
+    <td class="detail_item_id">
+        @Html.Hidden("DetailList[" + Model.OrderNo + "].Id", Model.Id)
+        @Html.Hidden("DetailList[" + Model.OrderNo + "].ProductId", Model.ProductId)
+        @Html.Hidden("DetailList[" + Model.OrderNo + "].ProductIdMem", Model.ProductIdMem)
+        @Model.ProductCode - @Model.ProductName
+    </td>
+    
+    <td class="has-error">
+         <input type="text" style="width:100%" value="@Model.Name" class="noidung" name="DetailList[@Model.OrderNo].Name" id="DetailList_@(Model.OrderNo)_Name" autocomplete="off" />
+       </td>
+    
+   
+    <td class="text-center">
+        <a class="btn-delete-item">
+            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+        </a>
+    </td>
+</tr>

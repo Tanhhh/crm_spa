@@ -1,0 +1,49 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_BaoCaoSapHetHang>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr class="" style="display:none">
+                <th class="" colspan="10" style="text-align:center"><h4>BÁO CÁO VẬT TƯ SẮP HẾT</h4></th>
+            </tr>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th style="width:200px;text-align:center">Vật tư</th>
+                <th style="width:100px;text-align:center">Nhóm</th>
+                <th style="width:100px;text-align:center">Định mức</th>
+                <th style="width:100px;text-align:center">Còn lại</th>
+                <th style="width:100px;text-align:center">Chênh lệch</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(index%2==0?"alert-warning":"")">
+                    <td>
+                        <span>@(index++)</span>
+                    </td>
+                    <td>@(item.Name)</td>
+                    <td>@(item.ProductGroup)</td>
+                    <td>@(item.MinInventory)</td>
+                    <td>@(item.Quantity)</td>
+                    <td>@(item.ChenhLech)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <script src="~/Scripts/jquery.floatThead.js"></script>
+    <script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        $("#CTable").floatThead({ top: 30 });
+    });
+    </script>
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>

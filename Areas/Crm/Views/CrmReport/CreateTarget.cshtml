@@ -1,0 +1,55 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = "Craete Target";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CrmReport",
+        ActionName = "CreateTarget",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    List<Crm_LevelViewModel> level = (List<Crm_LevelViewModel>)ViewBag.Level;
+    List<Crm_PeriodViewModel> period = (List<Crm_PeriodViewModel>)ViewBag.Period;
+
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+<form action="CreateTarget" method="post" style="max-width: 300px">
+    <label>Chọn Level: </label>
+    <select class="form-control" name="Level">
+        @foreach (var lev in level)
+        {
+            <option value="@lev.Id">@lev.Name</option>
+        }
+    </select>
+    <br />
+    <label>Chọn Period:</label>
+    <select class="form-control" name="Period">
+        @foreach(var per in period)
+        {
+            <option value="@per.Id">@per.Name</option>
+        }
+    </select>
+    <br />
+    <input type="number" name="Target" class="form-control" id="exampleFormControlInput1" placeholder="Enter Target number">
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>

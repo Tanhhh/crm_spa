@@ -1,0 +1,329 @@
+﻿<error errorId="9176c22b-1dbb-4680-9beb-d2adcf4eea4f" application="/LM/W3SVC/2/ROOT" host="DESKTOP-H6FQOND" type="System.NullReferenceException" message="Object reference not set to an instance of an object." source="Erp.BackOffice" detail="System.NullReferenceException: Object reference not set to an instance of an object.&#xD;&#xA;   at Erp.BackOffice.Sale.Controllers.InquiryCardController.Create(InquiryCardViewModel model, Nullable`1 IsPopup) in D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Areas\Sale\Controllers\InquiryCardController.cs:line 278&#xD;&#xA;   at lambda_method(Closure , ControllerBase , Object[] )&#xD;&#xA;   at System.Web.Mvc.ActionMethodDispatcher.Execute(ControllerBase controller, Object[] parameters)&#xD;&#xA;   at System.Web.Mvc.ReflectedActionDescriptor.Execute(ControllerContext controllerContext, IDictionary`2 parameters)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionMethod(ControllerContext controllerContext, ActionDescriptor actionDescriptor, IDictionary`2 parameters)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass42.&lt;BeginInvokeSynchronousActionMethod&gt;b__41()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass8`1.&lt;BeginSynchronous&gt;b__7(IAsyncResult _)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethod(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass37.&lt;&gt;c__DisplayClass39.&lt;BeginInvokeActionMethodWithFilters&gt;b__33()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass37.&lt;BeginInvokeActionMethodWithFilters&gt;b__36(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethodWithFilters(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;&gt;c__DisplayClass2a.&lt;BeginInvokeAction&gt;b__20()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;BeginInvokeAction&gt;b__22(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeAction(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.&lt;&gt;c__DisplayClass1d.&lt;BeginExecuteCore&gt;b__18(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.System.Web.Mvc.Async.IAsyncController.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.&lt;&gt;c__DisplayClass8.&lt;BeginProcessRequest&gt;b__3(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.System.Web.IHttpAsyncHandler.EndProcessRequest(IAsyncResult result)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="admin" time="2019-02-28T11:05:09.2063691Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CACHE_CONTROL:max-age=0&#xD;&#xA;HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_CONTENT_LENGTH:1532&#xD;&#xA;HTTP_CONTENT_TYPE:application/x-www-form-urlencoded&#xD;&#xA;HTTP_ACCEPT:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=ql4a1zgoac5a3m2vrtbkouqd; __RequestVerificationToken=azZVI-We9kIjiz-RNkloYWN7VjOKFYUmMmAfaKK1pQ_Gb7DSlOvqmj7KRrqi6WuqFCooYoAUyx8OdvwDwo7tiOVHRM9S1fGALqYLO7YEOuk1; BO=4265C79E39998B96E750ECCCF9BC9E5DD4F3AB5F96C99435E165B74CCAB2EBA023C3498137F0BCE79838599EE521CF2F0F0A9ADF13A112FD1AB838200E5A8020908EE55027ABD94E76933C15D73DE9826A64023B79948530A493818A172222C1&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/InquiryCard/Create?TargetId=1047&amp;TargetModule=Membership&amp;IsPopup=True&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36&#xD;&#xA;HTTP_ORIGIN:http://localhost:53200&#xD;&#xA;HTTP_UPGRADE_INSECURE_REQUESTS:1&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Cache-Control: max-age=0&#xD;&#xA;Connection: keep-alive&#xD;&#xA;Content-Length: 1532&#xD;&#xA;Content-Type: application/x-www-form-urlencoded&#xD;&#xA;Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8&#xD;&#xA;Accept-Encoding: gzip, deflate, br&#xD;&#xA;Accept-Language: vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5&#xD;&#xA;Cookie: ASP.NET_SessionId=ql4a1zgoac5a3m2vrtbkouqd; __RequestVerificationToken=azZVI-We9kIjiz-RNkloYWN7VjOKFYUmMmAfaKK1pQ_Gb7DSlOvqmj7KRrqi6WuqFCooYoAUyx8OdvwDwo7tiOVHRM9S1fGALqYLO7YEOuk1; BO=4265C79E39998B96E750ECCCF9BC9E5DD4F3AB5F96C99435E165B74CCAB2EBA023C3498137F0BCE79838599EE521CF2F0F0A9ADF13A112FD1AB838200E5A8020908EE55027ABD94E76933C15D73DE9826A64023B79948530A493818A172222C1&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/InquiryCard/Create?TargetId=1047&amp;TargetModule=Membership&amp;IsPopup=True&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36&#xD;&#xA;Origin: http://localhost:53200&#xD;&#xA;Upgrade-Insecure-Requests: 1&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="admin" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="admin" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="admin" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="1532" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="application/x-www-form-urlencoded" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/InquiryCard/Create" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\InquiryCard\Create" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="31082" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="POST" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/InquiryCard/Create" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/InquiryCard/Create" />
+    </item>
+    <item name="HTTP_CACHE_CONTROL">
+      <value string="max-age=0" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_CONTENT_LENGTH">
+      <value string="1532" />
+    </item>
+    <item name="HTTP_CONTENT_TYPE">
+      <value string="application/x-www-form-urlencoded" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=ql4a1zgoac5a3m2vrtbkouqd; __RequestVerificationToken=azZVI-We9kIjiz-RNkloYWN7VjOKFYUmMmAfaKK1pQ_Gb7DSlOvqmj7KRrqi6WuqFCooYoAUyx8OdvwDwo7tiOVHRM9S1fGALqYLO7YEOuk1; BO=4265C79E39998B96E750ECCCF9BC9E5DD4F3AB5F96C99435E165B74CCAB2EBA023C3498137F0BCE79838599EE521CF2F0F0A9ADF13A112FD1AB838200E5A8020908EE55027ABD94E76933C15D73DE9826A64023B79948530A493818A172222C1" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/InquiryCard/Create?TargetId=1047&amp;TargetModule=Membership&amp;IsPopup=True" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.84 Safari/537.36" />
+    </item>
+    <item name="HTTP_ORIGIN">
+      <value string="http://localhost:53200" />
+    </item>
+    <item name="HTTP_UPGRADE_INSECURE_REQUESTS">
+      <value string="1" />
+    </item>
+  </serverVariables>
+  <form>
+    <item name="ProductId">
+      <value string="" />
+    </item>
+    <item name="TargetModule">
+      <value string="Membership" />
+    </item>
+    <item name="TargetCode">
+      <value string="MBS0051" />
+    </item>
+    <item name="BranchId">
+      <value string="1" />
+    </item>
+    <item name="CustomerId">
+      <value string="4" />
+    </item>
+    <item name="Product">
+      <value string="" />
+    </item>
+    <item name="DetailList[0].IsActived">
+      <value string="True" />
+    </item>
+    <item name="DetailList[0].Id">
+      <value string="0" />
+    </item>
+    <item name="DetailList[0].Name">
+      <value string="Tẩy Trang" />
+    </item>
+    <item name="DetailList[0].TotalMinute">
+      <value string="5" />
+    </item>
+    <item name="DetailList[0].Note">
+      <value string="" />
+    </item>
+    <item name="DetailList[1].IsActived">
+      <value string="True" />
+    </item>
+    <item name="DetailList[1].Id">
+      <value string="0" />
+    </item>
+    <item name="DetailList[1].Name">
+      <value string="Tẩy tế bào chết " />
+    </item>
+    <item name="DetailList[1].TotalMinute">
+      <value string="10" />
+    </item>
+    <item name="DetailList[1].Note">
+      <value string="" />
+    </item>
+    <item name="DetailList[2].IsActived">
+      <value string="True" />
+    </item>
+    <item name="DetailList[2].Id">
+      <value string="0" />
+    </item>
+    <item name="DetailList[2].Name">
+      <value string="Rửa bằng sữa rửa mặt" />
+    </item>
+    <item name="DetailList[2].TotalMinute">
+      <value string="15" />
+    </item>
+    <item name="DetailList[2].Note">
+      <value string="" />
+    </item>
+    <item name="DetailList[3].IsActived">
+      <value string="True" />
+    </item>
+    <item name="DetailList[3].Id">
+      <value string="0" />
+    </item>
+    <item name="DetailList[3].Name">
+      <value string="Rữa bằng nước hoa hồng để làm mịn da " />
+    </item>
+    <item name="DetailList[3].TotalMinute">
+      <value string="20" />
+    </item>
+    <item name="DetailList[3].Note">
+      <value string="" />
+    </item>
+    <item name="DetailList[4].IsActived">
+      <value string="True" />
+    </item>
+    <item name="DetailList[4].Id">
+      <value string="0" />
+    </item>
+    <item name="DetailList[4].Name">
+      <value string="Sử dụng tinh chất hoặc huyết thanh để dưỡng lại da" />
+    </item>
+    <item name="DetailList[4].TotalMinute">
+      <value string="10" />
+    </item>
+    <item name="DetailList[4].Note">
+      <value string="" />
+    </item>
+    <item name="DetailList[5].IsActived">
+      <value string="True" />
+    </item>
+    <item name="DetailList[5].Id">
+      <value string="0" />
+    </item>
+    <item name="DetailList[5].Name">
+      <value string="Xoa kem dưỡng " />
+    </item>
+    <item name="DetailList[5].TotalMinute">
+      <value string="5" />
+    </item>
+    <item name="DetailList[5].Note">
+      <value string="" />
+    </item>
+    <item name="IsPopup">
+      <value string="True" />
+    </item>
+    <item name="group_choice">
+      <value string="Membership" />
+    </item>
+    <item name="Code">
+      <value string="YC0180" />
+    </item>
+    <item name="Type">
+      <value string="SkinScan" />
+    </item>
+    <item name="TargetId">
+      <value string="1047" />
+    </item>
+    <item name="TargetId_DisplayText">
+      <value string="MBS0051" />
+    </item>
+    <item name="CustomerName">
+      <value string="Phạm Đình Hòa" />
+    </item>
+    <item name="ProductName">
+      <value string="Căn bản" />
+    </item>
+    <item name="WorkDay">
+      <value string="28/02/2019 18:04" />
+    </item>
+    <item name="TotalMinute">
+      <value string="65" />
+    </item>
+    <item name="Note">
+      <value string="" />
+    </item>
+    <item name="Submit">
+      <value string="Save" />
+    </item>
+  </form>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="ql4a1zgoac5a3m2vrtbkouqd" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="azZVI-We9kIjiz-RNkloYWN7VjOKFYUmMmAfaKK1pQ_Gb7DSlOvqmj7KRrqi6WuqFCooYoAUyx8OdvwDwo7tiOVHRM9S1fGALqYLO7YEOuk1" />
+    </item>
+    <item name="BO">
+      <value string="4265C79E39998B96E750ECCCF9BC9E5DD4F3AB5F96C99435E165B74CCAB2EBA023C3498137F0BCE79838599EE521CF2F0F0A9ADF13A112FD1AB838200E5A8020908EE55027ABD94E76933C15D73DE9826A64023B79948530A493818A172222C1" />
+    </item>
+  </cookies>
+</error>

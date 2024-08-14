@@ -1,0 +1,329 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Staff.Models
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Administration.Models
+
+
+@model CustomerViewModel
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+@{
+    ViewBag.Title = "Khách hàng";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "Sale_Get_Customer",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        SearchButtonText = "Xem báo cáo"
+    };
+    IEnumerable<SelectListItem> CustomerTypeList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("CustomerType", null, "value");
+
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    //string branchId = Request["branchId"] != null ? Request["branchId"] : "";
+    //if (Request["BranchId"] == null)
+    //{
+    //    branchId = Erp.BackOffice.Helpers.Common.CurrentUser.BranchId.Value.ToString();
+    //}
+    //ViewData["branchId"] = branchId;
+    var branchId = Erp.BackOffice.Helpers.Common.CurrentUser.BranchId.Value.ToString();
+}
+
+@section HeadOfPage {
+    <style type="text/css">
+        .cell-center {
+            text-align: center;
+        }
+
+        .tr-bold {
+            font-weight: 700;
+        }
+
+        .ctl {
+            position: relative;
+            /*float: left;*/
+            margin-right: 3px;
+        }
+
+            .ctl .error {
+                position: absolute;
+                background: #de2a2a;
+                left: 0px;
+                top: 28px;
+                padding: 2px 5px;
+                color: #fff;
+                z-index: 999;
+            }
+
+                .ctl .error:before {
+                    border-bottom: 7px solid #de2a2a;
+                    border-left: 7px solid transparent;
+                    border-right: 7px solid transparent;
+                    left: 9px;
+                    top: -6px;
+                    content: "";
+                    display: inline-block;
+                    position: absolute;
+                }
+
+        .icon-add {
+            margin-top: 0px !important;
+        }
+
+        .combojax {
+            display: inline-block;
+            position: initial !important;
+            float: none !important;
+        }
+    </style>
+
+}
+
+<div id="page_header" class="widget-box">
+    <div class="widget-header">
+        <h5 class="widget-title">
+            <i class="ace-icon fa fa-star orange"></i>
+            @ViewBag.Title
+        </h5>
+        <div class="widget-toolbar">
+            <a class="btn-search" href="#" data-action="collapse">
+                <i class="ace-icon fa fa-search blue"></i>
+            </a>
+            <a class="btn-setting"></a>
+        </div>
+    </div>
+
+    <div class="widget-body" style="display: block;">
+        <div class="widget-main">
+            <div class="search-view form-inline" id="SaleReport">
+                @*@Html.Partial("_PartialSearchDrugStore", ViewData["branchId"])*@
+                <p>
+                    <span class="input-daterange input-group">
+                        @Html.TextBox("StartDate", Request["StartDate"] != null ? Request["StartDate"] : "", new { autocomplete = "off", placeholder = "Từ ngày" })
+                        <span class="input-group-addon">
+                            <i class="fa fa-exchange"></i>
+                        </span>
+                        @Html.TextBox("EndDate", Request["EndDate"] != null ? Request["EndDate"] : "", new { autocomplete = "off", placeholder = "Đến ngày" })
+                    </span>
+                    @Html.DropDownList("SkinLevel", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("skinLevel", Request["SkinLevel"], "Mức độ da"))
+                    @Html.DropDownList("HairlLevel", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("hairLevel", Request["HairlLevel"], "Mức độ tóc"))
+                    @Html.DropDownList("GladLevel", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("gladLevel", Request["SkinLevel"], "Mức độ hài lòng"))
+                    @*@Html.DropDownList("Customer_Type", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("CustomerType", Request["Customer_Type"], "-Loại khách hàng-"))*@
+                    @Html.TextBox("txtCusInfo", Request["txtCusInfo"], new { @class = "", autocomplete = "off", placeholder = "Mã hoặc Tên khách hàng..." })
+                </p>
+
+                <script>
+                    $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+
+                    });
+                </script>
+                @*@Html.Partial("_PartialSearchDrugStore", ViewData["branchId"])*@
+                <p>
+                    <span class="inline">
+                        <span class="ctl inline">
+                            @*@Html.TextBox("BranchId", Request["BranchId"], new { autocomplete = "off", placeholder = "Chi nhánh..." })*@
+                            @*@Html.DropDownList("BranchId", SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"))*@
+                        </span>
+                        <span class="ctl inline">
+                            @Html.DropDownList("CustomerType", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("CustomerType", Request["CustomerType"], "-Loại khách hàng-"))
+
+                            @*@Html.CustomDropDownListFor(model => model.CustomerType, CustomerTypeList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)*@
+                        </span>
+                        <span class="ctl inline">
+                            <label>Từ</label>
+                            @Html.TextBox("StartAge", Request["StartAge"], new { autocomplete = "off", style = "width:50px" })
+                            <span class="ctl inline">
+                                <i class="fa fa-exchange"></i>
+                            </span>
+                            @Html.TextBox("EndAge", Request["EndAge"], new { autocomplete = "off", style = "width:50px" })
+                            <label>Tuổi</label>
+                        </span>
+                        <span>
+                            @*@Html.DropDownList("User", SelectListHelper.GetSelectList_User(null, Request["User"], "-Loại khách hàng-"))*@
+
+                            <select id="ManagerStaffId" class="chzn-select" style="width:250px; float:left" name="ManagerStaffId">
+                                <option value="">- Nhân viên QL -</option>
+                                @foreach (var item in SelectListHelper.GetSelectList_User(null, null))
+                                {
+                                    <option @(Request["ManagerStaffId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </span>
+                    </span>
+                </p>
+                <p>
+                    <label>
+                        <input id="KhMoiDenVaHuaQuayLai" name="KhMoiDenVaHuaQuayLai" type="checkbox" class="ace" value="1">
+                        <span class="lbl"> Khách mới đến và hứa quay lại </span>
+                    </label>
+                    <label>
+                        <input id="KhMoiDenVaKinhTeYeu" name="KhMoiDenVaKinhTeYeu" type="checkbox" class="ace" value="1">
+                        <span class="lbl"> Khách mới đến kinh tế yếu </span>
+                    </label>
+                    <label>
+                        <input id="KhCuThanPhien" name="KhCuThanPhien" type="checkbox" class="ace" value="1">
+                        <span class="lbl"> Khách than phiền </span>
+                    </label>
+                    <label>
+                        <input id="KhLauNgayKhongTuongTac" name="KhLauNgayKhongTuongTac" type="checkbox" class="ace" value="1">
+                        <span class="lbl"> Khách Lâu ngày không tương tác </span>
+                    </label>
+                    <label>
+                        <input id="KhCuMuonBo" name="KhCuMuonBo" type="checkbox" class="ace" value="1">
+                        <span class="lbl"> Khách cũ muốn bỏ</span>
+
+                    </label>
+                   @Html.CustomSwitches("Khách ngưng theo dõi","isLock",Request["isLock"] != null ? true : false,SwitchesStyle.CheckboxStyle,WidthType.span,null)
+                </p>
+                <p style="margin:0px;">
+                    <button class="btn btn-mini btn-primary" name="search" onclick="searchreact()" type="submit" value="Search">
+                        Xem báo cáo
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="padding-top: 5px;">
+    <div class="col-xs-12">
+        <div id="react_report" class="table-responsive">
+
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(true)">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(false)">
+        <i class="ace-icon fa fa-print"></i>
+        In báo cáo
+    </button>
+}
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+    <script src="/Scripts/combojax.js"></script>
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <script>
+        var branchid = getCookie("BRANCH_ID_SPA_CookieName");
+        if (branchid == null || @branchId > 0) {
+            branchid = @branchId;
+        }
+        //alert(branchid);
+        $(function () {
+            searchreact();
+            //$("#BranchId").combojax({
+            //    url: "/api/BackOfficeServiceAPI/GetListBranch",
+            //    onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+            //        //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+            //    },
+            //    onSelected: function (obj) {
+            //        if (obj) {
+
+            //        }
+            //    }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+            //    , onShowImage: false                  //hiển thị hình ảnh
+            //    , onSearchSaveSelectedItem: true    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+            //    , onRemoveSelected: false  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+            //});
+        });
+        function searchreact() {
+            GetDatatable('/SaleReport/_GetListSale_Get_Customer');
+        };
+        function GetDatatable(url) {
+            var BranchId = branchid; //$('#BranchId').val();
+            var StartDate = $('#StartDate').val();
+            var EndDate = $('#EndDate').val();
+            var StartAge = $('#StartAge').val();
+            var EndAge = $('#EndAge').val();
+            var ManagerStaffId = $('#ManagerStaffId').val();
+            var CustomerType = $('#CustomerType').val();
+            var CityId = $('#CityId').val();
+            var DistrictId = $('#DistrictId').val();
+            var BranchName = $('#BranchName').val();
+            var DistrictName = $('#DistrictName').val();
+            var SkinLevel = $('#SkinLevel').val();
+            var HairlLevel = $('#HairlLevel').val();
+            var GladLevel = $('#GladLevel').val();
+            var KhCuMuonBo = $("[name='KhCuMuonBo']:checked").val();
+            var KhCuThanPhien = $("[name='KhCuThanPhien']:checked").val();
+            var KhLauNgayKhongTuongTac = $("[name='KhLauNgayKhongTuongTac']:checked").val();
+            var KhMoiDenVaHuaQuayLai = $("[name='KhMoiDenVaHuaQuayLai']:checked").val();
+            var KhMoiDenVaKinhTeYeu = $("[name='KhMoiDenVaKinhTeYeu']:checked").val();
+            var isLock = $("[name='isLock']:checked").val();
+            var txtCusInfo = $('#txtCusInfo').val();
+            var formdata = {
+                BranchId: BranchId,
+                StartDate: StartDate,
+                EndDate: EndDate,
+                StartAge: StartAge,
+                EndAge: EndAge,
+                ManagerStaffId: ManagerStaffId,
+                CustomerType: CustomerType,
+                CityId: CityId,
+                DistrictId: DistrictId,
+                BranchName: BranchName,
+                DistrictName: DistrictName,
+                SkinLevel: SkinLevel,
+                HairlLevel: HairlLevel,
+                GladLevel: GladLevel,
+                KhCuMuonBo: KhCuMuonBo,
+                KhCuThanPhien: KhCuThanPhien,
+                KhLauNgayKhongTuongTac: KhLauNgayKhongTuongTac,
+                KhMoiDenVaHuaQuayLai: KhMoiDenVaHuaQuayLai,
+                KhMoiDenVaKinhTeYeu: KhMoiDenVaKinhTeYeu,
+                txtCusInfo: txtCusInfo,
+                isLock : isLock
+            };
+            //$("#react_report").html("");
+            ClickEventHandlerHTML(true, url, "#react_report", formdata, function () {
+            });
+        };
+        function GetPrint(type) {
+            var BranchId = $('#BranchId').val();
+            var StartDate = $('#StartDate').val();
+            var EndDate = $('#EndDate').val();
+            var StartAge = $('#StartAge').val();
+            var EndAge = $('#EndAge').val();
+            var ManagerStaffId = $('#ManagerStaffId').val();
+            var CustomerType = $('#CustomerType').val();
+            var CityId = "";//$('#CityId').val();
+            var DistrictId =""; //$('#DistrictId').val();
+            var BranchName = $('#BranchName').val();
+            var DistrictName = $('#DistrictName').val();
+            var SkinLevel = $('#SkinLevel').val();
+            var HairlLevel = $('#HairlLevel').val();
+            var GladLevel = $('#GladLevel').val();
+            var KhCuMuonBo = $("[name='KhCuMuonBo']:checked").val();
+            var KhCuThanPhien = $("[name='KhCuThanPhien']:checked").val();
+            var KhLauNgayKhongTuongTac = $("[name='KhLauNgayKhongTuongTac']:checked").val();
+            var KhMoiDenVaHuaQuayLai = $("[name='KhMoiDenVaHuaQuayLai']:checked").val();
+            var KhMoiDenVaKinhTeYeu = $("[name='KhMoiDenVaKinhTeYeu']:checked").val();
+            var txtCusInfo = $('#txtCusInfo').val();
+            var isLock = $("[name='isLock']:checked").val();
+            OpenPopup('/SaleReport/PrintSale_Get_Customer?BranchId=' + BranchId + '&KhMoiDenVaKinhTeYeu=' + KhMoiDenVaKinhTeYeu + '&KhMoiDenVaHuaQuayLai=' + KhMoiDenVaHuaQuayLai + '&KhLauNgayKhongTuongTac=' + KhLauNgayKhongTuongTac + '&KhCuMuonBo=' + KhCuMuonBo + '&KhCuThanPhien=+KhCuThanPhien' + '&StartDate=' + StartDate + '&EndDate=' + EndDate + '&CustomerType=' + CustomerType + '&CityId=' + CityId + '&DistrictId=' + DistrictId + '&BranchName=' + BranchName + '&DistrictName=' + DistrictName + '&SkinLevel=' + SkinLevel + '&HairlLevel=' + HairlLevel + '&GladLevel=' + GladLevel + '&txtCusInfo' + txtCusInfo + '&isLock='+ isLock+ '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 20000);
+            HideLoading();
+        };
+
+    </script>
+
+}

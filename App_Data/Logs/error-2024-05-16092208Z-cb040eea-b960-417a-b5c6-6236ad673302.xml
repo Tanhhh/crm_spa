@@ -1,0 +1,1 @@
+﻿<error errorId="cb040eea-b960-417a-b5c6-6236ad673302" application="Hangfire" type="Info" message="Execution RecurringJobScheduler recovered from the Faulted state after 00:00:16.0522905 and is in the Running state now" time="2024-05-16T09:22:08.3300046Z" />

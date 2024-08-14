@@ -1,0 +1,123 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model StaffMadeViewModel
+
+@{
+    ViewBag.Title = "Lý do hủy";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {        
+        ModuleName = "SchedulingHistory",
+        ActionName = "Cancel",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <style>
+        .btn.btn-white {
+            /*border-color: rgba(204, 204, 204, 0)!important;*/
+            border-width: 0px !important;
+        }
+
+            .btn.btn-white:hover, .btn.btn-white:focus, .btn.btn-white.active,
+            .btn.btn-white:active, .open > .btn.btn-white.dropdown-toggle,
+            .open > .btn.btn-white.active.dropdown-toggle {
+                background-color: rgba(59, 183, 51, 0.46) !important;
+                border-color: #629959;
+                color: #3a3434 !important;
+            }
+
+        .img_user {
+            width: 40px !important;
+            height: 40px !important;
+            margin: 0 auto;
+            /* display: block; */
+            border-radius: 100%;
+            border: 2px solid;
+        }
+
+        .user_check {
+            width: 30px !important;
+        }
+    </style>
+}
+
+@*@using(Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}*@
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    <div class="row" style="text-align:center">
+        <div class="col-xs-12">
+            <div class="widget-box">
+                <div class="widget-body">
+                    <div class="widget-main" style="background: #f7f7f7;">
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <div class="ace-thumbnails clearfix">
+                                    <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.ProfileImage, "User", "user"))" title="@Model.FullName" data-rel="colorbox" class="cboxElement">
+                                        <img alt="@Model.FullName" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.ProfileImage, "User", "user"))" style="width:130px;height:130px;border-radius:100%;border:1px solid #ccc" />
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-sm-7">
+                                <div style="color:#337ab7;border-bottom:3px solid" class="top-20"><h3><b>@Model.FullName</b></h3></div>
+                                <div style="color:#337ab7">@Model.UserCode</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title"><i class="ace-icon fa fa-info-circle"></i>Lý do hủy</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+                        @Html.HiddenFor(model => model.Id)
+                        @Html.HiddenFor(model => model.CreatedUserId)
+                        @Html.HiddenFor(model => model.AssignedUserId)
+                        @Html.HiddenFor(model => model.CreatedDate)
+                        @Html.HiddenFor(model => model.IsDeleted)
+                        @Html.CustomTextAreaFor(model => model.Note, null, WidthType.span12, true, null)
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    
+<script>
+
+</script>
+@Html.ScriptBottom_ValidationMvc()
+@Html.ScriptBottom_ChosenStyle()
+@Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

@@ -1,0 +1,116 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model HOAHONG_NVKDViewModel
+
+@{
+    ViewBag.Title = "Tạo tỷ lệ hoa hồng";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "CreateHoaHong",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+
+    @Html.CustomTextboxFor(model => model.STT, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-xs-12" } })
+   
+    @Html.CustomTextboxFor(model => model.TYLE_TARGET, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-xs-12" } })
+    @Html.CustomTextboxFor(model => model.MIN_TARGET, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-xs-12" } })
+    @Html.CustomTextboxFor(model => model.MAX_TARGET, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-xs-12" } })
+    @Html.CustomTextboxFor(model => model.TYLE_HOAHONG, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-xs-12" } })
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    <script>
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.Id" >@Model.TYLE_TARGET</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+        });
+        $("button[name='Submit']").click(function (e) {
+            debugger
+            if ($('#STT').val() == "" || $('#TYLE_TARGET').val() == "" || $('#MIN_TARGET').val() == "" || $('#MAX_TARGET').val() == "" || $('#TYLE_HOAHONG').val() == "") {
+                alert("Chưa nhập đầy đủ thông tin !");
+                return false;
+            }
+        });
+        $('#STT').change(function () {
+            $(this).val($(this).val().replace(/\-/g, ''));
+            $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+            var ralVal = numeral($(this).val());
+            if (ralVal <= 0) {
+                $(this).val(0);
+            }
+        });
+        $('#TYLE_TARGET').change(function () {
+            $(this).val($(this).val().replace(/\-/g, ''));
+            $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+            var ralVal = numeral($(this).val());
+            if (ralVal <= 0) {
+                $(this).val(0);
+            }
+        });
+        $('#MIN_TARGET').change(function () {
+            $(this).val($(this).val().replace(/\-/g, ''));
+            $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+            var ralVal = numeral($(this).val());
+            if (ralVal <= 0) {
+                $(this).val(0);
+            }
+        });
+        $('#MAX_TARGET').change(function () {
+            $(this).val($(this).val().replace(/\-/g, ''));
+            $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+            var ralVal = numeral($(this).val());
+            if (ralVal <= 0) {
+                $(this).val(0);
+            }
+        });
+        $('#TYLE_HOAHONG').change(function () {
+            $(this).val($(this).val().replace(/\-/g, ''));
+            $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+            var ralVal = numeral($(this).val());
+            if (ralVal <= 0) {
+                $(this).val(0);
+            }
+        });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

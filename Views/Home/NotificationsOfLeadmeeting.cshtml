@@ -1,0 +1,304 @@
+﻿@model List<Erp.BackOffice.Crm.Models.TaskMeetingViewModel>
+
+    @{
+        Layout = null;
+    }
+
+    <style type="text/css">
+
+        /* Define how each icon button should look like */
+        .button {
+            color: white;
+            display: inline-block; /* Inline elements with width and height. TL;DR they make the icon buttons stack from left-to-right instead of top-to-bottom */
+            position: relative; /* All 'absolute'ly positioned elements are relative to this one */
+            padding: 2px 5px; /* Add some padding so it looks nice */
+        }
+
+        /* Make the badge float in the top right corner of the button */
+        .button__badge-leadMeeting {
+            background-color: #fa3e3e;
+            border-radius: 2px;
+            color: white;
+            padding: 1px 3px;
+            font-size: 10px;
+            position: absolute; /* Position the badge within the relatively positioned button */
+            top: 0px;
+            right: 0px;
+            height: 17px;
+            line-height: 15px;
+        }
+
+        .nav .open > a:focus {
+            color: #2c5976;
+        }
+
+        .ace-nav > li > a {
+            min-width: 30px !important;
+        }
+
+        .dropdown-navbar .msg-photo {
+            max-height: 45px;
+            border-radius: 100%;
+            max-width: 45px;
+        }
+
+        .mss-style {
+            padding: 10px 2px;
+            margin: 0;
+            border-top: 1px solid;
+            font-size: 12px;
+            line-height: 16px;
+            color: #555 !important;
+            background-color: transparent !important;
+            white-space: normal;
+            border-top-color: #E4ECF3;
+        }
+
+        .dropdown-navbar .msg-photo {
+            max-width: 45px;
+            float: left;
+            margin-top: 2px;
+            max-height: 45px;
+            border-radius: 100%;
+        }
+
+        .dropdown-navbar .msg-body {
+            display: block;
+            line-height: 20px;
+            white-space: normal;
+            vertical-align: middle;
+            margin-left: 50px;
+            margin-right: 40px;
+        }
+
+        .msg-title-leadmeeting {
+            display: inline-block;
+            line-height: 14px;
+            font-size: 14px !important;
+            color: black !important;
+        }
+
+        .msg-time {
+            display: block;
+            font-size: 11px;
+            color: #777;
+        }
+
+        .dropdown-navbar {
+            padding: 0;
+            width: 400px !important;
+        }
+
+        .gritter-image {
+            border-radius: 100%;
+        }
+
+        .notifications-action a {
+            margin: 0px !important;
+            height: 25px !important;
+            max-width: 20px !important;
+        }
+
+        .notifications-action {
+            max-width: 40px;
+            margin: 0px;
+            float: right;
+            position: initial;
+            display: grid !important;
+        }
+
+        .dropdown-navbar > li {
+            padding: 10px 8px;
+            background-color: #FFF;
+        }
+
+        .dropdown-navbar > .dropdown-content {
+            padding: 0;
+            width: 400px;
+        }
+
+        .dropdown-footer {
+            padding: 0px !important;
+        }
+
+        .dropdown-navbar.navbar-pink > li.dropdown-header {
+            background-color: #ECF2F7 !important;
+            color: #8090A0 !important;
+            border-bottom-color: #BCD4E5 !important;
+        }
+        .background-leadmeeting > li {
+            border-top: 1px solid #E4ECF3 !important;
+            margin-top: 1.5px;
+        }
+        .background-leadmeeting > li >a{
+            border-top: 0px !important;
+        }
+        .clickLead{
+            padding: 0 5px !important;
+        }
+        .sent-notification {
+            background-color: #fbf8df !important
+        }
+
+        a.dropdown-toggle {
+            background: #428BCA !important;
+        }
+    </style>
+
+    <a id="notifications_button" data-toggle="dropdown" class="button dropdown-toggle" href="#" aria-expanded="false" >
+        <i class="ace-icon fa fa-bell" style="font-size:24px;margin-top:2px; "></i>
+        <span class="button__badge-leadMeeting" style="display:block">10</span>
+    </a>
+    <ul class="dropdown-menu-right dropdown-navbar navbar-pink dropdown-menu dropdown-caret dropdown-close">
+        <li class="dropdown-header">
+            <i class="fa fa-bell"></i>
+            Thông báo
+            <a onclick="checkAllSeen()" class="pull-right">
+                Đánh dấu tất cả đã đọc
+            </a>
+        </li>
+
+        <li class="dropdown-content ace-scroll" style="position: relative;">
+            <div class="scroll-track" style="display: none;"><div class="scroll-bar"></div></div>
+            <div class="not-scroll">
+                <ul id="notifications_list" class="dropdown-menu dropdown-navbar background-leadmeeting notificationsLeedMeeting">
+                    @Html.Action("NotificationsLogOfLeadMeeting", new {})
+                </ul>
+            </div>
+        </li>
+        <li class="dropdown-footer">
+            <a href="@Url.Action("AllNotifications", "LeadMeeting")">Xem tất cả thông báo</a>
+        </li>
+    </ul>
+
+
+    <script>
+
+        // This optional function html-encodes messages for display in the page.
+        function htmlEncode(value) {
+            var encodedValue = $('<div />').text(value).html();
+            return encodedValue;
+        };
+        $(document).ready(function () {
+            $('[data-rel="tooltip"]').tooltip({ container: 'body' });
+            // click chuyển hướng
+
+            $(document).on('click', '.clickLead', function (e) {
+                e.preventDefault();
+                var leadId = $(this).data('lead-id');
+                var itemId = $(this).data('id');
+                var typeLead = $(this).data('typelead');
+                //alert(typeLead);
+
+                // Gửi yêu cầu AJAX đến controller để cập nhật IsSendNotifications
+                $.ajax({
+                    url: '/LeadMeeting/UpdateIsSendNotifications',
+                    method: 'POST',
+                    data: { idTaskNew: itemId },
+                    success: function (data) {
+                        // Xử lý kết quả nếu cần
+                        console.log(data);
+                        console.log('Cập nhật thành công');
+                    },
+                    error: function () {
+                        console.log('Đã xảy ra lỗi khi cập nhật');
+                    }
+                });
+                if (typeLead === 0)
+                    redirectToCustomerDetail(leadId);
+                else
+                    redirectToLeadDetail(leadId);
+            });
+            $(document).on('click', '.delete-notificationLogLeadMeeting-btn', function (e) {
+                e.preventDefault();
+                var idTask = $(this).closest('li').find('.clickLead').data('id');
+
+                $.ajax({
+                    url: '/Home/UpdateIsDeletedTask',
+                    method: 'POST',
+                    data: { idTask: idTask },
+                    success: function (data) {
+                        console.log(data.message);
+                    },
+                    error: function () {
+                        console.log('Đã xảy ra lỗi khi xóa thông báo');
+                    }
+                });
+            });
+            // kiểm tra seen chưa
+            $('.clickLead').each(function () {
+                var isSendNotifications = $(this).data('is-send-notifications');
+                if (isSendNotifications === 0) {
+                    $(this).closest('li').addClass('sent-notification'); // Thêm class "sent-notification" cho phần tử li chứa phần tử a
+                } else {
+                    $(this).closest('li').removeClass('sent-notification'); // Loại bỏ class "sent-notification" cho phần tử li chứa phần tử a
+                }
+            });
+            // tính số thông báo chưa xem
+            var count = $('.clickLead[data-is-send-notifications="0"]').length;
+
+            // Nếu số lượng là 0, ẩn phần tử .button__badge-leadMeeting, ngược lại hiển thị
+            if (count === 0) {
+                $('.button__badge-leadMeeting').hide();
+            } else {
+                $('.button__badge-leadMeeting').text(count).show();
+            }
+        });
+
+        function redirectToLeadDetail(leadId) {
+            // Kiểm tra xem window.location.href có đang ở AdviseCard/LeadIndex hay không
+            if (window.location.href.indexOf('/AdviseCard/LeadIndex') !== -1) {
+                // Nếu đang ở AdviseCard/LeadIndex, gọi trực tiếp hàm DetailLead(leadId)
+                DetailLead(leadId);
+            } else {
+                // Nếu không, chuyển hướng đến AdviseCard/LeadIndex và gọi hàm DetailLead(leadId) sau khi chuyển hướng
+                window.open(
+                    '/AdviseCard/LeadIndex?detailLeadId=' + leadId,
+                    '_blank' // <- This is what makes it open in a new window.
+                );
+            }
+        }
+        function redirectToCustomerDetail(leadId) {
+            if (window.location.href.indexOf('/Customer/Detail/' + leadId) !== -1) {
+                return;
+            } else {
+                window.open(
+                    '/Customer/Detail/' + leadId,
+                    '_blank' // <- This is what makes it open in a new window.
+                );
+                
+            }
+        }
+        function checkAllSeen() {
+            $('.clickLead').each(function () {
+                var isSendNotifications = $(this).data('is-send-notifications');
+                if (isSendNotifications === 0) {
+                    var itemId = $(this).data('id');
+
+                    // Gửi yêu cầu AJAX đến controller để cập nhật IsSendNotifications thành 1
+                    $.ajax({
+                        url: '/LeadMeeting/UpdateIsSendNotifications',
+                        method: 'POST',
+                        data: { idTaskNew: itemId },
+                        success: function (data) {
+                            // Xử lý kết quả nếu cần
+                            console.log(data);
+                            console.log('Cập nhật thành công');
+                        },
+                        error: function () {
+                            console.log('Đã xảy ra lỗi khi cập nhật');
+                        }
+                    });
+                }
+            });
+
+            // Sau khi cập nhật, cập nhật số lượng thông báo chưa đọc và ẩn badge nếu số lượng là 0
+            var count = $('.clickLead[data-is-send-notifications="0"]').length;
+            if (count === 0) {
+                $('.button__badge-leadMeeting').hide();
+            } else {
+                $('.button__badge-leadMeeting').text(count).show();
+            }
+        }
+
+    </script>

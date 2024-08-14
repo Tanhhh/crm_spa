@@ -1,0 +1,211 @@
+@model IEnumerable<LogReceiptViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = Wording.PageIndex_LogReceipt;
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "LogReceipt",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int rowNumber = 0;
+    int numberOfItem = 20;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    string Status = Request["Status"];
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+@helper GridColumnCommand(int id)
+{
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "LogReceipt", "Account"))
+{
+    <a class="btn btn-mini btn-success" href="@Url.Action("Create", "LogReceipt", new { Id = id })">
+        <i class="fa fa-edit"></i>
+    </a>
+}
+    <button name="Delete" value=@id type="submit" class="btn btn-mini btn-danger">
+        <i class="ace-icon fa fa-trash bigger-120"></i>
+    </button>
+}
+
+@helper GridColumnName(string name, int id, bool isPopup)
+{
+    if (isPopup)
+    {
+        <a onclick="parent.selectBranchItem(@id)">@name</a>
+    }
+    else
+    {
+        name = string.IsNullOrEmpty(name) ? "No Title" : name;
+        <a href="@Url.Action("Detail", "LogReceipt" , new { Id= id })">@name</a>
+    }
+}
+
+@helper GridColumnCategoryValue(object value)
+{
+    var attr = Common.GetCategoryByValueOrId("value", value);
+    <span>@(attr != null ? attr.Name : "")</span>
+}
+
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+    @Html.TextBox("Code", Request["Code"], new { autocomplete = "off", placeholder = "Mã nộp tiền..." })
+    <span class="input-daterange input-group">
+        @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : "", new { autocomplete = "off", placeholder = "Ngày nộp tiền từ..." })
+        <span class="input-group-addon">
+            <i class="fa fa-exchange"></i>
+        </span>
+        @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : "", new { autocomplete = "off", placeholder = "đến ngày..." })
+    </span>
+        <select id="Status" name="Status">
+            <option value="" @(Status == "" ? "selected" : "")>Trạng thái</option>
+            <option value="pending" @(Status == "pending" ? "selected" : "")>@Wording.Unconfimred</option>
+            <option value="inprogress" @(Status == "inprogress" ? "selected" : "")>@Wording.Status_InProcess</option>
+            <option value="complete" @(Status == "complete" ? "selected" : "")>@Wording.Status_Completed</option>
+        </select>
+        @Html.DropDownList("BranchId", SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"))
+        @Html.DropDownList("CreateUserId", SelectListHelper.GetSelectList_User(Request["CreateUserId"], "Người lập phiếu"))
+   </p>
+}
+@helper GridColumnStatus(string status)
+{
+    switch (status)
+    {
+        case "pending":
+            <span class="label label-info" id="status_room">@Wording.Unconfimred</span>
+            break;
+        case "complete":
+        <span class="label-success label" id="status_room">@Wording.Status_Completed</span>
+            break;
+        case "inprogress":
+        <span class="label-warning label" id="status_room">@Wording.Status_InProcess</span>
+            break;
+    }
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+
+@if (!isPopup)
+{
+    using (Html.BeginForm("Delete", pageSetting.ModuleName, FormMethod.Post))
+    {
+        @Html.Grid(Model).Columns(columns =>
+                 {
+                     columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+     {
+         rowNumber++;
+
+         return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+     });
+                     columns.Add().Titled(Wording.Status).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnStatus(u.Status)).SetWidth(100);
+                     columns.Add().Titled("Mã nộp tiền").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Id, isPopup)).SetWidth(100);
+                     columns.Add(u => u.DateReceipt).Titled("Ngày nộp tiền").SetWidth(150).Format("{0:dd/MM/yyyy HH:mm}").Sortable(true);
+                     columns.Add().Titled("Người nộp").Sanitized(false).Encoded(false).RenderValueAs(u => u.UserName);
+                     columns.Add(u => u.TotalAmount).Titled("Số tiền nộp (VNĐ)").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(u.TotalAmount, null));
+                     columns.Add(u => u.Tongtienxacnhan).Titled("Số tiền đã xác nhận (VNĐ)").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(u.Tongtienxacnhan, null));
+                     columns.Add().Titled("Ghi chú").Sanitized(false).Encoded(false).RenderValueAs(u => u.Note);
+                     columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+                 }).WithPaging(20)
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            <a class="btn btn-primary btn-mini" href="@Url.Action("Create", pageSetting.ModuleName)">
+                <i class="ace-icon fa fa-plus"></i>
+                @Wording.CreateNew
+            </a>
+           
+        }
+    }
+}
+
+@section Scripts {
+@Html.ScriptBottom_ValidationMvc()
+@Html.ScriptBottom_ChosenStyle()
+@Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+    </script>
+}

@@ -1,0 +1,288 @@
+﻿@model  ListNotiViewModel
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Account.Models;
+@using GridMvc.Html
+@{
+    ViewBag.Title = "Tạo thông báo";
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    //Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Task",
+        ActionName = "CreateNoti",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    var IsPopup = Request["IsPopup"];
+}
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+<style>
+    .select2-input{
+        width:200px !important;
+    }
+    /*.default {
+        width:190px !important;
+    }*/
+    .chosen-container{
+        width:190px !important;
+    }
+</style>
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "CreateCommissionCus", @class = "form-horizontal" }))
+{
+    @Html.Hidden("IsPopup", IsPopup)
+    if (Model.Id > 0)
+    {
+        @Html.HiddenFor(model => model.Id)
+    }
+<div id="" class="control-group form-group ">
+    <label class="control-label col-lg-5 col-md-4 col-sm-4 control-label-textarea" for="title">Tiêu đề</label>
+    <div class="control-value col-lg-7 col-md-8 col-sm-8" style="width: 277px;">
+        <div class="clearfix">
+            <input type="text" class="col-xs-12" cols="20" id="Title" name="Title" placeholder="" value="@Model.Title" rows="2" />
+        </div>
+        <div class="clearfix">
+            <span class="field-validation-valid help-inline" data-valmsg-for="title" data-valmsg-replace="true"></span>
+        </div>
+    </div>
+</div>
+<div id="" class="control-group form-group ">
+    <label class="control-label col-lg-5 col-md-4 col-sm-4 control-label-textarea" for="body">Nội dung</label>
+    <div class="control-value col-lg-7 col-md-8 col-sm-8" style="width: 277px;">
+        <div class="clearfix">
+            <textarea class="col-xs-12" cols="20" id="Body" name="Body" placeholder="" rows="2" value="@Model.Body">@Model.Body</textarea>
+        </div>
+        <div class="clearfix">
+            <span class="field-validation-valid help-inline" data-valmsg-for="body" data-valmsg-replace="true"></span>
+        </div>
+    </div>
+</div>
+
+<div class="control-group form-group">
+    <label class="control-label col-lg-5 col-md-4 col-sm-4 txtName-POS">Gửi theo:</label>
+    <div style="margin-top: 8px;">
+        <label style="margin-right: 10px;margin-left: 10px !important;">
+            <input type="radio" class="hidden-320 ace ng-valid ng-dirty" id="single1" @*data-toggle="tab" href="#tab1"*@  name="single" value="1">
+            <span class="lbl ng-binding">Tất cả </span>
+        </label>
+        <label style="margin-right: 10px;margin-left: 10px !important;">
+            <input type="radio" class="hidden-320 ace ng-valid ng-dirty" id="single2" @*data-toggle="tab" href="#tab2"*@ name="single" value="2">
+            <span class="lbl ng-binding">Nhóm hưởng DS</span>
+        </label>
+        <label style="margin-right: 10px;margin-left: 10px !important;">
+            <input type="radio" class="hidden-320 ace ng-valid ng-dirty" id="single3" @*data-toggle="tab" href="#tab2"*@ name="single" value="3">
+            <span class="lbl ng-binding">Nhân viên quản lý</span>
+        </label>
+        <label style="margin-right: 10px;margin-left: 10px !important;">
+            <input type="radio" class="hidden-320 ace ng-valid ng-dirty" id="single4" @*data-toggle="tab" href="#tab3"*@ name="single" value="4">
+            <span class="lbl ng-binding">Khách hàng</span>
+        </label>
+    </div>
+    
+  
+</div>
+
+    <div class="control-group form-group">
+        <div class="tab-pane clearfix" id="tab1">
+
+        </div>
+        <div class="tab-pane clearfix" id="tab2">
+            @Html.CustomDropDownListFor(model => model.NhomDS, SelectListHelper.GetSelectList_User_kd(Model.NhomDS, "0"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen, true)
+
+        </div>
+        <div class="tab-pane clearfix" id="tab3">
+            @Html.CustomDropDownListFor(model => model.Nhanvien, SelectListHelper.GetSelectList_User(Model.Nhanvien, "Nhân viên"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen, true)
+
+
+        </div>
+        <div class="tab-pane clearfix" id="tab4">
+            @Html.CustomDropDownListFor(model => model.KhachHang, SelectListHelper.GetSelectList_Customer_UseMobile(Model.BranchId,Model.KhachHang, "Khách hàng"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen, true)
+
+        </div>
+    </div>
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save" style="border-radius:5px;">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+
+    }
+
+}
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-css/1.4.6/select2-bootstrap.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js"></script>
+
+<script type="text/javascript">
+    var aasp1 = [];
+   debugger
+    $("#single1").change(function () {
+
+        $("#tab1").show();
+        $("#tab2").hide();
+        $("#tab3").hide();
+        $("#tab4").hide();
+    });
+
+    $("#single2").change(function () {
+
+        $("#tab2").show();
+        $("#tab1").hide();
+        $("#tab3").hide();
+        $("#tab4").hide();
+    });
+
+    $("#single3").change(function () {
+
+        $("#tab3").show();
+        $("#tab2").hide();
+        $("#tab1").hide();
+        $("#tab4").hide();
+    });
+
+    $("#single4").change(function () {
+
+        $("#tab4").show();
+        $("#tab3").hide();
+        $("#tab2").hide();
+        $("#tab1").hide();
+
+    });
+
+   
+    //lấy khách hàng
+    function initSelectsp2() {
+        (function () {
+            // initialize select2 dropdown
+            $('#CustomerList').select2({
+                placeholder: "Nhập Khách hàng...",
+                //minimumInputLength: 1,
+                data: dropdownData2(),
+                formatResult: function (item) {
+
+                    return '<pr style=font-size: 20px;>' + item.Name + ' - ' + item.Code + '</pr>';
+
+
+                },
+                multiple: true,
+                // creating query with pagination functionality.
+                query: function (data) {
+                    var pageSize,
+                            dataset,
+                            that = this;
+                    pageSize = 20; // Number of the option loads at a time
+                    results = [];
+                    if (data.term && data.term !== '') {
+                        // HEADS UP; for the _.filter function I use underscore (actually lo-dash) here
+                        results = _.filter(that.data, function (e) {
+                            return e.text.toUpperCase().indexOf(data.term.toUpperCase()) >= 0;
+                        });
+                    } else if (data.term === '') {
+                        results = that.data;
+                    }
+                    data.callback({
+                        results: results.slice((data.page - 1) * pageSize, data.page * pageSize),
+                        more: results.length >= data.page * pageSize,
+                    });
+                },
+            });
+        })();
+
+    }
+    //lấy khách hàng
+    function dropdownData2() {
+
+        //alert("da vao day co lay duoc id kho " + WarehouseSourceId);
+        $.ajax({
+
+            url: '/Membership/getCustomer',
+            dataType: "json",
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+            async: false,
+            success: function (data) {
+
+                $.each(data, function (i, item) {
+                    aasp1.push(item);
+
+
+                });
+
+
+            },
+            error: function (xhr) {
+                alert('error' + xhr);
+            }
+        });
+
+        //alert(aasp1);
+
+        return aasp1;
+
+
+    }
+
+
+    $(document).ready(function () {
+
+        initSelectsp2();
+        //$("#tab2").hide();
+        //$("#tab3").hide();
+        //$("#tab4").hide();
+
+        var apply = '@Model.ApplyFor';
+        if ((apply == '') || (apply == '1')) {
+            $('#single1').attr('checked', 'checked');
+            $("#tab1").show();
+            $("#tab2").hide();
+            $("#tab3").hide();
+            $("#tab4").hide();
+
+        }
+        if (apply == '2') {
+            $('#single2').attr('checked', 'checked');
+            $("#tab2").show();
+            $("#tab1").hide();
+            $("#tab3").hide();
+            $("#tab4").hide();
+        }
+        if (apply == '3') {
+            $('#single3').attr('checked', 'checked');
+            $("#tab3").show();
+            $("#tab2").hide();
+            $("#tab1").hide();
+            $("#tab4").hide();
+        }
+        if (apply == '4') {
+            $('#single4').attr('checked', 'checked');
+            $("#tab4").show();
+            $("#tab2").hide();
+            $("#tab1").hide();
+            $("#tab3").hide();
+        }
+    });
+    $('#CreateCommissionCus').delegate("#Save", 'click', function () {
+        ShowLoading();
+        var CommissionCusId = $("#Id").val();
+        ClearFormatBeforeSubmit($("#CreateCommissionCus"));
+        $("#CreateCommissionCus").submit();
+        //HideLoading();
+    });
+</script>
+@section Scripts {
+@Html.ScriptBottom_ValidationMvc()
+@Html.ScriptBottom_ChosenStyle()
+}

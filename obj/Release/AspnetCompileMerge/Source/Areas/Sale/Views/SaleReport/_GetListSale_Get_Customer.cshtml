@@ -1,0 +1,66 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_Get_CustomerViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Ngày tạo</th>
+                <th class="text-center">Tên khách hàng</th>
+                <th class="text-center">Điện thoại</th>
+                <th class="text-center">Mã khách hàng</th>
+                <th class="text-center">Địa chỉ</th>
+                <th class="text-center" style="width:150px" >Khách mới đến và hứa quay lại</th>
+                <th class="text-center" style="width:150px">Khách mới đến kinh tế yếu</th>
+                <th class="text-center" style="width:150px">Khách cũ muốn bỏ</th>
+                @*<th class="text-center">Khách lâu ngày không tương tác</th>
+                    <th class="text-center">Khách than phiền</th>*@
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(index % 2 == 0 ? " alert-warning" : "")">
+                    <td class="text-center">
+                        <span>@(index++)</span>
+                    </td>
+                    <td class="text-center">@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                    <td class="text-center">
+                        <a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = item.Id, IsPopup = true })', '', 0, 0)">@item.CompanyName</a>
+                    </td>
+                    <td class="text-center">@item.Phone</td>
+                    <td class="text-center">@item.Code</td>
+                    <td class="text-center">@item.Address</td>
+                    <td class="text-center">
+                        <span class="help-button" data-rel="tooltip" data-placement="bottom">@(item.KhMoiDenVaHuaQuayLai==null || item.KhMoiDenVaHuaQuayLai==0 ? "" : "V")</span>
+                    </td>
+                    <td class="text-center">
+                        <span class="help-button" data-rel="tooltip" data-placement="bottom">@(item.KhMoiDenKinhTeYeu==null  || item.KhMoiDenKinhTeYeu==0 ? "" : "V")</span>   
+                    </td>
+                    <td class="text-center">
+                        <span class="help-button" data-rel="tooltip" data-placement="bottom">@(item.KhCuMuonBo==null || item.KhCuMuonBo ==0 ? "" : "V")</span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+            </tr>
+        </tfoot>
+    </table>

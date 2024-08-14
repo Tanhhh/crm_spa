@@ -1,0 +1,2083 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Account.Models
+@model CustomerViewModel
+
+
+@{
+    ViewBag.Title = "Quản lý Fanpage";
+
+    Layout = "~/Views/Shared/_ManageFB.cshtml";
+    SelectList genderList = SelectListHelper.GetSelectList_Gender(true, null);
+    SelectList provinceList = SelectListHelper.GetSelectList_Location("0", null, Wording.Empty);
+    SelectList districtList = SelectListHelper.GetSelectList_Location("0", null, Wording.Empty);
+    SelectList wardList = SelectListHelper.GetSelectList_Location("0", null, Wording.Empty);
+    IEnumerable<SelectListItem> OriginList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("Origin", null, Wording.Empty);
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "",
+        ActionName = "",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false,
+        HideClearButton = true,
+        SearchButtonText = ""
+    };
+    var listfanpage = Session["FanPageId"] as List<Erp.BackOffice.Models.FaceBookPageViewModel>;
+    var tokent = ViewBag.tokent as string;
+    var id = ViewBag.id as string;
+    var page = listfanpage.Where(x => x.id == id).FirstOrDefault();
+}
+
+<style>
+    .button__badge {
+    background-color: #fa3e3e;
+    border-radius: 2px;
+    color: white;
+    padding: 1px 3px;
+    font-size: 10px;
+    position: absolute;
+    top: 0px;
+    right: 6px;
+    height: 17px;
+    line-height: 15px;
+}
+    iframe {
+        width: 100%;
+        height: 100%;
+    }
+
+    body {
+        padding-right: 0 !important;
+    }
+    /*new*/
+    .bg-gray.px-4.py-2.bg-light {
+        height: 60px;
+    }
+
+    .pt-1, .py-1 {
+        padding-top: 0.5rem !important;
+    }
+
+    .messages-box {
+        margin-top: 0.4%;
+    }
+
+    ._673w {
+        border-bottom: 1px solid rgba(0, 0, 0, .10);
+        box-sizing: border-box;
+        height: 50px;
+        padding: 8px;
+        position: relative;
+        text-align: center;
+        z-index: 201;
+    }
+
+    ._6ynl {
+        align-items: center;
+        border-bottom: 1px solid gainsboro;
+        /*box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .10);*/
+        display: flex;
+        height: 75px;
+        justify-content: space-between;
+        padding-left: 16px;
+    }
+
+    ._5743._6y4y {
+        padding-left: 0.5rem !important;
+        width: 80%;
+        display: flex;
+    }
+
+    ._1_fz ._5743._6y4y, ._5743._6y4y {
+        align-items: center;
+        display: flex;
+        font-size: 14px;
+        padding: 0;
+    }
+
+    ._5743 {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    ._87v3 {
+        border-radius: 50%;
+    }
+
+    ._6ynn {
+        line-height: 1px;
+        margin-top: -1%;
+    }
+
+    .user-type {
+        font-size: 11px;
+        margin-left: 12%;
+        margin-top: -5%;
+    }
+
+    .topnav {
+        height: 75px;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+        padding-bottom: .5rem !important;
+        padding-top: .5rem !important;
+        background-color: #f8f9fa;
+        font-weight: 500;
+        line-height: 1.2;
+        font-size: 1.25rem;
+        overflow: hidden;
+        background-color: #f3f2f7;
+        border-bottom: 1px solid gainsboro;
+    }
+
+        .topnav a {
+            float: left;
+            display: block;
+            color: black;
+            text-align: center;
+            padding: 18px 16px 10px;
+            text-decoration: none;
+            font-size: 14px;
+            border-bottom: none;
+            cursor: pointer;
+        }
+
+            .topnav a.active {
+                color: #007bff;
+                border-bottom: 3px solid #007bff;
+            }
+
+        .topnav i.active {
+            color: #007bff !important;
+        }
+
+    .list-group-item {
+        border: 0px !important;
+        line-height: 2;
+    }
+
+    ._5iwm._6-_b {
+        padding: 4px 16px 12px;
+    }
+
+    ._5iwm {
+        display: block;
+        padding: 12px 12px;
+        position: relative;
+    }
+
+        ._5iwm ._58ak {
+            border: none;
+            width: 100%;
+        }
+
+    ._58ak {
+        border: 1px solid #bdc7d8;
+        border: 1px solid var(--divider, #bdc7d8);
+        box-sizing: border-box;
+        cursor: default;
+        display: inline-block;
+        font-weight: normal;
+        margin: 0;
+        position: relative;
+        vertical-align: middle;
+    }
+
+    ._2xme {
+        cursor: pointer;
+        position: absolute;
+        left: 15px;
+        top: 9px;
+    }
+
+    ._5iwm._6-_b ._58al {
+        background-color: white;
+        border: 1px solid gainsboro;
+        border-radius: 50px;
+        font-size: 15px;
+        height: 36px;
+        padding-left: 36px;
+        padding-right: 16px;
+        text-align: left;
+    }
+
+    input._58al._7tpc {
+        padding-bottom: 2px;
+        width: 100%;
+    }
+
+    .pl-4, .px-4 {
+        padding-left: unset !important;
+        padding-right: unset !important;
+    }
+
+    div.media.ml-auto.mb-3 {
+        padding-right: 1.5rem !important;
+    }
+    /*new*/
+
+
+
+    .row.rounded-lg.overflow-hidden.shadow {
+        height: 710px;
+    }
+
+    .px-4.py-5.chat-box.bg-white {
+        height: 571px;
+    }
+
+    .container.py-5.px-4 {
+        float: left;
+        padding-top: 6rem !important;
+        padding-bottom: 0 !important;
+    }
+
+    div#TTKH {
+        float: right;
+        top: 28px;
+        padding-left: 1.5% !important;
+        padding-top: 5.5rem;
+    }
+
+    a#modalBtn {
+        float: right;
+        margin-right: 20px;
+        height: 23.6px;
+    }
+
+    /*Mới sửa lại*/
+    #txtSearch {
+        border-radius: 0;
+        color: #858585;
+        background-color: #FFF;
+        border-bottom: 1px solid #D5D5D5;
+        padding: 5px 4px 6px;
+        font-size: 14px;
+        font-family: inherit;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        -webkit-transition-duration: .1s;
+        transition-duration: .1s;
+        height: 75px;
+        width: 105% !important;
+        margin-left: -8px;
+    }
+
+    #txtSearch_content {
+        margin-top: 3%;
+        margin-left: 20px;
+        font-size: 17px;
+    }
+
+    #txtSearch_contentadded {
+        margin-top: 3%;
+        margin-left: 20px;
+        font-size: 17px;
+        display: flex;
+    }
+
+    a#modalBtn {
+        left: 30px;
+        width: 100px;
+        background: #008ed7;
+        border: 0;
+        color: white;
+        text-align: center;
+        height: 27px;
+        text-decoration: none;
+    }
+
+        a#modalBtn:hover {
+            opacity: 0.6;
+        }
+
+    .col-sm-4 {
+        height: 100%;
+    }
+
+    .modal-content {
+        height: 720px;
+        background: #f9f9fd;
+        font-size: 13px;
+        animation: growth linear 0.3s;
+    }
+
+    #modal1 {
+        position: absolute;
+        top: 67px;
+        right: 0;
+        bottom: 0;
+        left: 6px;
+    }
+
+
+
+
+
+    @@keyframes growth {
+        from {
+            transform: translateX(100%);
+        }
+
+        to {
+            transform: translateX(0%);
+        }
+    }
+
+
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(100%);
+        }
+
+        to {
+            transform: translateX(0%);
+        }
+    }
+
+
+    a.close-button {
+        margin-left: 75%;
+        font-size: 30px;
+        margin-top: -3px;
+    }
+
+    .modal-content > p {
+        font-size: 20px;
+        left: 20;
+        top: 2;
+        position: absolute;
+    }
+
+    .col-8.right-header {
+        line-height: 2.5;
+    }
+
+    input#Tim-KH {
+        width: 100%;
+        height: 30px;
+    }
+
+    input#file-image {
+        margin-top: 5px;
+        font-size: 8px;
+        margin-left: 5px;
+    }
+
+    input#Ma-macdinh {
+        width: 100%;
+        height: 30px;
+    }
+
+    .col-8 right-header > label {
+        display: unset;
+    }
+
+    .input-icons i {
+        position: absolute;
+        right: 0%;
+        opacity: 0.3;
+    }
+
+    .input-icons {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .icon {
+        padding: 10px;
+        min-width: 40px;
+    }
+
+    #Tim-KH {
+        width: 100%;
+        text-align: left;
+    }
+
+    .Input {
+        border: 0px;
+        border-bottom: 1px solid gainsboro;
+        background: #f9f9fd;
+    }
+
+    .modal-header {
+        border-bottom: none;
+    }
+
+    .form-group {
+        margin-left: 20px;
+    }
+
+        .form-group > input {
+            width: 62.66%;
+        }
+
+        .form-group > label {
+            width: 33.33%;
+        }
+
+    .modal-bottom {
+        font-size: 10px;
+        font-weight: 500;
+        height: 30px;
+    }
+
+        .modal-bottom > div {
+            display: inline-block;
+        }
+
+    a#save-add {
+        background: #3f943fe8;
+        color: white;
+        padding: 5px 45px;
+        margin-right: 10px;
+        margin-left: 32px;
+    }
+
+    a#save {
+        background: #3f943fe8;
+        color: white;
+        padding: 5px 35px;
+        margin-right: 10px;
+    }
+
+    a#cancel {
+        color: white;
+        padding: 5px 35px;
+        margin-right: 10px;
+        background: #808080e3;
+    }
+
+    div#txtSearch-body {
+        width: 105%;
+        height: 642px;
+        background: #f3f3f3b8;
+        margin-left: -8px;
+    }
+
+    div#body-content {
+        text-align: center;
+        padding-top: 50%;
+    }
+
+    i.fa.fa-envelope {
+        font-size: 80px;
+        color: #80808040;
+    }
+
+    a#modalBtn2 {
+        text-decoration: none;
+        background: #3f943fe8;
+        color: white;
+        font-weight: 500;
+        padding: 5px 25px;
+        font-size: 13px;
+    }
+
+    i.fa.fa-user {
+        color: #ada8a8;
+    }
+
+    #page {
+        color: white;
+        font-size: 13px;
+        font-weight: bold;
+        margin-left: 2%;
+        margin-top: 12px;
+        z-index: 1080;
+    }
+
+    .row.rounded-lg.overflow-hidden.shadow {
+        box-shadow: none !important;
+    }
+
+    .noti {
+        position: absolute;
+        top: 1px;
+        right: -10px;
+        width: 17px;
+        height: 15px;
+        background: #f33636;
+        color: #fff;
+        border-radius: 100%;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    a.facebook-logout {
+        display: flex;
+        margin-left: 76.5%;
+        color: white !important;
+    }
+
+        a.facebook-logout:hover {
+            background: #0072ac;
+        }
+
+    i.fas.fa-sign-out-alt {
+        margin-top: 5px;
+        margin-right: 5px;
+    }
+
+    .modal-backdrop.in {
+        background: unset;
+        position: unset;
+    }
+
+    .px-4.py-5.chat-box.bg-white {
+        padding-bottom: unset !important;
+        padding-top: 1rem !important;
+        overflow-x: hidden;
+    }
+
+    .modal-main {
+        overflow: auto;
+    }
+
+    #cmt {
+        position: absolute;
+        top: 18%;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        text-align: center;
+        background: white;
+    }
+
+    .page-empty {
+        margin-top: 90%;
+        text-align: center;
+    }
+
+    i.material-icons {
+        font-size: 70px;
+        color: #d2d2d2;
+    }
+
+    .empty_content {
+        color: #d2d2d2;
+        font-size: 16px;
+    }
+
+    .col-8.px-0 {
+        border-left: 1px solid gainsboro;
+        border-right: 1px solid gainsboro;
+    }
+
+    .empty-content {
+        margin-top: 25%;
+        text-align: center;
+    }
+
+        .empty-content .fa.fa-facebook-messenger {
+            font-size: 90px;
+        }
+
+    ::-webkit-scrollbar-track {
+        background: none;
+    }
+
+    .bg-light.reply {
+        position: sticky;
+        bottom: 0;
+    }
+
+    textarea#content {
+        width: 65%;
+        height: 9%;
+    }
+
+    .comments {
+        align-items: flex-start;
+    }
+
+    p.post-action {
+        margin-bottom: 0;
+        font-size: 12px;
+        color: lightgrey;
+        display: inline;
+        cursor: pointer;
+    }
+
+        p.post-action.link {
+            margin-left: 65%;
+        }
+
+    .comments-body.children {
+        display: flex;
+        margin-left: 1rem !important;
+    }
+
+    .comments-body.father {
+        display: flex;
+    }
+
+    .comments.children {
+        border-left: #007bff 3px solid;
+        margin-left: 3rem !important;
+    }
+
+    .control-group.form-group {
+        margin-left: 0px;
+        display: flex;
+    }
+
+    label.control-label.no-padding-right.col-lg-5.col-md-4.col-sm-4 {
+        padding-left: 0px;
+    }
+    /*p.post-action.time {
+        margin-left: 45%
+    }*/
+    /*ICON SHOPPING CART*/
+    p.titleHoten {
+        margin-bottom: 0;
+    }
+
+    p.emailsdt {
+        margin-bottom: 0;
+    }
+
+    .publish {
+        width: 100px;
+        background: #008ED6 !important;
+        border: 0;
+        color: white;
+        text-align: center !important;
+        height: 27px;
+        text-decoration: none !important;
+        padding: 0;
+        margin-right: 1%;
+    }
+
+    div#postModal {
+        margin-top: 7%;
+        margin-bottom: 35%;
+        margin-left: 25%;
+        margin-right: 20%;
+        width: 40% !important;
+        /*height: 40%;*/
+    }
+
+
+
+    .Postmodal-body {
+        /*height: 63%;*/
+        border-bottom: 1px solid;
+    }
+
+    .Postmodal-footer {
+        height: 18%;
+    }
+    /*Thêm mới*/
+    button.close {
+        float: left;
+    }
+
+    .Postmodal-body-info {
+        margin: 2% 3%;
+        display: flex;
+    }
+
+    .Postmodal-body-content {
+        padding: 0% 5%;
+        overflow-y: auto;
+    }
+
+    .Postmodal-content {
+        width: 100%;
+        background-color: white;
+        border-bottom: 1px solid;
+        border-radius: 10px;
+    }
+
+
+    .Postmodal-header {
+        text-align: center;
+        border-bottom: 2px solid #80808033;
+        padding-top: 2%;
+        display: flex;
+    }
+    /*Thêm mới*/
+    button.btn.btn-default {
+        width: 80%;
+        margin-left: 10%;
+        background-color: #80808073;
+        margin-top: 2px;
+    }
+
+    .post-action:hover {
+        color: dodgerblue;
+    }
+
+    .post-img {
+        width: 100%;
+    }
+
+    .Salemodal-content {
+        height: 100%;
+        width: 100%;
+    }
+
+    .Salemodal-header {
+        margin-left: 1%;
+        height: 5%;
+        background-color: #0277bc;
+        color: white;
+        display: flex;
+    }
+
+    .Salemodal-body {
+        height: 80%;
+        background-color: white;
+    }
+
+    .Salemodal-footer {
+        display: flex;
+        margin-left: 1%;
+    }
+
+    h4.Salemodal-title {
+        padding-left: 2%;
+        padding-top: 1%;
+    }
+
+    button.btn.Sale {
+        width: 100%;
+        background-color: #3f943fe8 !important;
+        border-radius: 0;
+        color: white;
+    }
+
+    .header-content {
+        width: 80%;
+    }
+
+    .header-button {
+        margin-left: 15%;
+    }
+
+    button.close.sale {
+        color: white;
+        font-size: 30px;
+    }
+
+    .search-product {
+        margin-left: 1%;
+        width: 100%;
+    }
+
+    .cart {
+        height: 92%;
+        width: 98%;
+        padding: 0%;
+        margin-left: 1%;
+        background-color: white;
+        margin-top: 0%;
+    }
+
+    div#s2id_productSelectList {
+        width: 100%;
+    }
+
+    input#productSelect {
+        width: 100%;
+        border-bottom: 1px solid;
+        border-tof: none;
+        border-right: none;
+        border-left: none;
+        height: 50px;
+    }
+
+    .discountbtn {
+        background-color: #d43f3a;
+        width: 20%;
+        border: none;
+        color: white;
+    }
+
+    .main-container {
+        margin-top: -4%;
+    }
+    /*Nút giảm giá theo định dạng*/
+    .toggle {
+        position: relative;
+    }
+
+        .toggle input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+        }
+
+        .toggle label {
+            background-color: #EEEEEE;
+            border: 1px solid #BBBBBB;
+            border-radius: 20px 20px 20px 20px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1) inset;
+            height: 28px;
+            position: relative;
+            width: 75px;
+            display: block;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+
+        .toggle input:checked ~ label {
+            background-color: #19A8E4;
+            background-image: linear-gradient(to bottom, #088CD4 0px, #19A8E4 100%);
+            border: 1px solid #096C9D;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.25) inset;
+        }
+
+        .toggle .toggle-handle {
+            background-color: #FFFFFF;
+            background-image: linear-gradient(to bottom, #FFFFFF 0px, #F2F2F2 100%);
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 100px 100px 100px 100px;
+            height: 28px;
+            position: absolute;
+            -webkit-transition: -webkit-transform 0.1s ease-in-out 0s, border 0.1s ease-in-out 0s;
+            transition: transform 0.1s ease-in-out 0s, border 0.1s ease-in-out 0s;
+            width: 28px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .toggle input:checked + .toggle-handle {
+            border-color: #0A76AD;
+            -webkit-transform: translate3d(48px, 0px, 0px);
+            transform: translate3d(48px, 0px, 0px);
+        }
+
+        .toggle label:after {
+            color: #777777;
+            content: "VNĐ";
+            font-weight: bold;
+            line-height: 28px;
+            position: absolute;
+            right: 13px;
+            text-shadow: 0 1px #FFFFFF;
+            text-transform: uppercase;
+        }
+
+        .toggle input:checked ~ label:after {
+            color: #FFFFFF;
+            content: "%";
+            left: 15px;
+            right: auto;
+            text-shadow: 0 -1px rgba(0, 0, 0, 0.25);
+        }
+    /*DISCOUNT MODAL*/
+    div#discountModal {
+        margin-left: 69%;
+        margin-top: 23%;
+        height: 40%;
+        width: 30% !important;
+        background-color: white;
+        border: 1px solid;
+        border-color: black;
+    }
+
+    .discount-header {
+        display: flex;
+        background-color: #0277bc;
+        text-align: center;
+        color: white;
+    }
+
+    .discount-body {
+        height: 80%;
+    }
+
+    .discount-footer {
+        height: 20%;
+    }
+
+    .disBody {
+        padding-left: 3%;
+    }
+
+    button.discountClose {
+        width: 100%;
+        border: none;
+        height: 100%;
+        background-color: #00609c !important;
+        text-align: center;
+        color: white;
+        font-size: 20px;
+    }
+
+    p.col-lg-4.mb-0 {
+        margin-top: auto;
+    }
+
+    input.discountInput {
+        width: 100%;
+        border-top: none;
+        border-right: none;
+        border-left: none;
+    }
+    /*HIDE TTKH*/
+    i#hideKH:hover {
+        color: blue;
+    }
+
+    i#hideKH {
+        font-size: 20px;
+    }
+
+    @@media only screen and (max-width: 2650px) {
+        .col-4.px-0 {
+            margin-top: 2.8%;
+        }
+
+        .col-8.px-0 {
+            margin-top: 2.5%;
+        }
+    }
+
+    @@media only screen and (max-width: 1960px) {
+        .col-4.px-0 {
+            margin-top: 1.5%;
+        }
+
+        .col-8.px-0 {
+            margin-top: 1.5%;
+        }
+
+        div#TTKH {
+            top: 42px;
+        }
+
+        #modal1 {
+            left: 14px;
+        }
+
+        div#nomsg-view {
+            top: 5% !important;
+        }
+    }
+
+    @@media only screen and (max-width: 1750px) {
+        .col-4.px-0 {
+            margin-top: 1%;
+        }
+    }
+
+    @@media only screen and (max-width: 1698px) {
+        div#TTKH {
+            top: 36px;
+        }
+    }
+
+    @@media only screen and (max-width: 1595px) {
+        .col-4.px-0 {
+            margin-top: 0.7%;
+        }
+
+        .col-8.px-0 {
+            margin-top: 0.5%;
+        }
+
+        div#TTKH {
+            top: 10px;
+        }
+    }
+
+    @@media only screen and (max-width: 1536px) {
+        div#nomsg-view {
+            top: 5.8% !important;
+        }
+    }
+
+    @@media only screen and (max-width: 1435px) {
+        div#TTKH {
+            top: 22px;
+        }
+
+        a#save-add {
+            margin-right: 0;
+            padding: 5px 25px;
+        }
+
+        a#save {
+            margin-right: 0;
+            padding: 5px 25px;
+        }
+
+        .col-4.px-0 {
+            margin-top: 0;
+        }
+    }
+
+    .modal-open {
+        overflow: auto;
+    }
+
+    .nav {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    th {
+        text-align: center;
+    }
+
+    div#saleModal {
+        position: absolute;
+        top: 67px;
+        left: 10px;
+        right: 0;
+        bottom: 0;
+        margin-left: 0;
+        width: auto !important;
+    }
+
+    .Salemodal-footer {
+        display: flex;
+        position: sticky;
+        bottom: 0;
+    }
+
+    .tablinks.active {
+        border-bottom: 2px solid blue;
+    }
+
+    .mystyle {
+        background-color: #008ED6 !important;
+        color: white;
+    }
+
+    .tabhover:hover {
+        background-color: #80808030;
+    }
+
+    .logout:hover {
+        color: black;
+    }
+
+    .logout {
+        float: left;
+        margin-left: 80%;
+        margin-top: 0.5%;
+        color: white;
+        font-size: 15px;
+        z-index: 1000;
+        cursor: pointer;
+    }
+</style>
+
+<div class="empty" id="nomsg-viewpost" style="position: absolute; background: black; height: 100%; left: 22%; right: 0; top: 5.5%; z-index: 10000; opacity: 1; background: #f3f2f7; border-left: 1px solid gainsboro;">
+    <div class="empty-content">
+        <i class="material-icons fa-flip-horizontal" style="font-size: 90px; color: #008ed7;">textsms</i>
+        <i class="fa fa-facebook-messenger" style="color: #4bac4d; position: absolute; padding-left: 8px;"></i>
+        <span style="display: block; font-size: 18px; padding-top: 10px; color: #666; padding-left: 5.5%;">Chọn 1 bài đăng để bắt đầu!</span>
+    </div>
+</div>
+
+<div class="empty" id="nomsg-view" style="position: absolute; background: black; height: 100%; left: 22%; right: 0; top: 3.9%; z-index: 10000; opacity: 1; background: #f3f2f7; border-left: 1px solid gainsboro;">
+    <div class="empty-content">
+        <i class="material-icons fa-flip-horizontal" style="font-size: 90px; color: #008ed7;">textsms</i>
+        <i class="fa fa-facebook-messenger" style="color: #4bac4d; position: absolute; padding-left: 8px;"></i>
+        <span style="display: block; font-size: 18px; padding-top: 10px; color: #666; padding-left: 5.5%;">Chọn 1 cuộc hội thoại để bắt đầu!</span>
+    </div>
+</div>
+<div class="container col-8 py-5 px-4">
+    <div class="col-4 px-0">
+        <select id="idFanPage" class="Fanpage" name="Fanpage" style="padding: .56rem;width:90%; background-color: #fff">
+            @if (listfanpage.Count > 0)
+            {
+                foreach (var i in listfanpage)
+                {
+                    if (i.id.Equals(id))
+                    {
+                        <option value="@i.id" data-token="@i.access_token" selected>@i.name</option>
+                    }
+                    else
+                    {
+                        <option value="@i.id" data-token="@i.access_token">@i.name</option>
+                    }
+
+                }
+
+            }
+
+        </select>
+        <a id="notifications_button"  href="#" aria-expanded="false" class="myPopover"
+               data-container="body" data-toggle="popover" title="Thông báo" data-placement="left"  data-html="true" data-popover-content="#cus">
+            <i class="fa fa-bell-o" style="margin-top:1.2rem;" aria-hidden="true"></i>
+            <span class="button__badge" style="display:none">0</span>
+        </a>
+        <div id="cus" style="display:none;" class="popupCus"><a>Hello</a></div>
+        </div>
+    <div class="row rounded-lg overflow-hidden shadow">
+        <div class="col-4 px-0">
+            <div class="bg-white">
+                <div class="topnav">
+                    <div class="message tablinks active" style="margin-left: -8%; height: 75px; width: 217.775px; margin-top: -16px;  float: left;max-width:50%;" onclick="openTab(event,'messagesbox')">
+                        <a class="tabhover" onclick="getUser();" style="margin-top: -2.5%; width: 100%;">
+                            <div style="font-size: 220%; margin-bottom: 1.5%;">
+                                <i class="fa fa-facebook-messenger " style="color: gray;"></i>
+                            </div>
+                            <small style="font-size: 13px;">Tin nhắn</small>
+                        </a>
+                    </div>
+
+                    <div class="comment tablinks" style="margin-right: -5%; height: 75px; width: 217.775px; margin-top: -16px; float: right;max-width:50%;" onclick="openTab(event,'commentsbox')">
+                        <a id="btnCMT" class="tabhover" onclick="getPageContent();" data-toggle="modal" data-target="#cmt" style="margin-top: -2.5%; width: 100%;">
+                            <div style="font-size: 220%; margin-bottom: 1.5%;">
+                                <i class="material-icons" style="font-size: 1.75rem; color: #8C9097;">textsms</i>
+                            </div>
+                            <small style="font-size: 13px;">Bình luận</small>
+                        </a>
+                    </div>
+                </div>
+
+                <span class="_5iwm _6-_b _150g _58ah"><label class="_58ak"><input autocomplete="off" class="_58al _7tpc" placeholder="Tìm kiếm trên Messenger" spellcheck="false" type="text" aria-label="Tìm kiếm trên Messenger" value=""></label></span>
+
+                <div class="messages-box mess" id="messagesbox" style="display: block;" onload="getUser()">
+                </div>
+                <div class="messages-box comm" id="commentsbox" style="display:none;">
+                    <div class="page-empty comm">
+                        <i class="material-icons">search</i>
+                        <div class="empty_content" translate="">
+                            Không có kết quả nào phù hợp
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-8 px-0">
+            <div class="modal" id="postModal" data-toggle="modal" aria-hidden="true" role="dialog">
+                <!-- Modal content-->
+                <div class="Postmodal-content">
+                    <div class="Postmodal-header">
+                        <div style="width: 100%;">
+                            <h4 class="Postmodal-title" style="font-weight:bold;">Đăng bài</h4>
+                        </div>
+                        <div style="width: 10%;">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                    </div>
+                    <div class="Postmodal-body">
+                        <div class="Postmodal-body-info">
+                            <div style="height: 40px; width: 40px;">
+                                <img class="_87v3 img" alt="" src="https://scontent.fvca1-2.fna.fbcdn.net/v/t1.0-1/cp0/p50x50/106243546_109497047483353_1218262410537704277_o.png?_nc_cat=104&amp;_nc_sid=dbb9e7&amp;_nc_ohc=Eh6V_d3gNtUAX-z05AO&amp;_nc_ht=scontent.fvca1-2.fna&amp;oh=42551e023b7cf2f4b4c7c38bca27bd86&amp;oe=5F3704C5" width="40" height="40">
+                            </div>
+
+                            <div style="margin-left: 2%;font-size: 14px;">
+                                @if (page != null)
+                                {
+                                    <p style="margin-bottom: 0%;font-weight: 600;">@page.name</p>
+                                }
+                                else
+                                {
+                                    <p style="margin-bottom: 0%;font-weight: 600;">Không rõ</p>
+                                }
+
+
+                                <span style="background: #80808030;">Công khai</span>
+                            </div>
+
+                        </div>
+
+                        <div class="Postmodal-body-content">
+                            <input type="text" id="post" placeholder="Viết bình luận tại đây..." onkeypress="return enterCmt(event);" class="form-control rounded-0 border-0 " autocomplete="off" style="height:80px; margin-bottom:10%;">
+                        </div>
+                    </div>
+                    <div class="Postmodal-footer">
+                        <button type="button" id="btnPost" class="btn btn-default" onclick="publishPost();">Đăng</button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                $('#post').on("change paste keyup", function () {
+                    if ($('#post').val() != '') {
+                        document.getElementById('btnPost').classList.add('mystyle');
+                    }
+
+                    else {
+                        document.getElementById('btnPost').classList.remove('mystyle');
+                    }
+                });
+
+            </script>
+
+        </div>
+    </div>
+</div>
+<div class="col-4" id="TTKH">
+    <div autocomplete="off" class="txtSearch" id="notadd" name="txtSearch" style="width:100%;display:none">
+        <div id="txtSearch_content">
+            <i class="fa fa-user" aria-hidden="true"></i>
+            <p style="display : inline-block;color: #d2cbcb;font-weight: 500;">Chưa có KH </p>
+            <button id="modalBtnLK" class="btn btn-mini btn-success" style="display:inline-block;">
+                <i class="fa fa-link" aria-hidden="true"></i>
+                Liên kết KH
+            </button>
+            <a id="modalBtn" class="button" style="display:inline-block;" data-toggle="modal" data-target="#modal1">
+                <i class="fa fa-user-plus" aria-hidden="true"></i>
+                Thêm
+            </a>
+        </div>
+    </div>
+    <div autocomplete="off" class="txtSearch " id="added" name="txtSearch" style="width:100%; display:none">
+        <div id="txtSearch_contentadded">
+            <p class="titleHoten" style="display : inline-block;color:black;font-weight:500;"> </p>
+            <p class="emailsdt" style="display : inline-block;color: black;font-weight:500;margin-left:8%"></p>
+
+        </div>
+    </div>
+    <div id="txtSearch-body">
+        <div id="body-content">
+            <i class="fa fa-envelope" aria-hidden="true"></i>
+            <p style="color: #80808040;font-weight: 500;font-size: 20px;">Tạo đơn hàng mới</p>
+            <a href="" id="modalBtn2" class="button" data-toggle="modal" data-target="#saleModal">
+                +Đơn hàng mới
+            </a>
+        </div>
+    </div>
+
+    <div class="modal" id="modal1" data-toggle="modal" data-backdrop="false" aria-hidden="true">
+        <div class="modal-content">
+            <div class="nav" style="background: #4267b2; height: 40px">
+                <p style="color:white; display: inline; margin-left: 37px; font-weight: 700;margin-top: 8px;font-size: 16px;">Tên KH</p>
+                <a class="close-button" href="" style="color:white;" data-dismiss="modal">&times;</a>
+            </div>
+
+            <div class="modal-main">
+                <div class="modal-header">
+                    <div class="col-4 left-header">
+                        <label for="image">
+                            <input type="file" name="image" id="image" style="display:none;" />
+                            <img src="/assets/css/images/noimage.gif" style="max-height:100px; " />
+                        </label>
+                    </div>
+
+                    <div class="col-8 right-header">
+                        <div class="input-icons">
+                            <i class="fa fa-search icon" aria-hidden="true"></i>
+                            <input id="Tim-KH" class="Input" type="text" placeholder="Tìm khách hàng" />
+
+                        </div>
+                        <input id="Canhan" type="radio" checked="checked" />
+                        <label style="margin-right: 20px;">Cá nhân </label>
+                        <input id="Congty" type="radio" />
+                        <label>Công ty </label>
+
+                        @*<input id="Ma-macdinh" class="Input" type="text" placeholder="Mã mặc định" />*@
+                    </div>
+
+                </div>
+
+                <div class="modal-body" style="margin-top: -15px ; line-height: 1;padding-bottom: 0;">
+                    <div class="form-group">
+                        <label>Tên khách hàng</label>
+                        <input id="Ten-KH" class="Input" type="text" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Điện thoại</label>
+                        <input id="SDT" class="Input" type="text" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngày sinh</label>
+                        <input id="Ngaysinh" class="Input" type="date" />
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ</label>
+                        <input id="diachi" class="Input" type="text" />
+                    </div>
+                    <div class="form-group">
+                        @Html.CustomDropDownListFor(model => model.CityId, provinceList, WidthType.span12)
+                    </div>
+                    <div class="form-group">
+                        @Html.CustomDropDownListFor(model => model.DistrictId, districtList, WidthType.span12)
+                    </div>
+
+                    <div class="form-group">
+                        @Html.CustomDropDownListFor(model => model.WardId, wardList, WidthType.span12)
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mã số thuế</label>
+                        <input id="MST" class="Input" type="text" />
+                    </div>
+                    <div class="form-group">
+                        @Html.CustomDropDownListFor(model => model.Gender, genderList, WidthType.span12, false, null, DropdownListStyle.DropdownListStyleDefault)
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input id="email" class="Input" type="text" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <input id="Ghichu" class="Input" type="text" />
+                    </div>
+                </div>
+                <div class="modal-bottom">
+                    <div>
+                        <a class="modal-button" id="save-add">Lưu và thêm đơn mới </a>
+                    </div>
+
+                    <div>
+                        <a class="modal-button" id="save">Lưu</a>
+                    </div>
+
+                    <div>
+                        <a class="modal-button" id="cancel" data-dismiss="modal">Bỏ qua</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="saleModal" data-toggle="modal" aria-hidden="true" data-backdrop="false" role="dialog">
+        <!-- Modal content-->
+        <div class="Salemodal-content">
+            <div class="Salemodal-header">
+                <div class="header-content">
+                    <h4 class="Salemodal-title">Đặt hàng</h4>
+                </div>
+                <div class="header-button">
+                    <button type="button" class="close sale" data-dismiss="modal">&times;</button>
+                </div>
+            </div>
+            <div class="Salemodal-body">
+                <div class="search-product">
+                    <input id="productSelectList" class="select2-input" placeholder="Nhập mã hoặc tên sản phẩm" name="productSelectList" />
+                </div>
+                <div class="cart">
+                    <div class="cart-detail">
+                        <div id="listOrderDetail" class="table-responsive top-10" style="max-height: 70%;margin-top: 0.4%; z-index: 2">
+
+                            <table id="listOrderDetail1" class="table table-bordered Testing">
+                                <thead>
+                                    <tr>
+                                        <th style="width:3%">STT</th>
+                                        @if (ViewBag.isGiaNhap == "true")
+                                        {
+                                            <th style="width:45%">Mã sản phẩm</th>
+                                            <th style="width:15%;">Số lượng<p id="TongSoLuong" value="0" readonly> </p></th>
+                                            <th style="width:25%">Giá nhập</th>
+                                        }
+                                        else
+                                        {
+                                            <th style="width:35%">Mã sản phẩm</th>
+                                            <th style="width:5%">SL</th>
+                                            <th hidden style="width:15%">Giá</th>
+                                            <th hidden style="width:10%">Giảm giá</th>
+                                            <th style="width:15%">Thành tiền</th>
+                                            <th style="width:15%"></th>}
+                                    </tr>
+                                </thead>
+                                <tbody class="detailList"></tbody>
+                                <tfoot>
+                                    <tr>
+                                        @*<td id="ProductItemCount" align="right" style="font-weight:bold"></td>*@
+                                        <td id="TongSoLuong" align="right" style="font-weight:bold"></td>
+                                        <td id="TongThanhTien" align="right" style="font-weight:bold"></td>
+
+                                    </tr>
+
+                                </tfoot>
+                            </table>
+                            <table hidden id="totalPrice">
+                                <tr>
+                                    <td id="GiaSauGiam" align="right" style="font-weight:bold">Giá sau giảm :</td>
+                                    <td id="PriceDiscount" align="right" style="font-weight:bold"></td>
+                                    <td hidden id="PriceDiscount1"></td>
+                                </tr>
+                            </table>
+                            <label>Tính cho nhãn hàng: </label>
+                            <select style="text-align-last:center; width:40%" class="item_countForBrand" id="CountForBrand" name="CountForBrand">
+                                <option value="">Chọn nhãn hàng</option>
+                                @foreach (var item in OriginList)
+                                {
+
+                                    <option value="@item.Value">@item.Text</option>
+
+                                }
+
+                            </select>
+                            <span style="color:red" class="field-validation-valid help-inline" data-valmsg-for="ProductItemCount" data-valmsg-replace="true"></span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="Salemodal-footer">
+                <button type="button" hidden class="discountbtn" id="discountBTN" data-toggle="modal" data-target="#discountModal">Giảm giá</button>
+                <button type="button" class="btn Sale">Tạo đơn hàng</button>
+            </div>
+        </div>
+    </div>
+    <!--DISCOUNT MODAL-->
+    <div class="modal" id="discountModal" data-backdrop="false" role="dialog">
+        <!-- Modal content-->
+        <div class="discount-content">
+            <div class="discount-header">
+                <div class="header-content">
+                    <h4 class="discount-title">Giảm giá</h4>
+                </div>
+                <div class="header-button">
+                    <button type="button" class="close discount" data-dismiss="modal">&times;</button>
+                </div>
+            </div>
+            <div class="discount-body col-lg-12">
+                <div class="money disBody mt-3" style="display:flex">
+                    <p class="col-lg-4 mb-0">Tiền hàng</p>
+                    <input class="discountInput" id="TienHang" type="text">
+                </div>
+                <div class="discount disBody mt-3" style="display:flex">
+                    <p class="col-lg-4 mb-0">Giảm giá </p>
+                    <input class="discountInput" id="Discount" type="number" autocomplete="off">
+                    <div class="toggle">
+                        <input type="checkbox" id="toggle1" />
+                        <div class="toggle-handle"></div>
+                        <label for="toggle1" onclick></label>
+                    </div>
+                </div>
+                <div class="pay disBody mt-3" style="display:flex">
+                    <p class="col-lg-4 mb-0">Thanh toán</p>
+                    <input class="discountInput" id="ThanhToan" type="text">
+                    <input hidden class="discountInput" id="ThanhToan1" type="text">
+                </div>
+                <div class="pay disBody mt-3" style="display:flex">
+                    <p class="col-lg-4 mb-0">Ghi Chú</p>
+                    <input class="discountInput" id="noteHD" type="text" autocomplete="off" />
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="display: block;padding: unset;">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="iframe-container" style="height:100%"></div>
+                    <div class="img-loading-wrap">
+                        <div class="outer">
+                            <div class="middle">
+                                <div class="img-loading"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script type="text/javascript">
+   
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover();
+    });
+   
+
+    //$('.myPopover').each(function () {
+
+    //    $('.myPopover').popover({
+
+    //        html: true,
+    //        content: function () {
+
+    //            var elementId = $(this).attr("data-popover-content");
+    //            return $(elementId).html();
+    //        }
+    //    }).on("mouseenter", function () {
+
+    //        var _this = this;
+    //        $(this).popover("show");
+    //        $(".popover").on("mouseleave", function () {
+    //            $(_this).popover('hide');
+    //        });
+    //    }).on("mouseleave", function () {
+    //        var _this = this;
+    //        setTimeout(function () {
+    //            if (!$(".popover:hover").length) {
+    //                $(_this).popover("hide");
+    //            }
+    //        }, 0);
+    //    });
+    //});
+
+    var aasp = [];
+
+    $(document).ready(function () {
+
+       
+
+        (function () {
+            // initialize select2 dropdown
+            $('#productSelectList').select2({
+                placeholder: "Nhập mã hoặc tên sản phẩm",
+                minimumInputLength: 1,
+                data: dropdownData(),
+                formatResult: function (item) {
+                    @*if (@ViewBag.Notdisplaysizecolor == 0)
+                        {*@
+                    return '<pr style=font-size: 20px;>' + item.code + ' - ' + item.ProductName + '</pr>' + '<br>' + '<b style=font-size: 16px;>Giá:' + item.price + '</b>';
+                    //}
+                    //else
+                    //{
+                    //    return '<pr style=font-size: 20px;>' + item.code + ' - ' + item.ProductName + '</pr>' + '<br>' + '<b style=font-size: 16px;>Giá:' + item.price + '</b>' + '<pr  style=font-size: 16px;> (Loại:' + item.TEN_LOAISANPHAM + ' Nhóm:' + item.TEN_NHOMSANPHAM + ') <pr> ';
+                    //}
+                },
+                multiple: true,
+                // creating query with pagination functionality.
+                query: function (data) {
+                    var pageSize,
+                            dataset,
+                            that = this;
+                    pageSize = 20; // Number of the option loads at a time
+                    results = [];
+                    if (data.term && data.term !== '') {
+                        // HEADS UP; for the _.filter function I use underscore (actually lo-dash) here
+                        results = _.filter(that.data, function (e) {
+                            return e.text.toUpperCase().indexOf(data.term.toUpperCase()) >= 0;
+                        });
+                    } else if (data.term === '') {
+                        results = that.data;
+                    }
+                    data.callback({
+                        results: results.slice((data.page - 1) * pageSize, data.page * pageSize),
+                        more: results.length >= data.page * pageSize,
+                    });
+                },
+            });
+        })();
+
+
+
+
+        LoadNumberInput();
+    });
+
+
+    function dropdownData() {
+        $.ajax({
+
+            url: '/ProductInbound/SearchProductInvoice3Json',
+            dataType: "json",
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+            async: false,
+            success: function (data) {
+
+                $.each(data, function (i, item) {
+                    aasp.push(item);
+
+
+                });
+
+
+            },
+            error: function (xhr) {
+                //alert('error' + xhr);
+            }
+        });
+
+        //alert(aasp);
+
+        return aasp;
+
+    }
+    $('#listOrderDetail').on('change', 'input', function () {
+        var value = $(this).val();
+        if (value == "") {
+            $(this).addClass("valid_null");
+        }
+        else {
+            $(this).removeClass("valid_null");
+            $(this).removeClass("has_error");
+
+        }
+    });
+    calcTotalAmount();
+    $('#ProductItemCount').val($('#listOrderDetail .detailList tr').length);
+    //init rcb chọn sản phẩm
+
+    //$('#TotalAmount').numberFormat();
+    //$('.detail_item_price').numberFormat('before');
+    //$('.detail_item_total').numberFormat('before');
+
+    //lấy danh sách sản phẩm theo đơn hàng
+    //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+    $('#productSelectList').on('change', function () {
+        debugger
+        var selected = "";
+        // var mbisFind=true;
+        var selected = $("#productSelectList").select2("data");
+        if (selected == null)
+            return;
+
+        var OrderNo = $('.detailList tr').length;
+        var ProductId = selected[0].product_id;
+        var ProductName = selected[0].ProductName;
+        var Unit = selected[0].unit;
+        var Quantity = 1;
+        var Price = selected[0].price;
+        var ProductType = selected[0].product_type;
+        var ProductCode = selected[0].code;
+        var LoCode = "";
+        var ExpiryDate = "";
+        var formdata = {
+            OrderNo: OrderNo,
+            ProductId: ProductId,
+            ProductName: ProductName,
+            Unit: Unit,
+            Quantity: Quantity,
+            Price: Price,
+            ProductType: ProductType,
+            ProductCode: ProductCode,
+            LoCode: LoCode,
+            ExpiryDate: ExpiryDate
+        };
+
+        $("#listOrderDetail1 TBODY TR").each(function () {
+            debugger
+            var row = $(this);
+            var w = $(window);
+            $(this).removeClass('selected_grey').addClass("text_data");
+
+            var ProductCode1 = $(this).closest('tr').find("td:eq(1) input:nth-child(2)").val();
+
+            // alert($('#product_barcode3').val());
+
+            if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                //alert(ProductCode);
+                $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val(parseInt($(this).closest('tr').find("td:eq(2) input:nth-child(2)").val()) + 1);
+                $(this).closest('tr').find("td:eq(2) input:nth-child(2)").trigger('change');
+                $(this).addClass('selected_grey');
+                var body = $("html,#listOrderDetail");
+                body.stop().animate({ scrollTop: row.offset().top - (w.height() / 1.6) }, 500, 'swing', function () {
+                    row.addClass('scrollCode');
+                });
+                formdata = {};
+                return;
+            } else {
+                $(this).removeClass("scrollCode");
+            }
+            //alert(ProductCode);
+
+        });
+        //Thêm dòng mới
+        ClickEventHandler(true, "/ProductInBound/LoadProductItem1", ".detailList", formdata, function () {
+            //Tinh số lượng sp
+            $('#ProductItemCount').val($('#listOrderDetail .detailList tr').length);
+            //$.mask.definitions['~'] = '[+-]';
+            //$('.input-mask-date').mask('99/99/9999');
+            $("#listorderdetail1 tbody tr").each(function () {
+                var row = $(this);
+                var thanhtien;
+                var price = removeComma($(this).closest('tr').find("td:eq(3) input").val());
+                var quantity = $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val();
+                var giatien = price * quantity;
+                var discountitem = removeComma($(this).closest('tr').find("td:eq(5) input:nth-child(1)").val());
+                var check = $(this).closest('tr').find("td:eq(5) input");
+                var checked = ToggleDiscount(check[1].id);
+                if (checked == 1) {
+                    thanhtien = giatien - giatien * discountitem / 100;
+                }
+                else {
+                    thanhtien = giatien - discountitem;
+                }
+                //var vnd = parseInt(price).toLocaleString('vi', { style: 'currency', currency: 'VND' });
+                //$(this).closest('tr').find("td:eq(3) input").val(vnd);
+                $(this).closest('tr').find("td:eq(6) input").val(thanhtien.toLocaleString('vi', { style: 'currency', currency: 'VND' }));
+                $(this).closest('tr').find("td:eq(7) input").val(thanhtien);
+
+            });
+            calcTotalAmount();
+            calTotal();
+            //$("#DetailList_" + formdata.OrderNo + "_Quantity").focus().select();
+
+        });
+
+        //HideLoading();
+        $("#productSelectList").select2("val", "");
+        $(".select2-input").trigger('click');
+    });
+
+    // tính thành tiền và tổng cộng
+
+    //Ô giảm giá bị thay đổi
+    $('#listOrderDetail').on('change', '.discountInputitem', function () {
+        $("#listorderdetail1 tbody tr").each(function () {
+            var row = $(this);
+            var thanhtien;
+            var price = removeComma($(this).closest('tr').find("td:eq(3) input").val());
+            var quantity = $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val();
+            var giatien = price * quantity;
+            //var discountitem = removeComma($(this).closest('tr').find("td:eq(5) input:nth-child(1)").val());
+            //var check = $(this).closest('tr').find("td:eq(5) input");
+            //var checked = ToggleDiscount(check[1].id);
+            //if ((discountitem > 100) && (checked == 1)) {
+            //    $(this).closest('tr').find("td:eq(5) input:nth-child(1)").val(100);
+            //    discountitem = 100;
+            //}
+            //if (checked == 1) {
+            //    thanhtien = giatien - giatien * discountitem / 100;
+            //}
+            //else {
+            //    thanhtien = giatien - discountitem;
+            //}
+            $(this).closest('tr').find("td:eq(6) input").val(giatien.toLocaleString('vi', { style: 'currency', currency: 'VND' }));
+            $(this).closest('tr').find("td:eq(7) input").val(giatien);
+
+        });
+        calcTotalAmount();
+        calTotal();
+    });
+
+    $('#listOrderDetail').on('change', '.detail_item_qty', function () {
+        var $this = $(this);
+        var id = $this.closest('tr').data('id');
+        var $detail_item_id = $this.closest('tr').find('.detail_item_id');
+        var $qty = $detail_item_id.closest('tr').find('.detail_item_qty');
+        var qty = 1;
+        if ($qty.val() == '') {
+            $qty.val(1);
+        } else {
+            qty = parseInt(removeComma($qty.val())) < 0 ? parseInt(removeComma($qty.val())) * -1 : parseInt(removeComma($qty.val()));
+        }
+        var $qtyUsed = $detail_item_id.closest('tr').find('.detail_item_qtyUsed');
+        var qtyUsed = 1;
+        if ($qtyUsed.val() == '') {
+            $qtyUsed.val(0);
+        } else {
+            //qtyUsed = parseInt($qtyUsed.val()) < 0 ? parseInt($qtyUsed.val()) * -1 : parseInt($qtyUsed.val());
+            qtyUsed = parseInt(removeComma($qtyUsed.val())) < 0 ? parseInt(removeComma($qtyUsed.val())) * -1 : parseInt(removeComma($qtyUsed.val()));
+        }
+        if (qty < qtyUsed) {
+            $qty.val(qtyUsed);
+        }
+        else {
+            $qty.val(qty);
+        }
+        $("#listorderdetail1 tbody tr").each(function () {
+            var row = $(this);
+            var thanhtien;
+            var price = removeComma($(this).closest('tr').find("td:eq(9) input").val());
+            var quantity = $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val();
+            var giatien = price * quantity;
+            var discountitem = removeComma($(this).closest('tr').find("td:eq(5) input:nth-child(1)").val());
+            var check = $(this).closest('tr').find("td:eq(5) input");
+            var checked = ToggleDiscount(check[1].id);
+            if (checked == 1) {
+                thanhtien = giatien - giatien * discountitem / 100;
+            }
+            else {
+                thanhtien = giatien - discountitem;
+            }
+            $(this).closest('tr').find("td:eq(6) input").val(thanhtien.toLocaleString('vi', { style: 'currency', currency: 'VND' }));
+            $(this).closest('tr').find("td:eq(7) input").val(thanhtien);
+
+        });
+        calcAmountItem($detail_item_id, id, 'price');
+        calcTotalAmount();
+        calTotal();
+
+    });
+
+    $('#listOrderDetail').on('change', '.detail_item_price:last-of-type', function () {
+        var $this = $(this);
+        var id = $this.closest('tr').data('id');
+        var $detail_item_id = $this.closest('tr').find('.detail_item_id');
+        $("#listorderdetail1 tbody tr").each(function () {
+            var row = $(this);
+            var thanhtien;
+            var price = removeComma($(this).closest('tr').find("td:eq(9) input").val());
+            var quantity = $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val();
+            var giatien = price * quantity;
+            var discountitem = removeComma($(this).closest('tr').find("td:eq(5) input:nth-child(1)").val());
+            var check = $(this).closest('tr').find("td:eq(5) input");
+            var checked = ToggleDiscount(check[1].id);
+            if (checked == 1) {
+                thanhtien = giatien - giatien * discountitem / 100;
+            }
+            else {
+                thanhtien = giatien - discountitem;
+            }
+            $(this).closest('tr').find("td:eq(6) input").val(thanhtien.toLocaleString('vi', { style: 'currency', currency: 'VND' }));
+            $(this).closest('tr').find("td:eq(7) input").val(thanhtien);
+
+        });
+        calcAmountItem($detail_item_id, id, 'price');
+        calcTotalAmount();
+        calTotal();
+    });
+
+
+    $('#listOrderDetail').on('keypress', '.detail-product-price, .detail_item_qty', function (e) {
+        if (e.which == 13) {
+            e.preventDefault();
+        }
+    });
+
+    $('#listOrderDetail').on('keypress', '.detail_item_price', function (e) {
+        if (e.keyCode === 46) {
+            e.preventDefault();
+        }
+    });
+
+    $('#listOrderDetail').on('keypress', '.detail_item_qty', function (e) {
+        if (e.keyCode === 46) {
+            e.preventDefault();
+        }
+    });
+    // xóa sản phẩm
+    $('#listOrderDetail').on('click', '.btn-delete-item', function () {
+        //$(this).closest('tr').next('tr.template_location').remove();
+        $(this).closest('tr').remove();
+
+        var countItem = $('.detailList tr').length;
+        $('#ProductItemCount').val(countItem);
+
+        if (countItem == 0) {
+            $('#ProductItemCount').val('');
+            $('#TongSoLuong').text('');
+            $('#TongThanhTien').text('');
+        }
+        calcTotalAmount();
+        calTotal();
+        $('.detailList tr').each(function (index, tr) {
+            $(tr).attr('role', index);
+            $(tr).find('td:first-child').text(index + 1);
+            $(tr).find('.detail_locode input').attr('name', 'DetailList[' + index + '].ExpiryDate').attr('id', 'DetailList_' + index + '__ExpiryDate');
+            $(tr).find('.detail_locode input').attr('name', 'DetailList[' + index + '].LoCode').attr('id', 'DetailList_' + index + '__LoCode');
+            $(tr).find('.detail_item_id input').attr('name', 'DetailList[' + index + '].ProductId').attr('id', 'DetailList_' + index + '_ProductId');
+            $(tr).find('.detail_item_qty').attr('name', 'DetailList[' + index + '].Quantity').attr('id', 'DetailList_' + index + '_Quantity');
+            $(tr).find('.detail_item_price').filter(':not(.mask-format-currency)').attr('name', 'DetailList[' + index + '].Price').attr('id', 'DetailList_' + index + '_Price');
+            $(tr).find('.detail_item_unit').attr('name', 'DetailList[' + index + '].Unit');
+        });
+    });
+    function calcTotalAmount() {
+        debugger
+        var total = 0;
+        var total1 = 0;
+        var iCount = 0;
+        var selector = '.detailList tr';
+        $(selector).each(function (index, elem) {
+            if ($(elem).find('.detail_item_total').text() != '') { // la số thì mới tính
+                total += parseFloat(removeComma($(elem).find('.detail_item_total').text()));
+                $("#TongThanhTien").text(total.toLocaleString('vi', { style: 'currency', currency: 'VND' }));
+            }
+
+            if ($(elem).find('.detail_item_qty').val() != '') { // la số thì mới tính
+                total1 += parseInt(removeComma($(elem).find('.detail_item_qty').val()));
+                $("#TongSoLuong").text(total1);
+                iCount++;
+            }
+
+            if (index == $(selector).length - 1) {
+                $('#mask-TotalAmount').val(total);
+                $('#TotalAmount').val(total.toLocaleString('vi', { style: 'currency', currency: 'VND' }));
+            }
+        });
+        $("#ProductItemCount").text(iCount);
+    };
+    function calTotal() {
+        var total = 0;
+        $("#listorderdetail1 tbody tr").each(function () {
+            total += parseInt($(this).closest('tr').find("td:eq(7) input").val());
+
+        });
+        $('#PriceDiscount').text(total.toLocaleString('vi', { style: 'currency', currency: 'VND' }));
+        $('#PriceDiscount1').text(total);
+        console.log(total);
+    }
+    function calcAmountItem($detail_item_id, id, priceFrom) {
+        //var price = 0;
+        //var $priceElem = $detail_item_id.closest('tr').find('.detail_item_price');
+        //if (priceFrom == 'item select') {
+        //    $priceElem.val($option.data('price')).trigger('change');
+        //    price = parseFloat($option.data('price'));
+        //} else {
+        //    price = parseFloat($priceElem.last().val().replace(/[^0-9\.]/g, ''));
+        //}
+        var input_price = $('#DetailList_' + id + '__Price');
+        var _price = input_price.val() != '' ? removeComma(input_price.val()) : 0;
+
+        var $qty = $detail_item_id.closest('tr').find('.detail_item_qty');
+        var qty = 1;
+        if ($qty.val() == '') {
+            $qty.val(1);
+        } else {
+            qty = parseInt(removeComma($qty.val())) < 0 ? parseInt(removeComma($qty.val())) * -1 : parseInt(removeComma($qty.val()));
+        }
+        var total = Math.round(_price * qty);
+        $detail_item_id.closest('tr').find('.detail_item_total').text(total.toLocaleString('vi', { style: 'currency', currency: 'VND' }));
+    };
+    function ToggleDiscount(id) {
+        check = document.getElementById(id);
+        if (check.checked == true) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+    function clickToggle(id) {
+        var dis = id.split("toggle+");
+        var toggle = document.getElementById('Discount+' + dis[1]);
+        toggle.value = "0";
+        $("#listorderdetail1 tbody tr").each(function () {
+            var row = $(this);
+            var thanhtien;
+            var price = removeComma($(this).closest('tr').find("td:eq(9) input").val());
+            var quantity = $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val();
+            var giatien = price * quantity;
+            var discountitem = removeComma($(this).closest('tr').find("td:eq(5) input:nth-child(1)").val());
+            var check = $(this).closest('tr').find("td:eq(5) input");
+            var checked = ToggleDiscount(check[1].id);
+            if (checked == 1) {
+                thanhtien = giatien - giatien * discountitem / 100;
+            }
+            else {
+                thanhtien = giatien - discountitem;
+            }
+            $(this).closest('tr').find("td:eq(6) input").val(thanhtien.toLocaleString('vi', { style: 'currency', currency: 'VND' }));
+            $(this).closest('tr').find("td:eq(7) input").val(thanhtien);
+
+        });
+        calcTotalAmount();
+        calTotal();
+    }
+
+    $("#modalBtnLK").click(function () {
+        OpenPopup('/Customer/IndexSearch?IsPopup=true&jsCallback=selectItem_CustomerId', 'Tìm kiếm khách hàng', 800, 600)
+    })
+
+    function OpenPopup(url, title, w, h, size) {
+
+        if (url != '') {
+            if (w == "0") {
+                $("#myModal").addClass("modal-full");
+            }
+            else {
+                $("#myModal").removeClass("modal-full");
+            }
+
+            $("#myModal .modal-title").text(title);
+            $("#myModal .modal-body .iframe-container").html("<iframe id=\"myiframe\" src=\"" + url + "\"></iframe>");
+            if (h == "100%") {
+
+                $("#myModal .modal-body").height("100%");
+            }
+            else
+                $("#myModal .modal-body").height(h);
+
+            $('#myModal').modal('show');
+            $("#myModal .modal-body .img-loading-wrap").show();
+
+        }
+    }
+
+
+
+
+    function selectItem_CustomerId(id, name, pluspoint, code, phone) {
+        //alert(id);
+        $("#myModal .modal-body .iframe-container").html("");
+        $('#myModal').modal('hide');
+        var fbId = localStorage.getItem("idUser");
+        UpdateFBId(id, fbId, 0);
+
+    }
+    function UpdateFBId(Id, fbId, check) {
+        $.ajax({
+            type: "POST",
+            url: "/Customer/LinkedCus",
+            data: JSON.stringify({ Id: Id, fbId: fbId, check: check }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (r) {
+                if (r == 1) {
+                    alert("Liên kết thành công");
+                    checkFBID();
+                }
+                else if (r == 2) {
+                    if (confirm('Khách hàng đã liên kết với tài khoản khác. Bạn có muốn tiếp tục ?')) {
+                        UpdateFBId(Id, fbId, 1);
+                    }
+                }
+                else {
+                    alert("Liên kết không thành công");
+                }
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+
+            }
+        });
+    }
+
+    //Tạo don hang
+    //set Page mới
+    $('#idFanPage').change(function () {
+        debugger
+        var id = $('#idFanPage option:selected').val();
+        var tokent = $(this).find(':selected').data('token');
+        if (id != "" && tokent != "") {
+            localStorage.setItem("accessPage", tokent);
+            localStorage.setItem("idPage", id);
+            window.location.href = '/Home/ManageFB?id=' + id + '';
+        }
+        //var countries = [];
+        //$.each($(".Fanpage option:selected"), function () {
+        //    debugger
+        //    countries.push($(this).val());
+        //});
+        //SetPageID(accesstoken, idpage);
+
+    })
+
+
+</script>
+
+
+
+
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.css" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-css/1.4.6/select2-bootstrap.min.css" />
+@*<script type="text/javascript" src='//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>*@
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js"></script>
+<!--Js Select2-->
+
+<link href="~/assets/css/ManageFB.css" rel="stylesheet" />
+<script src="~/Scripts/ManageFB/ManageFB.js"></script>
+<!--BOOTSTRAP 4-->
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+
+
+
+
+}

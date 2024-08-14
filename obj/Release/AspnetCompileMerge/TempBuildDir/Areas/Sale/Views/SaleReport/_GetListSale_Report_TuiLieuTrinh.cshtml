@@ -1,0 +1,44 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_Report_TuiLieuTrinhViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                @*<th class="text-center">Ngày tạo</th>*@
+                <th class="text-center">Mã dịch vụ</th>
+                <th class="text-center">Tên dịch vụ</th>
+                <th class="text-center">Mã gói liệu trình</th>
+                <th class="text-center">Tên gói liệu trình</th>
+                <th class="text-center">Số lượng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+                @*<td class="text-center">@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>*@
+                <td class="text-center">@item.ServiceCode</td>
+                <td class="text-center">@item.ServiceName</td>
+                <td class="text-center">@item.ProductCode</td>
+                <td class="text-center">@item.ProductName</td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(item.Quantity, null))</td>
+            </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" style="text-align:right"><b>Tổng</b></td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Quantity), null))</td>
+            </tr>
+        </tfoot>
+    </table>

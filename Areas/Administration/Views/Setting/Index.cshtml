@@ -1,0 +1,112 @@
+﻿@model List<Erp.BackOffice.Areas.Administration.Models.SettingGroupViewModel>
+
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = Resources.Wording.Settings;
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+{
+    ModuleName = "Setting",
+    ActionName = "Index",
+    PageTitle = ViewBag.Title,
+    DisplaySearchPanel = true,
+    IsPopup = false,
+    DisplayBackButton = false,
+    AdvancedSearch = false,
+};
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <label for="textSearch" class="inline">@Resources.Wording.Key</label>
+    @Html.TextBox("textSearch", null, new { @class = "inline" })
+}
+
+@if (ViewBag.AlertMessage != null && ViewBag.AlertMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="icon-remove"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.AlertMessage
+    </div>
+}
+
+@helper GridColumnCommand(bool? IsLocked, int id, string actionName, string controllerName)
+{
+    var Locked = IsLocked == true ? true : false;
+    if (!(bool)Locked)
+    {
+        @Html.Partial("_DeleteItemPartial", new ViewDataDictionary { { "Id", id }, { "ActionName", actionName }, { "ControllerName", controllerName } })
+    }
+}
+
+@helper EditLink(string name, int id)
+{
+    if (string.IsNullOrEmpty(name))
+    {
+        <a href="@Url.Action("Edit", "Setting", new {Id = id })">Empty</a>
+    }
+    else
+    {
+        <a href="@Url.Action("Edit", "Setting", new { Id = id})">@name</a>
+    }
+}
+
+@{
+    int n = 0;
+}
+<a href="@Url.Action("ResetCacheWebClient","Setting")">Reset WebClient</a>
+<div class="tabbable">
+    <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tab">
+        @foreach (var g in Model)
+        {
+            n++;
+            <li class="@(n == 1 ? "active" : "")">
+                <a data-toggle="tab" href="#tab@(n)">@(string.IsNullOrEmpty(g.Name) ? "Chưa phân nhóm" : g.Name)</a>
+            </li>}
+    </ul>
+
+    @{
+        n = 0;
+    }
+    <div class="tab-content">
+        @foreach (var g in Model)
+        {
+            n++;
+            <div id="tab@(n)" class="tab-pane in @(n == 1 ? "active" : "")">
+                <table class="table table-bordered table-striped" style="max-width:700px">
+                    @foreach (var item in g.ListSetting)
+                    {
+                        <tr>
+                            <td>
+                                <a href="@Url.Action("Edit", "Setting", new { Id = item.Id})">@item.Key</a> <span class="help-button" data-rel="tooltip" data-placement="bottom" data-original-title="@item.Value">?</span><br />
+                                <em>@item.Note</em>
+                            </td>
+                            <td style="width:50px">@GridColumnCommand(item.IsLocked, item.Id, "Delete", "Setting")</td>
+                        </tr>
+                    }
+                </table>
+
+            </div>
+        }
+    </div>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <a class="btn btn-primary btn-mini" href="@Url.Action("Create", pageSetting.ModuleName)">
+        <i class="ace-icon fa fa-plus"></i>
+        @Resources.Wording.CreateNew
+    </a>
+}
+
+<script type="text/javascript">
+    $(function () {
+        $('[data-rel=tooltip]').tooltip({ container: 'body' });
+    });
+</script>

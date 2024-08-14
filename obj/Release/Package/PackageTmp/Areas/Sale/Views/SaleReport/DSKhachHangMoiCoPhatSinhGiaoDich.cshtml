@@ -1,0 +1,181 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@model IEnumerable<ProductInvoiceViewModel>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+    @{
+        ViewBag.Title = "Danh sách khách hàng mới có phát sinh giao dịch";
+        if (Request["IsPopup"] == "true")
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            if (Request["IsPopup"] == "null")
+            {
+                Layout = null;
+            }
+            else
+            {
+                Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+            }
+        }
+        bool IsDisplaySearchPanel = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? false : true;
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "DSKhachHangMoiCoPhatSinhGiaoDich",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = IsDisplaySearchPanel,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int index = 1;
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        // Cộng thêm 1 tháng và trừ đi một ngày.
+        DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+
+        decimal _TongDS = ViewBag.total_ds;
+        decimal _TongDT = ViewBag.total_dt;
+        decimal _TongCN = ViewBag.total_cn;
+    }
+
+
+
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+
+        <p>
+            <span class="input-daterange input-group" style="z-index:1002">
+                @Html.TextBox("StartDate", Request["StartDate"] != null ? Request["StartDate"] : aDateTime.ToString("dd/MM/yyyy"), new { @class = "", autocomplete = "off", placeholder = "Từ ngày..." })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("EndDate", Request["EndDate"] != null ? Request["EndDate"] : retDateTime.ToString("dd/MM/yyyy"), new { @class = "", autocomplete = "off", placeholder = "Đến ngày..." })
+            </span>
+            <script>
+
+                $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+
+                });
+            </script>
+        </p>
+    }
+
+    <div class="table-responsive" id="DSKhachHangMoiCoPhatSinhGiaoDich" style="margin-bottom:40px">
+        <table id="cTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:40px;text-align:center">STT</th>
+                    <th style="width: 300px; text-align: center">Người Quản Lý</th>
+                    <th style="width: 300px; text-align:center">Nhóm Hưởng Doanh Số</th>
+                    <th style="width: 300px; text-align: center">Mã Số</th>
+                    <th style="width: 300px; text-align: center">Tên</th>
+                    <th style="width: 150px; text-align: center">SĐT</th>
+                    <th style="width: 300px; text-align: center">Địa Chỉ</th>
+                    <th style="width: 300px; text-align: center">Nhãn Hàng</th>
+                    <th style="width: 300px; text-align: center">Doanh Số</th>
+                    <th style="width: 300px; text-align: center">Doanh Thu</th>
+                    <th style="width: 300px; text-align: center">Còn Nợ</th>
+                    <th style="width: 300px; text-align: center">Ngày Bắt Đầu Giao Dịch</th>
+                    <th style="width: 300px; text-align: center">Ngày Giao Dịch Gần Nhất</th>
+                    <th style="width: 300px; text-align: center">Lần Chăm Sóc Gần Nhất</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="@(index%2==0?"alert-warning":"")">
+                        <td>
+                            <span>@(index++)</span>
+                        </td>
+                        <td>@(item.ManagerStaffName)</td>
+                        <td>@(item.NhomNVKD)</td>
+                        <td>@(item.CustomerCode)</td>
+                        <td>@(item.CustomerName)</td>
+                        <td>@(item.Phone)</td>
+                        <td>@(item.Address)</td>
+                        <td>@(item.CountForBrand)</td>
+                        <td style="text-align: right">@(CommonSatic.ToCurrencyStr((item.TotalAmount), null))</td>
+                        <td style="text-align: right">@(CommonSatic.ToCurrencyStr((item.DoanhThu), null))</td>
+                        <td style="text-align: right">@(CommonSatic.ToCurrencyStr((item.tienconno), null))</td>
+                        <td>@(Convert.ToDateTime(item.NgayGDDT).ToString("dd/MM/yyyy"))</td>
+                        <td>@(Convert.ToDateTime(item.NgayGDGN).ToString("dd/MM/yyyy"))</td>
+                        <td>@(Convert.ToDateTime(item.NgayCSGN).ToString("dd/MM/yyyy"))</td>
+                    </tr>
+                }
+            </tbody>
+            <thead>
+                <tr style="text-align: right">
+                    <td colspan="8"><b>Tổng:</b></td>
+                    <td><b>@(CommonSatic.ToCurrencyStr(_TongDS, null))</b></td>
+                    <td><b>@(CommonSatic.ToCurrencyStr(_TongDT, null))</b></td>
+                    <td><b>@(CommonSatic.ToCurrencyStr(_TongCN, null))</b></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportThis()">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+
+    <script src="~/Scripts/jquery.floatThead.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#cTable").floatThead({ top: 30 });
+        });
+    </script>
+
+
+    <script>
+
+
+
+
+        function exportThis() {
+            var tab_text = "<table border='2px'><tr>";
+            var textRange; var j = 0;
+            tab = document.getElementById('cTable'); // id of table
+
+            for (j = 0; j < tab.rows.length; j++) {
+                tab_text = tab_text + tab.rows[j].innerHTML + "</tr>";
+                //tab_text=tab_text+"</tr>";
+            }
+
+            tab_text = tab_text + "</table>";
+            //tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
+            //tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // remove if u want images in your table
+            //tab_text = tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // reomves input params
+
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf("MSIE ");
+
+            if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+            {
+                txtArea1.document.open("txt/html", "replace");
+                txtArea1.document.write(tab_text);
+                txtArea1.filename('BanDanhgia.xls');
+                txtArea1.document.close();
+                txtArea1.focus();
+
+                sa = txtArea1.document.execCommand("SaveAs", true, "Say Thanks to Sumit.xls");
+            }
+            else                 //other browser not tested on IE 11
+                sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text,));
+
+            return (sa);
+        }
+
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+

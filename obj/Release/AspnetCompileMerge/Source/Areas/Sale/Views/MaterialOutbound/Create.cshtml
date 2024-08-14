@@ -1,0 +1,323 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Areas.Cms.Models
+
+@model MaterialOutboundTransferViewModel
+
+@{
+    ViewBag.Title = "Xuất kho vật tư";
+
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "MaterialOutbound",
+        ActionName = "Transfer",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+
+    IEnumerable<SelectListItem> productCategoryList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("product", null, "value");
+
+    IEnumerable<SelectListItem> warehouseSourceList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Warehouse(null, Wording.Empty);
+    IEnumerable<SelectListItem> warehouseDestinationList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Warehouse(null, Wording.Empty);
+    IEnumerable<CategoryViewModel> categoryList = (IEnumerable<CategoryViewModel>)ViewBag.categoryList;
+    IEnumerable<CategoryViewModel> categoryListXuatPhucVu = (IEnumerable<CategoryViewModel>)ViewBag.categoryListXuatPhucVu;
+
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+<link href="/assets/css/combojax.css" rel="stylesheet" />
+<style>
+    .has_error {
+        border: 1px #f2a696 solid !important;
+        color: #D68273;
+    }
+
+    .box {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+        margin-top: 0px !important;
+    }
+
+    .popover {
+        width: 100% !important;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+        /* padding-left: 7px; */
+        /* font-size: 13px; */
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 42px;
+    }
+
+        .itemdiv > .body > .name {
+            color: black;
+        }
+</style>
+
+}
+
+
+
+<style>
+    .edit-view .control-group, .edit-view .form-group {
+        border-top: 1px solid #dedede !important;
+    }
+</style>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Create", "MaterialOutbound", null, FormMethod.Post, new { id = "CreateMaterialOutbound", @class = "form-horizontal clearfix" }))
+{
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-sm-7">
+            <div class="product-search-box clearfix " style="margin-bottom:10px">
+                <span class="label label-warning" style="padding: 6px; float: left; height: 26px;margin-left:0px">[F4]</span>
+                <div id="product_search_control">
+                    <span class="ctl">
+                        @Html.TextBox("Material", "", new { placeholder = "Vật tư...", autocomplete = "off", style = "width:300px; margin-right:0px" })
+                    </span>
+                </div>
+            </div>
+
+            <div id="listOrderDetail" class="table-responsive top-10">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th style="width:5%">STT</th>
+                            <th>Tên vật tư</th>
+                            <th class="detail_locode">Lô/Hạn SD</th>
+                            <th style="width:10%">Số lượng</th>
+                            <th style="width:15%">Đơn giá</th>
+                            <th style="width:15%">Thành tiền</th>
+                            <th style="width:50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="detailList">
+                        <tr role="0" hidden>
+                            <td class="text-center">
+                                1
+                            </td>
+                            <td>
+                                <input class="item_id" type="hidden" id="DetailList_0__Id" name="DetailList[0].Id" value="0" />
+                                <input class="item_material_id" type="hidden" id="DetailList_0__MaterialId" name="DetailList[0].MaterialId" value="0" />
+                                <span class="item_material_name"></span>
+                            </td>
+                            <td class="detail_locode">
+                                <input class="item_locode valid_null" type="text" id="DetailList_0__LoCode" name="DetailList[0].LoCode" value="" style="width:80px" />
+                                <input class="input-mask-date item_expiry_date valid_null" type="text" id="DetailList_0__ExpiryDate" name="DetailList[0].ExpiryDate" value="" style="width:80px;">
+                            </td>
+                            <td>
+                                <input type="hidden" name="DetailList[0].Unit" id="DetailList_0__Unit" value="" class="item_unit" />
+                                <input class="item_quantity numberinput2 text-right" type="text" id="DetailList_0__Quantity" name="DetailList[0].Quantity" value="0" style="width:100%" />
+                            </td>
+                            <td>
+                                <input class="item_price numberinput2 text-right" type="text" id="DetailList_0__Price" name="DetailList[0].Price" value="" style="width:100%" />
+                            </td>
+                            <td align="right"><span class="item_total" align="right"></span></td>
+                            <td class="text-center">
+                                <a class="btn-delete-item">
+                                    <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                </a>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td id="sta" colspan="3" class="red"><span id="status"></span></td>
+                     
+
+                            <td id="TongSoLuong" align="right" style="font-weight:bold"></td>
+                            <td></td>
+                            <td id="TongThanhTien" align="right" style="font-weight:bold"></td>
+                            <td id="statd"></td>
+                            <td class="detail_locode"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-box" id="widget-box-1">
+                <div class="widget-header">
+                    <h5 class="widget-title">Thông tin khởi tạo</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @if (Model.WarehouseSourceId == null)
+                        {
+                            <div class="alert alert-danger">
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <i class="ace-icon fa fa-times"></i>
+                                </button>
+
+                                <strong>
+                                    <i class="ace-icon fa fa-times"></i>
+                                    Thông báo!
+                                </strong>
+                                Chọn kho nguồn để thêm sản phẩm
+                                <br>
+                            </div>
+                        }
+                     
+                        @*@Html.CustomDropDownListFor(model => model.WarehouseSourceId, warehouseSourceList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)*@
+                        <div>
+                            <label class="control-label no-padding-right col-lg-5 col-md-4 col-sm-4" for="WarehouseSourceId">Xuất từ kho</label>
+                            <select id="WarehouseSourceId" name="WarehouseSourceId" class="form-control ">
+                                @foreach (var item in categoryList)
+                                {
+                                    <option @(Model.WarehouseSourceId == item.Id ? "selected" : "") value="@item.Id" title="@item.CategoryValue">
+                                        @item.Code - @item.Name (@item.BranchName)
+                                    </option>
+                                }
+                            </select>
+                            <p id="demo" hidden></p>
+                        </div>
+                        <div class="control-group form-group">
+                            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Xuất cho kho khác</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                                <label class="radio"><input data-target="#group_choice_wrap1" type="radio" value="internal" class="group_choice ace" @((Model.Type == null || Model.Type == "internal") ? "checked" : "") name="group_choice" />  <span class="lbl"></span></label>
+                            </div>
+                        </div>
+                        <div class="control-group form-group">
+                            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Xuất phục vụ</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                                <label class="radio"><input checked id="checkedservice" data-target="#group_choice_wrap2" type="radio" value="service" class="group_choice ace" @(Model.Type == "service" ? "checked" : "") name="group_choice" /> <span class="lbl"></span></label>
+                            </div>
+                        </div>
+                        <div id="group_choice_wrap1" class="group_choice_wrap clearfix" @((Model.Type == null || Model.Type == "internal") ? "" : "style=display:none")>
+                            <select id="WarehouseSourceId" name="WarehouseSourceId" class="form-control ">
+                                @foreach (var item in categoryListXuatPhucVu)
+                                {
+                                    <option @(Model.WarehouseSourceId == item.Id ? "selected" : "") value="@item.Id" title="@item.CategoryValue">
+                                        @item.Code - @item.Name (@item.BranchName)
+                                    </option>
+                                }
+                            </select>
+                        </div>
+
+                        <div id="group_choice_wrap2" class="group_choice_wrap clearfix" @(Model.Type == "service" ? "" : "style=display:none")>
+                        </div>
+                   
+                        @Html.CustomTextAreaFor(model => model.Note, null, WidthType.span12)
+                        @Html.CustomTextboxFor(model => model.TotalAmount, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-sm-12" }, { "disabled", "disabled" } })
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+@section Scripts {
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+<script src="/Scripts/combojax.js?=vs1.011"></script>
+    <script type="text/javascript">
+        $(function () {
+            if ($('#checkedservice').is(":checked")) {
+                $(".group_choice_wrap").attr('hidden', 'hidden');
+            }
+        });
+        $(document).ready(function () {
+            LoadNumberInput();
+            $(".group_choice").change(function () {
+                ShowLoading();
+                $(".group_choice_wrap").css('height', 'initial');
+                if ($(this).is(":checked")) {
+                    $(".group_choice_wrap").hide();
+                    $($(this).data("target")).show();
+                }
+                HideLoading();
+            });
+            $('#Save').click(function () {
+                ShowLoading();
+                var WarehouseSourceId = $("#WarehouseSourceId").val();
+                var messagge = "";
+                if ($(".group_choice :checked").val() == "internal") {
+                    var warehouseDestinationId = $("#WarehouseDestinationId").val();
+
+
+                    if (warehouseDestinationId == '') {
+                        messagge += "Kho nhận sản phẩm chưa có <br>";
+                    }
+                }
+
+                if ($('#demo').text() != 'VT') {
+                    if (count_locode > 0) {
+                        messagge += "Cần nhập đầy đủ số lô <br>";
+                    }
+                    if (expiry_date_null > 0) {
+                        messagge += "Cần nhập đầy đủ hạn sử dụng <br>";
+                    }
+                }
+
+                if (WarehouseSourceId == '') {
+                    messagge += "Kho xuất sản phẩm chưa có <br>";
+                }
+                if (messagge != '') {
+                    alertPopup('Lỗi!', messagge, 'error');
+                    HideLoading();
+                }
+                else {
+                    ClearFormatBeforeSubmit($("#CreateMaterialOutbound"));
+                    $("#CreateMaterialOutbound").submit();
+                    //  HideLoading();
+                }
+
+            });
+            $(function () {
+                //var selectedEventType = $("#WarehouseSourceId").options[$("#WarehouseSourceId").selectedIndex].title;
+                var e = document.getElementById("WarehouseSourceId");
+                var selectedEventType = e.options[e.selectedIndex].title;
+                document.getElementById("demo").innerHTML = selectedEventType;
+                if (selectedEventType == "VT") {
+                    $('.detail_locode').hide();
+                    $("#sta").attr("colspan", 2);
+                    $("#statd").show();
+                } else {
+                    $('.detail_locode').show();
+                    $("#sta").attr("colspan", 3);
+                    $("#statd").hide();
+                }
+            });
+
+            $("#WarehouseSourceId").change(function () {
+                ShowLoading();
+                window.location = window.location.href.split("?")[0] + "?WarehouseSourceId=" + $(this).val();        
+
+            });
+        });
+
+        //hàm gọi lại từ form tạo mới phiếu nhập
+        function ClosePopupAndAppendSelectPurchaseOrder(optionSelect) {
+            ClosePopup(false);
+            $('#PurchaseOrderId').append($(optionSelect)).trigger("chosen:updated");
+        }
+    </script>
+<script src="/Scripts/area_sale/MaterialOutbound.js?=vs1.12"></script>
+}

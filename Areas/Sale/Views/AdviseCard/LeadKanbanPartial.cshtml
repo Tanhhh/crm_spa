@@ -1,0 +1,703 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Sale.Controllers
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using Erp.BackOffice.Sale.Models
+@using System.ComponentModel
+@using Erp.Domain.Account.Helper
+@model IEnumerable<LeadModel>
+    @{
+        var lsstatus = ViewBag.lsstatus as IEnumerable<StatusLeadModel>;
+        var leaddt = Model as IEnumerable<LeadModel>;
+        Layout = "";
+        var tuple = ViewBag.section as Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>;
+    }
+    <style>
+        .body-content {
+            overflow: scroll;
+            width: 100%;
+            height: 680px;
+            background-image: url("https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2133x1600/171af0933cade9cf983c0ccd6086af40/photo-1556761175-4b46a572b786.jpg");
+            background-size: cover;
+            background-position: center center;
+            padding: 0;
+            display: flex;
+        }
+
+        .dragtrue:hover {
+            cursor: pointer;
+        }
+        .undragable:hover {
+            cursor: pointer;
+        }
+
+        .card-wrapper {
+            display: flex;
+        }
+
+        .card-item {
+            border: 1px solid #ddd;
+            width: 50%;
+            box-sizing: border-box;
+            background-color: #fff;
+            height: 100px;
+            overflow: hidden;
+        }
+
+            .card-item:first-child {
+                border-right: none;
+            }
+
+        .card-header,
+        .card-body {
+            padding: 10px;
+        }
+
+        .card-title {
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .card-value {
+            margin: 0;
+            font-size: 11px;
+        }
+        /*    Khách mua */
+        .customerPurchaseModal {
+            background-color: transparent;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            height: auto;
+            margin-top: 20px;
+        }
+
+            .customerPurchaseModal .modal-content {
+                padding: 20px;
+                margin: 400px;
+                margin-top: 240px;
+            }
+
+                .customerPurchaseModal .modal-content div {
+                    display: flex;
+                    flex-direction: row; /* Các thành phần nằm thẳng dọc */
+                    margin-bottom: 10px;
+                }
+
+                .customerPurchaseModal .modal-content label {
+                    font-weight: bold;
+                    margin-bottom: 5px; /* Khoảng cách giữa các label */
+                    width: 200px;
+                    margin-right: 65px;
+                }
+
+                .customerPurchaseModal .modal-content input[type="text"],
+                .customerPurchaseModal .modal-content input[type="date"],
+                .customerPurchaseModal .modal-content input[type="number"],
+                .customerPurchaseModal .modal-content select,
+                .customerPurchaseModal .modal-content textarea {
+                    padding: 8px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                    margin-bottom: 10px; /* Khoảng cách giữa các input */
+                    width: 100%; /* Chiều rộng 100% */
+                }
+
+
+                .customerPurchaseModal .modal-content button {
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-weight: bold;
+                }
+
+                .customerPurchaseModal .modal-content .saveCustomerPurchaseModal {
+                    background-color: #4CAF50; /* Màu nền cho nút Lưu */
+                    color: white;
+                }
+
+                .customerPurchaseModal .modal-content .cancelCustomerPurchaseModal {
+                    background-color: transparent; /* Nền trong suốt cho nút Hủy bỏ */
+                    color: black;
+                    border: 1px solid #ccc;
+                }
+
+                .customerPurchaseModal .modal-content saveCustomerPurchaseModal:hover {
+                    opacity: 0.8; /* Hiệu ứng khi di chuột qua */
+                }
+
+            .customerPurchaseModal .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5); /* Màu overlay */
+            }
+
+            .customerPurchaseModal .modal-content {
+                left: 25%;
+                transform: translate(-50%, -50%);
+                background-color: white; /* Màu nền của modal */
+                padding: 20px;
+                border-radius: 5px;
+                z-index: 1114; /* Z-index cao hơn overlay */
+                width: auto;
+            }
+    </style>
+
+    <div class="body-content">
+        @if (lsstatus != null && lsstatus.Count() > 0)
+        {
+            foreach (var item in lsstatus)
+            {
+                <div class="outer col-xs-2 zero-padding col-list" style="margin-left: 10px; display: inline-table; border-right: 1px solid white;">
+                    <div class="ui-state-default" style="width: 180px;">
+                        <div class="ticket clearfix" id="@item.Id" style="border-radius:3px;padding:0!important">
+                            <div class="row list-name-config" style=" padding:0px 0px 0px 12px !important;margin-top:10px">
+                                <div class="col-xs-11" style="padding: 0 !important">
+                                    <div contenteditable="false" class="name col-xs-12" style="padding: 0 !important">
+                                        <b class="list-name" prjitem="@item.Id" style="padding: 0 !important">
+                                            @*<div style="display: inline-block">*@
+                                            <label for="@item.Id" title="@item.Name" style="
+                                        border-bottom: 1px solid @item.ColorStatus;
+                                        cursor: pointer;
+                                        height: 30px;
+                                        width: 100%;
+                                        clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
+                                        background-color: @item.ColorStatus;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+                                        overflow: hidden;
+                                        color: #fff;
+                                        padding: 0 !important;
+                                        display:block;
+                                        text-align:center;
+                                        align-content: center;
+                                    " class="">@item.Name<input id="@item.Id" hidden type="radio" name="status" value="@item.Id" /></label>
+                                    @*</div>*@
+                                </b>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row list-name-config" style=" padding:0px 0px 0px 12px !important">
+                        <div class="col-xs-11" style="padding: 0 !important">
+                            <div contenteditable="false" class="name col-xs-12" style="padding: 0 !important">
+                                <button type="button" onclick="addNewbySt(@item.Id)" data-toggle="modal" data-target=".bs-example-modal-sm" style="background-color: #fff; text-align: center; width: 100%; border: none; outline: none; margin-bottom: 10px;margin-top:10px; padding: 0 !important"><i class="fa fa-plus"></i>thêm</button>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- CARD LIST -->
+                    <div class="cardslist">
+                        <div class="cardsBox inner droptrue" id="100" style="height:9999px ;width:100%;">
+                            @{IEnumerable<LeadModel> kabanModel = leaddt.Where(x => x.StatusId == item.Id);}
+                            <!-- droptrue has items inner and (ui-state-default) -->
+                            @if (kabanModel != null && kabanModel.Count() > 0)
+                            {
+                                <div class="card-wrapper" style="margin-bottom:30px">
+                                    <div class="card-item">
+                                        <div class="card-header">
+                                            <p class="card-title">Tổng Lead:</p>
+                                        </div>
+                                        <div class="card-body" style="text-align:center">
+                                            <p style="font-size:11px" class="card-value">@item.LeadCount</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-item">
+                                        <div class="card-header">
+                                            <p class="card-title">Tổng tiền:</p>
+                                        </div>
+                                        <div class="card-body" style="text-align:center">
+                                            <p style="font-size:11px" class="card-value">@string.Format("{0:#,##0} VNĐ", item.TotalPrice)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                foreach (var work in kabanModel)
+                                {
+                                    int finishedTasks = 8;
+
+                                    <!--CARD-->
+                                    <div id="@work.Id" class="card ui-state-default @( (item.Id == 27 || item.Id == 28)? "undragable" : "dragtrue" )" style="color: black; height: auto; width: 100%; margin-bottom: 10px; background-color: #fff;display:inline-block; padding:10px">
+                                        @if (work != null)
+                                        {
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    @for (int i = 0; i < 4; i++)
+                                                    {
+                                                        <div class="card_label col-xs-4" style="background-color: #FF0600; margin-right: 5px;display:none;"></div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                        @{string content = work.LeadName + ", " +
+                                                                work.Name + " " +
+                                                                work.Mobile + ", " +
+                                                                work.Address + ',';
+                                        }
+
+                                        <div class="card_name col-xs-12" title="@content.Remove(content.Length-1)">
+                                            @{
+                                                @(content.Remove(content.Length - 1));
+                                            }
+                                        </div>
+
+                                        <!--ACTION ICONS -->
+                                        <div class="icons">
+                                            @*<i class="col-xs-1 description glyphicon glyphicon-edit" onclick="searchPanel(`@item.Name`,@item.Id,@work.Id,`@work.StatusTo`,`@work.ContentEmail`,`@work.ContentRule`,`@work.TileEmail`,@work.TypeRuleId)" data-target=".bs-searchPanel-modal-sm" data-toggle="modal"></i>*@
+                                            @*<i class="col-xs-1 count glyphicon glyphicon-trash" onclick="deleteLeadRule(@work.Id)"></i>*@
+                                        </div>
+                                        <!--ACTION ICONS -->
+
+                                    </div>
+                                    <!--CARD-->
+                                }
+                            }
+                            else
+                            {
+                                <div class="card-wrapper">
+                                    <div class="card-item">
+                                        <div class="card-header">
+                                            <p class="card-title">Tổng Lead:</p>
+                                        </div>
+                                        <div class="card-body" style="text-align:center">
+                                            <p style="font-size:11px" class="card-value">0</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-item">
+                                        <div class="card-header">
+                                            <p class="card-title">Tổng tiền:</p>
+                                        </div>
+                                        <div class="card-body" style="text-align:center">
+                                            <p style="font-size:11px" class="card-value">0 VNĐ</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- ADD card link -->
+                    <!-- FOOTER BUTTONS -->
+                    <footer style="display: none" class="card_footer col-xs-5 margin_5">
+                        <input type="button" class="btn_addCard btn btn-success" value="Add" />
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </footer>
+                    <!-- FOOTER BUTTONS -->
+
+                </div>
+            </div>
+        </div>
+
+
+
+    }
+}
+    </div>
+    <div class="modal customerPurchaseModal" style="display: none; z-index: 1113; overflow-y: hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content" id="customerPurchaseModalContent">
+            <h2 id="tillePurchaseModal" style="margin: 10px 0 50px 0; font-weight:bolder">Chi tiết kết quả</h2>
+            <div>
+                <label for="amountcustomerPurchaseModal">Số tiền</label>
+                <input type="text" id="amountcustomerPurchaseModal" oninput="formatCurrencyCustomerPurchaseModal(this)">
+            </div>
+            <div>
+                <label for="endDatecustomerPurchaseModal">Ngày kết thúc</label>
+                <input type="date" id="endDatecustomerPurchaseModal" placeholder="Chọn ngày tháng năm">
+            </div>
+            <div>
+                <label for="reasoncustomerPurchaseModal">Lý do mua</label>
+                <select id="reasoncustomerPurchaseModal">
+                    <option value="option1">Lựa chọn 1</option>
+                    <option value="option2">Lựa chọn 2</option>
+                    <option value="option3">Lựa chọn 3</option>
+                    <!-- Thêm các option khác nếu cần -->
+                </select>
+            </div>
+            <div>
+                <label for="brandcustomerPurchaseModal">Nhãn hàng</label>
+                <select id="brandcustomerPurchaseModal">
+                    <option value="option1">Lựa chọn 1</option>
+                    <option value="option2">Lựa chọn 2</option>
+                    <option value="option3">Lựa chọn 3</option>
+                    <!-- Thêm các option khác nếu cần -->
+                </select>
+            </div>
+            <div style="justify-content: flex-end">
+                <button class="cancelCustomerPurchaseModal" style="margin-right: 5px">Hủy bỏ</button>
+                <button class="saveCustomerPurchaseModal">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <script>
+        var modalClosed = false;
+        function customerPurchaseModalShow(endst, callback) {
+            debugger
+            var label = $('.customerPurchaseModal').find('label[for="reasoncustomerPurchaseModal"]');
+            var selectReason = $('.customerPurchaseModal').find('#reasoncustomerPurchaseModal');
+            var selectBrand = $('.customerPurchaseModal').find('#brandcustomerPurchaseModal');
+
+            var tittlePurchase = $('.customerPurchaseModal').find('#tillePurchaseModal');
+            $('.customerPurchaseModal').attr('data-statusId', endst);
+
+            if (endst == 27) {
+                label.text('Lý do mua');
+                tittlePurchase.text('Chi tiết kết quả: Đã mua');
+
+            } else {
+                label.text('Lý do chưa mua');
+                tittlePurchase.text('Chi tiết kết quả: Chưa mua')
+
+            }
+            $.ajax({
+                url: '/AdviseCard/KetThucLeadCategoryGet',
+                type: 'GET',
+                dataType: 'json',
+                success: function (jsonDataList) {
+                    // Xóa các tùy chọn cũ trong select
+                    selectReason.empty();
+                    if (label.text() === 'Lý do mua') {
+                        selectReason.append($('<option>', {
+                            value: '',
+                            text: '' // Bạn có thể đặt văn bản cho tùy chọn trống nếu cần
+                        }));
+                    }
+                    // Thêm các tùy chọn mới từ dữ liệu nhận được từ AJAX
+                    $.each(jsonDataList, function (index, category) {
+                        selectReason.append($('<option>', {
+                            value: category.Value,
+                            text: category.Name
+                        }));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Xử lý lỗi nếu cần
+                    console.error(error);
+                }
+            });
+            $.ajax({
+                url: '/AdviseCard/OriginCategoryGet',
+                type: 'GET',
+                dataType: 'json',
+                success: function (jsonDataList) {
+                    // Xóa các tùy chọn cũ trong select
+                    selectBrand.empty();
+                    if (label.text() === 'Lý do chưa mua') {
+                        selectBrand.append($('<option>', {
+                            value: '',
+                            text: '' // Bạn có thể đặt văn bản cho tùy chọn trống nếu cần
+                        }));
+                    }
+                    // Thêm các tùy chọn mới từ dữ liệu nhận được từ AJAX
+                    $.each(jsonDataList, function (index, category) {
+                        selectBrand.append($('<option>', {
+                            value: category.Value,
+                            text: category.Name
+                        }));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Xử lý lỗi nếu cần
+                    console.error(error);
+                }
+            });
+            $('.customerPurchaseModal').show();
+            $('.saveCustomerPurchaseModal').on('click', function () {
+                var formDataPurchaseModal;
+                var amount = convertToNumberWithDot($('#amountcustomerPurchaseModal').val());
+                var endDate = $('#endDatecustomerPurchaseModal').val();
+                var dateParts = endDate.split("-");
+                var formattedDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+
+                var reason = $('#reasoncustomerPurchaseModal').val();
+                var label = $('.customerPurchaseModal').find('label[for="reasoncustomerPurchaseModal"]');
+                var brand = $('#brandcustomerPurchaseModal').val();
+                // Tạo một mảng chứa các lỗi
+                var errors = [];
+
+                // Kiểm tra từng trường dữ liệu
+                if ((!amount || isNaN(amount)) && tittlePurchase.text() === 'Chi tiết kết quả: Đã mua') {
+
+                    console.log(amount);
+                    errors.push('Số tiền phải là một số.');
+                }
+                if (label.text() === 'Lí do chưa mua' && !reason) {
+                    errors.push('Lí do chưa mua không được để trống.');
+                }
+                if (!endDate) {
+                    errors.push('Ngày kết thúc không được để trống.');
+                }
+                if (!brand && label.text() === 'Lí do mua') {
+                    errors.push('Nhãn hàng không được để trống.');
+                }
+                // Nếu có lỗi, hiển thị thông báo lỗi
+                if (errors.length > 0) {
+                    $('.customerPurchaseModal').hide();
+                    // Hiển thị thông báo lỗi với SweetAlert2
+                    modalClosed = false;
+                    callback(modalClosed, formDataPurchaseModal);
+                } else {
+                    // Nếu không có lỗi, tiếp tục xử lý dữ liệu
+                    formDataPurchaseModal = {
+                        amount: amount,
+                        endDate: formattedDate,
+                        reason: reason,
+                        brand: brand
+                    };
+                    $('.customerPurchaseModal').hide(); // Ẩn modal
+                    modalClosed = true;
+                    callback(modalClosed, formDataPurchaseModal);
+                }
+
+                
+
+            });
+            $('.cancelCustomerPurchaseModal').on('click', function () {
+                $('.customerPurchaseModal').hide(); // Ẩn modal
+                modalClosed = false;
+                callback(modalClosed, null);
+            });
+            $('.modal-overlay').on('click', function () {
+
+                $('.customerPurchaseModal').hide(); // Ẩn modal
+                modalClosed = false;
+                callback(modalClosed, null);
+            });
+        };
+        function convertToNumberWithDot(amountString) {
+            // Loại bỏ các dấu chấm
+            var amountWithoutDot = amountString.replace(/\./g, '');
+
+            // Chuyển đổi chuỗi thành số
+            var amountNumber = parseFloat(amountWithoutDot);
+
+            return amountNumber;
+        }
+        // attach sortable event on cards --  moving Cards && remembering positions
+        function AttachCardSortable() {
+            $(".droptrue").sortable({
+                connectWith: ".inner",
+                revert: true,
+                update: function (event, ui) { // update cards positions
+                    debugger
+                    var formData = new FormData();
+                    var data = [];
+                    var $items = $(this).children();
+
+                    $items.each(function () { // get all positions and card ids
+                        var LeadId = $(this).attr('id');
+                        var StatusId = $(this).closest(".outer").find('.ticket').attr('id');
+                        var row = { 'LeadId': LeadId, 'StatusId': StatusId };
+                        data.push(row);
+
+                    });
+                    $.each(data, function (index, item) {
+
+                        if ((item.StatusId == 27 || item.StatusId == 28) && item.LeadId !== null) {
+                            customerPurchaseModalShow(item.StatusId, function (modalClosed, formDataPurchaseModal) {
+                                debugger
+                                if (modalClosed) {
+                                    var jsonData = JSON.stringify(data);
+                                    var jsonData2 = JSON.stringify(formDataPurchaseModal);
+                                    formData.append('datalKb', jsonData);
+                                    formData.append('dataPurchase', jsonData2);
+                                    $.ajax({
+                                        url: "/AdviseCard/UpdateStatusLeadKanban",
+                                        type: "POST",
+                                        data: formData,
+                                        dataType: "json",
+                                        contentType: false,
+                                        processData: false,
+                                        success: function (data, textStatus, jqXHR) {
+                                            var scrollLeft = $(".body-content").scrollLeft();
+                                            callKanban(scrollLeft);
+                                            modalClosed = false;
+                                        },
+                                        error: function (data, textStatus, jqXHR) {
+                                            Swal.fire({
+                                                title: 'Lỗi!',
+                                                text: 'hehehehe',
+                                                icon: 'error',
+                                                confirmButtonText: 'OK'
+                                            });
+                                        },
+                                    });
+
+                                } else {
+                                    var jsonData = JSON.stringify(data);
+
+                                    formData.append('datalKb', jsonData);
+                                    Swal.fire({
+                                        title: 'Lỗi!',
+                                        text: 'Đã xảy ra lỗi khi lưu dữ liệu, vui lòng thử lại.',
+                                        icon: 'error',
+                                        confirmButtonText: 'OK'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            // Người dùng đã xác nhận, gọi AJAX
+                                            $.ajax({
+                                                url: "/AdviseCard/F5LeadLogsKanBan",
+                                                type: "POST",
+                                                data: formData,
+                                                dataType: "json",
+                                                contentType: false,
+                                                processData: false,
+                                                success: function (data, textStatus, jqXHR) {
+                                                    var scrollLeft = $(".body-content").scrollLeft();
+                                                    callKanban(scrollLeft);
+                                                    modalClosed = false;
+                                                },
+                                                error: function (data, textStatus, jqXHR) {
+                                                    Swal.fire({
+                                                        title: 'Lỗi!',
+                                                        text: 'hehehehe',
+                                                        icon: 'error',
+                                                        confirmButtonText: 'OK'
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                }
+
+                            });
+                            return false;
+                        } else {
+                            modalClosed = true;
+                        }
+                    });
+                    if (modalClosed) {
+                        var jsonData = JSON.stringify(data);
+                        formData.append('datalKb', jsonData);
+                        debugger;
+                        $.ajax({
+                            url: "/AdviseCard/UpdateStatusLeadKanban",
+                            type: "POST",
+                            data: formData,
+                            dataType: "json",
+                            contentType: false,
+                            processData: false,
+                            success: function (data, textStatus, jqXHR) {
+                                var scrollLeft = $(".body-content").scrollLeft();
+                                callKanban(scrollLeft);
+                            },
+                            error: function (data, textStatus, jqXHR) {
+                            },
+                        });
+                    }
+                    //$(".unsortable").sortable({
+                    //    connectWith: ".inner",
+                    //    revert: true,
+                    //    disabled: true,
+                    //});
+                }
+            });
+
+
+            $(".dragtrue").draggable({
+                connectToSortable: ".droptrue",
+                helper: "clone",
+                revert: "invalid",
+                scroll: true,
+                scrollSensitivity: 100,
+                scrollSpeed: 100,
+                start: function (event, ui) {
+                    // Get the ID from the draggable item
+                    itemId = $(this).attr('id');
+                },
+                stop: function (event, ui) {
+                    // Assign the ID to the clone
+                    ui.helper.attr('id', itemId);
+                }
+            });
+            $(".undragable").draggable({
+                helper: "clone",
+                revert: "invalid",
+                scroll: true,
+                scrollSensitivity: 100,
+                scrollSpeed: 100,
+            });
+        }
+
+        AttachCardSortable();
+        $(document).on('click', '.dragtrue', function () {
+            var id = $(this).attr('id');
+            DetailLead(id);
+        });
+        $(document).on('click', '.undragable', function () {
+            var id = $(this).attr('id');
+            DetailLead(id);
+        });
+        function addNewbySt(statusID) {
+            $.ajax({
+                url: "/AdviseCard/AddNewModal?type=1",
+                method: "get",
+                dataType: "html",
+                success: function (data) {
+                    $("#addNewContent").html(data)
+                    $('#IdLead').val(0)
+                    $('#StatusId').val(statusID)
+                }
+            })
+        }
+
+
+    </script>
+
+    @* Khách mua-Chưa mua*@
+                  <script>
+
+        $(document).ready(function () {
+            $('label').filter('[title="Khách mua"]').addClass('customerPurchaseLabel');
+            $('label').filter('[title="Chưa mua"]').addClass('customerPurchaseLabel');
+            setCurrentDateCustomerPurchase();
+        });
+        
+
+        // Ngăn chặn sự kiện click từ overlay truyền ra ngoài
+        $('.modal-content').click(function (event) {
+            if (!$(event.target).is('#btnCloseAdd')) {
+                event.stopPropagation();
+            }
+        });
+
+        function formatCurrencyCustomerPurchaseModal(input) {
+            var value = input.value;
+
+            var numberValue = parseInt(value.replace(/\./g, ''));
+
+            if (!isNaN(numberValue)) {
+                var stringValue = numberValue.toString();
+                var formattedValue = "";
+                for (var i = 0; i < stringValue.length; i++) {
+                    formattedValue += stringValue[i];
+                    if ((stringValue.length - i - 1) % 3 === 0 && i !== stringValue.length - 1) {
+                        formattedValue += ".";
+                    }
+                }
+
+                // Gán giá trị đã định dạng lại cho input
+                input.value = formattedValue;
+            }
+        }
+
+
+        function setCurrentDateCustomerPurchase() {
+            var currentDate = new Date();
+            var formattedDate = currentDate.toISOString().slice(0, 10);
+            $('#endDatecustomerPurchaseModal').val(formattedDate);
+        }
+        
+
+    </script>

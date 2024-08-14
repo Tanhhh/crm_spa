@@ -1,0 +1,255 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using Erp.Domain.Sale.Entities;
+@using Erp.BackOffice.Areas.Cms.Models
+
+@{
+    ViewBag.Title = Wording.PageIndex_InventoryMaterial;
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "InventoryMaterial",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+
+    var url = Request.Url;
+    List<InventoryMaterialViewModel> listProduct = (List<InventoryMaterialViewModel>)ViewBag.listProduct;
+    List<InventoryMaterialViewModel> inventoryList = (List<InventoryMaterialViewModel>)ViewBag.inventoryList;
+    List<WarehouseViewModel> warehouseList = (List<WarehouseViewModel>)ViewBag.warehouseList;
+    IEnumerable<CategoryViewModel> warehousecategoryList = (IEnumerable<CategoryViewModel>)ViewBag.warehousecategoryList;
+    string category = Request["category"] != null ? Request["category"] : "";
+    string manufacturer = Request["manufacturer"] != null ? Request["manufacturer"] : "";
+    string conHang = Request["conHang"] == null || Request["conHang"] == "1" ? "1" : "0";
+    string WarehouseId = Request["WarehouseId"] == null ? "" : Request["WarehouseId"];
+
+    var _index = 0;
+}
+<style>
+    #cTable table tbody, #cTable table thead {
+        display: block !important;
+    }
+
+    #cTable table tbody {
+        overflow: auto;
+        height: calc(100vh - 360px) !important;
+    }
+
+    #cTable table {
+        width: 1520px !important; /* can be dynamic */
+    }
+
+    #cTable th {
+        width: 100px;
+    }
+
+    #cTable td {
+        width: 100px;
+    }
+
+    #cTable > thead > tr > th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+
+    #cTable > tbody > tr > td {
+        vertical-align: middle;
+        /*text-align: center;*/
+    }
+</style>
+
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+        @*@Html.TextBox("txtCode", Request["txtCode"], new { @class = "", autocomplete = "off", placeholder = "Mã vật tư..." })
+            @Html.TextBox("txtSearch", Request["txtSearch"], new { @class = "", autocomplete = "off", placeholder = "Tên vật tư..." })*@
+        @Html.TextBox("txtInfo", Request["txtInfo"], new { @class = "", autocomplete = "off", placeholder = "Mã hoặc tên vật tư..." })
+        @Html.DropDownList("manufacturer", SelectListHelper.GetSelectList_Category("manufacturerList", manufacturer, "Nhà sản xuất"))
+        @Html.DropDownList("category", SelectListHelper.GetSelectList_Category("product", category, "Danh mục vật tư"))
+        <select id="conHang" name="conHang">
+            <option value="1" @(conHang == "1" ? "selected" : "")>Còn hàng</option>
+            <option value="0" @(conHang == "0" ? "selected" : "")>Hết hàng</option>
+        </select>
+        @*@Html.DropDownList("WarehouseId",SelectListHelper.GetSelectList_Warehouse(Request["WarehouseId"], "Kho quản lý"), new Dictionary<string, object> { { "class", "form-control" }, { "data-val-required", "Bắt buộc chọn." } })*@
+
+        @*@Html.DropDownList("WarehouseId", SelectListHelper.GetSelectList_Warehouse(Request["WarehouseId"], "Kho quản lý"))*@
+        <select id="WarehouseId" name="WarehouseId" class="form-control ">
+            <option value="">Kho quản lý</option>
+            @foreach (var item in warehousecategoryList)
+            {
+                <option @(WarehouseId == item.Id.ToString() ? "Selected" : "") value="@item.Id" title="@item.CategoryValue">
+                    @item.Code - @item.Name (@item.BranchName)
+                </option>
+            }
+        </select>
+        @*@Html.DropDownList("BranchId", SelectListHelper.GetSelectList_Branch(Request["BranchId"], Wording.BranchName))*@
+    </p>
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @Html.Raw(ViewBag.SuccessMessage)
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@if (inventoryList.Count() > 0)
+{
+    <div class="table-responsive">
+        <table id="cTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th colspan="3" style="width:40px;">STT</th>
+                    @*<th style="width:100px;">Lô</th>
+                        <th style="width:100px;">HSD</th>*@
+                    @foreach (var item in warehouseList)
+                    {
+                        <th style="width:70px;font-size: 11px; white-space: inherit !important"><span title="@item.Name">@item.Name</span></th>
+                    }
+                    <th class="grid-header" style="width:80px;" rowspan="2">Tổng số</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in listProduct.GroupBy(x => x.MaterialId))
+                {
+                    _index++;
+                    <tr class="alert-info">
+                        <td colspan="3" style="width:100px;">@(_index). @item.FirstOrDefault().MaterialCode - @item.FirstOrDefault().MaterialName</td>
+                        @foreach (var ii in warehouseList)
+                        {
+                            var productOfWH = inventoryList.Where(x => x.MaterialId == item.Key && x.WarehouseId == ii.Id).ToList();
+                            if (productOfWH.Count() != 0)
+                            {
+                                double? productQtyOfWH = productOfWH.Sum(x => x.Quantity);
+                                <td class="text-right" style="width:80px;font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(productQtyOfWH))</td>
+                            }
+                            else
+                            {
+                                <td class="text-right" style="width:80px;font-weight:bold">0</td>
+                            }
+                        }
+                        <td class="text-right" data-name="" style="width:80px;font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(inventoryList.Where(x => x.MaterialId == item.Key).Sum(x => x.Quantity)))</td>
+                    </tr>
+                    int index = 1;
+                    foreach (var product in listProduct.Where(x => x.MaterialId == item.Key))
+                    {
+
+                        <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+                            <td style="width:40px;padding-left:20px">@(_index).@(index++)</td>
+                            @*<td style="width:100px;">@product.ProductCode</td>
+                                <td style="width:200px;"><a onclick="OpenPopup('@Url.Action("Detail", new { Id = product.Id })', '', 500, 700)">@product.ProductName</a></td>*@
+                            <td style="width:100px;">@product.LoCode</td>
+                            <td style="width:100px;">@(product.ExpiryDate.HasValue ? product.ExpiryDate.Value.ToString("dd/MM/yyyy") : "")</td>
+                            @foreach (var ii in warehouseList)
+                            {
+                                var productOfWH = inventoryList.Where(x => x.MaterialId == product.MaterialId && x.LoCode == product.LoCode && x.day == product.day && x.month == product.month && x.year == product.year && x.WarehouseId == ii.Id).ToList();
+                                if (productOfWH.Count() != 0)
+                                {
+                                    double? productQtyOfWH = productOfWH.Sum(x => x.Quantity);
+                                    <td class="text-right" style="width:80px;font-weight:bold"><a onclick="OpenPopup('@Url.Action("Detail", new { Id = product.MaterialId, LoCode = product.LoCode, day = product.day, month = product.month, year = product.year, WarehouseId = ii.Id })', '', 500, 700)">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(productQtyOfWH))</a></td>
+                                }
+                                else
+                                {
+                                    <td class="text-right" style="width:80px;font-weight:bold"><a onclick="OpenPopup('@Url.Action("Detail", new { Id = product.MaterialId, LoCode = product.LoCode, day = product.day, month = product.month, year = product.year, WarehouseId = ii.Id })', '', 500, 700)">0</a></td>
+                                }
+                            }
+                            <td class="text-right" data-name="" style="width:80px;font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(inventoryList.Where(x => x.MaterialId == product.MaterialId && x.LoCode == product.LoCode && x.day == product.day && x.month == product.month && x.year == product.year).Sum(x => x.Quantity)))</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"></td>
+                    @foreach (var ii in warehouseList)
+                    {
+                        <td class="text-right" data-name="" style="width:80px;font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(inventoryList.Where(x => x.WarehouseId == ii.Id).Sum(x => x.Quantity)))</td>
+                    }
+                    <td class="text-right" data-name="" style="width:80px;font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(inventoryList.Sum(x => x.Quantity)))</td>
+                </tr>
+
+
+
+            </tfoot>
+        </table>
+
+    </div>
+}
+else
+{
+    <div class="alert alert-block alert-info">
+        Không có dữ liệu
+    </div>
+}
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("UpdateAll", "InventoryMaterial", "Sale"))
+    {
+        using (Html.BeginForm("UpdateAll", "InventoryMaterial", FormMethod.Post))
+        {
+            @Html.Hidden("url", url)
+            <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+                <i class="ace-icon fa fa-save"></i>
+                Kiểm tra kho
+            </button>
+            <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(true)">
+                <i class="ace-icon fa fa-file-excel-o"></i>
+                Xuất excel
+            </button>
+        }
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $("table tbody").height($(window).height() - $("table tbody").position().top - 170);
+        });
+        function GetPrint(type) {
+            debugger
+            var txtInfo = $('#txtInfo').val();
+            var manufacturer = $('#manufacturer').val();
+            var category = $('#category').val();
+            var conHang = $('#conHang').val();
+            var WarehouseId = $('#WarehouseId').val();
+            OpenPopup('/InventoryMaterial/ExportExcel?&txtInfo=' + txtInfo + '&manufacturer=' + manufacturer +
+                '&category=' + category + 'conHang=' + conHang + '&WarehouseId=' + WarehouseId + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 200000);
+            HideLoading();
+        };
+    </script>
+}

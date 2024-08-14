@@ -1,0 +1,138 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model ProductInvoiceViewModel
+@{
+
+    var count = 0;
+}
+
+<div id="accordion" class="accordion-style1 panel-group" style="margin-bottom: 0px!important;">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse_1" aria-expanded="false">
+                    <i class="bigger-110 ace-icon fa fa-angle-right" data-icon-hide="ace-icon fa fa-angle-down" data-icon-show="ace-icon fa fa-angle-right"></i>
+                    Chương trình khuyến mãi mua sản phẩm tặng sản phẩm
+                </a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="collapse_1" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body">
+                @foreach (var ii in Model.LogCommission.Where(x => x.Type == "product_donate"))
+                {
+                    ii.count = count;
+                    <div class="product_donate">
+                        @Html.Partial("PartialItemPromotion", ii)
+                    </div>
+                    count++;
+                }
+                @*<a class="btn btn-sm btn-white btn-primary" onclick="OpenPopup('@Url.Action("SettingPromotion", "ProductInvoice", new { Type = "product_donate", ProductInvoiceId = Model.Id, IsPopup = true })', 'Tạo khuyến mãi', 0, 0)"><i class="fa fa-plus"></i> Thêm khuyến mãi</a>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse_2" aria-expanded="false">
+                    <i class="bigger-110 ace-icon fa fa-angle-right" data-icon-hide="ace-icon fa fa-angle-down" data-icon-show="ace-icon fa fa-angle-right"></i>
+                    Chương trình khuyến mãi mua sản phẩm giảm giá
+                </a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="collapse_2" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body">
+                @foreach (var ii in Model.LogCommission.Where(x => x.Type == "product_discount"))
+                {
+                    ii.count = count;
+                    <div class="product_discount">
+                        @Html.Partial("PartialItemPromotion", ii)
+                    </div>
+                    count++;
+                }
+                @*<a class="btn btn-sm btn-white btn-primary" onclick="OpenPopup('@Url.Action("SettingPromotion", "ProductInvoice", new { Type = "product_discount",ProductInvoiceId=Model.Id, IsPopup = true })', 'Tạo khuyến mãi', 0, 0)"><i class="fa fa-plus"></i> Thêm khuyến mãi</a>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse_3" aria-expanded="false">
+                    <i class="bigger-110 ace-icon fa fa-angle-right" data-icon-hide="ace-icon fa fa-angle-down" data-icon-show="ace-icon fa fa-angle-right"></i>
+                    Chương trình khuyến mãi tặng sản phẩm theo giá trị hóa đơn
+                </a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="collapse_3" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body">
+                @foreach (var ii in Model.LogCommission.Where(x => x.Type == "invoice_donate"))
+                {
+                    ii.count = count;
+                    <div class="invoice_donate">
+                        @Html.Partial("PartialItemPromotion", ii)
+                    </div>
+                    count++;
+                }
+               @* <a class="btn btn-sm btn-white btn-primary" onclick="OpenPopup('@Url.Action("SettingPromotion", "ProductInvoice", new { Type = "invoice_donate", ProductInvoiceId = Model.Id, IsPopup = true })', 'Tạo khuyến mãi', 0, 0)"><i class="fa fa-plus"></i> Thêm khuyến mãi</a>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse_4" aria-expanded="false">
+                    <i class="bigger-110 ace-icon fa fa-angle-right" data-icon-hide="ace-icon fa fa-angle-down" data-icon-show="ace-icon fa fa-angle-right"></i>
+                    Chương trình khuyến mãi giảm giá theo giá trị hóa đơn
+                </a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="collapse_4" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body">
+                @foreach (var ii in Model.LogCommission.Where(x => x.Type == "invoice_discount"))
+                {
+                    ii.count = count;
+                    <div class="invoice_discount">
+                        @Html.Partial("PartialItemPromotion", ii)
+                    </div>
+                    count++;
+                }
+                @*<a class="btn btn-sm btn-white btn-primary" onclick="OpenPopup('@Url.Action("SettingPromotion", "ProductInvoice", new { Type = "invoice_discount", ProductInvoiceId = Model.Id, IsPopup = true })', 'Tạo khuyến mãi', 0, 0)"><i class="fa fa-plus"></i> Thêm khuyến mãi</a>*@
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse_5" aria-expanded="false">
+                    <i class="bigger-110 ace-icon fa fa-angle-right" data-icon-hide="ace-icon fa fa-angle-down" data-icon-show="ace-icon fa fa-angle-right"></i>
+                    Chương trình khuyến mãi khác
+                </a>
+            </h4>
+        </div>
+
+        <div class="panel-collapse collapse" id="collapse_5" aria-expanded="false" style="height: 0px;">
+            <div class="panel-body">
+                @foreach (var ii in Model.LogCommission.Where(x => x.Type == "invoice_discountdif"))
+                {
+                    ii.count = count;
+                    <div class="invoice_discountdif">
+                        @Html.Partial("PartialItemPromotion", ii)
+                    </div>
+                    count++;
+                }
+                @*<a class="btn btn-sm btn-white btn-primary" onclick="OpenPopup('@Url.Action("SettingPromotion", "ProductInvoice", new { Type = "invoice_discount", ProductInvoiceId = Model.Id, IsPopup = true })', 'Tạo khuyến mãi', 0, 0)"><i class="fa fa-plus"></i> Thêm khuyến mãi</a>*@
+            </div>
+        </div>
+    </div>
+</div>

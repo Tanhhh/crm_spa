@@ -1,0 +1,124 @@
+﻿@model IEnumerable<CheckPlanViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+    @using PagedList;
+    @using PagedList.Mvc;
+    @{
+        ViewBag.Title = "Kiểm tra Kế hoạch";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Plan",
+            ActionName = "CheckPlan",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false,
+            AdvancedSearch = false,
+            //SearchOjectAttr = ViewBag.ListOjectAttrSearch
+        };
+        int index = 1;
+        int rowNumber = 0;
+        int numberOfItem = 50;
+        int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+        string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        // Cộng thêm 1 tháng và trừ đi một ngày.
+        DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+
+        // List<KH_TUONGTACViewModel> Customer = (List<KH_TUONGTACViewModel>)ViewBag.Customer;
+
+    }
+    @helper GridColumnschedule(int id, string code)
+    {
+        <a href="@Url.Action("Detail", "Customer", new {Area = "Account", Id = id })">@code</a>
+    }
+    @helper GridTuongtac(int? id, string NgayLap, int? nvkd)
+    {
+
+        @*<a target="_blank" href='@Url.Action("LichSuTuongTac", "Plan", new { NGUOILAP_ID=nvkd,KHACHHANG_ID=id})'>@NgayLap</a>*@
+        <a onclick="OpenPopup('@Url.Action("LichSuTuongTac", "Plan", new {NGUOILAP_ID=nvkd,KHACHHANG_ID= id , IsPopup = true })', '', 0, 0)">@NgayLap</a>
+
+    }
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        @Html.TextBox("txtCusInfo", Request["txtCusInfo"], new { @class = "", autocomplete = "off", placeholder = "Mã hoặc Tên khách hàng..." })
+        <select class="chzn-select" style="width:250px; float:left" name="SalerId">
+            <option value="">- Nhân viên QL -</option>
+            @foreach (var item in SelectListHelper.GetSelectList_FullUserNameKD(null, null))
+            {
+                <option @(Request["SalerId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <span class="input-daterange input-group">
+            @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : aDateTime.ToString("dd/MM/yyyy"), new { @class = "", autocomplete = "off", placeholder = "Từ ngày..." })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : retDateTime.ToString("dd/MM/yyyy"), new { @class = "", autocomplete = "off", placeholder = "Đến ngày..." })
+        </span>
+        @Html.DropDownList("HINHTHUC_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_CategoryHT2("HINHTHUC_GIOITHIEU", Request["HINHTHUC_TUONGTAC"], "-Hình thức-","Chưa có KH"), new { style = "width: 150px;/* padding-right: 0px; */margin-right: 100px;margin-left:1px;" })
+
+    }
+
+    <div class="table-responsive">
+        @Html.Grid(Model).Columns(columns =>
+    {
+        columns.Add().Titled("STT").SetWidth(25).RenderValueAs(o =>
+        {
+            rowNumber++;
+
+            return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+        });
+        //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(40).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+        columns.Add().Titled("Mã KH").SetWidth(100).Sanitized(false).Encoded(false).Sortable(true).RenderValueAs(u => GridColumnschedule(u.Id, u.Code));
+        columns.Add(u => u.Name).Titled("Tên KH").Sortable(false); //.Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Name, u.Id, u.CategoryCode, u.Unit, u.Size));
+        columns.Add(u => u.Phone).Titled("Điện thoại").Sortable(false); //.Sanitized(false).Encoded(false).SetWidth(100).RenderValueAs(u => u.PriceOutbound.ToCurrencyStr(null)).Css("text-right");
+        columns.Add().Titled("Hình thức TT").Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridTuongtac(u.Id, u.HINHTHUC_TUONGTAC, u.ManagerStaffId));
+        columns.Add(u => u.NGAYLAP).Titled("Ngày").Sortable(false);
+        columns.Add(u => u.GIO_TUONGTAC).Titled("Giờ").Sortable(false);
+        columns.Add(u => u.KHBH).Titled("KHBH").Sortable(true);
+        columns.Add(u => u.BHTL).Titled("Tỷ lệ BH").Sortable(true);
+        columns.Add(u => u.KHCDS).Titled("KHCDS").Sortable(true);
+        columns.Add(u => u.DSTL).Titled("Tỷ lệ DS").Sortable(true);
+        columns.Add(u => u.ManagerStaffName).Titled("NVQL").Sortable(true);
+    }).WithPaging(50)
+
+    </div>
+    @using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(true)">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+ 
+}
+    @section Scripts {
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+     <script type="text/javascript">
+       function GetPrint(type) {
+            var Month = $('#Month').val();
+            var Year = $('#Year').val();
+            var branchId = $('#branchId').val();
+            var txtCusInfo = $('#txtCusInfo').val();
+            var SalerId = $('#SalerId').val();
+            var Brand = $('#Brand').val();
+            var HINHTHUC_TUONGTAC = $('#HINHTHUC_TUONGTAC').val();
+            OpenPopup('/Plan/PrintCheckPlan?Month=' + Month + '&Year=' + Year +'&branchId=' + branchId+ '&txtCusInfo=' + txtCusInfo + '&SalerId=' + SalerId + '&Brand=' + Brand + '&HINHTHUC_TUONGTAC=' + HINHTHUC_TUONGTAC + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 20000);
+            HideLoading();
+        };
+    </script>
+        @*@Html.ScriptBottom_ChosenStyle()*@
+    }

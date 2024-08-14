@@ -1,0 +1,278 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@model List<ProductInvoiceDetailViewModel>
+    @{
+        ViewBag.Title = "Khách mua dịch vụ/CNC";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "Sale_Report_CustomerIsCNC",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false,
+            SearchButtonText = "Xem báo cáo"
+        };
+
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        // Cộng thêm 1 tháng và trừ đi một ngày.
+        DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+        int index = 1;
+        //string Type = Request["Type"] != null ? Request["Type"] : "";
+        //string IsCNC = Request["IsCNC"] != null ? Request["IsCNC"] : "";  
+    }
+
+    @section HeadOfPage {
+        <style type="text/css">
+            .cell-center {
+                text-align: center;
+            }
+
+            .tr-bold {
+                font-weight: 700;
+            }
+
+            .ctl {
+                position: relative;
+                /*float: left;*/
+                margin-right: 3px;
+            }
+
+                .ctl .error {
+                    position: absolute;
+                    background: #de2a2a;
+                    left: 0px;
+                    top: 28px;
+                    padding: 2px 5px;
+                    color: #fff;
+                    z-index: 999;
+                }
+
+                    .ctl .error:before {
+                        border-bottom: 7px solid #de2a2a;
+                        border-left: 7px solid transparent;
+                        border-right: 7px solid transparent;
+                        left: 9px;
+                        top: -6px;
+                        content: "";
+                        display: inline-block;
+                        position: absolute;
+                    }
+
+            .icon-add {
+                margin-top: 0px !important;
+            }
+
+            .combojax {
+                display: inline-block;
+                position: initial !important;
+                float: none !important;
+            }
+        </style>
+
+    }
+    <script type="text/javascript">
+    var exportThis = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function () {
+            var ctx = { worksheet: '@ViewBag.Title' || 'Worksheet', table: document.getElementById("cTable").innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+
+    var exportThisWithParameter = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function (tableID, excelName) {
+            tableID = document.getElementById(tableID)
+            var ctx = { worksheet: excelName || 'Worksheet', table: tableID.innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+    </script>
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <p>
+            <span class="inline">
+                <span class="input-group input-daterange">
+                    @Html.TextBox("StartDate", Request["StartDate"] != null ? Request["StartDate"] : aDateTime.ToString("dd/MM/yyyy"), new { autocomlete = "off", placeholde = "Từ ngày" })
+                    <span class="input-group-addon">
+                        <i class="fa fa-exchange"></i>
+                    </span>
+                    @Html.TextBox("EndDate", Request["EndDate"] != null ? Request["EndDate"] : retDateTime.ToString("dd/MM/yyyy"), new { autocomlete = "off", placeholde = "Đến ngày" })
+                </span>
+            </span>
+            <span class="ctl inline">
+                @Html.DropDownList("BranchId", SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"))
+            </span>
+            <span class="ctl inline">
+                    @Html.DropDownList("ProductId", SelectListHelper.GetSelectList_Product("",Request["ProductId"], "Sản phẩm"))
+                </span>
+        </p>
+        <p>
+            Khách mua
+            <label>
+                <input id="single1" name="Type" type="radio" class="ace" value="service" checked="checked">
+                <span class="lbl"> Dịch vụ</span>
+            </label>
+            <label>
+                <input id="single2" name="Type" type="radio" class="ace" value="">
+                <span class="lbl"> Sản phẩm/dịch vụ</span>
+            </label>
+            <label>
+                <input id="single3" name="IsCNC" type="checkbox" class="ace" value="1">
+                <span class="lbl"> Công nghệ cao</span>
+            </label>
+        </p>
+    }
+    @if (Model.Count() > 0)
+    {
+        <table id="CTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:40px;text-align:center">STT</th>
+                    <th class="text-center">Ngày tạo</th>
+                    <th class="text-center">Hóa đơn</th>
+                    <th class="text-center">Mã khách hàng</th>
+                    <th class="text-center">Tên khách hàng</th>
+                    <th class="text-center">Mã sản dịch vụ</th>
+                    <th class="text-center">Tên dịch vụ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="@(index%2==0?" alert-warning":"")">
+                        <td>
+                            <span>@(index++)</span>
+                        </td>
+                        <td>@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                        <td>@item.Code</td>
+                        <td>@item.CustomerCode</td>
+                        <td>@item.CustomerName</td>
+                        <td>@item.ProductCode</td>
+                        <td>@item.ProductName</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-block alert-info">
+            Không có dữ liệu
+        </div>
+    }
+
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportThis()">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    }
+
+    @section Scripts {
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+        <script src="/Scripts/combojax.js"></script>
+        <link href="/assets/css/combojax.css" rel="stylesheet" />
+        @*<script>
+            $(function () {
+                searchreact();
+                //$("#ProductName").combojax({
+                //    url: "/CommissionCus/GetListJsonAll",
+                //    onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+                //        //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+                //    },
+                //    onSelected: function (obj) {
+                //        if (obj) {
+
+                //        }
+                //    }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+                //    , onShowImage: false                  //hiển thị hình ảnh
+                //    , onSearchSaveSelectedItem: true    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+                //    , onRemoveSelected: false  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+                //});
+
+                //$("#product").val(currentQuarter);
+                //var single = "product";
+
+                //$("#single1").change(function () {
+                //    if ($(this).val() == 'product') {
+                //    }
+                //});
+                //$("#single2").change(function () {
+                //    if ($(this).val() == '') {
+                //    }
+                //});
+            });
+            function searchreact() {
+                GetDatatable('/SaleReport/_GetListSale_Report_CustomerIsCNC');
+            };
+            //function GetDatatable(url) {
+            //    var StartDate = $('#StartDate').val();
+            //    var EndDate = $('#EndDate').val();
+            //    var BranchId = $('#BranchId').val();
+            //    var ProductId = $('#ProductId').val();
+            //    var Type = $('#Type').val();
+            //    var IsCNC = $('#IsCNC').val();
+
+            //    var formdata = {
+            //        StartDate: StartDate,
+            //        EndDate: EndDate,
+            //        BranchId: BranchId,
+            //        ProductId: ProductId,
+            //        Type: Type,
+            //        IsCNC: IsCNC
+
+            //    };
+            //    //$("#react_report").html("");
+            //    ClickEventHandlerHTML(true, url, "#react_report", formdata, function () {
+            //    });
+            //};
+            //function GetPrint(type) {
+            //    var StartDate = $('#StartDate').val();
+            //    var EndDate = $('#EndDate').val();
+            //    var BranchId = $('#BranchId').val();
+            //    var ProductId = $('#ProductId').val();
+            //    var Type = $('#Type').val();
+            //    var IsCNC = $('#IsCNC').val();
+
+            //    OpenPopup('/SaleReport/PrintSale_Report_CustomerIsCNC?StartDate=' + StartDate + '&EndDate=' + EndDate + '&BranchId=' + BranchId + '&ProductId=' + ProductId + '&Type=' + Type + '&IsCNC=' + IsCNC + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+            //    setTimeout(function () {
+            //        $("#myModal .modal-body .iframe-container").html("");
+            //        $('#myModal').modal('hide');
+            //    }, 2000);
+            //    HideLoading();
+            //};
+        </script>*@
+    }

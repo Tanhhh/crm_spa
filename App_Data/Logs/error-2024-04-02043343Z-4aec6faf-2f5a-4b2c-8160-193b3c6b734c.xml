@@ -1,0 +1,398 @@
+﻿<error errorId="4aec6faf-2f5a-4b2c-8160-193b3c6b734c" application="/LM/W3SVC/2/ROOT" host="PCHOA" type="System.NullReferenceException" message="Object reference not set to an instance of an object." source="Erp.BackOffice" detail="System.NullReferenceException: Object reference not set to an instance of an object.&#xD;&#xA;   at Erp.BackOffice.Sale.Controllers.AdviseCardController.SaveNewLead(LeadModel leadModel) in D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Areas\Sale\Controllers\AdviseCardController.cs:line 2033&#xD;&#xA;   at lambda_method(Closure , ControllerBase , Object[] )&#xD;&#xA;   at System.Web.Mvc.ReflectedActionDescriptor.Execute(ControllerContext controllerContext, IDictionary`2 parameters)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionMethod(ControllerContext controllerContext, ActionDescriptor actionDescriptor, IDictionary`2 parameters)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass42.&lt;BeginInvokeSynchronousActionMethod&gt;b__41()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethod(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass37.&lt;&gt;c__DisplayClass39.&lt;BeginInvokeActionMethodWithFilters&gt;b__33()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass4f.&lt;InvokeActionMethodFilterAsynchronously&gt;b__49()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeActionMethodWithFilters(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;&gt;c__DisplayClass2a.&lt;BeginInvokeAction&gt;b__20()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;BeginInvokeAction&gt;b__22(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeAction(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.&lt;&gt;c__DisplayClass1d.&lt;BeginExecuteCore&gt;b__18(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.&lt;&gt;c__DisplayClass8.&lt;BeginProcessRequest&gt;b__3(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="admin" time="2024-04-02T04:33:43.0703712Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_CONTENT_LENGTH:6195&#xD;&#xA;HTTP_CONTENT_TYPE:multipart/form-data; boundary=----WebKitFormBoundarylu7RtMNMOdN2pnKu&#xD;&#xA;HTTP_ACCEPT:text/html, */*; q=0.01&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br, zstd&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:en-US,en;q=0.9&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=ip4gnie31w4bde5lq3z1ueyw; __RequestVerificationToken=LEBa0MpR8iu-YeJeHqoprUDgtNo7Tsr5PKbCJ_K_7Xt0O8GKOY1U1C3YOPNFW99qzETR2f2ihyvVNwqgLzMkJIcj0in1VEznnAvXSbOoZzg1; BO=78E560873888E6B98A966530EE63E970D578141F41A38925939AD3F3744A92637BA2539C668CF7C6A1D6F58093A996F414ABA1D8F341D2E690B8A5B92DFA07A0EF4EDD0232818205220AEC591CA5A4F772B50EBCB657CD390513F21A77F9B82F; user={%22user%22:{%22createBy%22:null%2C%22createdAt%22:%222020-08-31T17:00:00.000Z%22%2C%22updatedAt%22:%22%22%2C%22id%22:%225f03e0faa12e501e0ca7d195%22%2C%22email%22:%22chinhanhdongnai@pgs.com.vn%22%2C%22avatar%22:%22%22%2C%22name%22:%22%C4%90%E1%BB%93ng%20Nai%22%2C%22phone%22:%22%22%2C%22shortName%22:%22%22%2C%22address%22:%22C%E1%BA%A3ng%20%C4%90%E1%BB%93ng%20Nai%2C%20Ph%C6%B0%E1%BB%9Dng%20Long%20B%C3%ACnh%20T%C3%A2n%2C%20TP%20Bi%C3%AAn%20H%C3%B2a%2C%20T%E1%BB%89nh%20%C4%90%E1%BB%93ng%20Nai%22%2C%22code%22:%22CNDN%22%2C%22role%22:%22user%22%2C%22locked%22:false%2C%22passwordFailures%22:0%2C%22lastPasswordFailure%22:%22%22%2C%22allowReport%22:true%2C%22resetToken%22:%22%22%2C%22userType%22:%22Factory%22%2C%22userRole%22:%22Owner%22%2C%22stationType%22:%22Own%22%2C%22importPrice%22:0%2C%22salePrice%22:0%2C%22deletedAt%22:%22%22%2C%22isDeleted%22:false%2C%22LAT%22:10.898846%2C%22LNG%22:106.844112%2C%22customerCode%22:%22%22%2C%22staffOf%22:%22%22%2C%22encryptedPassword%22:%22$2b$10$wDmN4yjoJX5rT.UaLJtH2eYskzT/vootAONB/AwZTlgO2iUOHmdXm%22%2C%22playerID%22:%2291d99d8a-ae62-403c-8480-7283be5cb256%22%2C%22playerIDWeb%22:%22ac67b81b-5928-46b8-94ea-d1dc2e68a3ce%22%2C%22prefix%22:%22DoN%22%2C%22organization%22:%225f01ab335452a61194c9e2c1%22%2C%22isChildOf%22:%225f5eee70a80d000828c25c3f%22%2C%22owner%22:%225f5eee70a80d000828c25c3f%22%2C%22updateBrandBy%22:null%2C%22parentRoot%22:%225f01ab335452a61194c9e2c1%22}%2C%22token%22:%22eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmMDNlMGZhYTEyZTUwMWUwY2E3ZDE5NSIsInB3aCI6NDI5Mjc1MjMxNywiaWF0IjoxNzEyMDMxMDQ3LCJleHAiOjE3MTIxMTc0NDd9.J--UmhIy--rkE_7ffw6HLix00T5JE3DvKDEeVOz14aE%22}&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/AdviseCard/LeadIndex&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36&#xD;&#xA;HTTP_SEC_CH_UA:&quot;Google Chrome&quot;;v=&quot;123&quot;, &quot;Not:A-Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;123&quot;&#xD;&#xA;HTTP_X_REQUESTED_WITH:XMLHttpRequest&#xD;&#xA;HTTP_SEC_CH_UA_MOBILE:?0&#xD;&#xA;HTTP_SEC_CH_UA_PLATFORM:&quot;Windows&quot;&#xD;&#xA;HTTP_ORIGIN:http://localhost:53200&#xD;&#xA;HTTP_SEC_FETCH_SITE:same-origin&#xD;&#xA;HTTP_SEC_FETCH_MODE:cors&#xD;&#xA;HTTP_SEC_FETCH_DEST:empty&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Connection: keep-alive&#xD;&#xA;Content-Length: 6195&#xD;&#xA;Content-Type: multipart/form-data; boundary=----WebKitFormBoundarylu7RtMNMOdN2pnKu&#xD;&#xA;Accept: text/html, */*; q=0.01&#xD;&#xA;Accept-Encoding: gzip, deflate, br, zstd&#xD;&#xA;Accept-Language: en-US,en;q=0.9&#xD;&#xA;Cookie: ASP.NET_SessionId=ip4gnie31w4bde5lq3z1ueyw; __RequestVerificationToken=LEBa0MpR8iu-YeJeHqoprUDgtNo7Tsr5PKbCJ_K_7Xt0O8GKOY1U1C3YOPNFW99qzETR2f2ihyvVNwqgLzMkJIcj0in1VEznnAvXSbOoZzg1; BO=78E560873888E6B98A966530EE63E970D578141F41A38925939AD3F3744A92637BA2539C668CF7C6A1D6F58093A996F414ABA1D8F341D2E690B8A5B92DFA07A0EF4EDD0232818205220AEC591CA5A4F772B50EBCB657CD390513F21A77F9B82F; user={%22user%22:{%22createBy%22:null%2C%22createdAt%22:%222020-08-31T17:00:00.000Z%22%2C%22updatedAt%22:%22%22%2C%22id%22:%225f03e0faa12e501e0ca7d195%22%2C%22email%22:%22chinhanhdongnai@pgs.com.vn%22%2C%22avatar%22:%22%22%2C%22name%22:%22%C4%90%E1%BB%93ng%20Nai%22%2C%22phone%22:%22%22%2C%22shortName%22:%22%22%2C%22address%22:%22C%E1%BA%A3ng%20%C4%90%E1%BB%93ng%20Nai%2C%20Ph%C6%B0%E1%BB%9Dng%20Long%20B%C3%ACnh%20T%C3%A2n%2C%20TP%20Bi%C3%AAn%20H%C3%B2a%2C%20T%E1%BB%89nh%20%C4%90%E1%BB%93ng%20Nai%22%2C%22code%22:%22CNDN%22%2C%22role%22:%22user%22%2C%22locked%22:false%2C%22passwordFailures%22:0%2C%22lastPasswordFailure%22:%22%22%2C%22allowReport%22:true%2C%22resetToken%22:%22%22%2C%22userType%22:%22Factory%22%2C%22userRole%22:%22Owner%22%2C%22stationType%22:%22Own%22%2C%22importPrice%22:0%2C%22salePrice%22:0%2C%22deletedAt%22:%22%22%2C%22isDeleted%22:false%2C%22LAT%22:10.898846%2C%22LNG%22:106.844112%2C%22customerCode%22:%22%22%2C%22staffOf%22:%22%22%2C%22encryptedPassword%22:%22$2b$10$wDmN4yjoJX5rT.UaLJtH2eYskzT/vootAONB/AwZTlgO2iUOHmdXm%22%2C%22playerID%22:%2291d99d8a-ae62-403c-8480-7283be5cb256%22%2C%22playerIDWeb%22:%22ac67b81b-5928-46b8-94ea-d1dc2e68a3ce%22%2C%22prefix%22:%22DoN%22%2C%22organization%22:%225f01ab335452a61194c9e2c1%22%2C%22isChildOf%22:%225f5eee70a80d000828c25c3f%22%2C%22owner%22:%225f5eee70a80d000828c25c3f%22%2C%22updateBrandBy%22:null%2C%22parentRoot%22:%225f01ab335452a61194c9e2c1%22}%2C%22token%22:%22eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmMDNlMGZhYTEyZTUwMWUwY2E3ZDE5NSIsInB3aCI6NDI5Mjc1MjMxNywiaWF0IjoxNzEyMDMxMDQ3LCJleHAiOjE3MTIxMTc0NDd9.J--UmhIy--rkE_7ffw6HLix00T5JE3DvKDEeVOz14aE%22}&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/AdviseCard/LeadIndex&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36&#xD;&#xA;sec-ch-ua: &quot;Google Chrome&quot;;v=&quot;123&quot;, &quot;Not:A-Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;123&quot;&#xD;&#xA;X-Requested-With: XMLHttpRequest&#xD;&#xA;sec-ch-ua-mobile: ?0&#xD;&#xA;sec-ch-ua-platform: &quot;Windows&quot;&#xD;&#xA;Origin: http://localhost:53200&#xD;&#xA;Sec-Fetch-Site: same-origin&#xD;&#xA;Sec-Fetch-Mode: cors&#xD;&#xA;Sec-Fetch-Dest: empty&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="admin" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="admin" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="admin" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="6195" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="multipart/form-data; boundary=----WebKitFormBoundarylu7RtMNMOdN2pnKu" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/AdviseCard/SaveNewLead" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\AdviseCard\SaveNewLead" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="14325" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="POST" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/AdviseCard/SaveNewLead" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/AdviseCard/SaveNewLead" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_CONTENT_LENGTH">
+      <value string="6195" />
+    </item>
+    <item name="HTTP_CONTENT_TYPE">
+      <value string="multipart/form-data; boundary=----WebKitFormBoundarylu7RtMNMOdN2pnKu" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="text/html, */*; q=0.01" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br, zstd" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="en-US,en;q=0.9" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=ip4gnie31w4bde5lq3z1ueyw; __RequestVerificationToken=LEBa0MpR8iu-YeJeHqoprUDgtNo7Tsr5PKbCJ_K_7Xt0O8GKOY1U1C3YOPNFW99qzETR2f2ihyvVNwqgLzMkJIcj0in1VEznnAvXSbOoZzg1; BO=78E560873888E6B98A966530EE63E970D578141F41A38925939AD3F3744A92637BA2539C668CF7C6A1D6F58093A996F414ABA1D8F341D2E690B8A5B92DFA07A0EF4EDD0232818205220AEC591CA5A4F772B50EBCB657CD390513F21A77F9B82F; user={%22user%22:{%22createBy%22:null%2C%22createdAt%22:%222020-08-31T17:00:00.000Z%22%2C%22updatedAt%22:%22%22%2C%22id%22:%225f03e0faa12e501e0ca7d195%22%2C%22email%22:%22chinhanhdongnai@pgs.com.vn%22%2C%22avatar%22:%22%22%2C%22name%22:%22%C4%90%E1%BB%93ng%20Nai%22%2C%22phone%22:%22%22%2C%22shortName%22:%22%22%2C%22address%22:%22C%E1%BA%A3ng%20%C4%90%E1%BB%93ng%20Nai%2C%20Ph%C6%B0%E1%BB%9Dng%20Long%20B%C3%ACnh%20T%C3%A2n%2C%20TP%20Bi%C3%AAn%20H%C3%B2a%2C%20T%E1%BB%89nh%20%C4%90%E1%BB%93ng%20Nai%22%2C%22code%22:%22CNDN%22%2C%22role%22:%22user%22%2C%22locked%22:false%2C%22passwordFailures%22:0%2C%22lastPasswordFailure%22:%22%22%2C%22allowReport%22:true%2C%22resetToken%22:%22%22%2C%22userType%22:%22Factory%22%2C%22userRole%22:%22Owner%22%2C%22stationType%22:%22Own%22%2C%22importPrice%22:0%2C%22salePrice%22:0%2C%22deletedAt%22:%22%22%2C%22isDeleted%22:false%2C%22LAT%22:10.898846%2C%22LNG%22:106.844112%2C%22customerCode%22:%22%22%2C%22staffOf%22:%22%22%2C%22encryptedPassword%22:%22$2b$10$wDmN4yjoJX5rT.UaLJtH2eYskzT/vootAONB/AwZTlgO2iUOHmdXm%22%2C%22playerID%22:%2291d99d8a-ae62-403c-8480-7283be5cb256%22%2C%22playerIDWeb%22:%22ac67b81b-5928-46b8-94ea-d1dc2e68a3ce%22%2C%22prefix%22:%22DoN%22%2C%22organization%22:%225f01ab335452a61194c9e2c1%22%2C%22isChildOf%22:%225f5eee70a80d000828c25c3f%22%2C%22owner%22:%225f5eee70a80d000828c25c3f%22%2C%22updateBrandBy%22:null%2C%22parentRoot%22:%225f01ab335452a61194c9e2c1%22}%2C%22token%22:%22eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmMDNlMGZhYTEyZTUwMWUwY2E3ZDE5NSIsInB3aCI6NDI5Mjc1MjMxNywiaWF0IjoxNzEyMDMxMDQ3LCJleHAiOjE3MTIxMTc0NDd9.J--UmhIy--rkE_7ffw6HLix00T5JE3DvKDEeVOz14aE%22}" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/AdviseCard/LeadIndex" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36" />
+    </item>
+    <item name="HTTP_SEC_CH_UA">
+      <value string="&quot;Google Chrome&quot;;v=&quot;123&quot;, &quot;Not:A-Brand&quot;;v=&quot;8&quot;, &quot;Chromium&quot;;v=&quot;123&quot;" />
+    </item>
+    <item name="HTTP_X_REQUESTED_WITH">
+      <value string="XMLHttpRequest" />
+    </item>
+    <item name="HTTP_SEC_CH_UA_MOBILE">
+      <value string="?0" />
+    </item>
+    <item name="HTTP_SEC_CH_UA_PLATFORM">
+      <value string="&quot;Windows&quot;" />
+    </item>
+    <item name="HTTP_ORIGIN">
+      <value string="http://localhost:53200" />
+    </item>
+    <item name="HTTP_SEC_FETCH_SITE">
+      <value string="same-origin" />
+    </item>
+    <item name="HTTP_SEC_FETCH_MODE">
+      <value string="cors" />
+    </item>
+    <item name="HTTP_SEC_FETCH_DEST">
+      <value string="empty" />
+    </item>
+  </serverVariables>
+  <form>
+    <item name="Id">
+      <value string="1009" />
+    </item>
+    <item name="Source">
+      <value string="facebook" />
+    </item>
+    <item name="TypeData">
+      <value string="FaceBook" />
+    </item>
+    <item name="Topic">
+      <value string="VIPs F" />
+    </item>
+    <item name="LeadName">
+      <value string="Hoa Pham" />
+    </item>
+    <item name="Name">
+      <value string="CÔNG TY TNHH CÔNG NGHỆ &amp; DỊCH VỤ ĐẤT VIỆT" />
+    </item>
+    <item name="Mobile">
+      <value string="0963456715" />
+    </item>
+    <item name="Email">
+      <value string="pdhoavn@gmail.com" />
+    </item>
+    <item name="Address">
+      <value string="997/35 Đường Trần Xuân Soạn - Khu phố 3, Phường Tân Hưng, Quận 7, Thành phố Hồ Chí Minh" />
+    </item>
+    <item name="CodeKC">
+      <value string="" />
+    </item>
+    <item name="CompanyName">
+      <value string="" />
+    </item>
+    <item name="MobileCompany">
+      <value string="" />
+    </item>
+    <item name="EmailCompany">
+      <value string="" />
+    </item>
+    <item name="Taxcode">
+      <value string="" />
+    </item>
+    <item name="YearofBirth">
+      <value string="" />
+    </item>
+    <item name="ReceptionStaffId">
+      <value string="" />
+    </item>
+    <item name="IsCancel">
+      <value string="" />
+    </item>
+    <item name="F48">
+      <value string="" />
+    </item>
+    <item name="F1">
+      <value string="" />
+    </item>
+    <item name="F2">
+      <value string="" />
+    </item>
+    <item name="F3">
+      <value string="" />
+    </item>
+    <item name="F4">
+      <value string="" />
+    </item>
+    <item name="F5">
+      <value string="" />
+    </item>
+    <item name="F6">
+      <value string="" />
+    </item>
+    <item name="F7">
+      <value string="" />
+    </item>
+    <item name="F8">
+      <value string="" />
+    </item>
+    <item name="F9">
+      <value string="" />
+    </item>
+    <item name="F10">
+      <value string="" />
+    </item>
+    <item name="F11">
+      <value string="" />
+    </item>
+    <item name="F12">
+      <value string="" />
+    </item>
+    <item name="F13">
+      <value string="" />
+    </item>
+    <item name="F14">
+      <value string="" />
+    </item>
+    <item name="F15">
+      <value string="" />
+    </item>
+    <item name="F16">
+      <value string="" />
+    </item>
+    <item name="F17">
+      <value string="" />
+    </item>
+    <item name="F18">
+      <value string="" />
+    </item>
+    <item name="F19">
+      <value string="" />
+    </item>
+    <item name="F20">
+      <value string="" />
+    </item>
+    <item name="F21">
+      <value string="" />
+    </item>
+    <item name="F22">
+      <value string="" />
+    </item>
+    <item name="F23">
+      <value string="" />
+    </item>
+    <item name="F24">
+      <value string="" />
+    </item>
+    <item name="F25">
+      <value string="" />
+    </item>
+    <item name="F26">
+      <value string="" />
+    </item>
+    <item name="F27">
+      <value string="" />
+    </item>
+    <item name="F28">
+      <value string="" />
+    </item>
+    <item name="F29">
+      <value string="" />
+    </item>
+    <item name="F30">
+      <value string="" />
+    </item>
+    <item name="F31">
+      <value string="" />
+    </item>
+    <item name="F32">
+      <value string="" />
+    </item>
+    <item name="F33">
+      <value string="" />
+    </item>
+    <item name="F34">
+      <value string="" />
+    </item>
+    <item name="F35">
+      <value string="" />
+    </item>
+    <item name="F36">
+      <value string="" />
+    </item>
+    <item name="F37">
+      <value string="" />
+    </item>
+    <item name="F38">
+      <value string="" />
+    </item>
+    <item name="F39">
+      <value string="" />
+    </item>
+    <item name="F40">
+      <value string="" />
+    </item>
+    <item name="F41">
+      <value string="" />
+    </item>
+    <item name="F42">
+      <value string="" />
+    </item>
+    <item name="F43">
+      <value string="" />
+    </item>
+    <item name="F44">
+      <value string="" />
+    </item>
+    <item name="F45">
+      <value string="" />
+    </item>
+    <item name="F46">
+      <value string="" />
+    </item>
+    <item name="F47">
+      <value string="" />
+    </item>
+  </form>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="ip4gnie31w4bde5lq3z1ueyw" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="LEBa0MpR8iu-YeJeHqoprUDgtNo7Tsr5PKbCJ_K_7Xt0O8GKOY1U1C3YOPNFW99qzETR2f2ihyvVNwqgLzMkJIcj0in1VEznnAvXSbOoZzg1" />
+    </item>
+    <item name="BO">
+      <value string="78E560873888E6B98A966530EE63E970D578141F41A38925939AD3F3744A92637BA2539C668CF7C6A1D6F58093A996F414ABA1D8F341D2E690B8A5B92DFA07A0EF4EDD0232818205220AEC591CA5A4F772B50EBCB657CD390513F21A77F9B82F" />
+    </item>
+    <item name="user">
+      <value string="{%22user%22:{%22createBy%22:null%2C%22createdAt%22:%222020-08-31T17:00:00.000Z%22%2C%22updatedAt%22:%22%22%2C%22id%22:%225f03e0faa12e501e0ca7d195%22%2C%22email%22:%22chinhanhdongnai@pgs.com.vn%22%2C%22avatar%22:%22%22%2C%22name%22:%22%C4%90%E1%BB%93ng%20Nai%22%2C%22phone%22:%22%22%2C%22shortName%22:%22%22%2C%22address%22:%22C%E1%BA%A3ng%20%C4%90%E1%BB%93ng%20Nai%2C%20Ph%C6%B0%E1%BB%9Dng%20Long%20B%C3%ACnh%20T%C3%A2n%2C%20TP%20Bi%C3%AAn%20H%C3%B2a%2C%20T%E1%BB%89nh%20%C4%90%E1%BB%93ng%20Nai%22%2C%22code%22:%22CNDN%22%2C%22role%22:%22user%22%2C%22locked%22:false%2C%22passwordFailures%22:0%2C%22lastPasswordFailure%22:%22%22%2C%22allowReport%22:true%2C%22resetToken%22:%22%22%2C%22userType%22:%22Factory%22%2C%22userRole%22:%22Owner%22%2C%22stationType%22:%22Own%22%2C%22importPrice%22:0%2C%22salePrice%22:0%2C%22deletedAt%22:%22%22%2C%22isDeleted%22:false%2C%22LAT%22:10.898846%2C%22LNG%22:106.844112%2C%22customerCode%22:%22%22%2C%22staffOf%22:%22%22%2C%22encryptedPassword%22:%22$2b$10$wDmN4yjoJX5rT.UaLJtH2eYskzT/vootAONB/AwZTlgO2iUOHmdXm%22%2C%22playerID%22:%2291d99d8a-ae62-403c-8480-7283be5cb256%22%2C%22playerIDWeb%22:%22ac67b81b-5928-46b8-94ea-d1dc2e68a3ce%22%2C%22prefix%22:%22DoN%22%2C%22organization%22:%225f01ab335452a61194c9e2c1%22%2C%22isChildOf%22:%225f5eee70a80d000828c25c3f%22%2C%22owner%22:%225f5eee70a80d000828c25c3f%22%2C%22updateBrandBy%22:null%2C%22parentRoot%22:%225f01ab335452a61194c9e2c1%22}%2C%22token%22:%22eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmMDNlMGZhYTEyZTUwMWUwY2E3ZDE5NSIsInB3aCI6NDI5Mjc1MjMxNywiaWF0IjoxNzEyMDMxMDQ3LCJleHAiOjE3MTIxMTc0NDd9.J--UmhIy--rkE_7ffw6HLix00T5JE3DvKDEeVOz14aE%22}" />
+    </item>
+  </cookies>
+</error>

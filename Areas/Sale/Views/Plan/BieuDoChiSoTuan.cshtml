@@ -1,0 +1,235 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using System.Globalization;
+
+@{
+    //Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Calendar calendar = CultureInfo.InvariantCulture.Calendar;
+    var single = ViewBag.single != null ? ViewBag.single : "week";
+
+    var weekdefault = calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+    string Month = ViewBag.Month != null ? ViewBag.Month : DateTime.Now.Month.ToString();
+    string Year = ViewBag.Year != null ? ViewBag.Year : DateTime.Now.Year.ToString();
+
+
+    string week = ViewBag.Week != null ? ViewBag.Week : weekdefault.ToString();
+
+}
+@model string
+
+<canvas id="canvas-chart"></canvas>
+<script src="/Scripts/Chartjs-master/Chartjs.bundle.min.js"></script>
+<script src="/Scripts/Chartjs-master/globalConfig.js"></script>
+<script src="/assets/js/jquery.easypiechart.min.js"></script>
+<script>
+    (function () {
+       // var colorRender = Chart.helpers.color;
+
+        var responseData = [];
+        var responseData2 = [];
+
+        @if (!string.IsNullOrEmpty(ViewBag.Listmodel))
+        {
+            @Html.Raw("responseData = " + ViewBag.Listmodel + ";");
+            @*@Html.Raw("responseData2 = " + ViewBag.Listmodel + ";");*@
+        }
+
+        //Tạo dữ liệu trục x
+        var arrayLabel = [];
+      
+        for (var i in responseData) {
+            arrayLabel.push(responseData[i].TenNguoiLap);
+        }
+        
+        //tuong tac
+        var dataPushToDataset = [];
+        var dataPushToDataset2 = [];
+        var dataPushToDataset3 = [];
+        var dataPushToDataset4 = [];
+        var dataPushToDataset5 = [];
+        var dataPushToDataset6 = [];
+
+        for (var i in arrayLabel) {
+            var item = responseData.filter(function (obj) {
+                return obj.TenNguoiLap == arrayLabel[i];
+            });
+            if (item.length != 0) {
+                dataPushToDataset.push(item[0].TT);
+                dataPushToDataset2.push(item[0].Hen);
+                dataPushToDataset3.push(item[0].Len);
+                dataPushToDataset4.push(item[0].Mua);
+                dataPushToDataset5.push(item[0].AoFloat);
+                dataPushToDataset6.push(item[0].ThucFloat);
+            } else {
+                dataPushToDataset.push(0);
+                dataPushToDataset2.push(0);
+                dataPushToDataset3.push(0);
+                dataPushToDataset4.push(0);
+                dataPushToDataset5.push(0);
+                dataPushToDataset6.push(0);
+            }
+        }
+
+      
+       // var newDataset = createNewDataset(dataPushToDataset, 'Doanh số', window.chartColors.blue, window.chartColors.blue, 1);
+        //arrayDataset.push(newDataset);
+
+        //var arrayDataset2 = [];
+        //var newDataset2 = createNewDataset(dataPushToDataset2, 'Doanh số 2', window.chartColors.red, window.chartColors.red, 1);
+        //arrayDataset2.push(newDataset2);
+
+        var barChartData = {
+            labels: arrayLabel,
+            datasets: [],
+            order: 1
+        };
+        //var barChartData2 = {
+        //    labels: arrayLabel2,
+        //    datasets: [],
+        //    type: 'bar',
+        //    order: 2
+        //};
+
+        function createNewDataset(arrayData, label, backgroundColorValue, borderColorValue, borderWidth) {
+            var objectDataset = {
+                label: label,
+                backgroundColor: 'hsl(120,60%,70%)',//colorRender(backgroundColorValue).alpha(0.5).rgbString(),
+                borderColor: 'hsl(120,60%,70%)',//borderColorValue,
+                borderWidth: borderWidth,
+                data: []
+            };
+
+            for (var i in arrayData) {
+                objectDataset.data.push(arrayData[i]);
+            }
+
+            return objectDataset;
+        };
+
+        $(document).ready(function () {
+            //Chart.defaults.global.hover.mode = 'nearest';
+            var canvaschart = document.getElementById("canvas-chart");
+            var ctx = document.getElementById("canvas-chart").getContext("2d");
+            
+                data = {
+                    datasets: [{
+                        label: 'Tương tác',
+                        data: dataPushToDataset,
+                        backgroundColor: 'hsl(120,60%,70%)'
+                    }, {
+                        label: 'Hẹn',
+                        data: dataPushToDataset2,
+                        backgroundColor: 'hsla(0, 100%, 30%, 0.3)',
+                        // Changes this dataset to become a line
+                        type: 'bar'
+                    },
+                    {
+                        label: 'Lên',
+                        data: dataPushToDataset3,
+                        backgroundColor: 'hsl(242, 100%, 50%)',
+                        // Changes this dataset to become a line
+                        type: 'bar'
+                    },
+                    {
+                        label: 'Mua',
+                        data: dataPushToDataset4,
+                        backgroundColor: 'hsl(27, 100%, 50%)',
+                        // Changes this dataset to become a line
+                        type: 'bar'
+                    },
+                    {
+                        label: 'Doanh số ảo (Triệu VNĐ)',
+                        data: dataPushToDataset5,
+                        backgroundColor: 'hsl(60, 100%, 50%)',
+                        // Changes this dataset to become a line
+                        type: 'bar'
+                    },
+                    {
+                        label: 'Doanh số thực (Triệu VNĐ)',
+                        data: dataPushToDataset6,
+                        backgroundColor: 'hsl(195, 100%, 50%)',
+                        // Changes this dataset to become a line
+                        type: 'bar'
+                    }],
+                    labels: arrayLabel
+                };
+           
+            //legend: là các chú thích theo màu
+
+            var invoiceBar = new Chart(ctx, {
+                type: 'bar',
+                data:data,
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: false,
+                        text: 'Biểu đồ doanh số theo ngày'
+                    },
+                    animation: {
+                        duration: 500,
+                        enabled: true,
+                    },
+                    scales: {
+                        yAxes: [
+                            {
+                                ticks: {
+                                    fontSize: window.outerWidth < 992 ? 9 : 12,
+                                    callback: function (label, index, labels) {
+                                        return numeral(label).format('0,0');
+                                    }
+                                },
+                                scaleLabel: {
+                                    display: window.outerWidth < 992 ? false : true,
+                                    //labelString: '1k = 1000',
+                                }
+                            }
+                        ],
+                        xAxes: [{
+                            ticks: {
+                                fontSize: 10
+                            }
+                        }]
+                    },
+                    tooltips: {
+                        enabled: true,
+                        mode: 'single',
+                        callbacks: {
+                            title: function (tooltipItem, data) { return ; },
+                            label: function (tooltipItems, data) {
+                                //return data.datasets[tooltipItems.datasetIndex].label + ': ' + Number(tooltipItems.yLabel/1000).toFixed(0).toString().replace(/\d(?=(?:\d{3})+(?!\d))/g,'$&.') + 'k';
+                                return numeral(tooltipItems.yLabel).format('0,0');
+                            }
+                        }
+                    }
+                }
+            });
+
+            setTimeout(function () {
+                //for (var i in arrayDataset) {
+                //    console.log(arrayDataset[i]);
+                //    barChartData.datasets.push(arrayDataset[i]);
+                //}
+                //for (var i in arrayDataset2) {
+                //    console.log(arrayDataset2[i]);
+                //    barChartData2.datasets.push(arrayDataset2[i]);
+                //}
+
+                invoiceBar.update();
+                //console.log('updated')
+            }, 500);
+
+                
+
+        });
+
+        var colorNames = Object.keys(window.chartColors);
+
+    })();
+
+</script>

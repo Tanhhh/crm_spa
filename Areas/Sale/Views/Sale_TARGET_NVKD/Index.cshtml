@@ -1,0 +1,207 @@
+﻿@model IEnumerable<HoaHongChiNhanhViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = "Target Chi Nhánh";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Sale_TARGET_NVKD",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    string FailedMessage = Request["FailedMessage"];
+
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"> </script>
+
+@helper GridColumnCommand(int id)
+{
+    <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+        <p>
+            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("DeleteHoaHong", "SaleReport", "Sale"))
+            {
+                <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                </button>
+            }
+        </p>
+    </div>
+}
+
+@helper GridColumnName(string name, int id)
+{
+
+    name = string.IsNullOrEmpty(name) ? "No Title" : name;
+        <a href="@Url.Action("Edit", "Sale_TARGET_NVKD" , new { Id = id })">@name</a>
+}
+
+@helper GridColumnCategoryValue(object value)
+{
+var attr = Common.GetCategoryByValueOrId("value", value);
+    <span>@(attr != null ? attr.Name : "")</span>
+}
+
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@if (FailedMessage != null && FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @FailedMessage
+    </div>
+}
+
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+    <p style="height:50px">
+        <label>Chi nhánh</label>
+        @Html.DropDownList("BranchId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"))
+        <label>Tháng</label>
+        <select id="month" name="month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(Month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Năm</label>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+            {
+                <option @(Year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+
+    </p>
+}
+  @Html.Grid(Model).Columns(columns =>
+   {
+       //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+       columns.Add().Titled("Tháng").Sortable(false).SetWidth(20).RenderValueAs(u => u.month.ToString());
+       columns.Add().Titled("Năm").Sortable(false).SetWidth(20).Sanitized(false).RenderValueAs(u => u.year.ToString());
+       columns.Add().Titled("Chi nhánh").Sortable(false).SetWidth(30).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.BranchName, u.Id));
+       columns.Add().Titled("Tổng Orlane").Sortable(false).SetWidth(30).RenderValueAs(u => CommonSatic.ToCurrencyStr(u.Orlane, null));
+       columns.Add().Titled("DS cũ Orlane").SetWidth(30).RenderValueAs(u => CommonSatic.ToCurrencyStr(u.OldOrlane,null));
+       columns.Add().Titled("DS mới Orlane").SetWidth(30).RenderValueAs(u => CommonSatic.ToCurrencyStr(u.NewOrlane, null));
+       columns.Add().Titled("DS Annayake").SetWidth(30).RenderValueAs(u => CommonSatic.ToCurrencyStr(u.Annayake, null));
+       columns.Add().Titled("DS Lennor Greyl").SetWidth(30).RenderValueAs(u => CommonSatic.ToCurrencyStr(u.LennorGreyl, null));
+       columns.Add().Titled("Tổng").SetWidth(30).RenderValueAs(u => CommonSatic.ToCurrencyStr(u.Total, null));
+
+   }).WithPaging(10)
+
+
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "Sale_TARGET_NVKD", "Sale"))
+        {
+            <a class="btn btn-primary btn-mini" href="@Url.Action("Create", "Sale_TARGET_NVKD")">
+                <i class="ace-icon fa fa-plus"></i>
+                @Wording.CreateNew
+            </a>
+        }
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("BranchCommision", "Commision", "Sale"))
+        {
+            <a class="btn btn-white btn-sm btn-file" name="DeleteAll2" value="" href="@Url.Action("BranchCommision", "Commision")">
+                <i class="ace-icon fa fa-credit-card"></i>
+                Tỷ lệ đạt Target
+            </a>
+        }
+    }
+
+
+
+@section Scripts {
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+    </script>
+}

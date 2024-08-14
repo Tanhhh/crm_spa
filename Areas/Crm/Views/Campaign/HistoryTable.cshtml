@@ -1,0 +1,109 @@
+﻿@model List<CampaignHistoryViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = Wording.PageIndex_SMSLog;
+        int sttEmail = 1;
+        int sttSMS = 1;
+        int sttZalo = 1;
+        var Email = Model.Where(u => u.Action == "SENDEMAIL").ToList();
+        var SMS = Model.Where(u => u.Action == "SMS").ToList();
+        var Zalo = Model.Where(u => u.Action == "SENDZALO").ToList();
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Campaign",
+            ActionName = "ShowHistory",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false,
+
+        };
+    }
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+
+    @helper GridColumnName(string Name)
+    {
+        <b>@Name</b>
+    }
+    @helper GridColumnName(int Count)
+    {
+        <b>@Count</b>
+    }
+           <div class="table-responsive" id="smsTbl">
+               <h4>Lịch sử chiến dịch SMS</h4>
+               @Html.Grid(SMS).Columns(columns =>
+              {
+                  columns.Add().Titled("STT").SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(sttSMS++));
+                  columns.Add().Titled("Mã Chiến Dịch").Sortable(false).Sanitized(false).Encoded(false).SetWidth(20).RenderValueAs(u => GridColumnName(u.Id));
+                  columns.Add().Titled("Mô tả").Sortable(false).Sanitized(false).Encoded(false).SetWidth(100).RenderValueAs(u => GridColumnName(u.Name));
+                  columns.Add().Titled("Tổng số khách").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.TongKhach));
+                  columns.Add().Titled("Tổng số tin nhắn").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.TongTN));
+                  columns.Add().Titled("Đã gửi").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.ThanhCong));
+                  columns.Add().Titled("Chưa gửi").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.ChuaGui));
+                  columns.Add().Titled("Thất bại").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.ThatBai));
+              })
+           </div>
+
+    <div class="table-responsive" id="emailTbl">
+        <h4>Lịch sử chiến dịch Email</h4>
+        @Html.Grid(Email).Columns(columns =>
+       {
+
+           columns.Add().Titled("STT").SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(sttEmail++));
+           columns.Add().Titled("Mã Chiến Dịch").Sortable(false).Sanitized(false).Encoded(false).SetWidth(20).RenderValueAs(u => GridColumnName(u.Id));
+           columns.Add().Titled("Mô tả").Sortable(false).Sanitized(false).Encoded(false).SetWidth(100).RenderValueAs(u => GridColumnName(u.Name));
+           columns.Add().Titled("Tổng số khách").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.TongKhach));
+           columns.Add().Titled("Tổng số tin nhắn").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.TongTN));
+           columns.Add().Titled("Đã gửi").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.ThanhCong));
+           columns.Add().Titled("Chưa gửi").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.ChuaGui));
+           columns.Add().Titled("Thất bại").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.ThatBai));
+       }).WithPaging(1000)
+    </div>
+    <div class="table-responsive" id="zaloTbl">
+        <h4>Lịch sử chiến dịch Zalo</h4>
+        @Html.Grid(Zalo).Columns(columns =>
+       {
+           
+           columns.Add().Titled("STT").SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(sttZalo++));
+           columns.Add().Titled("Mã Chiến Dịch").Sortable(false).Sanitized(false).Encoded(false).SetWidth(20).RenderValueAs(u => GridColumnName(u.Id));
+           columns.Add().Titled("Mô tả").Sortable(false).Sanitized(false).Encoded(false).SetWidth(100).RenderValueAs(u => GridColumnName(u.Name));
+           columns.Add().Titled("Tổng số khách").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.TongKhach));
+           columns.Add().Titled("Tổng số tin nhắn").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.TongTN));
+           columns.Add().Titled("Đã gửi").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.ThanhCong));
+           columns.Add().Titled("Chưa gửi").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.ChuaGui));
+           columns.Add().Titled("Thất bại").Sortable(false).Sanitized(false).Encoded(false).SetWidth(40).RenderValueAs(u => GridColumnName(u.ThatBai));
+       }).WithPaging(1000)
+    </div>
+
+
+    <script>
+        $(document).ready(function () {
+            $('#smsTbl').prop('hidden', !smsTblDisplay);
+            $('#emailTbl').prop('hidden', !emailTblDisplay);
+            $('#zaloTbl').prop('hidden', !znsTblDisplay);
+        });
+        $('#showEmail').click(function () {
+            $('#smsTbl').prop('hidden', !smsTblDisplay);
+            $('#emailTbl').prop('hidden', !emailTblDisplay);
+            $('#zaloTbl').prop('hidden', !znsTblDisplay);
+        });
+        $('#showSms').click(function () {
+            $('#smsTbl').prop('hidden', !smsTblDisplay);
+            $('#emailTbl').prop('hidden', !emailTblDisplay);
+            $('#zaloTbl').prop('hidden', !znsTblDisplay);
+        });
+        $('#showZns').click(function () {
+            $('#smsTbl').prop('hidden', !smsTblDisplay);
+            $('#emailTbl').prop('hidden', !emailTblDisplay);
+            $('#zaloTbl').prop('hidden', !znsTblDisplay);
+        });
+
+        
+    </script>

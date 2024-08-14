@@ -1,0 +1,42 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_TotalTourOfStaffViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center" style="width:30%">Mã nhân viên</th>
+                <th class="text-center">Tên nhân viên</th>
+                <th class="text-center">Số lượng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+                {
+                    <tr class="@(index % 2 == 0 ? " alert-warning" : "")">
+                        <td class="text-center">
+                            <span>@(index++)</span>
+                        </td>
+                        <td id="ktvId" style="text-align:center">@item.IdNV</td>
+                        <td style="text-align:center">@item.FullName</td>
+                        <td style="text-align:center">
+                            <a class="tour_detail" onclick="GetDetailTour(@item.IdNV)">
+                                @(CommonSatic.ToCurrencyStr(item.Quantity, null))
+                            </a>
+                        </td>
+                    </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" style="text-align:right"><b>Tổng: @(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Quantity), null))</b></td>
+                @*<td class="text-right"></td>*@
+            </tr>
+        </tfoot>
+    </table>

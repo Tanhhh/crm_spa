@@ -1,0 +1,471 @@
+﻿@using Erp.BackOffice.Sale.Controllers
+@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model SectionCusModel
+
+
+@{
+    var tuple = Model.Tuple as Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>;
+    var category = ViewBag.category as Erp.Domain.Interfaces.ICategoryRepository;
+    var user = ViewBag.user as Erp.Domain.Repositories.UserRepository;
+    Layout = null;
+    var CustomerInfo = ViewBag.CustomerInfo;
+    var ldcusview = ViewBag.ldcusview;
+}
+
+<style>
+    .modal-body input {
+        width: 100%;
+    }
+
+        .modal-body input[type=checkbox], .modal-body input[type=radio] {
+            width: 4%;
+            vertical-align: top;
+            margin-left: 20px;
+        }
+
+    .select2-container--default .select2-selection--single {
+        height: 33px !important;
+        border-radius: unset !important;
+    }
+
+    .wrapper {
+        display: flex;
+        align-items: center;
+        margin: 1rem 0;
+    }
+
+        .wrapper .border-checked {
+            border: .1rem solid #dbdbdb;
+            border-radius: 5rem;
+            align-items: center;
+            padding: 3px 0 0 0;
+        }
+
+            .wrapper .border-checked input {
+                width: 1.2rem !important;
+                vertical-align: top;
+                margin-left: 10px !important;
+            }
+
+    section h4 {
+        margin-bottom: -5px !important;
+        font-weight: bold;
+    }
+
+    /*[H-Nam AddNew Client]*/
+    .modal-contentAddNew {
+        background: #fff;
+        height: auto;
+        overflow: hidden;
+        border-radius: 4px;
+    }
+</style>
+<div id="themmoi" class="modal-dialog modal-sm" style="width: 100%; padding: 0 31%; background: rgba(0,0,0,0.5); box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);" role="document">
+    <div class="modal-contentAddNew">
+
+
+        <!-- Modal header -->
+        <div class="modal-header">
+            @*<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>*@
+            <h4 style="padding-bottom: .8rem !important;" class="modal-title">Thêm mới</h4>
+            <style>
+                label.control-label.customerid {
+                    display: block;
+                }
+
+                label.control-label {
+                    display: none;
+                }
+
+                .wrapper-ClientId .control-group.form-group {
+                    display: block;
+                }
+
+                .wrapper-ClientId {
+                    padding: 0 47px 0 32px;
+                    margin-bottom: -1.8rem;
+                }
+
+                input#CustomerId_DisplayText {
+                    width: 43.7rem !important;
+                    padding: .4rem 1.3rem;
+                }
+            </style>
+            <div class="wrapper-ClientId">
+                @*Tạm đóng*@ 
+                @*@if (ldcusview == -1)
+                {
+
+                    @Html.ModulePopupFor(m => m.CustomerId, "Customer", Model.CustomerName, false, true, addClassForLabelField: "customerid")
+                }*@
+
+                @if (ldcusview == -1)
+                {
+                    @Html.Label("Mã khách hàng (*)", new { @class = "customerid" })
+                    @Html.ModulePopupFor(m => Model.CustomerId, "Customer", Model.CustomerName, false, true)
+                }
+
+            </div>
+        </div>
+        <script>
+            $(function () {
+                $('#CustomerId').change(function () {
+                    ShowLoading()
+                    debugger
+                    $.ajax({
+                        type: "get",
+                        url: '/Customer/GetInfoCustomer',
+                        data: { idc: $(this).val() },
+                        dataType: "json ",
+                        success: function (data, textStatus, jqXHR) {
+                            if (data == 0) {
+                                toastr.warning('Không tìm thấy mã khách hàng')
+                                $('#themmoi input[name=Email]').val('')
+                                $('#themmoi input[name=Address]').val('')
+                                $('#themmoi input[name=Mobile]').val('')
+                                $('#themmoi input[name=Name]').val('')
+                                $('#themmoi input[name=LeadName]').val('')
+                                $('#saveLeadForm #CustomerId').val('')
+                            }
+                            $('#themmoi input[name=Email]').val(data.Email)
+                            $('#themmoi input[name=Address]').val(data.Address)
+                            $('#themmoi input[name=Mobile]').val(data.Phone)
+                            $('#themmoi input[name=Name]').val(data.LastName)
+                            $('#themmoi input[name=LeadName]').val(data.LastName)
+                            $('#themmoi input[name=CustomerCode]').val(data.Code)
+
+                            $('#saveLeadForm #CustomerId').val(data.Id)
+                        },
+                        complete: function () {
+                            HideLoading()
+                        }
+                    })
+                })
+                $('#CustomerId_DisplayText').attr('readonly', false)
+                $('#CustomerId_DisplayText').keypress(function (e) {
+                    var key = e.which; if (key == 13) {
+                        debugger
+                        $('#CustomerId').val($('#CustomerId_DisplayText').val())
+                        $('#CustomerId').trigger('change')
+                    }
+                })
+            })
+        </script>
+        <div id="StatusHeader">
+
+        </div>
+        <div style="display:flex;" id="select2parent">
+            <form id="saveLeadForm" action="/AdviseCard/SaveNewLead" style="overflow-y:scroll; height: @(ldcusview == -1 ? "513px" : "597px")" method="post">
+                <input hidden id="IdLead" name="Id" />
+                <input hidden id="CustomerId" name="CusId" value="@CustomerInfo.Id" />
+
+                <input hidden id="StatusId" name="StatusId" />
+                <!-- Modal body -->
+                <div class="modal-body">
+
+                    @foreach (var item in tuple.Item1)
+                    {
+
+                        <section style="border: 1px solid #337ab7;padding:5px;border-radius:3px; margin-top: 5px">
+                            <h4 style="color: #337ab7">@item.Name</h4>
+                            @if (item.isDefault == 1)
+                            {
+                                var properties = typeof(LeadModel).GetProperties();
+                                int outchk;
+                                string[] dont = new string[] { "IsDeleted", "CreatedDate", "CreatedUserId", "ModifiedDate", "ModifiedUserId", "AssignedUserId", "StatusId" };
+                                var prop = properties.Where(x => !x.Name.StartsWith("F") && !int.TryParse(x.Name.Remove(0, 1).ToString(), out outchk) && x.Name != "Id" && !dont.Contains(x.Name));
+                                foreach (var item1 in prop)
+                                {
+                                    var display = item1.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;
+                                    string displayname = ((ldcusview == -1 || CustomerInfo.Id > 0) && item1.Name == "LeadName") ? "Tên cơ hội" : display != null ? display.DisplayName : "";
+                                    string[] categorydefault = new string[] { "Source", "TypeData", "Topic" };
+                                    string[] listdefault = new string[] { "ReceptionStaffId" };
+                                    string[] checkdefault = new string[] { "IsCancel" };
+                                    string[] required = new string[] { "LeadName" };
+                                    if (categorydefault.Contains(item1.Name))
+                                    {
+                                        var content = category.GetCategoryByCode(item1.Name).FirstOrDefault();
+                                        <br>
+                                        @Html.Label(displayname, new { style = "margin-right:10px" })
+                                        @Html.TextBox(item1.Name, content != null ? content.Value : "", (object)"")
+                                    }
+                                    else if (checkdefault.Contains(item1.Name))
+                                    {
+
+                                        <div class="wrapper">
+                                            <div class="title">
+                                                @Html.Label(displayname, new { style = "margin-right:10px" })
+                                                <input name='@item1.Name' hidden />
+                                                @Html.RadioButton(item1.Name, "", true, new { style = "display:none" })
+                                            </div>
+                                            <div class="border-checked">
+                                                @Html.RadioButton(item1.Name, "0", false, (object)"")
+                                                @Html.Label("Không hủy", new { style = "margin-right:10px" })
+                                                @Html.RadioButton(item1.Name, "1", false, (object)"")
+                                                @Html.Label("Hủy", new { style = "margin-right:10px" })
+                                            </div>
+                                        </div>
+                                    }
+                                    else if (listdefault.Contains(item1.Name))
+                                    {
+
+
+                                        IEnumerable<Erp.Domain.Entities.User> users = user.GetAllUsers();
+                                        List<SelectListItem> lstcus = new List<SelectListItem>();
+                                        foreach (var item2 in users)
+                                        {
+                                            SelectListItem selectListItem = new SelectListItem() { Text = item2.FullName, Value = item2.Id.ToString() };
+                                            lstcus.Add(selectListItem);
+                                        }
+                                        <br>
+                                        @Html.Label(displayname, new { style = "margin-right:10px" })
+                                        <input name='@item1.Name' hidden />
+                                        <select class="js-example-basic-single" name='@item1.Name'>
+                                            <option selected value=''>---Chọn---</option>
+                                            @foreach (var item2 in lstcus)
+                                            {
+
+                                                <option value="@item2.Value">@item2.Text</option>
+                                            }
+                                        </select>
+                                    }
+                                    else if (item1.PropertyType == typeof(String))
+                                    {
+                                        <br>
+                                        if (required.Contains(item1.Name))
+                                        {
+                                            @Html.Label(displayname + " (*)", new { style = "margin-right:10px" })
+                                        }
+                                        else
+                                        {
+                                            @Html.Label(displayname, new { style = "margin-right:10px" })
+                                        }
+                                        if (required.Contains(item1.Name))
+                                        {<input value='' name="@item1.Name" required style="width: 100%; border: 0.5px solid #0000002b; height: 33px;" /> }
+                                        else
+                                        {
+                                            @Html.TextBox(item1.Name, "", (object)"");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <br>
+                                        <label style="margin-right:10px">@displayname</label>
+                                        <input type="number" value='' name="@item1.Name" style="width:100%;" />
+                                    }
+                                }
+
+                            }
+                            @{ var itemField = tuple.Item2.Where(x => x.LeadSectionId == item.Id);
+                                string inputele = "";
+                            }
+                            @foreach (var item1 in itemField)
+                            {
+                                inputele += "</br><label style='margin-right:10px'>" + item1.NameLabel + "</label>";
+                                switch (item1.TypeField)
+                                {
+                                    case "Number":
+                                        inputele += Html.Raw("<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' maxlength='12' value='" + "' type='number' " + " name='" + item1.FieldName + "'/>");
+                                        break;
+                                    case "Date":
+                                        inputele += Html.Raw("<input value='" + "' type='date' " + " name='" + item1.FieldName + "'/>");
+                                        break;
+                                    case "Datetime":
+                                        inputele += Html.Raw("<input value='" + "' type='datetime-local' " + " name='" + item1.FieldName + "'/>");
+                                        break;
+                                    case "String":
+                                        inputele += Html.Raw("<input value='" + "' type='text' " + " name='" + item1.FieldName + "'/>");
+                                        break;
+                                    case "Bool":
+                                        inputele += Html.Raw("<input value='" + "' type='hidden' name='" + item1.FieldName + "' value='' /><input type='checkbox' onclick=\"this.previousSibling.value = this.checked ? '1' : '0'\"/>");
+                                        break;
+
+                                }
+                                if (item1.TypeField == "List")
+                                {
+                                    var itemList = category.GetListCategoryByCode(item1.CodeList);
+                                    string optionele = "";
+                                    foreach (var item2 in itemList)
+                                    {
+
+                                        optionele += "<option value='" + item2.Value + "'>" + item2.Name + "</option>";
+
+                                    }
+                                    inputele += "<input hidden name='" + item1.FieldName + "'/><select class='js-example-basic-single' " + " name='" + item1.FieldName + "'> <option selected" + " value =''>---Chọn---</option>" + optionele + "</select>";
+                                }
+                            }
+                            @Html.Raw(inputele)
+                        </section>
+                    }
+                    <!-- Your content goes here -->
+                </div>
+                <!-- Modal footer -->
+                <div id="btnAdd" class="modal-footer" style="position:sticky;bottom:2%;width:100%">
+                    <button type="button" id="btnCloseAdd" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                    <button type="button" id="saveLeadModal" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script>
+                    // In your Javascript (external .js resource or <script> tag)
+                    $(document).ready(function () {
+                    $('.js-example-basic-single').select2({ dropdownParent: $("#themmoi #select2parent") });
+                    debugger
+                    $('#themmoi input[name=Email]').val('@Html.Raw(CustomerInfo.Email)')
+                    $('#themmoi input[name=Address]').val('@Html.Raw(CustomerInfo.Address)')
+                    $('#themmoi input[name=Mobile]').val('@Html.Raw(CustomerInfo.Phone)')
+                    $('#themmoi input[name=Name]').val('@Html.Raw(CustomerInfo.LastName)')
+                    $('#themmoi input[name=LeadName]').val('@Html.Raw(CustomerInfo.LastName)')
+                    if ('-1' != '@ldcusview') {
+                        $('#CustomerCode').hide();
+                        $('label[for="M__Kh_ch_h_ng"]').hide();
+                    }
+                    $('#themmoi #saveLeadModal').click(function () {
+                        if ('-1' == '@ldcusview') {
+                            if ($('#saveLeadForm #CustomerId').val() > 0) {
+
+                            } else {
+                                $('#CustomerId_DisplayText').focus()
+                                toastr.warning('Bắt buộc nhập mã khách hàng')
+                                return
+                            }
+                        }
+
+                        ShowLoading();
+                        var $form = $($('#themmoi #saveLeadForm')[0]);
+                        var mobile = $form.find('input[name="Mobile"]').val();
+                        $.ajax({
+                            url: '/AdviseCard/CheckExistedMobileLead',
+                            type: 'POST',
+                            data: {
+                                mobile: mobile,
+                            },
+                            success: function (response) {
+                                console.log(response.success)
+                                if (response.success) {
+                                    var formData = new FormData($('#themmoi #saveLeadForm')[0]);
+                                    $.ajax({
+                                        type: "POST",
+                                        url: $('#saveLeadForm')[0].action,
+                                        data: formData,
+                                        processData: false,
+                                        contentType: false,
+                                        dataType: "html",
+                                        success: function (data, textStatus, jqXHR) {
+                                            toastr.success('Lưu thành công!')
+                                            let cookiepg = getCookieLeadIndex('ListOrKanbanId');
+                                            if (cookiepg == 0) {
+                                                $("#btnCloseAdd").click();
+                                                $('#LeadTbl').html(data);
+
+                                            } else {
+                                                $("#btnCloseAdd").click();
+                                                callKanban();
+                                            }
+                                        },
+                                        error: function (data, textStatus, jqXHR) {
+                                            toastr.warning('Vui lòng nhập thông tin "Tên Lead"!')
+                                        },
+                                        complete: function () {
+                                            HideLoading();
+                                        }
+                                    })
+                                } else {
+                                    HideLoading();
+                                    // Sử dụng SweetAlert2 để hiển thị thông báo xác nhận
+                                    Swal.fire({
+                                        title: 'Số điện thoại đã tồn tại',
+                                        text: response.message + ' Bạn có muốn tiếp tục không?',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonText: 'Có',
+                                        cancelButtonText: 'Không'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            var formData = new FormData($('#themmoi #saveLeadForm')[0]);
+                                            $.ajax({
+                                                type: "POST",
+                                                url: $('#saveLeadForm')[0].action,
+                                                data: formData,
+                                                processData: false,
+                                                contentType: false,
+                                                dataType: "html",
+                                                success: function (data, textStatus, jqXHR) {
+                                                    toastr.success('Lưu thành công!')
+                                                    let cookiepg = getCookieLeadIndex('ListOrKanbanId');
+                                                    if (cookiepg == 0) {
+                                                        $("#btnCloseAdd").click();
+                                                        $('#LeadTbl').html(data);
+
+                                                    } else {
+                                                        $("#btnCloseAdd").click();
+                                                        callKanban();
+                                                    }
+                                                },
+                                                error: function (data, textStatus, jqXHR) {
+                                                    toastr.warning('Vui lòng nhập thông tin "Tên Lead"!')
+                                                },
+                                                complete: function () {
+                                                    HideLoading();
+                                                }
+                                            });
+                                        } else {
+                                            return;
+                                        }
+                                    });
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                // Xử lý lỗi nếu có
+                                toastr.warning('Đã xảy ra lỗi khi kiểm tra số điện thoại"!')
+                                HideLoading();
+                            }
+                        });
+                    //var formData = new FormData($('#themmoi #saveLeadForm')[0]);
+                    //$.ajax({
+                    //type: "POST",
+                    //url: $('#saveLeadForm')[0].action,
+                    //data: formData,
+                    //processData: false,
+                    //contentType: false,
+                    //dataType: "html",
+                    //success: function (data, textStatus, jqXHR) {
+                    //toastr.success('Lưu thành công!')
+                    //let cookiepg = getCookieLeadIndex('ListOrKanbanId');
+                    //if (cookiepg == 0) {
+                    //$("#btnCloseAdd").click();
+                    //$('#LeadTbl').html(data);
+
+                    //} else {
+                    //$("#btnCloseAdd").click();
+                    //callKanban();
+                    //}
+                    //},
+                    //error: function (data, textStatus, jqXHR) {
+                    //toastr.warning('Vui lòng nhập thông tin "Tên Lead"!')
+                    //},
+                    //complete: function () {
+                    //HideLoading();
+                    //}
+                    //})
+                    })
+                    let radisel = $('#themmoi #saveLeadForm').find('input[type=radio],select')
+                    $.each(radisel, function (index, item) {
+                    $(this).on('change', function () {
+                    $(`input[name=${$(this).attr('name')}]`).val(`${$(this).val()}`)
+                    })
+                    })
+                    })
+</script>

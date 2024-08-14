@@ -1,0 +1,807 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@using Erp.BackOffice.Crm.Models
+@using Newtonsoft.Json;
+@{
+    ViewBag.Title = "DashboardReport";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Calendar calendar = CultureInfo.InvariantCulture.Calendar;
+    var weekdefault = calendar.GetWeekOfYear(DateTime.Now, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+    string Month = DateTime.Now.Month.ToString();
+    string Year = DateTime.Now.Year.ToString();
+    string week = weekdefault.ToString();
+    var currentDate = DateTime.Now;
+    int quarter = (currentDate.Month - 1) / 3 + 1;
+    string single = "month";
+    var Branchs = ViewBag.Branchs as IEnumerable<BranchVModel>;
+    var Branchsc = JsonConvert.SerializeObject(Branchs);
+}
+<style type="text/css">
+    .widget-main.no-padding .table-bordered td:first-child, .widget-main.no-padding .table-bordered th:first-child {
+        border-left-width: 0px;
+    }
+
+    .widget-main.no-padding .table-bordered > thead > tr > th:last-child {
+        border-right-width: 0px !important;
+    }
+
+    .widget-main.no-padding .table-bordered > tbody > tr:last-child > td {
+        border-bottom-width: 0px !important;
+    }
+
+    .infobox:hover {
+        background-color: rgba(132, 171, 183, 0.67);
+    }
+
+    .infobox {
+        width: 100% !important;
+    }
+
+        .infobox .infobox-content {
+            max-width: 100% !important;
+        }
+
+    #totalMuadiv, #totalHendiv, #totalLendiv {
+        margin-top: 10px;
+    }
+    #totalCalldiv, #totalPlaydiv, #totalCallMinutesdiv,#totalMuadiv, #totalHendiv, #totalLendiv {
+        height: 90px !important;
+    }
+    
+    #totalDSAodiv {
+        margin-top: 24px;
+        height: 142px !important;
+    }
+
+    .clChiso {
+        margin-bottom: 10px;
+    }
+
+    #btnsearch, #year, #month, #week, #ibranch {
+        margin-left: 10px;
+    }
+
+    #btnsearch {
+        cursor: pointer;
+    }
+
+    select { 
+        height: 30px !important;
+    }
+
+    .btn-responseData {
+        border: none !important;
+        outline: none !important;
+        padding: .5rem 1rem;
+        margin-top: -2px;
+        border-radius: 2px;
+    }
+</style>
+<div class="widget-box clChiso">
+    <div class="widget-header">
+        <h4 class="widget-title">
+            Dashboard
+        </h4>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <p>
+                Xem dữ liệu theo
+                <label>
+                    <input id="single3" name="single" type="radio" class="ace" value="week" @(single == "week" ? "checked=checked" : "")>
+                    <span class="lbl"> Tuần</span>
+                </label>
+                <label>
+                    <input id="single1" name="single" type="radio" class="ace" value="month" @(single == "month" ? "checked=checked" : "")>
+                    <span class="lbl"> Tháng</span>
+                </label>
+
+                <label>
+                    <input id="single2" name="single" type="radio" class="ace" value="quarter" @(single == "quarter" ? "checked=checked" : "")>
+                    <span class="lbl"> Quý</span>
+                </label>
+
+                <select id="month" name="month" style="@(single == "month" ? "" : "display:none")">
+                    @for (int i = 1; i <= 12; i++)
+                    {
+                        <option @(Month == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+                    }
+                </select>
+                <select id="quarter" name="quarter" style="@(single == "quarter" ? "" : "display:none")">
+                    <option value="1">Quý I</option>
+                    <option value="2">Quý II</option>
+                    <option value="3">Quý III</option>
+                    <option value="4">Quý IV</option>
+                </select>
+                <select id="week" name="week" style="@(single == "week" ? "" : "display:none")">
+                    @for (int i = 1; i <= 52; i++)
+                    {
+                        <option @(week == i.ToString() ? "Selected" : "") value="@i">Tuần @i</option>
+                    }
+                </select>
+                <select id="year" name="year">
+                    @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+                    {
+                        <option @(Year == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+                    }
+                </select>
+                <select data-val="true" id="ibranch" name="ibranch">
+                    <option value="-1">Chi nhánh</option>
+                    @foreach (var item in Branchs)
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                    }
+                </select>
+                <select data-val="true" id="ileadct" name="ileadct" style="margin-left:10px;">
+                    <option value="-1">Nguồn dữ liệu</option>
+                    <option value="1">Lead</option>
+                    <option value="0">Contact</option>
+                </select>
+                <button class="btn btn-mini btn-primary btn-responseData" name="search" id="btnsearch">
+                    Lấy dữ liệu
+                </button>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="widget-box clChiso">
+    <div class="widget-header">
+        <h4 class="widget-title">
+            Thống kê
+        </h4>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="clearfix">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="infobox infobox-blue" id="totalCalldiv">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-phone-square"></i>
+                            </div>
+                            <div class="infobox-data">
+                                <span class="infobox-data-number ng-binding" id="totalCallsp">0</span>
+                                <span class="infobox-data-number ng-binding" style="font-style: italic; font-size: 18px;" id="percentCallChange"></span>
+                                <div class="infobox-content">
+                                    Tổng số cuộc gọi đã thực hiện
+                                </div>
+                            </div>
+                        </div>
+                        <div class="infobox infobox-blue" id="totalHendiv">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-handshake-o"></i>
+                            </div>
+                            <div class="infobox-data">
+                                <span class="infobox-data-number ng-binding" id="totalHensp">0</span>
+                                <span class="infobox-data-number ng-binding" style="font-style: italic; font-size: 18px;" id="percentHenChange"></span>
+                                <div class="infobox-content">
+                                    Tổng số khách đã book hẹn
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="infobox infobox-blue" id="totalPlaydiv">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-volume-control-phone"></i>
+                            </div>
+                            <div class="infobox-data">
+                                <span class="infobox-data-number ng-binding" id="totalPlaysp">0</span>
+                                <span class="infobox-data-number ng-binding" style="font-style: italic; font-size: 18px;" id="percentPlayChange"></span>
+                                <div class="infobox-content">
+                                    Tổng số cuộc gọi nghe máy
+                                </div>
+                            </div>
+                        </div>
+                        <div class="infobox infobox-blue" id="totalLendiv">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-caret-square-o-up"></i>
+                            </div>
+                            <div class="infobox-data">
+                                <span class="infobox-data-number ng-binding" id="totalLensp">0</span>
+                                <span class="infobox-data-number ng-binding" style="font-style: italic; font-size: 18px;" id="percentLenChange"></span>
+                                <div class="infobox-content">
+                                    Tổng số khách đến Showroom
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="infobox infobox-blue" id="totalCallMinutesdiv">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-clock-o"></i>
+                            </div>
+                            <div class="infobox-data">
+                                <span class="infobox-data-number ng-binding" id="totalCallMinutessp">0</span>
+                                <span class="infobox-data-number ng-binding" style="font-style: italic; font-size: 18px;" id="percentCallMinutesChange"></span>
+                                <div class="infobox-content">
+                                    Tổng thời lượng (phút)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="infobox infobox-blue" id="totalMuadiv">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-shopping-cart"></i>
+                            </div>
+                            <div class="infobox-data">
+                                <span class="infobox-data-number ng-binding" id="totalMuasp">0</span>
+                                <span class="infobox-data-number ng-binding" style="font-style: italic; font-size: 18px;" id="percentMuaChange"></span>
+                                <div class="infobox-content">
+                                    Tổng số khách mua hàng
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="infobox infobox-blue" id="totalDSAodiv" style="align-content: center;">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-dollar"></i>
+                            </div>
+                            <div class="infobox-data">
+                                <span class="infobox-data-number ng-binding" id="totalDsAosp">0</span>
+                                <span class="infobox-data-number ng-binding" style="font-style: italic; font-size: 18px;" id="percentDSAoChange"></span>
+                                <div class="infobox-content" style="font-size: 20px;">
+                                    Tổng doanh số ảo
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="widget-box clChiso">
+    <div class="widget-header">
+        <h4 class="widget-title">
+            Chỉ số Call
+        </h4>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="clearfix">
+                <div class="row">
+                    <div class="col-sm-3" style="display: flex; justify-content: center; align-items: center;">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 350px; width: 350px">
+                            <canvas id="progress_1"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-sm-7" style="display: flex; justify-content: center; align-items: center;">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 350px; width: 100%">
+                            <canvas id="detailtarget_1"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="widget-box clChiso">
+    <div class="widget-header">
+        <h4 class="widget-title">
+            Chỉ số Play
+        </h4>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="clearfix">
+                <div class="row">
+                    <div class="col-sm-3" style="display: flex; justify-content: center; align-items: center;">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 350px; width: 350px">
+                            <canvas id="progress_2"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-sm-7" style="display: flex; justify-content: center; align-items: center;">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 350px; width: 100%">
+                            <canvas id="detailtarget_2"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="widget-box clChiso">
+    <div class="widget-header">
+        <h4 class="widget-title">
+            Chỉ số Hẹn
+        </h4>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="clearfix">
+                <div style="display: flex; overflow-x: auto;">
+                    <div style="display: flex; justify-content: center; align-items: center; width: 330px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 330px">
+                            <canvas id="progress_3"></canvas>
+                        </div>
+                    </div>
+                    <div  style="display: flex; justify-content: center; align-items: center; width: 330px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 330px">
+                            <canvas id="prencnt_3"></canvas>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center; min-width: 700px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 100%">
+                            <canvas id="detailtarget_3"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="widget-box clChiso">
+    <div class="widget-header">
+        <h4 class="widget-title">
+            Chỉ số Lên
+        </h4>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="clearfix">
+                <div style="display: flex; overflow-x: auto;">
+                    <div style="display: flex; justify-content: center; align-items: center; width: 330px ">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 330px ">
+                            <canvas id="progress_4"></canvas>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center; width: 330px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 330px ">
+                            <canvas id="prencnt_4"></canvas>
+                        </div>
+                    </div>
+                    <div  style="display: flex; justify-content: center; align-items: center; min-width: 700px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 100%">
+                            <canvas id="detailtarget_4"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="widget-box clChiso">
+    <div class="widget-header">
+        <h4 class="widget-title">
+            Chỉ số Mua
+        </h4>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="clearfix">
+                <div style="display: flex; overflow-x: auto;">
+                    <div  style="display: flex; justify-content: center; align-items: center; width: 330px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 330px ">
+                            <canvas id="progress_5"></canvas>
+                        </div>
+                    </div>
+                    <div  style="display: flex; justify-content: center; align-items: center; width: 330px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 330px ">
+                            <canvas id="prencnt_5"></canvas>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center;min-width:700px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 100%">
+                            <canvas id="detailtarget_5"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="widget-box clChiso">
+    <div class="widget-header">
+        <h4 class="widget-title">
+            Chỉ số Doanh số ảo
+        </h4>
+    </div>
+    <div class="widget-body">
+        <div class="widget-main">
+            <div class="clearfix">
+                <div style="display: flex; overflow-x: auto;">
+                    <div style="display: flex; justify-content: center; align-items: center; width: 330px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 330px ">
+                            <canvas id="progress_6"></canvas>
+                        </div>
+                    </div>
+                    <div  style="display: flex; justify-content: center; align-items: center; width: 330px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 330px ">
+                            <canvas id="prencnt_6"></canvas>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: center; align-items: center; min-width: 700px">
+                        <div style="overflow-x: auto; max-height: 600px; margin-bottom: 30px; height: 330px; width: 100% ">
+                            <canvas id="detailtarget_6"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script>
+    $("#quarter").val(@quarter);
+
+    var single = "month";
+    $("#single1").on('change', function () {
+        if ($(this).val() == 'month') {
+            $("#month").show();
+            $("#week").hide();
+            $("#quarter").hide();
+            single = "month";
+        }
+    });
+
+    $("#single2").on('change', function () {
+        if ($(this).val() == 'quarter') {
+            $("#month").hide();
+            $("#week").hide();
+            $("#quarter").show();
+            single = "quarter";
+        }
+    });
+    $("#single3").on('change', function () {
+        if ($(this).val() == 'week') {
+            $("#month").hide();
+            $("#quarter").hide();
+            $("#week").show();
+            single = "week";
+        }
+    });
+    var datadt = [];
+    $("#btnsearch").on('click', function (e) {
+        e.preventDefault();
+        ShowLoading();
+        var month = $("#month option:selected").val();
+        var quarter = $("#quarter option:selected").val();
+        var year = $("#year option:selected").val();
+        var week = $("#week option:selected").val();
+        var branchId = $("#ibranch option:selected").val();
+        var isLead = $("#ileadct option:selected").val();
+        $.ajax({
+            url: "/Appointment/GetResultDashboardRp",
+            data: { single: single, year: year, month: month, quarter: quarter, week: week, branchId: branchId, isLead: isLead },
+            method: 'get',
+            dataType: 'json',
+            success: function (rs) {
+                if (rs.Success) {
+                    for (let i = charts.length - 1; i >= 0; i--) {
+                        charts[i].destroy();
+                        charts.splice(i, 1);
+                    }
+                    console.log(rs.datadt);
+                    insertdata(rs.datadt, rs.sumCallMinutes, rs.percentCallMinutesChange);
+                    CreatePieChartItem(rs.datadt);
+                    CreateBarChartItem(rs.datars, rs.datadt, rs.targetNewList );
+                    CreatePieChart2Item(rs.dataPrbr);
+                    HideLoading();
+                }
+                else {
+                    HideLoading();
+                    alert("Lỗi.\nKhông thể lấy dữ liệu báo cáo (Quá 1 tháng!).");
+                }
+            },
+            error: function () {
+                HideLoading();
+                alert("Lỗi.\nKhông thể lấy dữ liệu báo cáo (1).");
+            }
+        });
+    });
+    function insertdata(datadt, sumCallMinutes, percentCallMinutesChange) {
+        var dtcall = datadt.filter(x => x.Key === 1)[0];
+        var dtPlay = datadt.filter(x => x.Key === 2)[0];
+        var dtHen = datadt.filter(x => x.Key === 3)[0];
+        var dtLen = datadt.filter(x => x.Key === 4)[0];
+        var dtMua = datadt.filter(x => x.Key === 5)[0];
+        var dtDSAost = datadt.filter(x => x.Key === 6)[0];
+        $('#totalCallsp').text(parseFloat(dtcall.SumValue).toLocaleString());
+        $('#totalPlaysp').text(parseFloat(dtPlay.SumValue).toLocaleString());
+        $('#totalHensp').text(parseFloat(dtHen.SumValue).toLocaleString());
+        $('#totalLensp').text(parseFloat(dtLen.SumValue).toLocaleString());
+        $('#totalCallMinutessp').text(sumCallMinutes.toLocaleString());
+        $('#totalMuasp').text(parseFloat(dtMua.SumValue).toLocaleString());
+        $('#totalDsAosp').text(parseFloat(dtDSAost.SumValue).toLocaleString());
+        $('#percentCallChange').html('');
+        $('#percentPlayChange').html('');
+        $('#percentHenChange').html('');
+        $('#percentLenChange').html('');
+        $('#percentMuaChange').html('');
+        $('#percentDSAoChange').html('');
+        $('#percentCallMinutesChange').html('');
+        if (dtcall.PercentChange > 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-up" style="margin-right: 5px"></i>';
+            $('#percentCallChange').html(icon + dtcall.PercentChange + '%');
+            $('#percentCallChange').css('color', 'mediumspringgreen'); 
+        } else if (dtcall.PercentChange < 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-down" style="margin-right: 5px"></i>';
+            $('#percentCallChange').html(icon + dtcall.PercentChange + '%');
+            $('#percentCallChange').css('color', 'Gold');
+        }
+        if (dtPlay.PercentChange > 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-up" style="margin-right: 5px"></i>';
+            $('#percentPlayChange').html(icon + dtPlay.PercentChange + '%');
+            $('#percentPlayChange').css('color', 'mediumspringgreen'); 
+        } else if (dtPlay.PercentChange < 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-down" style="margin-right: 5px"></i>';
+            $('#percentPlayChange').html(icon + dtPlay.PercentChange + '%');
+            $('#percentPlayChange').css('color', 'Gold');
+        }
+        if (dtHen.PercentChange > 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-up" style="margin-right: 5px"></i>';
+            $('#percentHenChange').html(icon + dtHen.PercentChange + '%');
+            $('#percentHenChange').css('color', 'mediumspringgreen'); 
+        } else if (dtHen.PercentChange < 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-down" style="margin-right: 5px"></i>';
+            $('#percentHenChange').html(icon + dtHen.PercentChange + '%');
+            $('#percentHenChange').css('color', 'Gold');
+        }
+        if (dtLen.PercentChange > 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-up" style="margin-right: 5px"></i>';
+            $('#percentLenChange').html(icon + dtLen.PercentChange + '%');
+            $('#percentLenChange').css('color', 'mediumspringgreen'); 
+        } else if (dtLen.PercentChange < 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-down" style="margin-right: 5px"></i>';
+            $('#percentLenChange').html(icon + dtLen.PercentChange + '%');
+            $('#percentLenChange').css('color', 'Gold');
+        }
+        if (dtMua.PercentChange > 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-up" style="margin-right: 5px"></i>';
+            $('#percentMuaChange').html(icon + dtMua.PercentChange + '%');
+            $('#percentMuaChange').css('color', 'mediumspringgreen'); 
+        } else if (dtMua.PercentChange < 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-down" style="margin-right: 5px"></i>';
+            $('#percentMuaChange').html(icon + dtMua.PercentChange + '%');
+            $('#percentMuaChange').css('color', 'Gold');
+        }
+        if (dtDSAost.PercentChange > 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-up" style="margin-right: 5px"></i>';
+            $('#percentDSAoChange').html(icon + dtDSAost.PercentChange + '%');
+            $('#percentDSAoChange').css('color', 'mediumspringgreen'); 
+        } else if (dtDSAost.PercentChange < 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-down" style="margin-right: 5px"></i>';
+            $('#percentDSAoChange').html(icon + dtDSAost.PercentChange + '%');
+            $('#percentDSAoChange').css('color', 'Gold');
+        }
+        if (percentCallMinutesChange > 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-up" style="margin-right: 5px"></i>';
+            $('#percentCallMinutesChange').html(icon + percentCallMinutesChange + '%');
+            $('#percentCallMinutesChange').css('color', 'mediumspringgreen'); 
+        } else if (percentCallMinutesChange < 0) {
+            var icon = '<i class="ace-icon fa fa-long-arrow-down" style="margin-right: 5px"></i>';
+            $('#percentCallMinutesChange').html(icon + percentCallMinutesChange + '%');
+            $('#percentCallMinutesChange').css('color', 'Gold');
+        }
+    }
+    function CreatePieChartItem(datadt) {
+        datadt.forEach(function (x) {
+            var labels = [];
+            var data = [];
+            var title = '';
+            var color = [];
+            labels.push('Số lượng '+x.Name + ' đã đạt');
+            labels.push('Chưa đạt');
+            data.push(x.PercentDat);
+            data.push(x.PercentChuaDat);
+            color.push('DodgerBlue');
+            color.push('Gray');
+            title = x.Name;
+            if (x.percentChuaDat == '100') {
+                $('#item' + x.AssignedUserId + '_error').text('Chưa thiết lập chỉ tiêu cho ' + title + ' !');
+            } else {
+                DrawPieChart('progress_' + x.Key , data, labels, color, title);
+            }
+        })
+    }
+    function CreatePieChart2Item(dataPrbr) {
+        var branchss = @Html.Raw(Branchsc);
+        for (let i = 3; i <= 6; i++) {
+            var labels = [];
+            var data = [];
+            var title = '';
+            var color = [];
+            var databrfiter = dataPrbr.filter(x => x.TypeTarget === i);
+            databrfiter.forEach(function (d, index) {
+                labels.push(branchss.filter(b=>b.Id === d.BranchId)[0].Name);
+                data.push(d.PercentDat);
+                color.push(getColor(index));
+            }); 
+            if (i === 3) {
+                title = 'Tỷ lệ khách đã đặt hẹn tại từng chi nhánh'
+            } else if (i === 4) {
+                title = 'Tỷ lệ khách đến của từng chi nhánh'
+            }
+            else if (i === 5) {
+                title = 'Tỷ lệ khách mua hàng của từng chi nhánh'
+            } else if (i === 6) {
+                title = 'Tỷ lệ doanh số ảo của từng chi nhánh'
+            }
+            DrawPieChart('prencnt_' + i, data, labels, color, title);
+        }
+        branchss.forEach(function (x) {
+            
+        });
+    }
+    function CreateBarChartItem(datarsv, datadt, dataTarget) {
+        datadt.forEach(function (dt) {
+            var labels = [];
+            var datars = [];
+            var datatarget = [];
+            var title = '';
+            var labeladd = '';
+            if (dt.Key !== 6) {
+                title = 'Số lượng ' + dt.Name + ' so với target ' + dt.Name + ' của từng nhân viên';
+            } else {
+                title = dt.Name + ' so với target ' + dt.Name + ' của từng nhân viên';
+            }
+            labeladd = dt.Name; 
+            datarsv.forEach(function (x) {
+                labels.push(x.AssignedUserName);
+                let targetItem = dataTarget.filter(tg => tg.TypeTarget === dt.Key && tg.UserId === x.AssignedUserId)[0];
+                let targetTotal = targetItem ? targetItem.TargetTotal : 0;
+                datatarget.push(targetTotal);
+                if (dt.Key === 1) {
+                    datars.push(x.TotalCall ?? 0);
+                } else if (dt.Key === 2) {
+                    datars.push(x.TotalPlay ?? 0);
+                } if (dt.Key === 3) {
+                    datars.push(x.TotalHen ?? 0);
+                } else if (dt.Key === 4) {
+                    datars.push(x.TotalLen ?? 0);
+                } else if (dt.Key === 5) {
+                    datars.push(x.TotalMua ?? 0);
+                } else if (dt.Key === 6) {
+                    datars.push(x.TotalDSAo ?? 0);
+                }
+            })
+            DrawbarChart('detailtarget_' + dt.Key, labels, datars, datatarget, title, labeladd);
+        });
+
+    }
+    var charts = []
+    function DrawPieChart(i, data, labels, backgroundColor, title) {
+      /*  debugger*/
+        const ctx = document.getElementById(i);
+        charts.push(new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: backgroundColor
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                    },
+                    title: {
+                        display: true,
+                        text: title,
+                        font: {
+                            size: 17
+                        }
+                    }
+                },
+                datalabels: {
+                    color: 'black',
+                    font: {
+                        size: 12,
+                        weight: 'normal'
+                    },
+                    formatter: function (value, context) {
+                        return context.chart.data.labels[context.dataIndex] + ': ' + value.toFixed(2) + '%';
+                    }
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    align: 'center',
+                    labels: {
+                        boxWidth: 20,
+                        padding: 5
+                    }
+                }
+            }
+        })
+        );
+    }
+    function DrawbarChart(i, labels, datars, datatarget, title, labeladd) {
+       /* debugger*/
+        const ctx = document.getElementById(i);
+        charts.push(new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Target ' + labeladd,
+                        data: datatarget,
+                        backgroundColor: 'DodgerBlue',
+                        order: 1
+                    },
+                    {
+                        label: 'Lượng ' + labeladd,
+                        data: datars,
+                        backgroundColor: 'Gold',
+                        type: 'line',
+                        order: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                    },
+                    title: {
+                        display: true,
+                        text: title,
+                        font: {
+                            size: 17
+                        }
+                    },
+                    datalabels: {
+                        color: 'black',
+                        font: {
+                            size: 12,
+                            weight: 'normal'
+                        }
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        align: 'center',
+                        labels: {
+                            boxWidth: 20,
+                            padding: 5
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        stacked: true
+                    }
+                }
+            }
+        })
+        );
+    }
+    function getColor(i) {
+        if (i === 0) {
+            return 'DodgerBlue';
+        }
+        else if (i === 1) {
+            return 'FireBrick';
+        } else if (i === 2) {
+            return 'Gold';
+        } else {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+    }
+</script>

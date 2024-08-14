@@ -1,0 +1,54 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_SchedulingHistoryViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Nhóm sản phẩm</th>
+                <th class="text-center">Mã sản phẩm</th>
+                <th class="text-center">Tên sản phẩm</th>
+                <th class="text-center">Số lượng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @*@foreach (var item in Model)
+                {*@
+            @foreach (var qq in Model.GroupBy(x => x.CategoryCode))
+            {
+                <tr style="background:#D9D9D9;font-weight:bold">
+                    <td colspan="4">
+                        @(qq.Key == null ? "Chưa có nhóm" : qq.Key)
+                    </td>
+                    <td style="text-align:right">@(Common.PhanCachHangNgan2(qq.Sum(x => x.Quantity)))</td>
+                </tr>
+
+                foreach (var item in Model.Where(x => x.CategoryCode == qq.Key))
+                {
+
+                    <tr class="@(index % 2 == 0 ? " alert-warning" : "")">
+                        <td class="text-center">
+                            <span>@(index++)</span>
+                        </td>
+                        <td style="text-align:right">@item.ProductGroup</td>
+                        <td style="text-align:right">@item.ProductCode</td>
+                        <td style="text-align:right">@item.ProductName</td>
+                        <td style="text-align:right">@(CommonSatic.ToCurrencyStr(item.Quantity, null))</td>
+
+                    </tr>
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" style="text-align:right"><b>Tổng</b></td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Quantity), null))</td>
+            </tr>
+        </tfoot>
+    </table>

@@ -1,0 +1,60 @@
+﻿@model List<LogPromotionViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    Layout = null;
+}
+
+
+
+<div class="">
+    <label><font style="font-size:medium;font-style:oblique;font-weight:bold">Danh sách đơn hàng (@Model.Count)</font> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  Tổng: @CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalAmount), null) </label>
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="text-align:center">Chi nhánh</th>
+                <th style="text-align:center">Ngày mua</th>
+                <th style="text-align:center"> Mã đơn hàng</th>
+                <th style="text-align:center">Khách hàng</th>
+                <th style="text-align:center">Mã khách hàng</th>
+                <th style="width:40%;text-align:center"> Loại khuyến mãi</th>
+                <th style="text-align:center"> Giảm giá</th>
+                <th style="text-align:center"> Hàng tặng</th>
+                <th style="text-align:center"> Tổng tiền</th>
+                <th style="text-align:center"> Nhóm QL</th>
+                <th style="text-align:center"> Nhóm hưởng DS</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var i in Model)
+            {
+            <tr>
+                <td>@i.BranchName</td>
+                <td>@i.BuyDate.Value.ToString("dd/MM/yyyy")</td>
+                <td><a target="_blank" href="/ProductInvoice/Detail/?code=@i.ProductInvoiceCode"> @i.ProductInvoiceCode </a></td>
+                <td>@i.CustomerName</td>
+                <td>@i.CustomerCode</td>
+                <td style="width:40%;text-align:center"> @i.Name </td>
+
+
+                <td>
+                    @i.CommissionValue @if (i.GiftProductId == null)
+                    {@(i.IsMoney.HasValue ? "VNĐ" : "%");
+                    }
+                </td>
+                <td> @i.GiftProductName </td>
+                <td> @CommonSatic.ToCurrencyStr(i.TotalAmount, null) </td>
+                <td> @i.ManagerStaffName </td>
+                <td> @i.NhomNVKD </td>
+            </tr>
+            }
+        </tbody>
+        <tfoot></tfoot>
+    </table>
+</div>

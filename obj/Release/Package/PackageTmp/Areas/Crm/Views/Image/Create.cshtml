@@ -1,0 +1,86 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Crm.Models
+@model ImageViewModel
+@{
+    ViewBag.Title = "Thêm hình ảnh mới";
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Image",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false,
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <style type="text/css">
+    </style>
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+}
+
+@Html.Partial("_UploadDocumentField")
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title,pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal clearfix" }))
+{
+    @Html.HiddenFor(m => m.TargetId)
+    @Html.HiddenFor(m => m.TargetModule)
+    @*@Html.CustomDropDownListFor(model => model.Name, SelectListHelper.GetSelectList_Category("NameREProductImage",null,null), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)*@
+    @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span12, true);
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save" onclick="return submitDocumentFieldAdd()">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        function submitDocumentFieldAdd() {
+            if ($(".file-caption-name").html() == '') {
+                alert("Vui lòng chọn hình ảnh!");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        $("#file-1").attr("accept", "image/x-png,image/gif,image/jpeg");
+    </script>
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/mm/yyyy")
+    @Html.ScriptBottom_ChosenStyle()
+}

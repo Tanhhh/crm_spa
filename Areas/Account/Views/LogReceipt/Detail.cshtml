@@ -1,0 +1,222 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Account.Models
+
+@model LogReceiptViewModel
+
+@{
+    ViewBag.Title = "Chi tiết phiếu nộp tiền";
+
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "LogReceipt",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@helper GridColumnStatus(string status)
+{
+switch (status)
+{
+    case "pending":
+            <span class="label label-info" id="status_room">@Wording.Unconfimred</span>
+        break;
+    case "complete":
+            <span class="label-success label" id="status_room">@Wording.Status_Completed</span>
+        break;
+    case "inprogress":
+            <span class="label-warning label" id="status_room">@Wording.Status_InProcess</span>
+        break;
+}
+}
+
+<div class="row">
+    <div class="col-sm-7 ">
+
+        <table class="table table-bordered grid-table bottom-5">
+            <thead>
+
+                <tr>
+                    <th class="grid-header" width="50">STT</th>
+                    <th class="grid-header" width="100">Mã phiếu thu</th>
+                    <th class="grid-header" width="150">Người nộp</th>
+                    <th class="grid-header">Lý do</th>
+                    <th class="grid-header" width="100">Số tiền</th>
+                    <th class="grid-header" width="20">Trạng thái</th>
+                    <th class="text-center" width="30"> <input type="checkbox" id="selectall" style="glyphicon-ok" /> </th>
+                </tr>
+            </thead>
+            <tbody class="detailList">
+                @if (Model.DetailList.Any())
+                {
+                    for (int i = 0; i < Model.DetailList.Count(); i++)
+                    {
+
+                        <tr role="@(i+1)">
+                            <td class="text-center">
+                                @(i + 1)
+                            </td>
+                            <td>
+
+                                <span class="item_code">@Model.DetailList[i].Code</span>
+                            </td>
+                            <td>
+                                <span class="item_customer_name">@Model.DetailList[i].CompanyName</span>
+                            </td>
+                            <td>
+                                <span class="item_note">@Model.DetailList[i].Name</span>
+                            </td>
+                            <td align="right"><span class="item_amount" align="right">@Model.DetailList[i].Amount.ToCurrencyStr(null)</span></td>
+                            <td>
+                                <span class="item_note">@(Model.DetailList[i].IsArchive == true ? Html.Raw("<i class=\"fa fa-check green\"></i>") : Html.Raw("<i class=\"fa fa-remove red\"></i>"))</span>
+                            </td>
+                            <td>
+                                <input class="id" type="hidden" id="DetailList_@(i+1)__Id" name="DetailList[@(i+1)].Id" value="@Model.DetailList[i].Id" />
+                                @if (!Model.DetailList[i].IsArchive)
+                                {
+                                    <a onclick="Archive(@Model.DetailList[i].Id)" class="btn btn-mini btn-primary">
+                                        <i class="fa fa-check-circle-o"></i>  Xác nhận
+                                    </a>
+                                }
+                            </td>
+
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="red"><span id="status"></span></td>
+                    <td class="detailList_Amount" align="right" style="font-weight:bold">@Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Model.DetailList.Sum(x => x.Amount), null)</td>
+                    <td class="text-center"></td>
+                    <td class="text-center"></td>
+
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    <div class="col-sm-5">
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title"><i class="fa fa-info-circle"></i> Tổng quan</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="detail-view">
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Code, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItem(GridColumnStatus(Model.Status), "Status", Wording.Status, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemDateTimeFor(model => model.DateReceipt, true, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItem(Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Model.TotalAmount, null), "TotalAmount", Wording.TotalAmount, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Note, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    @*<a class="btn btn-mini btn-primary" href="@Url.Action("Edit", pageSetting.ModuleName, new { Id = Model.Id })">
+            <i class="ace-icon fa fa-edit"></i>
+            @Wording.Edit
+        </a>*@
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        function Archive(id) {
+            ShowLoading();
+            $.post("@Url.Action("Archive", "Receipt", new { area = "Account" })", { id: id })
+        .done(function (data) {
+            location.reload();
+        });
+            location.reload();
+           
+        }
+
+        function Archive_all(id) {
+            $.post("@Url.Action("Archive", "Receipt", new { area = "Account" })", { id: id })
+        }
+    </script>
+    <script>
+        @*$('#selectall').click(function (event) {
+            
+            if (this.checked) {
+                debugger
+                var result = confirm('Bạn có muốn xác nhận tất cả cho biên bản nộp tiền này không ?');
+                if (result) {
+                    ShowLoading();
+                    for (var i = 0 ; i <= '@Model.DetailList.Count'; i++) {
+                        var item = $('#DetailList_' + i + '__Id').val();
+                        Archive_all(item);
+
+                    }
+                    location.reload();
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                this.checked = false;
+            }
+        });*@
+
+        $('#selectall').click(function (event) {
+
+            if (this.checked) {
+                debugger
+                var result = confirm('Bạn có muốn xác nhận tất cả cho biên bản nộp tiền này không ?');
+                var ListId = new Array();
+                if (result) {
+                    ShowLoading();
+                    for (var i = 0 ; i <= '@Model.DetailList.Count'; i++) {
+                        var item = $('#DetailList_' + i + '__Id').val();
+                        //Archive_all(item);
+                        ListId.push(item);
+                    }
+                    $.ajax({
+                        type: "POST",
+                        url: "/Receipt/ArchiveAll",
+                        data: JSON.stringify(ListId),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function (r) {
+                            location.reload();
+                            HideLoading();
+                        }
+                    });
+
+                    //location.reload();
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                this.checked = false;
+            }
+        });
+    </script>
+}

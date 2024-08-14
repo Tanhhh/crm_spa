@@ -1,0 +1,33 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+@model Erp.BackOffice.Sale.Models.DonateProOrSerViewModel
+
+<tr data-id="@(Model.OrderNo)">
+    <td class="orderNo">
+      
+        @(Model.OrderNo+1)
+    </td>
+    <td>@Model.ProductCode</td>
+    <td>@Model.ProductName</td>
+    <td class="text-right">@CommonSatic.ToCurrencyStr(Model.Price, null)</td>
+    <td>
+        @Html.Hidden("DetailList[" + Model.ParentOrderNo + "].DonateDetailList[" + Model.OrderNo + "].Id", Model.Id)
+        @Html.Hidden("DetailList[" + Model.ParentOrderNo + "].DonateDetailList[" + Model.OrderNo + "].ProductId", Model.ProductId)
+        @Html.Hidden("DetailList[" + Model.ParentOrderNo + "].DonateDetailList[" + Model.OrderNo + "].TargetModule", Model.TargetModule)
+        @Html.Hidden("DetailList[" + Model.ParentOrderNo + "].DonateDetailList[" + Model.OrderNo + "].TargetId", Model.TargetId)
+        @Html.TextBox("DetailList[" + Model.ParentOrderNo + "].DonateDetailList[" + Model.OrderNo + "].Quantity", Model.Quantity, new { style = "width:50px; text-align:right; ", @class = "numberinput2", autocomplete = "off" })
+    </td>
+    <td>
+        @Html.TextBox("DetailList[" + Model.ParentOrderNo + "].DonateDetailList[" + Model.OrderNo + "].TotalQuantity", Model.TotalQuantity, new { style = "width:50px; text-align:right; ", @class = "numberinput2", autocomplete = "off" })
+    </td>
+    <td>
+        @Html.TextBox("DetailList[" + Model.ParentOrderNo + "].DonateDetailList[" + Model.OrderNo + "].ExpriryMonth", Model.ExpriryMonth, new { style = "width:50px; text-align:right; ", @class = "numberinput2", autocomplete = "off" })
+    </td>
+    <td class="text-center">
+        <a class="btn-delete-item">
+            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+        </a>
+    </td>
+</tr>

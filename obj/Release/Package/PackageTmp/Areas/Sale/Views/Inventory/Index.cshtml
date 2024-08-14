@@ -1,0 +1,282 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using Erp.Domain.Sale.Entities;
+@using PagedList;
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = Wording.PageIndex_Inventory;
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Inventory",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+
+    var url = Request.Url;
+    PagedList.IPagedList<InventoryViewModel> listProduct = (PagedList.IPagedList<InventoryViewModel>)ViewBag.listProduct;
+    List<InventoryViewModel> inventoryList = (List<InventoryViewModel>)ViewBag.inventoryList;
+    List<WarehouseViewModel> warehouseList = (List<WarehouseViewModel>)ViewBag.warehouseList;
+    List<WarehouseViewModel> warehouseList2 = (List<WarehouseViewModel>)ViewBag.warehouseList2;
+    string category = Request["category"] != null ? Request["category"] : "";
+    string manufacturer = Request["manufacturer"] != null ? Request["manufacturer"] : "";
+    string conHang = Request["conHang"] == null || Request["conHang"] == "1" ? "1" : "0";
+    string WarehouseId = Request["WarehouseId"] == null ? "" : Request["WarehouseId"];
+
+    var _index = 0;
+}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs/dt-1.10.20/af-2.3.4/b-1.6.1/cr-1.5.2/fc-3.3.0/fh-3.1.6/kt-2.5.1/r-2.2.3/rg-1.1.1/rr-1.2.6/sc-2.0.1/sl-1.3.1/datatables.min.css" />
+
+<style>
+    #cTable table tbody, #cTable table thead {
+        display: block !important;
+    }
+
+    #cTable table tbody {
+        overflow: auto;
+        height: calc(100vh - 360px) !important;
+    }
+
+    #cTable table {
+        width: 1520px !important; /* can be dynamic */
+    }
+
+    #cTable th {
+        width: 100px;
+    }
+
+    #cTable td {
+        width: 100px;
+    }
+
+    #cTable > thead > tr > th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+
+    #cTable > tbody > tr > td {
+        vertical-align: middle;
+        /*text-align: center;*/
+    }
+    .btn-search{
+        visibility:hidden;
+     }
+
+</style>
+
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+        @Html.TextBox("txtCode", Request["txtCode"], new { @class = "", autocomplete = "off", placeholder = "Mã hoặc tên sản phẩm..." })
+        @*@Html.TextBox("txtSearch", Request["txtSearch"], new { @class = "", autocomplete = "off", placeholder = "..." })*@
+        @Html.DropDownList("manufacturer", SelectListHelper.GetSelectList_Category("manufacturerList", manufacturer, "Nhà sản xuất"))
+        @Html.DropDownList("category", SelectListHelper.GetSelectList_Category("product", category, "Danh mục sản phẩm"))
+        <select id="conHang" name="conHang">
+            <option value="1" @(conHang == "1" ? "selected" : "")>Còn hàng</option>
+            <option value="0" @(conHang == "0" ? "selected" : "")>Hết hàng</option>
+        </select>
+        @*@Html.DropDownList("WarehouseId", SelectListHelper.GetSelectList_Warehouse(Request["WarehouseId"], "Kho quản lý"))*@
+        @*@Html.DropDownList("WarehouseId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Warehouse(Request["WarehouseId"], "Kho quản lý"), new Dictionary<string, object> { { "class", "form-control" }, { "data-val-required", "Bắt buộc chọn." } })*@
+
+        <select id="WarehouseId" name="WarehouseId" class="form-control ">
+            <option value="">Kho quản lý</option>
+            @foreach (var item in warehouseList2)
+            {
+                <option @(WarehouseId == item.Id.ToString() ?"Selected" : "") value="@item.Id" title="@item.Categories">
+                    @item.Code - @item.Name (@item.BranchName)
+                </option>
+            }
+        </select>
+        @*@Html.DropDownList("BranchId", SelectListHelper.GetSelectList_Branch(Request["BranchId"], Wording.BranchName))*@
+        @Html.DropDownList("origin", SelectListHelper.GetSelectList_Category("Origin", Request["origin"], Wording.Origin))
+    </p>
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @Html.Raw(ViewBag.SuccessMessage)
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@if (inventoryList.Count() > 0)
+{
+    <div class="table-responsive">
+        <table id="cTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:40px;">STT</th>
+                    <th style="width:100px;">Lô</th>
+                    <th style="width:100px;">HSD</th>
+                    @foreach (var item in warehouseList)
+                    {
+                        <th style="width:70px;font-size: 11px; white-space: inherit !important"><span title="@item.Name">@item.Name</span></th>
+                    }
+                    <th class="grid-header" style="width:80px;" rowspan="2">Tổng số</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in listProduct.GroupBy(x => x.ProductId))
+                {
+                    _index++;
+                    <tr class="alert-info">
+                        <td colspan="3" style="width:100px;">@(_index). @item.FirstOrDefault().ProductCode - @item.FirstOrDefault().ProductName - @item.FirstOrDefault().Origin</td>
+                        @foreach (var ii in warehouseList)
+                        {
+                            var productOfWH = inventoryList.Where(x => x.ProductId == item.Key && x.WarehouseId == ii.Id).ToList();
+                            if (productOfWH.Count() != 0)
+                            {
+                                int? productQtyOfWH = productOfWH.Sum(x => x.Quantity);
+                                <td class="text-right" style="width:80px;font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(productQtyOfWH))</td>
+                            }
+                            else
+                            {
+                                <td class="text-right" style="width:80px;font-weight:bold">0</td>
+                            }
+                        }
+                        <td class="text-right" data-name="" style="width:80px;font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(inventoryList.Where(x => x.ProductId == item.Key).Sum(x => x.Quantity)))</td>
+                    </tr>
+                        int index = 1;
+                        foreach (var product in listProduct.Where(x => x.ProductId == item.Key))
+                        {
+
+
+                            <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+                                <td style="width:40px;padding-left:20px">@(_index).@(index++)</td>
+                                @*<td style="width:100px;">@product.ProductCode</td>
+                                    <td style="width:200px;"><a onclick="OpenPopup('@Url.Action("Detail", new { Id = product.Id })', '', 500, 700)">@product.ProductName</a></td>*@
+                                <td style="width:100px;">@product.LoCode</td>
+                                <td style="width:100px;">@(product.ExpiryDate.HasValue ? product.ExpiryDate.Value.ToString("dd/MM/yyyy") : "")</td>
+                                @foreach (var ii in warehouseList)
+                                {
+                                    var productOfWH = inventoryList.Where(x => x.ProductId == product.ProductId && x.LoCode == product.LoCode && x.day == product.day && x.month == product.month && x.year == product.year && x.WarehouseId == ii.Id).ToList();
+                                    if (productOfWH.Count() != 0)
+                                    {
+                                        int? productQtyOfWH = productOfWH.Sum(x => x.Quantity);
+                                        <td class="text-right" style="width:80px;font-weight:bold"><a onclick="OpenPopup('@Url.Action("Detail", new { Id = product.ProductId, LoCode = product.LoCode, day = product.day, month = product.month, year = product.year, WarehouseId = ii.Id })', '', 500, 700)">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(productQtyOfWH))</a></td>
+                                    }
+                                    else
+                                    {
+                                        <td class="text-right" style="width:80px;font-weight:bold"><a onclick="OpenPopup('@Url.Action("Detail", new { Id = product.ProductId, LoCode = product.LoCode, day = product.day, month = product.month, year = product.year, WarehouseId = ii.Id })', '', 500, 700)">0</a></td>
+                                    }
+                                }
+                                <td class="text-right" data-name="" style="width:80px;font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(inventoryList.Where(x => x.ProductId == product.ProductId && x.LoCode == product.LoCode && x.day == product.day && x.month == product.month && x.year == product.year).Sum(x => x.Quantity)))</td>
+                            </tr>
+                        }
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"></td>
+                    @foreach (var ii in warehouseList)
+                    {
+                        <td class="text-right" data-name="" style="width:80px;font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(inventoryList.Where(x => x.WarehouseId == ii.Id).Sum(x => x.Quantity)))</td>
+                    }
+                    <td class="text-right" data-name="" style="width:80px;font-weight:bold">@(Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(inventoryList.Sum(x => x.Quantity)))</td>
+                </tr>
+
+
+
+            </tfoot>
+        </table>
+        @Html.PagedListPager(listProduct, page => Url.Action("Index", "Inventory",
+       new { page, txtCode = Request["txtCode"], WarehouseId = Request["WarehouseId"], origin = Request["origin"], conHang = Request["conHang"], category = Request["category"], manufacturer = Request["manufacturer"] }))
+
+    </div>
+}
+else
+{
+    <div class="alert alert-block alert-info">
+        Không có dữ liệu
+    </div>
+}
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("UpdateAll", "Inventory", "Sale"))
+    {
+        using (Html.BeginForm("UpdateAll", "Inventory", FormMethod.Post))
+        {
+            @Html.Hidden("url", url)
+            <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+                <i class="ace-icon fa fa-save"></i>
+                Kiểm tra kho
+            </button>
+    
+            <button class="btn btn-success btn-mini" type="button" value="Export" onclick="GetPrint(true)">
+                <i class="ace-icon fa fa-file-excel-o"></i>
+                Xuất excel
+            </button>
+        }
+    }
+   
+}
+
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.20/af-2.3.4/b-1.6.1/cr-1.5.2/fc-3.3.0/fh-3.1.6/kt-2.5.1/r-2.2.3/rg-1.1.1/rr-1.2.6/sc-2.0.1/sl-1.3.1/datatables.min.js">
+   
+
+</script>
+
+<script src="~/Scripts/jquery.floatThead.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#cTable").floatThead({ top: 30 });
+    });
+</script>
+@section Scripts {
+    <script type="text/javascript">
+        //$(document).ready(function () {
+        //    $('#cTable').DataTable();
+        //});
+        $(function () {
+            $("table tbody").height($(window).height() - $("table tbody").position().top - 170);
+        });
+        
+        function GetPrint(type) {
+            var txtCode = $('#txtCode').val();
+            var manufacturer = $('#manufacturer').val();
+            var category = $('#category').val();
+            var conHang = $('#conHang').val();
+            var WarehouseId = $('#WarehouseId').val();
+            var origin = $('#origin').val();
+
+            OpenPopup('/Inventory/ExportExcel?txtCode=' + txtCode + '&manufacturer=' + manufacturer + '&category=' + category + '&conHang=' + conHang + '&WarehouseId=' + WarehouseId + '&origin=' + origin + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 300000);
+            HideLoading();
+        };
+    </script>
+}

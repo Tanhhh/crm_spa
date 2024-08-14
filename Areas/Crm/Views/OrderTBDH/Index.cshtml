@@ -1,0 +1,627 @@
+﻿@model List<Erp.BackOffice.Crm.Models.OrderTBDHCViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = Wording.PageIndex_OrderTBDH;
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "CrmTargetAllocation",
+            ActionName = "Index",
+            PageTitle = "Xếp loại trung bình đơn hàng",
+            DisplaySearchPanel = false,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+
+    }
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.0/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.0/js/select2.min.js"></script>
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    <style>
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+            .table th:first-child, .table td:first-child {
+                width: 50px;
+            }
+
+        .table thead th {
+            background-color: #428BCA;
+            color: white;
+        }
+
+        .footer {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        #editButton {
+            border: 2px solid #3F51B5;
+            background-color: #3f51b5 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            border-radius: 3px;
+            padding: 5px 20px !important;
+        }
+
+        #deleteButton {
+            border: 2px solid #dc3545;
+            color: #ffffff !important;
+            font-weight: bold;
+            border-radius: 3px;
+            padding: 5px 20px !important;
+        }
+
+        #saveButton {
+            border: 2px solid #3F51B5;
+            background-color: #3f51b5 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            border-radius: 3px;
+            padding: 5px 20px !important;
+        }
+
+        #cancelButton {
+            border: 2px solid #b7bbd2;
+            background-color: #b7bbd2 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            border-radius: 3px;
+            padding: 5px 20px !important;
+        }
+
+        #saveButton2 {
+            border: 2px solid #3F51B5;
+            background-color: #3f51b5 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            border-radius: 3px;
+            padding: 5px 20px !important;
+        }
+
+        #cancelButton2 {
+            border: 2px solid #b7bbd2;
+            background-color: #b7bbd2 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            border-radius: 3px;
+            padding: 5px 20px !important;
+        }
+
+        #createButton {
+            border: 2px solid #3F51B5;
+            background-color: #3f51b5 !important;
+            color: #ffffff !important;
+            font-weight: bold;
+            border-radius: 3px;
+            padding: 5px 20px !important;
+        }
+    </style>
+
+    @section HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+    }
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+
+    }
+    <br />
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" id="selectAll" />
+                </th>
+                <th>Giá trị từ</th>
+                <th>Giá trị đến</th>
+                <th>Xếp loại TBĐH</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrderBy(x => x.MinTotal))
+            {
+
+
+                <tr>
+                    <td>
+                        <input type="checkbox" class="select-item" data-id="@item.Id" />
+                    </td>
+                    <td class="editable" value="@item.MinTotal" style="text-align:right">@item.MinTotal</td>
+                    <td class="editable" value="@item.MaxTotal" style="text-align:right">@item.MaxTotal</td>
+                    <td class="editable" value="@item.Name">@item.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="row">
+        <div class="col-md-12" id="editSaveCancelButtons">
+            <button id="createButton" class="btn btn-primary">Tạo mới</button>
+            <div class="btn-group" role="group">
+                <button id="saveButton" class="btn btn-primary" style="display:none;margin-right:5px">Lưu</button>
+                <button id="cancelButton" class="btn btn-primary" style="display:none">Hủy</button>
+            </div>
+        </div>
+        <div class="col-md-12" id="editSaveCancelButtons">
+            <button id="editButton" class="btn btn-primary" style="display:none">Chỉnh sửa</button>
+            <div class="btn-group" role="group">
+                <button id="saveButton2" class="btn btn-primary" style="display:none;margin-right:5px">Lưu</button>
+                <button id="cancelButton2" class="btn btn-primary" style="display:none">Hủy</button>
+            </div>
+        </div>
+
+        <div class="col-md-1">
+            <button id="deleteButton" class="btn btn-danger" style="display:none;margin-top:5px">Xóa</button>
+        </div>
+    </div>
+
+
+    <script src="~/Scripts/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script>
+        $(document).ready(function () {
+            // Select/Deselect all checkboxes
+            $('#selectAll').click(function () {
+                if (isCreate === true) {
+                    toastr.clear();
+                    toastr.warning('Vui lòng hoàn thành tạo mới trước');
+                    $(this).prop('checked', false);
+                    return false;
+                }
+
+                var isChecked = this.checked;
+                $('input:checkbox.select-item').each(function () {
+                    $(this).prop('checked', isChecked);
+
+                    var tr = $(this).closest('tr');
+                    var id = $(this).data('id');
+
+                    if (isChecked) {
+                        if (isEditing) {
+                            if (!initialData[id]) {
+                                initialData[id] = {
+                                    minTotal: tr.find('td:eq(1)').text(),
+                                    maxTotal: tr.find('td:eq(2)').text(),
+                                    name: tr.find('td:eq(3)').text()
+                                };
+                            }
+                            var minTotal = initialData[id].minTotal;
+                            var maxTotal = initialData[id].maxTotal;
+                            var name = initialData[id].name;
+
+                            tr.find('td:eq(1)').html('<input type="text" class="form-control" value="' + minTotal + '">');
+                            tr.find('td:eq(2)').html('<input type="text" class="form-control" value="' + maxTotal + '">');
+                            tr.find('td:eq(3)').html('<input type="text" class="form-control" value="' + name + '">');
+                        }
+                        else {
+                            toggleButtons();
+
+                        }
+                    } else {
+
+                        if (initialData[id]) {
+                            tr.find('td:eq(1)').text(initialData[id].minTotal);
+                            tr.find('td:eq(2)').text(initialData[id].maxTotal);
+                            tr.find('td:eq(3)').text(initialData[id].name);
+                        }
+                        var selectedCount = $('.select-item:checked').length;
+                        if (selectedCount === 0) {
+                            $('#editButton').hide();
+                            $('#deleteButton').hide();
+                            $('#saveButton2').hide();
+                            $('#cancelButton2').hide();
+                            $('#createButton').show();
+                            isEditing = false;
+                        }
+                    }
+                });
+            });
+
+
+            var initialData = {}; // Di chuyển khai báo ra khỏi sự kiện change để tránh ghi đè dữ liệu
+
+            $('.select-item').change(function () {
+                if (isCreate === true) {
+                    toastr.clear();
+                    toastr.warning('Vui lòng hoàn thành tạo mới trước');
+                    $(this).prop('checked', false);
+                    return false;
+                }
+
+                var tr = $(this).closest('tr');
+                var id = $(this).data('id');
+
+                if ($(this).is(':checked')) {
+                    if (isEditing) {
+                        // Chuyển thành ô input để chỉnh sửa
+                        if (!initialData[id]) {
+                            initialData[id] = {
+                                minTotal: tr.find('td:eq(1)').text(),
+                                maxTotal: tr.find('td:eq(2)').text(),
+                                name: tr.find('td:eq(3)').text()
+                            };
+                        }
+                        var minTotal = initialData[id].minTotal;
+                        var maxTotal = initialData[id].maxTotal;
+                        var name = initialData[id].name;
+
+                        tr.find('td:eq(1)').html('<input type="text" class="form-control" value="' + minTotal + '">');
+                        tr.find('td:eq(2)').html('<input type="text" class="form-control" value="' + maxTotal + '">');
+                        tr.find('td:eq(3)').html('<input type="text" class="form-control" value="' + name + '">');
+
+                    } else {
+                        toggleButtons();
+
+                    }
+                } else {
+                    if (initialData[id]) {
+                        // Khôi phục giá trị ban đầu nếu checkbox không được chọn
+                        tr.find('td:eq(1)').text(initialData[id].minTotal);
+                        tr.find('td:eq(2)').text(initialData[id].maxTotal);
+                        tr.find('td:eq(3)').text(initialData[id].name);
+                    }
+
+                    var selectedCount = $('.select-item:checked').length;
+                    if (selectedCount === 0) {
+                        $('#editButton').hide();
+                        $('#deleteButton').hide();
+                        $('#saveButton2').hide();
+                        $('#cancelButton2').hide();
+                        $('#createButton').show();
+                        isEditing = false;
+                    }
+                }
+
+            });
+            function toggleButtons() {
+                var selectedCount = $('.select-item:checked').length;
+                if (selectedCount > 0) {
+                    $('#editButton').show();
+                    $('#deleteButton').show();
+                    $('#createButton').hide();
+                } else {
+                    $('#editButton').hide();
+                    $('#deleteButton').hide();
+                    $('#createButton').show();
+                }
+            }
+            var isCreate = false;
+            $('#createButton').click(function () {
+                ShowLoading();
+                setTimeout(function () {
+                    HideLoading();
+                }, 1000);
+                $(this).hide();
+                $('#saveButton, #cancelButton').show();
+
+                var newRow = `
+                    <tr class="new-row">
+                        <td></td>
+                        <td><input type="number" class="form-control" id="newMinTotal" /></td>
+                        <td><input type="number" class="form-control" id="newMaxTotal" /></td>
+                        <td><input type="text" class="form-control" id="newName" /></td>
+                    </tr>
+                `;
+                $('table tbody').prepend(newRow);
+                isCreate = true;
+            });
+
+            $('#cancelButton').click(function () {
+                $('.new-row').remove();
+                $('#createButton').show();
+                $('#saveButton, #cancelButton').hide();
+                isCreate = false;
+            });
+
+            $('#saveButton').click(function () {
+                var minTotal = $('#newMinTotal').val();
+                var maxTotal = $('#newMaxTotal').val();
+                var name = $('#newName').val();
+
+                console.log('minTotal', minTotal);
+                console.log('maxTotal', maxTotal);
+                console.log('name', name);
+                if (!minTotal || !maxTotal || !name) {
+                    toastr.clear();
+                    toastr.warning('Vui lòng nhập đầy đủ thông tin');
+                }
+                else if (parseInt(minTotal) >= parseInt(maxTotal)) {
+                   toastr.clear();
+                   toastr.warning('Giá trị đến phải lớn hơn Giá trị từ');
+            }
+            else {
+                    // Kiểm tra xem minTotal và maxTotal mới có nằm trong khoảng minTotal và maxTotal của dữ liệu trước không
+                    var isValid = true;
+                    $('table tbody tr').each(function () {
+                        var currentMinTotal = parseInt($(this).find('td:eq(1)').text());
+                        var currentMaxTotal = parseInt($(this).find('td:eq(2)').text());
+                        if (minTotal >= currentMinTotal && minTotal <= currentMaxTotal) {
+                            isValid = false;
+                            return false;
+                        }
+                        if (maxTotal >= currentMinTotal && maxTotal <= currentMaxTotal) {
+                            isValid = false;
+                            return false;
+                        }
+                    });
+
+                    if (!isValid) {
+                        toastr.clear();
+                        toastr.warning('Khoảng giá trị bị trùng lập');
+                    } else {
+                        // Gửi dữ liệu thông qua Ajax
+                        ShowLoading();
+
+                        $.ajax({
+                            url: '/OrderTBDH/Create',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                MinTotal: minTotal,
+                                MaxTotal: maxTotal,
+                                Name: name,
+                            },
+                            success: function (response) {
+                                // Xử lý phản hồi từ server
+                                if (response.success) {
+                                    setTimeout(function () {
+                                        HideLoading();
+                                    }, 1000);
+                                    toastr.clear();
+                                    toastr.success('Lưu thành công');
+
+                                    setTimeout(function () {
+                                        location.reload();
+                                    }, 1000);
+                                } else {
+                                    toastr.error(response.message);
+                                }
+                            },
+                            error: function () {
+                                toastr.clear();
+                                toastr.warning('Đã xảy ra lỗi khi gửi dữ liệu');
+                            }
+                        });
+                    }
+                }
+            });
+
+
+            var isEditing = false;
+            // Handle edit button click
+            $('#editButton').click(function () {
+                ShowLoading();
+                setTimeout(function () {
+                    HideLoading();
+                }, 1000);
+                saveInitialData();
+                $('#editButton').hide();
+
+                // Hiện nút lưu và hủy
+                $('#saveButton2').show();
+                $('#cancelButton2').show();
+
+                // Mở các ô input của các checkbox đã chọn
+                $('.select-item:checked').each(function () {
+                    var tr = $(this).closest('tr');
+                    var minTotal = tr.find('td:eq(1)').text();
+                    var maxTotal = tr.find('td:eq(2)').text();
+                    var name = tr.find('td:eq(3)').text();
+
+                    // Thêm ô input vào các cột dữ liệu
+                    tr.find('td:eq(1)').html('<input type="text" class="form-control" value="' + minTotal + '">');
+                    tr.find('td:eq(2)').html('<input type="text" class="form-control" value="' + maxTotal + '">');
+                    tr.find('td:eq(3)').html('<input type="text" class="form-control" value="' + name + '">');
+                });
+                isEditing = true;
+
+            });
+
+  $('#saveButton2').click(function () {
+    var updatedData = [];
+
+    // Lặp qua mỗi hàng được chọn
+    $('.select-item:checked').each(function () {
+        var tr = $(this).closest('tr');
+        var id = $(this).data('id');
+        var minTotal = tr.find('td:eq(1) input').val();
+        var maxTotal = tr.find('td:eq(2) input').val();
+        var name = tr.find('td:eq(3) input').val();
+
+        // Thêm dữ liệu cập nhật vào mảng
+        updatedData.push({
+            Id: id,
+            MinTotal: minTotal,
+            MaxTotal: maxTotal,
+            Name: name
+        });
+    });
+
+      var isValid = true;
+      var isValid2 = true;
+
+    updatedData.forEach(function (data) {
+        $('table tbody tr').each(function () {
+            var currentId = $(this).find('.select-item').data('id');
+            if (currentId !== data.Id) {
+                var currentMinTotal = parseInt($(this).find('td:eq(1)').text());
+                var currentMaxTotal = parseInt($(this).find('td:eq(2)').text());
+                var currentMinTotal2 = parseInt($(this).find('td:eq(1) input').val());
+                var currentMaxTotal2 = parseInt($(this).find('td:eq(2) input').val());
+                if ((data.MinTotal >= currentMinTotal && data.MinTotal <= currentMaxTotal)
+                    ||( data.MinTotal >= currentMinTotal2 && data.MinTotal <= currentMaxTotal2)) {
+                    isValid = false;
+                    return false; // Break out of the loop if invalid
+                }
+                if ((data.MaxTotal >= currentMinTotal && data.MaxTotal <= currentMaxTotal)
+                    ||( data.MaxTotal >= currentMinTotal2 && data.MaxTotal <= currentMaxTotal2)) {
+                    isValid = false;
+                    return false; // Break out of the loop if invalid
+                }
+            }
+        });
+
+        if (parseInt(data.MinTotal) >= parseInt(data.MaxTotal)) {
+            isValid2 = false;
+            return false; 
+        }
+    });
+
+      if (!isValid2) {
+          toastr.clear();
+          toastr.warning('Giá trị đến phải lớn hơn Giá trị từ');
+    }
+      else if (!isValid) {
+          toastr.clear();
+          toastr.warning('Khoảng giá trị bị trùng lập');
+
+    }
+
+    else {
+        // Gửi mỗi dòng dữ liệu cập nhật qua Ajax
+        var ajaxRequests = updatedData.map(function (data) {
+            return $.ajax({
+                url: '@Url.Action("Edit", "OrderTBDH")',
+                type: 'POST',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    Id: data.Id,
+                    MinTotal: data.MinTotal,
+                    MaxTotal: data.MaxTotal,
+                    Name: data.Name
+                })
+            });
+        });
+
+        ShowLoading();
+        // Gửi tất cả các yêu cầu Ajax
+        $.when.apply($, ajaxRequests).then(function () {
+            setTimeout(function () {
+                HideLoading();
+            }, 1000);
+            toastr.clear();
+            toastr.success('Cập nhật thành công');
+            setTimeout(function () {
+                location.reload();
+            }, 1000);
+        }).fail(function (xhr, status, error) {
+            HideLoading();
+            toastr.error('Đã xảy ra lỗi khi gửi yêu cầu: ' + error);
+        });
+    }
+});
+
+
+            var initialData = {};
+
+            // Lưu trữ giá trị ban đầu của các ô dữ liệu
+            function saveInitialData() {
+                $('.select-item:checked').each(function () {
+                    var tr = $(this).closest('tr');
+                    var id = $(this).data('id');
+                    initialData[id] = {
+                        minTotal: tr.find('td:eq(1)').text(),
+                        maxTotal: tr.find('td:eq(2)').text(),
+                        name: tr.find('td:eq(3)').text()
+                    };
+                });
+            }
+
+            // Khôi phục lại giá trị ban đầu từ mảng và cập nhật các ô dữ liệu tương ứng
+            function restoreInitialData() {
+                $('.select-item:checked').each(function () {
+                    var tr = $(this).closest('tr');
+                    var id = $(this).data('id');
+                    tr.find('td:eq(1)').text(initialData[id].minTotal);
+                    tr.find('td:eq(2)').text(initialData[id].maxTotal);
+                    tr.find('td:eq(3)').text(initialData[id].name);
+                });
+            }
+
+            // Handle cancel button click
+            $('#cancelButton2').click(function () {
+                restoreInitialData();
+                $('.select-item:checked').prop('checked', false);
+                $('#selectAll').prop('checked', false);
+                $('#editButton').hide();
+                $('#saveButton2').hide();
+                $('#cancelButton2').hide();
+                $('#deleteButton').hide();
+                $('#createButton').show();
+                isEditing = false;
+
+            });
+
+            // Handle delete button click
+            $('#deleteButton').click(function () {
+                var selectedIds = [];
+                $('.select-item:checked').each(function () {
+                    selectedIds.push($(this).data('id'));
+                });
+
+                console.log(selectedIds);
+
+                Swal.fire({
+                    title: 'Bạn có chắc chắn muốn xóa?',
+                    text: "Dữ liệu trung bình đơn hàng sẽ bị xóa!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        ShowLoading();
+                        var idsToDelete = selectedIds.join(',');
+                         $.ajax({
+                            url: '@Url.Action("Delete", "OrderTBDH")',
+                            type: 'POST',
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify({
+                                Ids: idsToDelete
+                            }),
+                                 success: function (response) {
+                                if (response.success) {
+                                    setTimeout(function () {
+                                        HideLoading();
+                                    }, 1000);
+                                    toastr.clear();
+                                    toastr.success('Xóa thành công');
+
+                                    setTimeout(function () {
+                                        location.reload();
+                                    }, 1000);
+
+                                } else {
+                                    toastr.error(response.message);
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                toastr.error('Đã xảy ra lỗi khi gọi API: ' + error);
+                            }
+                        });
+                    }
+                });
+            });
+
+        });
+    </script>

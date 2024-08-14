@@ -1,0 +1,393 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.Domain.Sale.Entities
+@using GridMvc.Html
+
+@model  DM_BAIVE_YHLViewModel
+
+@{
+    ViewBag.Title = "Danh mục Bài về KISSY";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "DM_TINTUC",
+        ActionName = "DM_BaiVe_YHL",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    List<DM_BAIVE_YHLViewModel> dm_baiveyhl = (List<DM_BAIVE_YHLViewModel>)ViewBag.DM_BAIVE_YHL;
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"> </script>
+
+<style type="text/css">
+    .input-edit-inline {
+        height: 23px;
+        line-height: 23px;
+        font-size: 10px;
+    }
+
+    .subItem2 {
+        border: 1px solid #ddd;
+        margin-left: -8px;
+        margin-right: -8px;
+        padding: 8px;
+        border-width: 1px 0px 0px 0px;
+        height: 39px;
+    }
+
+    .subItem {
+        height: 22px;
+    }
+
+    .createupdateheader {
+        font-size: large;
+        font-weight: bold;
+    }
+</style>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="icon-remove"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-error">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="icon-remove"></i>
+        </button>
+        <i class="icon-warning-sign red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@if (ViewBag.AlertMessage != null && ViewBag.AlertMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="icon-remove"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.AlertMessage
+    </div>
+}
+
+@helper GridColumnCommand(int id)
+{
+    <div class="hidden-phone visible-desktop action-buttons">
+        @using (Html.BeginForm("DeleteBaiveYHL", "DM_TINTUC", FormMethod.Post))
+        {
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("DeleteBaiveYHL", "DM_TINTUC", "Sale"))
+            {
+                <input type="hidden" value="@id" name="Id" />
+                <button type="submit" class="btn btn-minier btn-danger" onclick="return confirm('Bạn có muốn xóa dữ liệu không ?');" style="margin-top:-3px">
+                    <i class="ace-icon fa fa-trash"></i>
+                    Xóa
+                </button>
+            }
+        }
+    </div>
+}
+
+@helper RenderEditItem(int id, string banner,string tieude, int? is_show)
+{
+    var td = tieude.ToString();
+   // var tt = tomtat.ToString();
+    //var nd = noidung.ToString();
+    var bannersrc = Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Erp.BackOffice.Helpers.Common.CurrentUser.MA_DVIQLY,banner, "tintuc-image-folder", "service");
+        if (!string.IsNullOrEmpty(banner))
+        {
+            bannersrc = "~" + bannersrc;
+        }
+
+    <a id="edit" class="btn btn-info btn-minier" onclick="return edit(@id,'@bannersrc','@banner','@td',@is_show)" style="margin-top:-3px">
+        <i class="ace-icon fa fa-edit"></i>
+        Sửa 
+    </a>
+}
+
+@helper isshow(int id, int? is_show)
+{
+    <label>
+        <input id="is_show_table" class="ace class-is-show text-center" type="checkbox" name="is-show-table" value="@is_show" checked="@(is_show == 1? "checked":null)">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper ShowImage(int id, string banner)
+{
+    var bannersrc = Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Erp.BackOffice.Helpers.Common.CurrentUser.MA_DVIQLY,banner, "tintuc-image-folder", "service");
+   /* if (!string.IsNullOrEmpty(banner))
+    {
+        bannersrc = "~" + bannersrc;
+    }
+    */
+    <div class="text-center ace-thumbnails">
+        <a id="showimage_@id" name="showimage" href="@bannersrc" data-rel="colorbox" class="cboxElement">
+            <span class="glyphicon glyphicon-picture"></span>Xem
+        </a>
+    </div>
+
+}
+
+
+<hr>
+@using (Html.BeginForm("CreateBaiveYHL", "DM_TINTUC", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.HiddenFor(model => model.HINHANH)
+    @Html.HiddenFor(model => model.BAIVE_YHL_ID)
+
+    <p id="createupdateheader" class="createupdateheader text-center"><span>Tạo Bài về KISSY</span></p>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-info-circle"></i> Tổng quan</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#image" aria-expanded="false"><i class="fa fa-image"></i> Ảnh Đại Diện</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#TT" aria-expanded="false"><i class="fa fa-comment-o"></i>Tóm Tắt</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#ND" aria-expanded="false"><i class="fa fa-comment-o"></i>Nội Dung</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body" style="overflow: hidden;">
+                        <div class="widget-body">
+                            <div class="widget-main padding-6">
+                                <div class="tab-content">
+                                    <div id="home" class="tab-pane active">
+                                        <p align="center">
+
+                                            @Html.TextBoxFor(model => model.TIEUDE, new { @class = "", autocomplete = "off", @placeholder = "Tiêu Đề" })
+
+                                            <span>Hiện</span>
+                                            <label>
+                                                <input id="is_show" class="ace class-is-show" type="checkbox" name="is-show-checkbox" value="1" checked="checked">
+                                                <span class="lbl"></span>
+                                            </label>
+
+                                        </p>
+
+                                    </div>
+                                    <div id="image" class="tab-pane">
+                                        <div class="wrap-btn-upload">
+                                            <a class="btn btn-primary btn-sm btn-white"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                                            <input type="file" id="file-image" name="file-image" class="file-image" onchange="previewFileImage(event, '#display-image img')" />
+                                        </div>
+                                        <div class="text-center" id="display-image">
+                                            <img src="/assets/css/images/noimage.gif" title="@Model.CreatedDate" id="" style="max-height:250px" />
+                                        </div>
+                                        
+                                    </div>
+                                    <div id="TT" class="tab-pane">
+                                        <textarea class="ckeditor" cols="20" id="TOMTAT" name="TOMTAT" placeholder="" rows="2">@Model.TOMTAT</textarea>
+                                    </div>
+                                    <div id="ND" class="tab-pane">
+                                        <textarea class="ckeditor" cols="20" id="NOIDUNG" name="NOIDUNG" placeholder="" rows="2">@Model.NOIDUNG</textarea>
+                                    </div>
+                                </div>
+                                <div style="float:left;padding-left:50%;">
+                                    <a class="btn btn-mini btn-black" onclick="return reset()">
+                                        Nhập lại
+                                        <i class="ace-icon fa fa-refresh icon-on-right"></i>
+                                    </a>
+                                </div>
+
+                                <div style="float:right;">
+                                    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CreateBaiveYHL", "DM_TINTUC", "Sale"))
+                                    {
+                                        <button id="save" name="Save" value="Save" type="submit" class="btn btn-mini btn-primary" href="@Url.Action("CreateBaiveYHL", pageSetting.ModuleName)">
+                                            <i class="ace-icon fa fa-plus"></i>
+                                            Lưu
+                                        </button>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<hr>
+
+<table class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th width="5">ID</th>
+            <th width="10">Tiêu Đề</th>
+            <th width="15">Tóm Tắt</th>
+            <th width="50">Nội Dung</th>
+            <th style="width:5px">Hình Ảnh</th>
+            <th style="width:5px">Hiện</th>
+            <th style="width:5px">Chỉnh Sửa</th>
+            <th style="width:5px">Xóa</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in dm_baiveyhl)
+        {
+            var subList = dm_baiveyhl.ToList(); //.Where(i => i.LOAISANPHAM_IDCHA == item.LOAISANPHAM_ID).ToList();
+
+            <tr>
+                <td>
+                    <i style="cursor:pointer" class="fa @(subList.Count > 0 ? "btn-group fa-plus-square-o" : "") bigger-120" data-id="@item.BAIVE_YHL_ID">
+                        <b id="label_name_@item.BAIVE_YHL_ID" style=" font-family:'open sans'">@item.BAIVE_YHL_ID</b>
+                    </i>
+                </td>
+                <td>@item.TIEUDE</td>
+                <td>@item.TOMTAT</td>
+                <td><textarea>@item.NOIDUNG</textarea></td>
+                <td>@ShowImage(item.BAIVE_YHL_ID, item.HINHANH)</td>
+                <td>@isshow(item.BAIVE_YHL_ID, item.IS_SHOW)</td>
+                <td>@RenderEditItem(item.BAIVE_YHL_ID, item.HINHANH, item.TIEUDE, item.IS_SHOW)</td>
+                <td>@GridColumnCommand(item.BAIVE_YHL_ID)</td>
+            </tr>
+
+
+
+        }
+    </tbody>
+</table>
+
+
+
+@section Scripts {
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".btn-group").click(function () {
+                var id = $(this).data("id");
+                var on = $(this).hasClass("on");
+                if (on) {
+                    $(".item_of_" + id).hide();
+                    $(this).removeClass("on");
+                    $(this).removeClass("fa-minus-square-o");
+                    $(this).addClass("fa-plus-square-o");
+                }
+                else {
+                    $(".item_of_" + id).show();
+                    $(this).addClass("on");
+                    $(this).removeClass("fa-plus-square-o");
+                    $(this).addClass("fa-minus-square-o");
+                }
+            });
+        });
+
+        function edit(id, bannersrc, banner, tieude, is_show) {
+            $("#BAIVE_YHL_ID").val(id);
+            $("#TIEUDE").val(tieude);
+            
+            $("#HINHANH").val(banner);
+            $("#display-image img").attr("src", bannersrc);
+            $("#createupdateheader").text("Sửa bài - " + id);
+           
+            if (is_show == 1) {
+                $("#is_show").prop('checked', true);
+            }
+            else {
+                $("#is_show").prop('checked', false);
+            }
+        }
+
+        function reset() {
+            $("#BAIVE_YHL_ID").val(0);
+            $("#TIEUDE").val("");
+            $("#TOMTAT").val("");
+            $("#NOIDUNG").val("");
+            $("#display-image img").attr("src", "/assets/css/images/noimage.gif");
+            $("#createupdateheader").text("Tạo Bài về KISSY");
+            $("#is_show").prop('checked', true);
+        }
+
+        function initCkeditor() {
+            $('.ckeditor').ckeditor({
+                "extraPlugins": 'imagebrowser',
+                "imageBrowser_listUrl": "@Url.Action("ListJson","Images")",
+                // Define the toolbar groups as it is a more accessible solution.
+                toolbarGroups: [
+                    { "name": "document", "groups": ["mode", "document", "doctools"] },
+                    { "name": "editing", "groups": ["find", "selection", "spellchecker"] },
+                    { "name": "forms" },
+                    { "name": "tools" },
+                    { "name": "basicstyles", "groups": ["basicstyles", "cleanup"] },
+                    { "name": "clipboard", "groups": ["clipboar", "undo"] },
+                    { "name": "links", "groups": ["links"] },
+                    { "name": "paragraph", "groups": ["list", "blocks"] },
+                    { "name": "insert", "groups": ["insert"] },
+                    { "name": "styles", "groups": ["styles"] },
+                    //{ "name": "about", "groups": ["about"] },
+                    { "name": "styles" },
+                    { "name": "colors" },
+                    { "name": "align", "groups": ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+
+                ],
+            // Remove the redundant buttons from toolbar groups defined above.
+            removeButtons: 'Underline,Strike,Subscript,Superscript,Anchor,Styles,Specialchar'
+        });
+        }
+        var $tr_template = $('#detailList tr:first-child');
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.BAIVE_YHL_ID" >@Model.TIEUDE</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+
+        });
+       
+
+    </script>
+@Html.ScriptBottom_ValidationMvc()
+@Html.ScriptBottom_ChosenStyle()
+}
+
+
+
+

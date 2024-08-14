@@ -1,0 +1,145 @@
+﻿@using Erp.BackOffice.Sale.Models;
+@model IEnumerable<LeadModel>
+    @{
+        Layout = "";
+        int stt = 1;
+        var user = ViewBag.user as Erp.Domain.Interfaces.IUserRepository;
+        var statusCustomer = ViewBag.statusCustomer as IEnumerable<StatusLeadModel>;
+    }
+    @foreach (var item in Model)
+    {
+        decimal successRatePercentage = 0;
+        var colorStatus = "";
+        var nameStatus = "";
+        var flag = true;
+        foreach (var status in statusCustomer)
+        {
+            if (status.Id == item.StatusId)
+            {
+                colorStatus = status.ColorStatus;
+                successRatePercentage = Math.Round(status.SuccessRate, 0);
+                break;
+
+            }
+        }
+        <tr class="lead-chance">
+            <td>@(stt++)</td>
+            <td><a onclick="DetailLead(@item.Id,-1)">@item.LeadName</a></td>
+            <td>@item.Name</td>
+            <td>@(user.GetUserById(item.ReceptionStaffId??0)!=null? user.GetUserById(item.ReceptionStaffId ?? 0).FullName:"")</td>
+            <td>
+                <!-- Tạo statusChart -->
+
+                @for (var i = 0; i < statusCustomer.Count(); i++)
+                {
+                    var status = statusCustomer.ElementAt(i);
+                    if (flag)
+                    {
+                        <span style="width: 10px; height: 10px; background-color: @colorStatus;"></span>
+                        nameStatus = status.Name;
+                        if (status.Id == item.StatusId)
+                        {
+                            flag = false;
+                        }
+                    }
+                    else
+                    {
+                        <span style="width: 10px; height: 10px;"></span>
+                    }
+                }
+            <p>@nameStatus (@successRatePercentage%)</p>
+            </td>
+            <td>@item.CreatedDate</td>
+            <td>@item.Email</td>
+            <td>@item.Address</td>
+            <td>@item.Mobile</td>
+            <td>
+                <div class="delete-btnCustomer deleteLeadById" data-lead-id="@item.Id">Xóa</div>
+            </td>
+        </tr>
+    }
+    <style>
+        .delete-btnCustomer {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #fff;
+            color: #333;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer !important;
+        }
+
+            .delete-btnCustomer:hover {
+                background-color: #c82333;
+                cursor: pointer !important;
+                color: #fff;
+            }
+
+            /* Hiệu ứng hover */
+            .delete-btnCustomer:hover {
+                background-color: #c82333;
+            }
+
+        .lead-chance span {
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            border-left: 1px solid #ccc;
+            border-right: 1px solid #ccc;
+            display: inline-block;
+        }
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function () {
+            // Bắt sự kiện click trên nút xóa
+            $(".deleteLeadById").on("click", function () {
+                var leadId = $(this).data("lead-id");
+                Swal.fire({
+                    title: 'Xác nhận xóa',
+                    text: 'Bạn có chắc chắn muốn xóa?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Hủy bỏ'
+                }).then((result) => {
+                    // Nếu người dùng xác nhận xóa
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: "/AdviseCard/DeleteLeadById",
+                            method: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify({ id: leadId }),
+                            dataType: "json",
+                            success: function (data) {
+                                if (data > 0) {
+                                    Swal.fire(
+                                        'Đã xóa!',
+                                        'Lead đã được xóa.',
+                                        'success'
+                                    );
+                                    f5DsLeadCustomer();
+                                } else {
+                                    Swal.fire(
+                                        'Lỗi!',
+                                        'Xóa thất bại',
+                                        'error'
+                                    );
+                                }
+                            },
+                            error: function () {
+                                Swal.fire(
+                                    'Lỗi!',
+                                    'Đã xảy ra lỗi khi gửi yêu cầu xóa.',
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+    </script>

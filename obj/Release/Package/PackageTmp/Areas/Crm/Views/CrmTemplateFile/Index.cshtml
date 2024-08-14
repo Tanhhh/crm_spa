@@ -1,0 +1,179 @@
+﻿@model IEnumerable<CrmTemplateFileViewModel>
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Helpers
+    @using Erp.BackOffice.Crm.Models;
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = "Tải File Mẫu";
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "CrmTemplateFile",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = false,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        var datasl = ViewBag.Data as IEnumerable<DataSelectItem>;
+    }
+
+    <style>
+        .button-group-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            justify-items: center;
+        }
+        .clickDown :hover,
+        .clickDelete:hover {
+            cursor: pointer;
+        }
+
+        .btn-all {
+            padding: .5rem 1.5rem;
+            border: none;
+            background: #ef8123;
+            border-radius: 3px;
+            color: #fff;
+        }
+
+            .btn-all:hover {
+                background: #f79b4c;
+                transform: scale(.97);
+                transition: .3s linear;
+                box-shadow: 0 .3rem .8rem rgba(0,0,0, .2)
+            }
+
+        i.fa.fa-download,
+        i.fa.fa-trash {
+            font-size: 1.7rem;
+        }
+    </style>
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    <script src="~/assets/js/jquery.2.1.1.min.js"></script>
+    <link href="~/assets/toastr/toastr.min.css" rel="stylesheet" />
+    <script src="~/assets/toastr/toastr.min.js"></script>
+    @helper GridColumnSetValue(string module)
+    {
+        foreach (var itemdt in ViewBag.Data)
+        {
+            if (itemdt.Key == module)
+            {
+                @itemdt.Value
+                break;
+            }
+        }
+    }
+    @helper GridColumnClickDown(string fileName, int id)
+    {
+        <div class="button-group-grid">
+            <div style="text-align: center;" class="clickDown" onclick="downloadFile('@fileName')">
+                <i class="fa fa-download"></i>
+            </div>
+            <div style="text-align: center;" class="clickDelete" data-id="@id">
+                <i class="fa fa-trash" style="color:red"></i>
+            </div>
+        </div>
+        
+    }
+    <div id="page_header" class="widget-box  ">
+        <div class="widget-header">
+            <h5 class="widget-title">
+                <i class="ace-icon fa fa-star orange"></i>
+                Tải File Mẫu
+            </h5>
+            <div class="widget-toolbar">
+                <a class="btn-search" href="#" data-action="collapse">
+                    <i class="ace-icon fa"></i>
+                </a>
+                <a class="btn-setting"></a>
+            </div>
+
+        </div>
+        <div class="widget-body" style="">
+            <div class="widget-main">
+                <label style="margin-right:8px;font-weight: bold;">Mô-đun</label>
+                <select data-val="true" data-val-required="Bắt buộc nhập" id="iArea" name="iArea" style="height: 30px;width:300px; border-radius: 3px;" onchange="onAreaChange()">
+                    @foreach (var area in datasl)
+                    {
+                        <option value="@area.Key" @(ViewBag.DataSe == area.Key ? "selected" : "")>@area.Value</option>
+                    }
+                </select>
+                <button class="btn-all" onclick="onClickAll()">Tất cả</button>
+            </div>
+        </div>
+    </div>
+    <div style="float: left">
+        @Html.Grid(Model).Columns(columns =>
+       {
+           columns.Add(u => u.Module).Titled("Mô-đun").SetWidth(420).Sanitized(false).Encoded(false).RenderValueAs(n => GridColumnSetValue(n.Module));
+           columns.Add(u => u.FileName).Titled("Tên File").SetWidth(320);
+           columns.Add(u => u.Id).Titled("").SetWidth(120).Sanitized(false).Encoded(false).RenderValueAs(n => GridColumnClickDown(n.FileName, n.Id));
+       }).WithPaging(10)
+        @using (Html.BeginButtonContainer(pageSetting))
+        {
+            <a class="btn btn-info btn-mini" href="#" onclick="OpenPopup('/CrmTemplateFile/Create', 'Tải File Mẫu',400, 300)">
+                <i class="ace-icon fa fa-plus"></i>
+                @Wording.CreateNew
+            </a>
+        }
+    </div>
+
+    <script>
+        function onAreaChange() {
+            var areaId = document.getElementById("iArea").value;
+            if (areaId != 0) {
+                var newUrl = "/CrmTemplateFile/Index?areasT=" + areaId;
+                window.location.href = newUrl;
+            } else {
+                var newUrl = "/CrmTemplateFile/Index";
+                window.location.href = newUrl;
+            }
+        }
+        function onClickAll() {
+            var newUrl = "/CrmTemplateFile/Index";
+            window.location.href = newUrl;
+        }
+        function downloadFile(fileName) {
+            var url = '/CrmTemplateFile/DownloadFileXLSX?fileNames=' + fileName;
+            window.location.href = url;
+        }
+        $(document).on('click', '.clickDelete', function() {
+            var id = $(this).data('id');
+            var row = $(this).closest('tr');
+
+            $.ajax({
+                url: '@Url.Action("DeleteTF", "CrmTemplateFile")',
+                data: { Id: id },
+                type: 'POST',
+                success: function (response) {
+                    if (response.Success) {
+                        console.log("Xóa thành công");
+                        row.remove(); // Loại bỏ dòng từ DOM
+                    } else {
+                        console.log("Xóa thất bại");
+                    }
+                },
+                error: function () {
+                    console.log("Lỗi khi gửi yêu cầu xóa");
+                }
+            });
+        });
+        window.addEventListener('message', function (event) {
+            if (event.data === 'createTFSuccess') {
+                onAreaChange();
+            }
+        });
+    </script>
+

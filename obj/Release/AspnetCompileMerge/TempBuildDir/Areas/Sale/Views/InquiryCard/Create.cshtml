@@ -1,0 +1,233 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model InquiryCardViewModel
+
+@{
+    ViewBag.Title = Wording.PageCreate_InquiryCard;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "InquiryCard",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    IEnumerable<SelectListItem> AdviseType = Erp.BackOffice.Helpers.Common.GetSelectList_Category("TemplateListVote", Model.Type, "value");
+    IEnumerable<SelectListItem> categoryList = (IEnumerable<SelectListItem>)ViewBag.categoryList;
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <style>
+        .box {
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+            margin-top: 0px !important;
+        }
+
+        .popover {
+            width: 100% !important;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+    </style>
+
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@if (TempData["Seccess"] != null && TempData["Seccess"] != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @TempData["Seccess"]
+    </div>
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.ProductId)
+    @Html.HiddenFor(model => model.CustomerCode)
+    @Html.HiddenFor(model => model.TargetModule)
+    @Html.HiddenFor(model => model.TargetId)
+    @Html.HiddenFor(model => model.TargetCode)
+    @Html.HiddenFor(model => model.BranchId)
+    @Html.HiddenFor(model => model.CustomerId)
+    <div class="row">
+        <div class="col-sm-7">
+            <div class="product-search-box clearfix " style="margin-bottom:10px;display:none">
+                <span class="label label-warning" style="padding: 6px; float: left; height: 26px; margin-left: 3px;">[F4]</span>
+                <div id="product_search_control">
+                    <span class="ctl">
+                        @Html.TextBox("Product", "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "off", style = "width:500px; margin-right:0px;" })
+                    </span>
+                </div>
+            </div>
+            <div id="discount" class="table-responsive active top-10 ">
+                <table class="table table-bordered grid-table bottom-5">
+                    <thead>
+                        <tr>
+                            <th class="grid-header" width="50">#</th>
+                            <th class="grid-header" width="50">STT</th>
+                            <th class="grid-header">Hạng mục</th>
+                            <th class="grid-header">Thời gian làm (phút)</th>
+                            <th class="grid-header" width="150">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody class="detailList">
+                        @if (Model.TargetModule == "discount" || Model.TargetModule == "AdviseCard" || Model.TargetModule == "Membership")
+                        {
+                            try
+                            {
+                                if (Model.DetailList != null)
+                                {
+                                    @Html.Partial("LoadDetail", Model);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
+
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title"><i class="ace-icon fa fa-info-circle"></i> Thông tin phiếu yêu cầu</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+                        <div class="control-group form-group">
+                            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Phiếu tư vấn</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                                <label class="radio"><input type="radio" value="AdviseCard" class="group_choice ace" @((Model.TargetModule == null || Model.TargetModule == "AdviseCard") ? "checked" : "") name="group_choice" />  <span class="lbl"></span></label>
+                            </div>
+                        </div>
+                        <div class="control-group form-group">
+                            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Phiếu Membership</label>
+                            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                                <label class="radio"><input type="radio" value="Membership" class="group_choice ace" @(Model.TargetModule == "Membership" ? "checked" : "") name="group_choice" /> <span class="lbl"></span></label>
+                            </div>
+                        </div>
+                        @*@Html.CustomDropDownListFor(model => model.BranchId, Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Model.BranchId, null), WidthType.span4, true, null, DropdownListStyle.DropdownListStyleChosen)*@
+                        @Html.CustomTextboxFor(model => model.Code, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" } })
+                        @Html.CustomDropDownListFor(model => model.Type, AdviseType, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                        @Html.ModulePopupFor(m => m.TargetId, Model.TargetModule, Model.TargetCode, false, true)
+                        @*@Html.ModulePopupFor(m => m.CustomerId, "Customer", Model.CustomerName, false, true)*@
+                        @Html.CustomTextboxFor(model => model.CustomerName, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.ProductName, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" } })
+                        @Html.DateTimePicker(model => model.WorkDay, "dd/MM/yyyy H:mm", "00/00/0000 00:00:00", true, false)
+                        @Html.CustomTextboxFor(model => model.TotalMinute, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" } })
+                        @Html.CustomTextAreaFor(model => model.Note, null, WidthType.span12, true, null)
+                        @Html.CustomDropDownListFor(model => model.SkinscanUserId, Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_User(Model.SkinscanUserId, Wording.Empty), WidthType.span4, true, null, DropdownListStyle.DropdownListStyleChosen)
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    <script src="/Scripts/combojax.js?=vs1.01"></script>
+    <script src="/Scripts/area_sale/InquiryCard.js?=vs1.1"></script>
+    <script type="text/javascript">
+
+        $("#TargetId").change(function () {
+            ShowLoading();
+            var id = $(this).val();
+            var module =  $("#TargetModule").val();
+            if (module == "Membership") {
+                $.post("@Url.Action("GetInfoMemberShip", "MemberShip", new { area = "Sale" })", { id: id })
+            .done(function (data) {
+                $("#CustomerId").val(data.CustomerId);
+                $("#CustomerName").val(data.CustomerName);
+                $("#ProductName").val(data.ProductName);
+                $("#ProductId").val(data.ProductId);
+                $("#Type").val(data.Type);
+
+                var formdata = {
+                    ProductId: data.ProductId
+                };
+                $(".detailList").html("");
+                //Thêm dòng mới
+                ClickEventHandler(true, "/InquiryCard/LoadDetail", ".detailList", formdata, function () {
+                    tinh_total_minute();
+                });
+                HideLoading();
+            });
+            }
+            else {
+                $.post("@Url.Action("GetInfoAdviseCard", "AdviseCard", new { area = "Sale" })", { id: id })
+            .done(function (data) {
+                $("#CustomerId").val(data.CustomerId);
+                $("#CustomerName").val(data.CustomerName);
+                $("#Type").val(data.Type);
+                HideLoading();
+            });
+            }
+            HideLoading();
+        });
+
+        $(document).ready(function () {
+
+            /*****/
+            _val = $("#TargetModule").val();
+            var _str = "OpenPopup('/" + _val + "/Index?IsPopup=true&module_list=&jsCallback=selectItem_TargetId', 'Tìm kiếm dữ liệu', 0, 0)";
+            $(".targetid").attr("onclick", _str);
+
+        });
+        $(function () {
+            enable_cb();
+            $(".btn btn-primary btn-mini").click(enable_cb);
+        });
+        function enable_cb() {
+            $('#Type').attr('disabled', true);
+
+        }
+
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+}

@@ -1,0 +1,96 @@
+﻿@model Erp.BackOffice.Models.LoginModel
+
+@using Erp.BackOffice.Helpers
+
+<head>
+<link rel="manifest" href="/manifest.json" />
+<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+<script>
+  var OneSignal = window.OneSignal || [];
+  OneSignal.push(function() {
+    OneSignal.init({
+        appId: "@Common.GetSetting("OneSignalApp")",//"872eae43-21c1-44f7-80c9-ab594b66bbb6",
+    });
+
+
+   OneSignal.getUserId(function(userId) {
+       //alert(userId);
+       $.post("@Url.Action("UserPlayID", "User", new { area = "Administration" })", { id: userId })
+        .done(function (data) {
+            //alert("tra ve tu session", data);
+            //HideLoading();
+        });
+         
+
+      });
+  });
+</script>
+</head>
+
+@{
+    ViewBag.Title = Resources.Wording.Login;
+    Layout = "~/Views/Shared/_AnonymousLayout.cshtml";
+}
+
+
+
+@section HeadOfPage
+{
+    <title>@MvcHtmlString.Create((string)ViewBag.Title)</title>
+    <meta name="description" content="User login page" />
+}
+
+<div id="login-box" class="login-box visible widget-box top-40">
+    <div class="widget-body">
+        <div class="widget-main">
+            <h4 class="blue lighter bigger" style="padding-bottom: 10px; border-bottom: 1px solid #478FCA;">
+                <i class="fa fa-coffee green"></i>
+                @MvcHtmlString.Create(Resources.Wording.PleaseEnterYourInformation)
+            </h4>
+            <div class="space-6"></div>
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <fieldset>
+                    <label class="block clearfix">
+                        <span class="block input-icon input-icon-right">
+                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = Resources.Wording.Username })
+                            <i class="ace-icon fa fa-user"></i>
+                        </span>
+                        @Html.ValidationMessageFor(m => m.UserName)
+                    </label>
+
+                    <label class="block clearfix">
+                        <span class="block input-icon input-icon-right">
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = Resources.Wording.Password })
+                            <i class="ace-icon fa fa-lock"></i>
+                        </span>
+                        @Html.ValidationMessageFor(m => m.Password)
+                    </label>
+
+                    <div class="space"></div>
+
+                    <div class="clearfix">
+                        @*@Html.ActionLink(Resources.Wording.ForgetPassword + "?", "ForgetPassword", "User", new { @area = "Administration" }, null)*@
+
+                        <button class="width-39 pull-right btn btn-sm btn-primary">
+                            <i class="ace-icon fa fa-key"></i>
+                            <span class="bigger-110">Đăng nhập</span>
+                        </button>
+                    </div>
+
+                    <div class="space-4"></div>
+                </fieldset>
+            }
+        </div>
+        <!--/widget-main-->
+
+    </div>
+    <!--/widget-body-->
+</div>
+<!--/login-box-->
+@section Scripts
+{
+    @Html.ScriptBottom_ValidationMvc()
+}

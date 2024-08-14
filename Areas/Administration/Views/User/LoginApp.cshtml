@@ -1,0 +1,54 @@
+﻿@model Erp.BackOffice.Models.LoginModel
+
+@using Erp.BackOffice.Helpers
+
+@{
+    ViewBag.Title = Resources.Wording.Login;
+    Layout = "~/Views/Shared/_AnonymousLayoutApp.cshtml";
+}
+
+@section HeadOfPage
+{
+    <title>@MvcHtmlString.Create((string)ViewBag.Title)</title>
+    <meta name="description" content="User login page" />
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <fieldset style="padding:10px">
+        <label class="block clearfix">
+            <span class="block input-icon input-icon-right">
+                @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", placeholder = Resources.Wording.Username,@style="height:40px;font-size:18px"})
+                <i class="ace-icon fa fa-user bigger-110"></i>
+            </span>
+            @Html.ValidationMessageFor(m => m.UserName)
+        </label>
+
+        <label class="block clearfix">
+            <span class="block input-icon input-icon-right">
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = Resources.Wording.Password, @style = "height:40px;font-size:18px" })
+                <i class="ace-icon fa fa-lock bigger-110"></i>
+            </span>
+            @Html.ValidationMessageFor(m => m.Password)
+        </label>
+
+        <div class="space"></div>
+
+        <div class="clearfix">
+            @*@Html.ActionLink(Resources.Wording.ForgetPassword + "?", "ForgetPassword", "User", new { @area = "Administration" }, null)*@
+
+            <button class="width-39 pull-right btn btn-sm btn-primary">
+                <i class="ace-icon fa fa-key"></i>
+                <span class="bigger-110">Đăng nhập</span>
+            </button>
+        </div>
+
+        <div class="space-4"></div>
+    </fieldset>
+}
+@section Scripts
+{
+    @Html.ScriptBottom_ValidationMvc()
+}

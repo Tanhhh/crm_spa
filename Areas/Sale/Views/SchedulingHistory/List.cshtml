@@ -1,0 +1,320 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+
+@model IEnumerable<SchedulingHistoryViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = Wording.PageIndex_AdviseCard;
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+
+        var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SchedulingHistory",
+            ActionName = "List",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        string Status = Request["Status"]; //== null || Request["Status"] == "0") ? "0" : "1";
+                                           //string type = (Request["type"] == null || Request["type"] == "SkinScan") ? "SkinScan" : "CheckingHair";
+        int rowNumber = 0;
+        int numberOfItem = 30;
+        int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+
+    }
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+    @helper GridColumnCommand(int id)
+    {
+        <p>
+            <a class="btn btn-mini btn-success" onclick="OpenPopup('@Url.Action("Edit", "SchedulingHistory", new { Id = id, IsPopup = true })', '@Wording.PageEdit_SchedulingHistory', 0, 0)"><i class="fa fa-edit"></i></a>
+            <button name="Delete" value="@id" type="submit" class="btn btn-mini btn-danger">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+            </button>
+        </p>
+    }
+
+    @helper GridColumnName(string name, string note, int id, bool isPopup = false, string jsCallback = null)
+    {
+        if (isPopup)
+        {
+            <a onclick="parent.@(jsCallback)(@id, '@name')">@name</a>
+        }
+        else
+        {
+            name = string.IsNullOrEmpty(name) ? "No Title" : name;
+            <a href="@Url.Action("Detail", "SchedulingHistory", new { Id = id })">@name</a>
+
+            if (!string.IsNullOrEmpty(note))
+            {
+                <span class="help-button" data-rel="tooltip" data-placement="bottom" data-original-title="@note">?</span>
+            }
+        }
+    }
+
+    @helper GridColumnCategoryValue(object value)
+    {
+        var attr = Common.GetCategoryByValueOrId("value", value);
+        <span>@(attr != null ? attr.Name : "")</span>
+    }
+
+    @helper CheckDeleteColumns(int Id)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl" ></span>
+        </label>
+    }
+    @helper GridColumnStatusName(string status)
+    {
+        switch (status)
+        {
+            case "pending":
+                <span class="label label-info" id="status_room">@Wording.pending</span>
+                break;
+            case "complete":
+                <span class="label-success label" id="status_room">@Wording.Status_Completed</span>
+                break;
+            case "expired":
+                <span class="label-danger label" id="status_room">@Wording.expired</span>
+                break;
+            case "inprogress":
+                <span class="label-warning label" id="status_room">@Wording.inprogresss</span>
+                break;
+        }
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <p>
+            <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+            <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+            <span class="input-daterange input-group">
+                @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : "", new { @class = "", autocomplete = "off", placeholder = "Từ ngày..." })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : "", new { @class = "", autocomplete = "off", placeholder = "Đến ngày..." })
+            </span>
+            @Html.TextBox("txtCode", Request["txtCode"], new { @class = "", autocomplete = "off", placeholder = "Mã xếp lịch..." })
+            @*@Html.TextBox("txtCusCode", Request["txtCusCode"], new { @class = "", autocomplete = "off", placeholder = "Mã KH..." })*@
+            @Html.TextBox("txtCusName", Request["txtCusName"], new { @class = "", autocomplete = "off", placeholder = "Mã Hoặc Tên KH" })
+            @Html.TextBox("txtDichvu", Request["txtDichvu"], new { @class = "", autocomplete ="off", placeholder = "Dịch vụ" })
+
+        </p>
+        <script>
+
+            $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+                var started = $('#startDate').datepicker('getDate');
+                var finished = $('#endDate').datepicker('getDate');
+                var date;
+                //if (started >= finished) {
+                //    if (e.target.id == 'startDate') {
+                //        date = new Date(started);
+                //        date.setDate(started.getDate());
+                //        $('#startDate').datepicker('setDate', date);
+                //    }
+                //    if (e.target.id == 'endDate') {
+                //        date = new Date(finished);
+                //        date.setDate(finished.getDate() + 1);
+                //        $('#endDate').datepicker('setDate', date);
+                //    }
+                //}
+            });
+        </script>
+        <p>
+            <select id="Status" name="Status">
+                <option value="" @(Status == "" ? "selected" : "")>Trạng thái</option>
+                <option value="pending" @(Status == "pending" ? "selected" : "")>@Wording.pending</option>
+                <option value="inprogress" @(Status == "inprogress" ? "selected" : "")>@Wording.inprogresss</option>
+                <option value="complete" @(Status == "complete" ? "selected" : "")>@Wording.Status_Completed</option>
+                <option value="expired" @(Status == "expired" ? "selected" : "")>@Wording.expired</option>
+            </select>
+            @*@Html.DropDownList("BranchId", SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"))*@
+        </p>
+    }
+
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+
+    @if (!isPopup)
+    {
+        <H4 style="color:cornflowerblue">Tổng số:  @Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Model.Count())</H4>
+
+        using (Html.BeginForm("Delete", pageSetting.ModuleName, FormMethod.Post))
+        {
+            <div class="table table-responsive">
+                @Html.Grid(Model).Columns(columns =>
+                {
+                columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+                {
+                    rowNumber++;
+
+                    return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+                });
+
+
+                columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+                columns.Add().Titled(Wording.Status).SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnStatusName(u.Status));
+                columns.Add(u => u.TargetModule).Titled("Tạo Từ").RenderValueAs(u => u.TargetModule);
+                columns.Add().Titled(Wording.AdviseCode).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Note, u.Id, isPopup));
+                columns.Add(u => u.CustomerCode).Titled(Wording.CustomerCode).Sortable(true).RenderValueAs(u => u.CustomerCode);
+                columns.Add(u => u.CustomerName).Titled(Wording.CustomerName).RenderValueAs(u => u.CustomerName);
+                columns.Add(u => u.NameNV).Titled(Wording.userMembership).RenderValueAs(u => u.NameNV);
+
+                columns.Add(u => u.strexecutionTime).Titled("TG Thực Hiện Thực Tế").RenderValueAs(u => u.strexecutionTime);
+                columns.Add(u => u.startTime).Titled("TG vào Liệu Trình").RenderValueAs(u => u.startTime);
+                columns.Add(u => u.endTime).Titled("TG Kết thúc Liệu Trình").RenderValueAs(u => u.endTime);
+                columns.Add(u => u.ExpectFinishHour).Titled("TG kết thúc dự kiến").RenderValueAs(u=>u.ExpectFinishHour).SetWidth(200);
+
+                columns.Add(u => u.ProductName).Titled(Wording.Service).RenderValueAs(u => u.ProductName);
+                columns.Add(u => u.InquiryCardCode).Titled(Wording.InquiryCode).RenderValueAs(u => u.InquiryCardCode);
+               
+                columns.Add(u => u.WorkDay).Titled(Wording.WorkDay).SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+
+                //columns.Add(u => u.CreatedUserName).Titled(Wording.CreateStaffName).RenderValueAs(u => u.CreatedUserName);
+                //columns.Add(u => u.Note).Titled(Wording.Note).RenderValueAs(u => u.Note);
+                columns.Add(u => u.CreatedDate).Titled(Wording.CreatedDate).SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+                //columns.Add(u => u.ModifiedUserId).Titled(Html.DisplayNameFor(u => u.FirstOrDefault().ModifiedUserId).ToString()).SetWidth(100).RenderValueAs(u => u.ModifiedUserName);
+                //columns.Add(u => u.ModifiedDate).Titled(Wording.ModifiedDate).SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+                //columns.Add(u => u.IsActived).Titled("Lập phiếu YC").Sanitized(false).Encoded(false).RenderValueAs(n => (n.IsActived ? "<span style=\"color:green\"><b>Đã lập phiếu YC</b></span>" : "<span style=\"color:red\"><b>Chưa lập phiếu YC</b></span>")).Sortable(true);
+                columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+            }).WithPaging(30)
+            </div>
+            using (Html.BeginButtonContainer(pageSetting))
+            {
+                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", pageSetting.ModuleName, "Sale"))
+                {
+                    @*@Html.Button(Wording.CreateNew, ButtonType.aTag, ButtonColor.Primary, ButtonSize.Mini, true, IconType.Plus, IconSize.Default, false, new { onclick = "OpenPopup('" + Url.Action("Create", pageSetting.ModuleName, new { IsPopup = true }) + "', '', 0, 0)" })*@
+                }
+                <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint()">
+                    <i class="ace-icon fa fa-file-excel-o"></i>
+                    Xuất excel
+                </button>
+                <button name="DeleteAll" value="DeleteAll" type="submit" class="btn btn-mini btn-danger" onclick="return CheckIsval();">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                    @Wording.Delete
+                </button>
+
+
+            }
+        }
+    }
+    else
+    {
+        @Html.Grid(Model).Columns(columns =>
+        {
+            //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+            columns.Add().Titled(Html.DisplayNameFor(u => u.FirstOrDefault().Code).ToString()).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Note, u.Id, true, jsCallback));
+        }).WithPaging(10)
+    }
+
+    @section Scripts {
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+        <script type="text/javascript">
+            $('.class-delete-all').on('click', function () {
+                if ($('.class-delete-all:checked').length == $('.class-delete-all').length) {
+                    $('#checkAll').prop('checked', true);
+                } else {
+                    $('#checkAll').prop('checked', false);
+                }
+            });
+            function CheckIsval() {
+                if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+
+            $('[name="Delete"]').click(function () {
+                if (confirm('Bạn có chắc muốn xóa item ?')) {
+                    $(this).closest('tr').children('td').each(function (i, e) {
+                        //$(this).find("input.class-delete-all").prop("checked", true);
+                        return true;
+                    })
+                }
+                else {
+                    return false;
+                }
+
+            })
+
+            $('.grid-header').mouseover(function () {
+                $('.grid-header')[1].title = "Chọn tất cả";
+            });
+
+
+            function GetPrint() {
+                var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+                var txtCode = $('#txtCode').val();
+                //var txtCusCode = $('#txtCusCode').val();
+                //alert(startDate);
+                var txtCusName = $('#txtCusName').val();
+
+
+                var Status = $('#Status').val();
+
+                OpenPopup('/SchedulingHistory/ExportExcel?startDate=' + startDate + '&Status=' + Status + '&txtCusName=' + txtCusName + '&endDate=' + endDate + '&IsPopup=true', '', 0, 900);
+
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 400000);
+                HideLoading();
+            };
+
+        </script>
+    }

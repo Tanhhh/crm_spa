@@ -1,0 +1,33 @@
+﻿.combojax {
+    display: inline-block;
+    position: relative;
+    float: left;
+}
+
+    .combojax ul {
+        position: absolute;
+        width: 100%;
+        max-height: 300px;
+        overflow-y: scroll;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-top: none;
+        display: none;
+        margin:0px;
+        z-index:999;
+        top:26px;
+        left:0px
+    }
+
+        .combojax ul li {
+            padding: 2px 5px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            display: block;
+            text-decoration: none;
+        }
+
+            .combojax ul li:hover, .combojax ul li.selected {
+                background: #eee;
+                font-weight: bold;
+            }

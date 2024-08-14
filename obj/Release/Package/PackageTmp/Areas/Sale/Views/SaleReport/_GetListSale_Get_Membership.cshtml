@@ -1,0 +1,69 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_Get_MembershipViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Ngày tạo phiếu</th>
+                <th class="text-center">Mã phiếu</th>
+                <th class="text-center">Mã khách hàng</th>
+                <th class="text-center">Tên khách hàng</th>
+                <th class="text-center">Mã dịch vụ</th>
+                <th class="text-center">Tên dịch vụ</th>
+                <th class="text-center">Mã chứng từ liên quan</th>
+                <th class="text-center">Ngày hết hạn</th>
+                <th class="text-center">Nhân viên</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(index%2==0?" alert-warning":"")">
+                    <td><span>@(index++)</span></td>
+                    <td>@item.CreatedDate.ToString("dd/MM/yyyy  hh:mm")</td>
+                    <td>@item.Code</td>
+                    <td>
+                        @*@item.CustomerCode*@
+                        
+                        <a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { Area = "Account", Id = item.CustomerId, IsPopup = true})', '', 0, 0)">@item.CustomerCode</a>
+                    </td>
+                    <td>@item.CustomerName</td>
+                    <td>@item.ProductCode</td>
+                    <td>@item.ProductName</td>
+                    <td>
+                        @if (item.TargetModule == "ProductInvoiceDetail")
+                        {
+                            <a onclick="OpenPopup('@Url.Action("Detail", "ProductInvoice", new { Code = item.TargetCode, IsPopup = true })', '', 0, 0)">@item.TargetCode</a>
+                        }
+                        else
+                        {
+                            <a onclick="OpenPopup('@Url.Action("Detail",item.TargetModule, new { Id = item.TargetId, IsPopup = true })', '', 0, 0)">@item.TargetCode</a>
+                        }
+                    </td>
+                    <td>@(item.ExpiryDate.HasValue ? item.ExpiryDate.Value.ToString("dd/MM/yyyy  hh:mm") : "")</td>
+                    <td>@item.ManagerName</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>

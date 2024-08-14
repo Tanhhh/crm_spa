@@ -1,0 +1,179 @@
+﻿@model List<Erp.BackOffice.Crm.Models.TaskMeetingViewModel>
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+    @{
+        var path = Erp.BackOffice.Helpers.Common.GetSetting("Staff");
+        ViewBag.Title = "Log notifications";
+        bool isPopup = Request["popup"] != null && Request["popup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Task",
+            ActionName = "LogNotifications",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = false,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        var mau = "";
+    }
+    <style type="text/css">
+        .msg-photoall {
+            display: inline-block;
+            width: 60px;
+        }
+
+
+        .notificationAllLead {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: black;
+            width: 100%;
+            background-color: #fafafa;
+            border-radius: 15px;
+            border: 1px solid #fbf8df;
+        }
+
+        .msg-bodyall {
+            margin-left: 20px;
+        }
+
+        .notificationAllLeadli {
+            list-style-type: none;
+            margin-left: 40px;
+            margin-bottom: 5px;
+        }
+
+        .notificationAllLead:hover {
+            background-color: #efefef;
+            text-decoration: none;
+        }
+
+    </style>
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+    <ul>
+        <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; border-bottom: 1.5px dashed #dbdbdb; padding-bottom: 1.5rem; margin-left: 40px;">
+            <img src="~/assets/img/bell.png" alt="Alternate Text" />
+            <h3 style="margin: 0; text-transform: capitalize; font-size: 2rem; font-weight: 500;">Các Thông báo</h3>
+        </div>
+        @foreach (var item in Model)
+        {
+            <li class="notificationAllLeadli">
+                <a data-lead-id="@item.LeadId" data-is-send-allnotifications="@item.IsSendNotifications" data-id="@item.Id" data-typelead="@item.TypeLead" class="clickLead notificationAllLead">
+                    <span class="msg-photo">
+                        @if (item.Action == "MEETING")
+                        {
+                            <img src="~/assets/img/meeting.png" alt="User Avatar" class="msg-photoall">
+                        }
+                        else if (item.Action == "TASK")
+                        {
+                            <img src="~/assets/img/task.png" alt="User Avatar" class="msg-photoall">
+                        }
+                        else if (item.Action == "CALL")
+                        {
+                            <img src="~/assets/img/call.png" alt="User Avatar" class="msg-photoall">
+                        }
+                        else if (item.Action == "LEADCREATEZALO")
+                        {
+                            <img src="~/assets/images/zalo-icon.png" alt="User Avatar" class="msg-photoall" style="width:40px;height:40px;margin-left:10px">
+                        }
+                        else if (item.Action == "LEADCREATEFACEBOOK")
+                        {
+                            <img src="https://img.icons8.com/?size=256&id=118568&format=png" alt="User Avatar" class="msg-photoall" style="width:40px;height:40px;margin-left:10px">
+                        }
+                        else
+                        {
+                            <img src="https://img.icons8.com/?size=256&id=S2nXC8Z2nl3J&format=png" alt="User Avatar" class="msg-photoall">
+                        }
+                    </span>
+                    @if (item.Action == "LEADCREATEZALO")
+                    {
+                        <div class="msg-bodyall">
+                            <div style="display; flex; align-items:center; gap: 1rem">
+                                <span class="msg-title-leadmeetingall"><strong>Zalo</strong></span>
+                                <span class="msg-timeall">
+                                    <i class="ace-icon fa fa-clock-o"></i>
+                                    @item.CreatedDate.Value.ToString("HH:mm dd/MM/yyyy")
+                                </span>
+                            </div>
+                            <span class="msg-title-leadmeetingall">Khách hàng: @item.LeadName </span>
+                            <span class="msg-locationall" style="display: block;">Nội dung: @item.MeetingTitle</span>
+                            <span class="msg-locationall" style="display: block;">Link: @item.MeetingLocation</span>
+
+                        </div>
+                    }
+                    else if (item.Action == "LEADCREATEFACEBOOK")
+                    {
+                        <div class="msg-bodyall">
+                            <div style="display; flex; align-items:center; gap: 1rem">
+                                <span class="msg-title-leadmeetingall"><strong>FACEBOOK</strong></span>
+                                <span class="msg-timeall">
+                                    <i class="ace-icon fa fa-clock-o"></i>
+                                    @item.CreatedDate.Value.ToString("HH:mm dd/MM/yyyy")
+                                </span>
+                            </div>
+                            <span class="msg-title-leadmeetingall">Khách hàng: @item.LeadName </span>
+                            <span class="msg-locationall" style="display: block;">Nội dung: @item.MeetingTitle</span>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="msg-bodyall">
+                            <div style="display; flex; align-items:center; gap: 1rem">
+                                <span class="msg-title-leadmeetingall"><strong>@item.Action</strong></span>
+                                <span class="msg-timeall">
+                                    <i class="ace-icon fa fa-clock-o"></i>
+                                    @item.CreatedDate.Value.ToString("HH:mm dd/MM/yyyy")
+                                </span>
+                            </div>
+                            <span class="msg-title-leadmeetingall">@item.MeetingTitle (Thời lượng: @item.MeetingTime phút) </span>
+                            @*<span class="msg-locationall" style="display: block;">Địa chỉ: @item.MeetingLocation</span>*@
+
+                        </div>
+                    }
+                </a>
+            </li>
+        }
+    </ul>
+
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js" type="text/javascript"></script>
+    <script src="~/signalr/hubs"></script>
+    @section Scripts {
+        <script type="text/javascript">
+
+
+            // This optional function html-encodes messages for display in the page.
+            function htmlEncode(value) {
+                var encodedValue = $('<div />').text(value).html();
+                return encodedValue;
+            }
+
+            $(document).ready(function () {
+                $('[data-rel="tooltip"]').tooltip({ container: 'body' });
+                $('.clickLead').each(function () {
+                    var isSendNotifications = $(this).data('is-send-allnotifications'); 
+                    if (isSendNotifications === 0) {
+                        $(this).closest('li').find('.notificationAllLead').addClass('sent-notification');
+                        $(this).find('.msg-bodyall').css('font-weight', 'bold');
+                    } else {
+                        $(this).closest('li').find('.notificationAllLead').removeClass('sent-notification'); 
+                        $(this).find('.msg-bodyall').css('font-weight', '');
+                    }
+                });
+            });
+
+        </script>
+    }

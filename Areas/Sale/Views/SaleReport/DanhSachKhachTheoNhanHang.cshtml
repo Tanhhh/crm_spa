@@ -1,0 +1,184 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@using GridMvc.Html
+@using Erp.BackOffice.Areas.Cms.Models
+@model IEnumerable<ProductInvoiceViewModel>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+@{
+    ViewBag.Title = "Danh sách khách hàng theo nhãn hàng";
+    if (Request["IsPopup"] == "true")
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        if (Request["IsPopup"] == "null")
+        {
+            Layout = null;
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+    }
+    bool IsDisplaySearchPanel = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? false : true;
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "DanhSachKhachTheoNhanHang",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = IsDisplaySearchPanel,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int index = 1;
+
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+
+    decimal _TongDS = ViewBag.total_ds;
+    decimal _TongDT = ViewBag.total_dt;
+    decimal _TongCN = ViewBag.total_cn;
+    int rowNumber = 0;
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.category;
+    string Brand = Request["Brand"];
+}
+
+
+<script type="text/javascript">
+    var exportThis = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function () {
+            var ctx = { worksheet: '@ViewBag.Title' || 'Worksheet', table: document.getElementById("cTable").innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+
+    var exportThisWithParameter = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function (tableID, excelName) {
+            tableID = document.getElementById(tableID)
+            var ctx = { worksheet: excelName || 'Worksheet', table: tableID.innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+</script>
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+        <span class="input-daterange input-group" style="z-index:1002">
+            @Html.TextBox("StartDate", Request["StartDate"] != null ? Request["StartDate"] : "", new { autocomplete = "off", placeholder = "Từ ngày" })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("EndDate", Request["EndDate"] != null ? Request["EndDate"] : "", new { autocomplete = "off", placeholder = "Đến ngày" })
+        </span>
+          
+        @Html.TextBox("ManagerStaffName", Request["ManagerStaffName"], new { @class = "", autocomplete = "off", placeholder = "Tên người quản lý..." })
+        @Html.TextBox("CustomerCode", Request["CustomerCode"], new { @class = "", autocomplete = "off", placeholder = "Mã hoặc tên khách hàng..." })
+        @Html.TextBox("Phone", Request["Phone"], new { @class = "", autocomplete = "off", placeholder = "Số Điện Thoại..." })
+
+        <select style="text-align-last:center; width:125px" class="item_countForBrand" id="Brand" name="Brand">
+            <option value=""> Chọn nhãn hàng</option>
+            @foreach (var item in origin)
+            {
+                <option @(Brand == item.Value ? "Selected" : "") value="@item.Value"> @item.Name </option>
+            }
+        </select>
+    </p>
+}
+
+<div class="table-responsive" id="TopDichVu" style="margin-bottom:40px">
+    @Html.Grid(Model).Columns(columns =>
+        {
+            columns.Add().Titled("STT").SetWidth(50).RenderValueAs(n =>
+            {
+                rowNumber++;
+                
+                return @<text> @(rowNumber) </text>;
+            });
+            columns.Add(n => n.ManagerStaffName).Titled("Người Quản Lý").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => n.ManagerStaffName).Sortable(true);
+            columns.Add().Titled("Nhóm Hưởng Doanh Số").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => n.NhomNVKD);
+            columns.Add(n => n.CustomerCode).Titled("Mã Số").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => n.CustomerCode).Sortable(true);
+            columns.Add().Titled("Tên").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => n.CustomerName);
+            columns.Add(n => n.Phone).Titled("SĐT").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => n.Phone).Sortable(true);
+            columns.Add().Titled("Địa Chỉ").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => n.Address);
+            columns.Add(n => n.CountForBrand).Titled("Nhãn Hàng").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => n.CountForBrand).Sortable(true);
+            columns.Add(u => u.StartDate).Titled("Ngày Bắt Đầu Giao Dịch").SetWidth(100).Sanitized(false).Encoded(false).Format("{0:dd/MM/yyyy}");
+            columns.Add(u => u.EndDate).Titled("Lần Cuối Giao Dịch").SetWidth(100).Sanitized(false).Encoded(false).Format("{0:dd/MM/yyyy}");
+            columns.Add().Titled("Doanh Số").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => CommonSatic.ToCurrencyStr((n.TotalAmount), null));
+            columns.Add().Titled("Doanh Thu").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => CommonSatic.ToCurrencyStr((n.DoanhThu), null));
+            columns.Add().Titled("Còn Nợ").SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => CommonSatic.ToCurrencyStr((n.tienconno), null));
+        }).WithPaging(50)
+
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <td style="text-align:right; width: 950px"><b>Tổng:</b></td>
+                <td style="text-align: right; width: 100px"><b>@(CommonSatic.ToCurrencyStr(_TongDS, null))</b></td>
+                <td style="text-align: right; width: 100px"><b>@(CommonSatic.ToCurrencyStr(_TongDT, null))</b></td>
+                <td style="text-align: right; width: 100px"><b>@(CommonSatic.ToCurrencyStr(_TongCN, null))</b></td>
+            </tr>
+        </thead>
+    </table>
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportThis()">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+}
+
+<script src="~/Scripts/jquery.floatThead.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#cTable").floatThead({ top: 30 });
+    });
+</script>
+
+
+@section Scripts {
+    <script>
+        function exportThis() {
+            var StartDate = $('#StartDate').val();
+            var EndDate = $('#EndDate').val();
+            var ManagerStaffName = $('#ManagerStaffName').val();
+            var CustomerCode = $('#CustomerCode').val();
+            var Phone = $('#Phone').val();
+            var Brand = $('#Brand').val();
+
+            OpenPopup('/SaleReport/ExportDanhSachKhachHangTheoNhanHang?StartDate=' + StartDate + '&EndDate=' + EndDate + '&ManagerStaffName=' + ManagerStaffName + '&CustomerCode=' + CustomerCode + '&Phone=' + Phone + '&Brand=' + Brand + '&IsPopup=true', '', 0, 900);
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 200000);
+            HideLoading();
+        }
+        $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+        });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

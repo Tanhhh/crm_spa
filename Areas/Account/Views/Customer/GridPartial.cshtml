@@ -1,0 +1,161 @@
+﻿@using GridMvc.Columns
+@model GridMvc.IGrid
+@if (Model == null) { return; }
+@if (Model.RenderOptions.RenderRowsOnly)
+{
+    @RenderGridBody();
+}
+else
+{
+
+    <style>
+
+        /*Table*/
+
+        .grid-mvc {
+            overflow: auto;
+        }
+
+        .grid-wrap {
+            width: 290rem;
+        }
+
+        table.grid-table {
+            border: none;
+        }
+
+        table {
+            border-collapse: unset;
+            border-spacing: 0;
+        }
+
+            table.grid-table .grid-header {
+                background: #fff;
+                background-image: none;
+                background-image: -o-linear-gradient(top, #f8f8f8 0, #ececec 100%);
+                background-image: none;
+                background-repeat: none;
+                filter: none;
+            }
+
+        .table > caption + thead > tr:first-child > td, .table > caption + thead > tr:first-child > th, .table > colgroup + thead > tr:first-child > td, .table > colgroup + thead > tr:first-child > th, .table > thead:first-child > tr:first-child > td, .table > thead:first-child > tr:first-child > th {
+            /* border-top: 0; */
+        }
+
+        .table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+            /* border: 1px solid #ddd; */
+            background: #ffff;
+        }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            /* border-right: unset; */
+        }
+
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            /* border-right: 1px solid #ddd; */
+        }
+
+        .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+            /* border-bottom-width: 2px; */
+        }
+
+        .table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+            /* border: 1px solid #ddd; */
+        }
+
+            .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+                /* border-bottom-width: 2px; */
+            }
+
+            .table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+                border-right: none !important;
+                border-left: none !important;
+            }
+
+                .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+                    border-bottom-width: 0;
+                }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 8px !important;
+        }
+
+        .table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+            /* border: 1px solid #ddd; */
+            background: #ffff;
+        }
+
+
+
+            .table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+                border: none !important;
+            }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            border-right: none !important;
+        }
+
+            .table > thead > tr > th.grid-header {
+                border-right: none;
+                border-left: none;
+            }
+    </style>
+
+
+    <div class="grid-mvc" data-lang="@Model.Language" data-gridname="@Model.RenderOptions.GridName" data-selectable="@Model.RenderOptions.Selectable.ToString().ToLower()" data-multiplefilters="@Model.RenderOptions.AllowMultipleFilters.ToString().ToLower()">
+        <div class="grid-wrap">
+            <table class="table table-striped grid-table">
+                @* Draw grid header *@
+                <thead>
+                    @RenderGridHeader()
+                </thead>
+                <tbody>
+                    @RenderGridBody()
+                </tbody>
+            </table>
+            @RenderGridPager()
+        </div>
+    </div>
+}
+@helper RenderGridBody()
+{
+    if (!Model.ItemsToDisplay.Any())
+    {
+        <tr class="grid-empty-text">
+            <td colspan="@Model.Columns.Count()">
+                @Model.EmptyGridText
+            </td>
+        </tr>
+    }
+    else
+    {
+        foreach (object item in Model.ItemsToDisplay)
+        {
+            <tr class="grid-row @Model.GetRowCssClasses(item)">
+                @foreach (IGridColumn column in Model.Columns)
+                {
+                    @column.CellRenderer.Render(column, column.GetCell(item))
+                }
+            </tr>
+        }
+    }
+}
+@helper RenderGridHeader()
+{
+    <tr>
+        @foreach (IGridColumn column in Model.Columns)
+        {
+            @column.HeaderRenderer.Render(column)
+        }
+    </tr>
+}
+@helper RenderGridPager()
+{
+    if (Model.EnablePaging && Model.Pager != null)
+    {
+        <div class="grid-footer">
+            @Html.Partial(Model.Pager.TemplateName, Model.Pager)
+        </div>
+    }
+}

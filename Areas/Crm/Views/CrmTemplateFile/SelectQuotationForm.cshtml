@@ -1,0 +1,115 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Crm.Models;
+@using Erp.BackOffice.Sale.Models
+@{
+    ViewBag.Title = "Chọn File Mẫu";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CrmTemplateFile",
+        ActionName = "SelectQuotationForm",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    var datasl = ViewBag.DataSel as IEnumerable<CrmTemplateFileViewModel>;
+    var datalist = ViewBag.DataList as IEnumerable<LeadQuotationIndex>;
+    var leadId = ViewBag.LeadId;
+}
+<div style="margin-left:40px">
+    <div>
+        <label class="form-label" style="font-weight:bold">File mẫu</label>
+        <select data-val="true" class="form-control" id="iFileName" name="iFileName" style="margin-left: 20px; height: 30px; width: 300px">
+            @if (datasl != null)
+            {
+                foreach (var item in datasl)
+                {
+                    <option value="@item.FileName">@item.FileName</option>
+                }
+            }
+
+        </select>
+    </div>
+    <div style="margin-top: 20px;">
+        <label class="form-label" style="font-weight:bold">Số báo giá</label>
+        <select data-val="true" class="form-control" id="iCodeQuota" name="iCodeQuota" style="margin-left: 20px; height: 30px; width: 300px">
+            @if (datasl != null)
+            {
+                foreach (var item in datalist)
+                {
+                    <option value="@item.Code">@item.Code</option>
+                }
+            }
+
+        </select>
+    </div>
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <a class="btn btn-info btn-mini" href="#" onclick="onClickIn()">
+        <i class="ace-icon fa fa-download"></i>
+        In báo giá
+    </a>
+}
+<link href="~/assets/toastr/toastr.min.css" rel="stylesheet" />
+<script src="~/assets/toastr/toastr.min.js"></script>
+<script>
+
+    function onClickIn() {
+        window.parent.postMessage('showloadding', '*');
+        var fileName = $('#iFileName').val();
+        var codequo = $('#iCodeQuota').val();
+        if (fileName == null || codequo == null) {
+            toastr.warning("Vui lòng chọn chọn đầy đủ File mẫu và Số báo giá", "Thông báo");
+        } else {
+            checkFileExists(fileName, function (isValid) {
+                if (isValid) {
+                    $.ajax({
+                        url: '/CrmTemplateFile/PrintFileInTL',
+                        type: "GET",
+                        data: { fileName: fileName, codeQuo: codequo },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data != null) {
+                                $.ajax({
+                                    url: '/CrmTemplateFile/UpdateLeadLogDownloadFile',
+                                    type: "POST",
+                                    data: { leadId: @leadId },
+                                    success: function (rs) { }
+                                });
+                                var url = '/CrmTemplateFile/DownloadFileXLSX?fileNames=' + data.fileName;
+                                window.parent.postMessage({
+                                    type: 'downloadFileIn',
+                                    data: url,
+                                    fileName: data.fileName
+                                }, '*');
+                                window.parent.ClosePopup();
+                            }
+                        },
+                        complete: function () {
+                            window.parent.postMessage('hiddenloadding', '*');
+                        }
+                    });
+                } else {
+                    window.parent.postMessage('hiddenloadding', '*');
+                    toastr.warning('File mẫu ' + fileName + 'không tồn tại trong hệ thống!');
+                    return;
+                }
+            });
+        }
+    }
+     function checkFileExists(fileName, callback) {
+         $.ajax({
+             url: '/CrmTemplateFile/CheckFileExists',
+             type: 'POST',
+             data: { fileName: fileName },
+             success: function (rs) {
+                 debugger;
+                 callback(rs.Success);
+             }
+         });
+     }
+</script>

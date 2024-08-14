@@ -1,0 +1,93 @@
+@model Erp.BackOffice.Areas.Crm.Models.CrmEmailFooterViewModel
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = Wording.PageIndex_TemplatePrint;
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CrmTemplate",
+        ActionName = "CreateFooterEmail",
+        PageTitle = "Tạo mới Email Footer",
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm("CreateFooterEmail", "CrmTemplate", FormMethod.Post))
+{
+    <br />
+    @Html.LabelFor(model => model.Logs, htmlAttributes: new { @class = "control-label col-md-2" })
+
+    <div class="row">
+
+        <div class="col-md-12">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <div class="col-md-10">
+                    @Html.TextAreaFor(model => model.Logs, new { @class = "form-control", id = "ContentEmail" })
+                    @Html.ValidationMessageFor(model => model.Logs, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+    <br />
+    <br />
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="pull-left">
+                <a class="btn btn-info btn-mini" href="@Url.Action("IndexFooterEmail", "CrmTemplate")">
+                    Quay lại trang
+                </a>
+            </div>
+            <div class="pull-left" style="margin-left:5px">
+
+                <input type="submit" value="Tạo mới" class="btn btn-mini btn-primary" />
+
+            </div>
+        </div>
+    </div>
+
+}
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Configure CKEditor with custom toolbar for email composition
+            CKEDITOR.replace('ContentEmail', {
+                toolbar: [
+                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                    { name: 'styles', items: ['Format', 'FontSize'] },
+                    { name: 'colors', items: ['TextColor', 'BGColor'] },
+                    { name: 'paragraph', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                    { name: 'links', items: ['Link', 'Unlink'] },
+                    { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] }
+                ],
+                // Remove unwanted plugins
+                removePlugins: 'elementspath',
+                // Set default CKEditor height
+                height: 300,
+            });
+        });
+    </script>
+}

@@ -1,0 +1,243 @@
+﻿@using Erp.BackOffice.Sale.Models
+
+@{
+    var lsstatus = ViewBag.lsstatus as IEnumerable<StatusLeadModel>;
+    var lead = ViewBag.lead as LeadModel;
+    var kq = (int?)ViewBag.kq;
+    Layout = "";
+    bool moveabletrue = false;
+}
+
+<style>
+
+    #StatusHeader label {
+        width: 4.74% !important;
+        /* background-color: #03a9f4a1 !important; */
+        padding: 5px;
+        transition: all 1s;
+        text-transform: uppercase;
+        border-radius: 5px;
+        margin-left: -4px;
+    }
+
+    .endLead {
+        width: 6.6% !important;
+        height: 30px;
+        width: 50px;
+        background-color: #d9edf7;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%) !important;
+        outline: none;
+        border: none;
+        border-bottom: 1px solid #ff0736 !important;
+        cursor: pointer !important;
+    }
+
+        .endLead:hover {
+            background-color: #64da69cc !important;
+            transform-origin: left;
+            width: fit-content !important;
+            clip-path: polygon(0% 0%, 100% 0, 100% 50%, 100% 100%, 0% 100%) !important;
+            box-shadow: inset 200px 0em 0 0 #64da6954;
+            border-radius: 5px;
+            transition: .7s linear;
+        }
+</style>
+@if (lsstatus != null && lsstatus.Count() > 0)
+{
+    bool chkcolor = lead.StatusId > 0 ? false : true;
+    foreach (var item in lsstatus)
+    {
+        if ((item.NotMoveable == true) && item.Id == lead.StatusId)
+        {
+            moveabletrue = true;
+        }
+
+        <label @(item.EndStatus == true ? "Id=KM" : item.EndStatus == false ? "Id=KCM" : "") for="@item.Id" title="@item.Name" style="border-bottom: 1px solid @item.ColorStatus;cursor:pointer;
+        height: 30px;
+        width:50px;
+        @(chkcolor?"background-color:#d9edf7;":"")
+        clip-path: polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%);
+        text-overflow:ellipsis;
+        white-space:nowrap;
+        " class="@(chkcolor?"":"bg-info")">@item.Name<input id="@item.Id" hidden type="radio" name="status" data-endst="@item.EndStatus" value="@item.Id" /></label>
+        if (item.Id == lead.StatusId)
+        {
+            chkcolor = true;
+        }
+    }
+    <button @(ViewBag.chkend > 0 ? "hidden" : "") class="endLead" onclick="CheckBeforeOpen()" title="Kết thúc LEAD" type="button">KẾT THÚC LEAD</button>
+}
+
+@if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("UpdateStatusLeadForCheckRight", "AdviseCard", "Sale"))
+{
+    <script>
+    $(function () {
+        debugger;
+        if (@(moveabletrue ? "true" : "false")) {
+            console.log("Đã ở trạng thái không thể thay đổi");
+        } else {
+            $('input[name=status]').change(function () {
+                if ($(this).data('endst') === 'False') { // Kiểm tra giá trị data-endst
+                    return
+                } else if ($(this).data('endst') === 'True') { return} else {
+                    f5StatusLead($('input[name=status]:checked').val())
+                }
+            });
+
+        }
+    })
+    </script>
+    <script>
+
+    $(document).ready(function () {
+        $('label').filter('[title="Khách mua"]').addClass('customerPurchaseLabel');
+        $('label').filter('[title="Chưa mua"]').addClass('customerPurchaseLabel');
+        setCurrentDateCustomerPurchase();
+    });
+    $('.customerPurchaseLabel').click(function () {
+        if ($('.customerPurchaseLabel').hasClass('bg-info')) {
+            return;
+        }
+        var endst = $(this).find('input[type="radio"]').data('endst');
+        var label = $('.customerPurchaseModal').find('label[for="reasoncustomerPurchaseModal"]');
+        var selectReason = $('.customerPurchaseModal').find('#reasoncustomerPurchaseModal');
+        var selectBrand = $('.customerPurchaseModal').find('#brandcustomerPurchaseModal');
+
+        var statusId = $(this).find('input[type="radio"]').val();
+        var tittlePurchase = $('.customerPurchaseModal').find('#tillePurchaseModal');
+        $('.customerPurchaseModal').attr('data-statusId', statusId);
+
+        if (endst === 'True') {
+            label.text('Lý do mua');
+            tittlePurchase.text('Chi tiết kết quả: Đã mua');
+
+        } else {
+            label.text('Lý do chưa mua');
+            tittlePurchase.text('Chi tiết kết quả: Chưa mua')
+
+        }
+        $.ajax({
+            url: '/AdviseCard/KetThucLeadCategoryGet',
+            type: 'GET',
+            dataType: 'json',
+            success: function (jsonDataList) {
+                // Xóa các tùy chọn cũ trong select
+                selectReason.empty();
+                if (label.text() === 'Lý do mua') {
+                    selectReason.append($('<option>', {
+                        value: '',
+                        text: '' // Bạn có thể đặt văn bản cho tùy chọn trống nếu cần
+                    }));
+                }
+                // Thêm các tùy chọn mới từ dữ liệu nhận được từ AJAX
+                $.each(jsonDataList, function (index, category) {
+                    selectReason.append($('<option>', {
+                        value: category.Value,
+                        text: category.Name
+                    }));
+                });
+            },
+            error: function (xhr, status, error) {
+                // Xử lý lỗi nếu cần
+                console.error(error);
+            }
+        });
+        $.ajax({
+            url: '/AdviseCard/OriginCategoryGet',
+            type: 'GET',
+            dataType: 'json',
+            success: function (jsonDataList) {
+                // Xóa các tùy chọn cũ trong select
+                selectBrand.empty();
+                if (label.text() === 'Lý do chưa mua') {
+                    selectBrand.append($('<option>', {
+                        value: '',
+                        text: '' // Bạn có thể đặt văn bản cho tùy chọn trống nếu cần
+                    }));
+                }
+                // Thêm các tùy chọn mới từ dữ liệu nhận được từ AJAX
+                $.each(jsonDataList, function (index, category) {
+                    selectBrand.append($('<option>', {
+                        value: category.Value,
+                        text: category.Name
+                    }));
+                });
+            },
+            error: function (xhr, status, error) {
+                // Xử lý lỗi nếu cần
+                console.error(error);
+            }
+        });
+        $('.customerPurchaseModal').show();
+
+    });
+    // cập nhật status bảng lead
+
+
+    $('.cancelCustomerPurchaseModal').click(function () {
+        // Ẩn modal và lớp mờ
+        $('.customerPurchaseModal').hide();
+    });
+    $('.modal-overlay').click(function () {
+        $('.customerPurchaseModal').hide();
+    });
+
+    // Ngăn chặn sự kiện click từ overlay truyền ra ngoài
+    $('.modal-content').click(function (event) {
+        if (!$(event.target).is('#btnCloseAdd')) {
+            event.stopPropagation();
+        }
+    });
+
+    function formatCurrencyCustomerPurchaseModal(input) {
+        var value = input.value;
+
+        var numberValue = parseInt(value.replace(/\./g, ''));
+
+        if (!isNaN(numberValue)) {
+            var stringValue = numberValue.toString();
+            var formattedValue = "";
+            for (var i = 0; i < stringValue.length; i++) {
+                formattedValue += stringValue[i];
+                if ((stringValue.length - i - 1) % 3 === 0 && i !== stringValue.length - 1) {
+                    formattedValue += ".";
+                }
+            }
+
+            // Gán giá trị đã định dạng lại cho input
+            input.value = formattedValue;
+        }
+    }
+
+    function setCurrentDateCustomerPurchase() {
+        var currentDate = new Date();
+        var formattedDate = currentDate.toISOString().slice(0, 10);
+        $('#endDatecustomerPurchaseModal').val(formattedDate);
+    }
+
+    </script>
+}
+else
+{
+    <script>
+        $(function () {
+            debugger;
+            if (@(moveabletrue ? "true" : "false")) {
+                console.log("Đã ở trạng thái không thể thay đổi");
+            } else {
+                $('input[name=status]').change(function () {
+                    if ($(this).data('endst') === 'False') {
+                        return
+                    } else if ($(this).data('endst') === 'True') { return} else {
+                        return;
+                    }
+                });
+
+            }
+        })
+    </script>
+}
+
+@* Khách mua-Chưa mua*@

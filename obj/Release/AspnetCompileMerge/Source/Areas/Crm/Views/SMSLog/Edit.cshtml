@@ -1,0 +1,138 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Crm.Models
+
+@model SMSLogViewModel
+@{
+    ViewBag.Title = Wording.PageEdit_SMSLog;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SMSLog",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+}
+
+
+@section HeadOfPage {
+
+    @Html.ScriptTop_ChosenStyle()
+
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm("Edit", "SMSLog", FormMethod.Post))
+{
+
+
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Edit", "SMSLog", "Crm"))
+    {
+
+    //<input id="body" name="body" type="text" value="body" />
+    <h2>Soạn nội dung tin nhắn:</h2>
+    <div class="form-group">
+       
+        <textarea id="body" name="body" type="text" style="width:80%;height:300px;"></textarea>
+        <input type="hidden" name="IsPopup" value="false">
+        <input type="hidden" name="UrlReferrerEdit" value="@Request.UrlReferrer" />
+        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+        <input id="TargetID" name="TargetID" type="hidden" value="@ViewBag.Id">
+        <input id="TargetModule" name="TargetModule" type="hidden" value="@ViewBag.TargetModule">
+        <input id="strIdKH" name="strIdKH" type="hidden" value="@ViewBag.strIdKH">
+    </div>
+
+    <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+        <i class="fa fa-paper-plane" aria-hidden="true"></i>
+        @Wording.Send
+    </button>
+    <button style="display:inline; height:30px;" name="quaylai" value="true" class="btn btn-mini btn-danger">
+
+        <input id="TargetID" name="TargetID" type="hidden" value="@ViewBag.TargetID">
+        <input id="TargetModule" name="TargetModule" type="hidden" value="Campaign">
+
+        <p>quay lại</p>
+    </button>
+}
+
+
+
+}
+
+
+@section Scripts {
+    <script>
+   var urlRefer = '@ViewBag.urlRefer';
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.Id" >@Model.Body</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                //nếu có url thì gọi hàm này để trang ngoài iframe nhảy trang
+                if (urlRefer != '') {
+                    window.parent.ClosePopupAndRedirectToURL(urlRefer);
+                }
+                window.parent.ClosePopupAndDoSomething(option);
+            }
+        });
+       $(document).ready(function () {
+           $('[data-rel="tooltip"]').tooltip({ container: 'body' });
+
+       });
+       var url = '/api/BackOfficeServiceAPI/FetchCustomerPhone';
+       var phone = $('#Phone'); // cache it
+
+       $("#CustomerID").change(function () {
+           var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+           $.getJSON(url, { CustomerID: id }, function (response) {
+               phone.val(response);
+               phone.text(response);
+           });
+
+       });
+
+       function initCkeditor() {
+           $('.ckeditor').ckeditor({
+               "extraPlugins": 'imagebrowser',
+               "imageBrowser_listUrl": "@Url.Action("ListJson","Images")",
+               // Define the toolbar groups as it is a more accessible solution.
+               toolbarGroups: [
+                   { "name": "document", "groups": ["mode", "document", "doctools"] },
+                   { "name": "editing", "groups": ["find", "selection", "spellchecker"] },
+                   { "name": "forms" },
+                   { "name": "tools" },
+                   { "name": "basicstyles", "groups": ["basicstyles", "cleanup"] },
+                   { "name": "clipboard", "groups": ["clipboar", "undo"] },
+                   { "name": "links", "groups": ["links"] },
+                   { "name": "paragraph", "groups": ["list", "blocks"] },
+                   { "name": "insert", "groups": ["insert"] },
+                   { "name": "styles", "groups": ["styles"] },
+                   //{ "name": "about", "groups": ["about"] },
+                   { "name": "styles" },
+                   { "name": "colors" },
+                   { "name": "align", "groups": ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+
+               ],
+           // Remove the redundant buttons from toolbar groups defined above.
+           removeButtons: 'Underline,Strike,Subscript,Superscript,Anchor,Styles,Specialchar'
+       });
+       }
+    </script>
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/mm/yyyy")
+    @Html.ScriptBottom_ChosenStyle()
+}
+
+
+
+

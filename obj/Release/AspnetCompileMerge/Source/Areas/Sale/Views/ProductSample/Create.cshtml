@@ -1,0 +1,290 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Staff.Models
+@using Erp.BackOffice.Account.Models
+@using Erp.Domain.Sale.Entities
+@model ProductSampleViewModel
+
+@{
+    if(Model.Id>0)
+    {   
+        ViewBag.Title = "Cập nhật chương trình Sample";
+    }
+    else
+    { 
+    ViewBag.Title = "Thêm mới chương trình Sample";
+    }
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "ProductSample",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+<link href="/assets/css/combojax.css" rel="stylesheet" />
+    <style>
+        /*#ProductName{
+            padding: 0;
+            margin: 0;
+            text-align: right;
+        }*/
+        .box {
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+            margin-top: 0px !important;
+        }
+
+        .popover {
+            width: 100% !important;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+    </style>
+    <style type="text/css">
+        .table-detail {
+            display: none;
+        }
+
+        .open {
+            display: block;
+        }
+
+        .show-details-btn {
+            cursor: pointer;
+        }
+
+        table > tbody > tr > td.cell-has-table {
+            padding: 0 !important;
+        }
+
+            table > tbody > tr > td.cell-has-table.open {
+                padding: 8px;
+                display: table-cell;
+            }
+    </style>
+
+}
+
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "CreateProductSample", @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    @Html.HiddenFor(model => model.AssignedUserId)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.HiddenFor(model => model.Status)
+    @Html.HiddenFor(model => model.BranchId)
+    <div class="row">
+        <div class="col-sm-7">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title">Thông tin khách hàng được tặng sample</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                      
+                        <div class="product-search-box clearfix " style="margin-bottom:10px">
+                            <a class="btn btn-mini btn-primary" onclick="OpenPopup('/Customer/Index?IsPopup=true', 'Tìm kiếm dữ liệu', 800, 600)">
+                                <i class="ace-icon fa fa-search"></i> Thêm khách hàng
+                            </a>
+                        </div>
+                        @* delete *@
+                        <div id="discount" class="tab-pane active table-responsive clearfix">
+                            <table id="tableCustomer" class="table table-bordered grid-table">
+                                <thead>
+                                    <tr>
+                                        <th class="grid-header" width="60">STT</th>
+                                        <th class="grid-header" width="60">Mã KH</th>
+                                        <th class="grid-header">Tên khách hàng</th>
+                                        <th class="grid-header">Ghi chú</th>
+                                        <th class="grid-header"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="detailList">
+                                    <tr role="0" hidden>
+                                        <td class="text-center">
+                                            1
+                                        </td>
+                                        <td>
+                                            <input class="item_id" type="hidden" id="DetailList_0__Id" name="DetailList[0].Id" value="0" />
+                                            <input class="item_customer_id" type="hidden" id="DetailList_0__CustomerId" name="DetailList[0].CustomerId" value="0" />
+                                            <span class="item_customer_code"></span>
+                                        </td>
+                                        <td>
+                                            <span class="item_customer_name"></span>
+                                        </td>
+                                        <td class="">
+                                            <input class="item_note" type="text" id="DetailList_0__Note" name="DetailList[0].Note" value="" style="width:80px" />
+                                        </td>
+                                        <td class="text-center">
+                                            <a class="btn-delete-item">
+                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    @for (int i = 0; i < Model.DetailList.Count(); i++)
+                                    {
+                                        <tr role="@(i+1)">
+                                            <td class="text-center">
+                                               @(i + 1)
+                                            </td>
+                                            <td>
+                                                <input class="item_id" type="hidden" id="DetailList_@(i+1)__Id" name="DetailList[@(i+1)].Id" value="@Model.DetailList[i].Id" />
+                                                <input class="item_customer_id" type="hidden" id="DetailList_@(i+1)__CustomerId" name="DetailList[@(i+1)].CustomerId" value="@Model.DetailList[i].CustomerId" />
+                                                <span class="item_customer_code">@Model.DetailList[i].CustomerCode</span>
+                                            </td>
+                                            <td>
+                                                <span class="item_customer_name">@Model.DetailList[i].FirstName @Model.DetailList[i].LastName</span>
+                                            </td>
+                                            <td class="">
+                                                <input class="item_note" type="text" id="DetailList_@(i+1)__Note" name="DetailList[@(i+1)].Note" value="@Model.DetailList[i].Note" style="width:80px" />
+                                            </td>
+                                            <td class="text-center">
+                                                <a class="btn-delete-item">
+                                                    <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title">Thông tin sample tặng</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @Html.HiddenFor(model=>model.ProductId)
+                        @if (Model.Id > 0)
+                        {
+                            @Html.CustomTextboxFor(model => model.ProductName, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" } })
+                        }
+                        else
+                        { 
+                        @Html.CustomTextboxFor(x => x.ProductName, null, null, WidthType.span12)
+                        }
+                        @Html.CustomTextAreaFor(x => x.Note, null, WidthType.span12)
+                    </div>
+                </div>
+            </div>
+            <p></p>
+
+        </div>
+    </div>
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="SaveSample" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+@section Scripts {
+
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script src="/Scripts/combojax.js"></script>
+
+    <script>
+        var $tr_template = $('.detailList tr:first-child');
+        function selectItem_Customer(id,code, name) {
+            var len = $('.detailList tr').length;
+            var tr_new = $tr_template.clone()[0].outerHTML;
+            tr_new = tr_new.replace(/\[0\]/g, "[" + len + "]");
+            tr_new = tr_new.replace(/\_0\__/g, "_" + len + "__");
+            var $tr_new = $(tr_new);
+            $tr_new.attr('role', len);
+            $tr_new.find('td:first-child').text(len);
+            $tr_new.find('.item_customer_id').val(id);
+            $tr_new.find('.item_id').val(0);
+            $tr_new.find('.item_customer_code').text(code);
+            $tr_new.find('.item_customer_name').text(name);
+            $tr_new.find('.item_note').val("");
+           
+            $('.detailList').append($tr_new);
+            var $tr_after_append = $('tr[role="' + len + '"]');
+            $tr_after_append.removeAttr("hidden", "hidden");
+            ClosePopup();
+        }
+        $(document).ready(function () {
+
+            $('#SaveSample').click(function () {
+                ShowLoading();
+                ClearFormatBeforeSubmit($("#CreateProductSample"));
+                $("#CreateProductSample").submit();
+                HideLoading();
+            });
+        });
+        $(function () {
+            var id=$("ProductId").val();
+            if (id == "") {
+                $("#ProductName").combojax({
+                    url: "/ProductSample/GetListProductZeroPrice",
+                    onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+                        //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+                    },
+                    onSelected: function (obj) {
+                        console.log(obj);
+                        if (obj) {
+                            $("#ProductId").val(obj.Id);
+                        }
+                    }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+                    , onShowImage: false                  //hiển thị hình ảnh
+                    , onSearchSaveSelectedItem: true    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+                    , onRemoveSelected: false  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+                });
+            }
+            $('#tableCustomer').on('click', '.btn-delete-item', function () {
+                $(this).closest('tr').remove();
+                $('.detailList tr').each(function (index, tr) {
+                    $(tr).attr('role', index);
+                    $(tr).find('td:first-child').text(index);
+                    $(tr).find('.item_note').attr('name', 'DetailList[' + index + '].Note').attr('id', 'DetailList_' + index + '__Note');
+                    $(tr).find('.item_id').attr('name', 'DetailList[' + index + '].Id').attr('id', 'DetailList_' + index + '__Id');
+                    $(tr).find('.item_customer_id').attr('name', 'DetailList[' + index + '].CustomerId').attr('id', 'DetailList_' + index + '__CustomerId');
+                });
+            });
+        });
+     
+    </script>
+}

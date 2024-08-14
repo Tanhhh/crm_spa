@@ -1,0 +1,313 @@
+﻿@using System.Globalization
+@using System.Web.Helpers;
+@model IEnumerable<Erp.BackOffice.Account.Models.CustomerViewModel>
+    @{
+        Layout = null;
+        var customerData = ViewBag.CustomerData as IEnumerable<Erp.BackOffice.Account.Models.CustomerViewModel>;
+        CultureInfo culture = new CultureInfo("vi-VN");
+    }
+
+    <style>
+
+        .customer-table-recover {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+        }
+
+            .customer-table-recover th,
+            .customer-table-recover td {
+                padding: 10px;
+                border: 1px solid #ddd;
+                text-align: left;
+                overflow-wrap: break-word; /* Cho phép các từ dài tự động xuống dòng */
+                max-width: 250px; /* Giới hạn chiều rộng của cột */
+            }
+
+            .customer-table-recover th {
+                background-color: #f2f2f2;
+                font-weight: bold;
+            }
+
+            .customer-table-recover tbody tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+
+            .customer-table-recover tbody tr:hover {
+                background-color: #ddd;
+            }
+
+        /* CSS cho checkbox */
+        .checkbox-container {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background-color: #fff;
+            color: #000;
+        }
+
+            .checkbox-container input[type="checkbox"] {
+                margin: 0;
+            }
+
+        /* CSS cho div chứa nút phục hồi */
+        #editshowLeadRecover {
+            margin-top: 10px; /* Khoảng cách giữa bảng và nút phục hồi */
+            text-align: center; /* Căn giữa nút phục hồi */
+        }
+
+        #btnLeadRecover {
+            border: 1px solid black;
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 15px;
+            cursor: pointer; /* Biểu tượng chuột cho nút */
+        }
+
+            #btnLeadRecover:hover {
+                background-color: #218838; /* Màu nền khi hover */
+            }
+
+        .modal-open {
+            overflow: visible !important;
+        }
+
+        #CustomerTblR_info {
+            display: none;
+        }
+
+        .dataTables_paginate {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+            .dataTables_paginate a {
+                padding: 5px 10px;
+                margin: 0 5px;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+                color: #333;
+                text-decoration: none;
+            }
+
+                .dataTables_paginate a:hover {
+                    background-color: #f0f0f0;
+                }
+
+            .dataTables_paginate .previous, .dataTables_paginate .next {
+                font-weight: bold;
+            }
+
+            .dataTables_paginate .current {
+                background-color: #007bff;
+                color: #fff;
+            }
+    </style>
+
+
+    @if (customerData != null && customerData.Any())
+    {
+        <table class="customer-table-recover" id="CustomerTblR">
+            <thead>
+                <tr>
+                    <th class="checkbox-container">
+                        <input type="checkbox" id="checkAll" class="checkbox-recover-customer">
+                    </th>
+                    <th>Stt</th> <!-- Thêm cột số thứ tự -->
+                    <th>Chi nhánh</th>
+                    <th>Họ và tên</th>
+                    <th>Liên hệ</th>
+                    <th>Địa chỉ</th>
+                    <th>Ghi chú</th>
+                    <th>Loại khách hàng</th>
+                    <th>Nguồn khách</th>
+                    <th>Birthday</th>
+                    <!-- Và các trường khác -->
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < customerData.Count(); i++)
+                {
+                    var customer = customerData.ElementAt(i);
+                    var checkboxId = "checkbox_" + i;<!-- Tạo ID duy nhất cho checkbox -->
+                    <tr>
+                        <td class="checkbox-container">
+                            <input type="checkbox" data-id="@customer.Id" class="checkbox child">
+                        </td>
+                        <td>@(i + 1)</td> <!-- Hiển thị số thứ tự -->
+                        <td>Chi nhánh @customer.BranchId </td>
+                        <td>@customer.FirstName @customer.LastName</td>
+                        <td>
+                            Phone: @customer.Phone <br>
+                            Mobile: @customer.Mobile <br>
+                            Email: @customer.Email
+                        </td>
+                        <td>@customer.Address</td>
+                        <td>@customer.Note</td>
+                        <td>@customer.CustomerType</td>
+                        <td>@customer.tenNguonkhach</td>
+                        <td>
+                            @if (customer.Birthday.HasValue)
+                            {
+                                @customer.Birthday.Value.ToString("dd/MM/yyyy")
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div id="editshowLeadRecover" style="visibility:visible;">
+            <button id="btnCustomerRecover" type="button" style="border: 1px solid black; background-color: #28a745; color: #fff; padding: 10px 15px;">Phục hồi</button>
+        </div>
+        <input type="hidden" id="customerDataLength" value="@customerData.Count()" />
+    }
+    else
+    {
+        <h1 style="text-align: center">Thùng rác rỗng</h1>
+    }
+
+    <script>
+        $(document).ready(function () {
+            $('#CustomerTblR').DataTable({
+                "paging": $('#customerDataLength').val() > 8, // Phân trang chỉ khi có nhiều hơn 10 dòng
+                "ordering": false,
+                "language": {
+                    "paginate": {
+                        "previous": "Trước",
+                        "next": "Sau"
+                    }
+                }
+            });
+
+
+
+        });
+
+
+        $(document).on('click', '#btnCustomerRecover', function () {
+            Swal.fire({
+                title: 'Bạn có chắc chắn muốn phục hồi những khác hàng này không?',
+                icon: 'check',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Phục hồi',
+                cancelButtonText: 'Không'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var arr = [];
+                    $('.checkbox.child:checked').each(function () {
+                        arr.push($(this).data('id'));
+                    });
+                    fnRecoverCus(arr);
+                } else {
+
+                }
+            })
+        })
+        function fnRecoverCus(arr) {
+            $.ajax({
+                url: "/AdviseCard/RecoverCustomer",
+                method: "post",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(arr),
+                dataType: "json",
+                success: function (data) {
+                    if (data > 0) {
+                        toastr.success('Phục hồi thành công!')
+                        SearchCustomer();
+                    } else {
+                        toastr.warning('Phục hồi thất bại!')
+                    }
+                }
+            })
+        }
+        function SearchCustomer() {
+            ShowLoading();
+            $.ajax({
+                type: "GET",
+                url: '/AdviseCard/SearchCustomerRecover',
+                processData: false,
+                contentType: false,
+                /*  async: false,*/
+                dataType: "html",
+                success: function (data, textStatus, jqXHR) {
+                    $('#LeadTbl').html(data)
+                    /*  $('.js-example-basic-single').select2();*/
+                    $('.modal-open').css('overflow', 'visible');
+                    $('.modal-open').css('padding-right', 'unset');
+                },
+                error: function (data, textStatus, jqXHR) {
+                    toastr.warning('Xảy ra lỗi!')
+                },
+                complete: function () {
+                    debugger
+                    HideLoading();
+                }
+            })
+        }
+        $(document).on('click', '#empty-trash-button', function () {
+            var chkallCheckbox = document.querySelector('#checkAll');
+            if (chkallCheckbox) {
+                chkallCheckbox.checked = true;
+            }
+
+            var ele = $('#CustomerTblR').find('.checkbox.child');
+            ele.each(function () {
+                $(this).prop('checked', true);
+            });
+
+            Swal.fire({
+                title: 'Bạn có chắc chắn muốn xóa những khác hàng này không?',
+                icon: 'check',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Xóa tất cả',
+                cancelButtonText: 'Không'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var arr = [];
+                    $('.checkbox.child:checked').each(function () {
+                        arr.push($(this).data('id'));
+                    });
+                    fnDeleteAllCustomerRecover(arr);
+                } else {
+                    // Thực hiện hành động khi người dùng hủy
+                }
+            })
+        });
+        function fnDeleteAllCustomerRecover(arr) {
+            $.ajax({
+                url: "/AdviseCard/DeleteAllCustomerRecover",
+                method: "post",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(arr),
+                dataType: "json",
+                success: function (data) {
+                    if (data > 0) {
+                        toastr.success('Xóa tất cả thành công!')
+                        SearchCustomer();
+                    } else {
+                        toastr.warning('Xóa tất cả thất bại!')
+                    }
+                }
+            })
+        }
+
+        $('#checkAll').change(function () {
+            var ele = $('#CustomerTblR').find('.checkbox.child');
+
+            if (this.checked) {
+                ele.each(function () {
+                    $(this).prop('checked', true);
+                });
+                $('#editshowLeadRecover').css('visibility', 'visible');
+            } else {
+                ele.each(function () {
+                    $(this).prop('checked', false);
+                });
+                $('#editshowLeadRecover').css('visibility', 'hidden');
+            }
+        });
+    </script>

@@ -1,0 +1,277 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+
+@model ProductSampleViewModel
+
+@{
+    if (ViewBag.IsNullLayOut == true)
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    }
+    ViewBag.Title = "Chi tiết chương trình tặng sample";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "ProductSample",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    int index = 0;
+}
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <style>
+        /*#ProductName{
+            padding: 0;
+            margin: 0;
+            text-align: right;
+        }*/
+        .box {
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+            margin-top: 0px !important;
+        }
+
+        .popover {
+            width: 100% !important;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+    </style>
+    <style type="text/css">
+        .table-detail {
+            display: none;
+        }
+
+        .open {
+            display: block;
+        }
+
+        .show-details-btn {
+            cursor: pointer;
+        }
+
+        table > tbody > tr > td.cell-has-table {
+            padding: 0 !important;
+        }
+
+            table > tbody > tr > td.cell-has-table.open {
+                padding: 8px;
+                display: table-cell;
+            }
+    </style>
+
+}
+
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@helper renderStatus(string status)
+{
+    switch (status)
+    {
+        case "pending":
+            <span class="label label-info">@Wording.ProductSampleStatus_Make</span>
+            break;
+        case "Registered":
+        <span class="label label-warning">@Wording.ProductSampleStatus_Registered</span>
+            break;
+        case "Refuse":
+        <span class="label label-warning">@Wording.ProductSampleStatus_Refuse</span>
+            break;
+        case "Cancel":
+        <span class="label label-success">@Wording.ProductSampleStatus_Cancel</span>
+            break;
+    }
+}
+
+<div class="row">
+    <div class="col-sm-7">
+
+        <h4 class="green" style="margin-top:0px">
+
+            <span>Chi tiết: @Model.Code (@Model.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm"))</span>
+
+        </h4>
+        <div id="discount" class="tab-pane active table-responsive">
+            <table id="tableCustomer" class="table table-bordered" style="margin:0px">
+                <thead>
+                    <tr>
+                        <th class="grid-header">STT</th>
+                        <th class="grid-header">Mã KH</th>
+                        <th class="grid-header">Tên khách hàng</th>
+                        <th class="grid-header">Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody class="detailList">
+                    @foreach (var item in Model.DetailList)
+                    {
+                        index++;
+                        <tr>
+                            <td>@index</td>
+                            <td>
+                                <p class="show-invoice-details-btn" data-target="@index" onclick="ShowDetailBtnInvoice(@index)">
+                                    <a class="green bigger-140" title="Xem chi tiết">
+                                        <i class="ace-icon fa fa-angle-double-down"></i>
+                                    </a>
+                                    @item.CustomerCode
+                                </p>
+                            </td>
+                            <td>@item.FirstName @item.LastName</td>
+                            <td>@item.Note</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="cell-has-table">
+                                <div id="table-invoice-detail-@index" class="table-detail">
+                                    <div class="widget-box">
+                                        <div class="widget-header">
+                                            <h5 class="widget-title">Danh sách sản phẩm/dịch vụ khách hàng đã mua</h5>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+
+                                                <div class="grid-mvc">
+                                                    <div class="grid-wrap">
+                                                        <table class="table table-striped grid-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="grid-header" width="30">STT</th>
+                                                                    <th class="grid-header">
+                                                                        <div class="grid-header-title">Ngày mua</div>
+                                                                    </th>
+                                                                    <th class="grid-header">
+                                                                        <div class="grid-header-title">Mã hóa đơn</div>
+                                                                    </th>
+                                                                    <th class="grid-header">
+                                                                        <div class="grid-header-title">Mã SP/DV</div>
+                                                                    </th>
+                                                                    <th class="grid-header">
+                                                                        <div class="grid-header-title">Tên SP/DV</div>
+                                                                    </th>
+                                                                    <th class="grid-header">
+                                                                        <div class="grid-header-title">Đơn giá</div>
+                                                                    </th>
+                                                                    <th class="grid-header">
+                                                                        <div class="grid-header-title">Số lượng</div>
+                                                                    </th>
+                                                                   
+                                                                </tr>
+
+                                                            </thead>
+                                                            <tbody class="">
+                                                                @if (item.InvoiceList.Any())
+                                                                {
+                                                                    var index2 = 0;
+                                                                    foreach (var ii in item.InvoiceList)
+                                                                    {
+                                                                        index2++;
+                                                                        <tr>
+                                                                            <td>@index2</td>
+                                                                            <td>@ii.ProductInvoiceDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                                                            <td>@ii.ProductInvoiceCode</td>
+                                                                            <td>@ii.ProductCode</td>
+                                                                            <td>@ii.ProductName</td>
+                                                                            <td>@ii.Price</td>
+                                                                            <td>@ii.Quantity</td>
+                                                                        </tr>
+                                                                    }
+                                                                }
+                                                            </tbody>
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <td colspan="6"></td>
+                                                                    <td>@item.InvoiceList.Sum(x=>x.Quantity)</td>
+                                                                </tr>
+                                                            </tfoot>
+</table>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-sm-5">
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title">Thông tin sản phẩm tặng</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="detail-view">
+
+                        <div class="row control-group">
+                            @Html.DetailViewItem(renderStatus(Model.Status), "Status", Wording.Status, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(m => m.ProductName, true, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(m => m.Note, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p></p>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script src="/Scripts/combojax.js"></script>
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+
+    <script type="text/javascript">
+        function ShowDetailBtnInvoice(targetId) {
+            $('td.cell-has-table').toggleClass('open');
+            var tableDetail = $("#table-invoice-detail-" + targetId);
+            if (tableDetail.hasClass("open")) {
+                tableDetail.removeClass("open");
+                $(".show-invoice-details-btn[data-target='" + targetId + "']").find("i").removeClass("fa-angle-double-up").addClass("fa-angle-double-down");
+            }
+            else {
+                tableDetail.addClass("open");
+                $(".show-invoice-details-btn[data-target='" + targetId + "']").find("i").removeClass("fa-angle-double-down").addClass("fa-angle-double-up");
+            }
+        };
+    </script>
+}

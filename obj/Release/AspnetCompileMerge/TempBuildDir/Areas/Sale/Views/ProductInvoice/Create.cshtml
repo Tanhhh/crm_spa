@@ -1,0 +1,527 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@model ProductInvoiceViewModel
+
+@{
+    if (Model.Id > 0)
+    {
+        ViewBag.Title = Wording.PageEdit_ProductInvoice;
+    }
+    else
+    {
+        ViewBag.Title = Wording.PageCreate_ProductInvoice;
+    }
+
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+
+    IEnumerable<SelectListItem> categoryList = (IEnumerable<SelectListItem>)ViewBag.categoryList;
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "ProductInvoice",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    IEnumerable<InventoryViewModel> productList = (IEnumerable<InventoryViewModel>)ViewBag.productList;
+    IEnumerable<SelectListItem> BranchList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Model.BranchId, Wording.Empty);
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.category;
+}
+
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <style type="text/css">
+        .mini-popup {
+            position: relative;
+            display: inline;
+        }
+
+        #popup_archive {
+            position: absolute;
+            bottom: 34px;
+            left: -154px;
+            width: 410px;
+            height: 235px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        .item {
+            /*width: 600px !important;*/
+            height: 90px !important;
+        }
+
+        /*.itemdiv > .body {
+            margin-right: 0px !important;
+        }*/
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /*font-size: 13pt ;*/
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+    </style>
+}
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger" style="margin: 30px 0px -10px 0px;">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Create", "ProductInvoice", null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.ValidationSummary(true)
+    if (Model.Id == 0)
+    {
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.CreatedUserId)
+    }
+    else
+    {
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.CreatedUserId)
+        @Html.HiddenFor(model => model.CreatedDate)
+        @Html.HiddenFor(model => model.IsDeleted)
+        @Html.HiddenFor(model => model.Code)
+        @Html.HiddenFor(model => model.Status)
+        @Html.HiddenFor(model => model.Type)
+    }
+
+    <div class="row">
+        <div class="col-sm-7 ">
+            <div class="listsearch">
+                <div>
+                    <label style="float:left">Nhãn hàng: </label>
+                    <select style="text-align-last:center;float:left;width:125px" class="item_origin" id="item_origin">
+                        <option value="">Chọn nhãn hàng </option>
+                        @foreach (var item in origin)
+                        {
+                            if (item.Value == Model.CountForBrand)
+                            {
+                                <option value="@item.Value">@item.Name</option>
+                            }
+                        }
+
+                        @foreach (var item in origin)
+                        {
+
+                            if (item.Value != Model.CountForBrand)
+                            {
+                                <option value="@item.Value">@item.Name</option>
+                            }
+
+                        }
+                    </select>
+                    &nbsp;&nbsp;&nbsp;
+                    <label>Tính cho nhãn hàng: </label>
+                    <select style="text-align-last:center;width:125px" class="item_countForBrand" id="CountForBrand" name="CountForBrand">
+                        <option value="">Chọn nhãn hàng</option>
+                        @foreach (var item in origin)
+                        {
+                            if (item.Value == Model.CountForBrand)
+                            {
+                                <option value="@item.Value">@item.Name</option>
+                            }
+                        }
+                        @foreach (var item in origin)
+                        {
+                            if (item.Value != Model.CountForBrand)
+                            {
+                                <option value="@item.Value">@item.Name</option>
+                            }
+                        }
+                    </select>
+
+                </div>
+                <div class="product-search-box clearfix " style="margin-bottom:10px">
+                    <span class="label label-warning" style="padding: 6px; float: left; height: 26px; margin-left: 0px;">[F4]</span>
+                    <div id="product_search_control">
+                        <span class="ctl">
+                            @Html.TextBox("Product", "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "off", style = "width:700px;", disabled = "true" })
+                        </span>
+
+                    </div>
+
+                </div>
+                <div id="listOrderDetail" class="table-responsive top-10 ">
+                    <table class="table table-bordered grid-table bottom-5">
+                        <thead>
+                            <tr>
+                                <th class="grid-header" width="30">STT</th>
+                                <th class="grid-header">Tên SP/DV</th>
+                                <th class="grid-header">Nhãn hàng</th>
+                                <th class="grid-header">Lô/Hạn SD</th>
+                                <th class="grid-header" width="50">SL</th>
+                                <th class="grid-header" width="90">Đơn giá</th>
+                                <th class="grid-header" width="90">Thành tiền</th>
+                                <th class="grid-header">Ghi chú</th>
+                                <th class="grid-header">Tặng</th>
+                                <th class="grid-header" width="20"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="productInvoiceList">
+                            <tr role="0" id="0" hidden>
+                                <td class="text-center">
+                                    1
+                                </td>
+                                <td>
+                                    <input class="item_id" type="hidden" id="InvoiceList_0__Id" name="InvoiceList[0].Id" value="0" />
+                                    <input class="item_product_id" type="hidden" id="InvoiceList_0__ProductId" name="InvoiceList[0].ProductId" value="0" />
+                                    <span class="item_product_name"></span>
+                                </td>
+                                <td>
+                                    <span class="item_product_origin"></span>
+                                </td>
+                                <td class="detail_locode">
+                                    <input class="item_locode valid_null" type="text" id="InvoiceList_0__LoCode" name="InvoiceList[0].LoCode" value="" style="width:80px" />
+                                    <input class="input-mask-date item_expiry_date valid_null" type="text" id="InvoiceList_0__ExpiryDate" name="InvoiceList[0].ExpiryDate" value="" style="width:80px;">
+                                </td>
+                                <td>
+                                    <input type="hidden" name="InvoiceList[0].Unit" id="InvoiceList_0__Unit" value="" class="item_unit" />
+                                    <input class="item_quantity numberinput2 text-right" type="text" id="InvoiceList_0__Quantity" name="InvoiceList[0].Quantity" value="0" style="width:100%" />
+                                </td>
+                                <td>
+                                    <input class="item_price numberinput2 text-right" type="text" id="InvoiceList_0__Price" name="InvoiceList[0].Price" value="" style="width:100%" />
+                                </td>
+                                <td align="right" id="InvoiceList_0__Total"><span class="item_total" align="right"></span></td>
+                                <td>
+                                    <input class="item_note valid_null" type="text" id="InvoiceList_0__Note" name="InvoiceList[0].Note" value="" style="width:80px" />
+                                </td>
+                                <td class="text-center">
+                                    @*<input class="item_is_TANG" type="checkbox" id="InvoiceList_0__is_TANG" name="InvoiceList[0].is_TANG"/>*@
+                                    @*<input class="checkbox1" type="checkbox" id="InvoiceList_0__is_TANG checkbox1" name="InvoiceList[0].is_TANG" style="width:30px" />*@
+                                    <input id="InvoiceList_0__is_TANG" name="InvoiceList[0].is_TANG" type="checkbox" class="ace item_is_TANG" value="1">
+                                    <span class="lbl"></span>
+
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn-delete-item">
+                                        <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                    </a>
+                                </td>
+                                <td style="display:none">
+                                    <input class="hidden_price numberinput2 text-right" type="text" id="hidden_0__Price" name="hidden[0].Price" value="" style="width:100%" />
+                                </td>
+
+                                <td style="display:none" align="right" id="hidden_0__Total"><span class="hidden_total" align="right"></span></td>
+                            </tr>
+                            @for (int i = 0; i < Model.InvoiceList.Count(); i++)
+                            {
+                                var thanh_tien = Model.InvoiceList[i].Price * Model.InvoiceList[i].Quantity;
+                                <tr role="@(i+1)" id="@(i+1)">
+                                    <td class="text-center">
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        <input class="item_id" type="hidden" id="InvoiceList_@(i+1)__Id" name="InvoiceList[@(i+1)].Id" value="@Model.InvoiceList[i].Id" />
+                                        <input class="item_product_id" type="hidden" id="InvoiceList_@(i+1)__ProductId" name="InvoiceList[@(i+1)].ProductId" value="@Model.InvoiceList[i].ProductId" />
+                                        <span class="item_product_name">@Model.InvoiceList[i].ProductName</span>
+                                    </td>
+                                    <td>
+
+                                        <input class="item_product_origin" type="hidden" id="InvoiceList_@(i+1)__Origin" name="InvoiceList[@(i+1)].Origin" value="@Model.InvoiceList[i].Origin" />
+                                        <span class="item_product_name">@Model.InvoiceList[i].Origin</span>
+                                    </td>
+                                    <td class="detail_locode">
+                                        <input class="item_locode" type="text" id="InvoiceList_@(i+1)__LoCode" name="InvoiceList[@(i+1)].LoCode" value="@Model.InvoiceList[i].LoCode" style="width:80px" />
+                                        <input class="input-mask-date item_expiry_date" type="text" id="InvoiceList_@(i+1)__ExpiryDate" name="InvoiceList[@(i+1)].ExpiryDate" value="@(Model.InvoiceList[i].ExpiryDate.HasValue ? Model.InvoiceList[i].ExpiryDate.Value.ToString("dd/MM/yyyy") : "")" style="width:80px;">
+                                    </td>
+                                    <td>
+                                        <input type="hidden" name="InvoiceList@(i+1).Unit" id="InvoiceList_@(i+1)__Unit" value="@Model.InvoiceList[i].Unit" class="item_unit" />
+                                        <input class="item_quantity numberinput2 text-right" type="text" id="InvoiceList_@(i+1)__Quantity" name="InvoiceList[@(i+1)].Quantity" value="@Model.InvoiceList[i].Quantity" style="width:100%" />
+                                    </td>
+                                    <td>
+                                        <input class="item_price numberinput2 text-right" type="text" id="InvoiceList_@(i+1)__Price" name="InvoiceList[@(i+1)].Price" value="@Model.InvoiceList[i].Price" style="width:100%" />
+                                    </td>
+                                    <td align="right" id="InvoiceList_@(i+1)__Total"><span class="item_total" align="right">@(thanh_tien.ToCurrencyStr(null))</span></td>
+
+                                    <td>
+                                        <input class="item_note" type="text" id="InvoiceList_@(i+1)__Note" name="InvoiceList[@(i+1)].Note" value="@Model.InvoiceList[i].Note" style="width:80px" />
+                                    </td>
+                                    <td class="text-center">
+
+                                        @if (@Model.InvoiceList[i].is_TANG == 1)
+                                        {
+                                            <input id="InvoiceList_@(i + 1)__is_TANG" name="InvoiceList[@(i + 1)].is_TANG" type="checkbox" class="ace item_is_TANG" value="@Model.InvoiceList[i].is_TANG" checked="checked">
+                                            <span class="lbl"></span>
+                                        }
+                                        else
+                                        {
+                                            <input id="InvoiceList_@(i + 1)__is_TANG" name="InvoiceList[@(i + 1)].is_TANG" type="checkbox" class="ace item_is_TANG" value="@Model.InvoiceList[i].is_TANG">
+                                            <span class="lbl"></span>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <a class="btn-delete-item">
+                                            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                        </a>
+                                    </td>
+                                    <td style="display:none">
+                                        <input class="hidden_price numberinput2 text-right" type="text" id="hidden_@(i+1)__Price" name="hidden[@(i+1)].Price" value="@Model.InvoiceList[i].Price" style="width:100%" />
+                                    </td>
+
+                                    <td style="display:none" align="right" id="hidden_@(i+1)__Total"><span class="hidden_total" align="right">@(thanh_tien.ToCurrencyStr(null))</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+
+                                <td colspan="4" class="red"><span id="status"></span></td>
+                                <td class="productInvoiceList_SL" align="right" style="font-weight:bold"></td>
+                                <td></td>
+                                <td class="productInvoiceList_Amount" align="right" style="font-weight:bold"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <input type="text" class="test" id="test" hidden />
+
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-spinner"></i> Tổng quan</a>
+                                </li>
+
+                                <li class="">
+                                    <a data-toggle="tab" href="#profile" aria-expanded="false"><i class="fa fa-tasks"></i> Thông tin giao hàng</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane active">
+                                    @if (Model.Id > 0)
+                                    {
+                                        <div class="detail-view">
+                                            <div class="row control-group">
+                                                @Html.DetailViewItemFor2(m => m.Code)
+                                            </div>
+                                            <div class="row control-group">
+                                                @Html.DetailViewItemFor2(m => m.CreatedUserName)
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        @*@Html.CustomTextboxFor(model => model.CreatedUserName, null, null, WidthType.span12)*@
+                                    }
+
+                                    @Html.CustomSwitchesFor(model => model.IsBonusSales, SwitchesStyle.CheckboxStyle, true)
+                                    @Html.ModulePopupFor(m => m.CustomerId, "Customer", Model.CustomerName, false, true)
+                                    @Html.HiddenFor(m => m.ProductInvoiceOldId)
+                                    @Html.HiddenFor(m => m.CustomerCode)
+                                    <div class="control-group form-group">
+                                        <label class="control-label " for="ProductInvoiceOldCode">Đơn hàng trả</label>
+                                        <div class="control-value" style="width: 52%;">
+
+                                            <div class="input-group">
+                                                <input id="ProductInvoiceOldCode" name="ProductInvoiceOldCode" type="hidden" value="">
+                                                <input id="ProductInvoiceOldCode_DisplayText" name="ProductInvoiceOldCode_DisplayText" readonly="True" type="text" value="">
+                                                <span class="input-group-addon productinvoiceoldcode" id="ProductInvoiceOldCode_DisplayText1" style="cursor:pointer">
+                                                    <i class="ace-icon fa fa-search"></i>
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    @Html.CustomTextboxFor(model => model.PlusPoint, "Giảm giá trên hóa đơn (%)", null, WidthType.span12)
+                                    @Html.CustomTextboxFor(model => model.Discount_KM, "Khuyến mãi", null, WidthType.span12)
+                                    @Html.CustomTextboxFor(model => model.Discount_DB, "Khuyến mãi đặc biệt", null, WidthType.span12)
+                                    @Html.CustomTextboxFor(model => model.Discount_VIP, "Khuyến mãi VIP", null, WidthType.span12)
+                                    @Html.CustomTextboxFor(model => model.Total_Discount, "Tổng Khuyến mãi (%)", null, WidthType.span12)
+                                    @Html.CustomTextAreaFor(model => model.Note, Wording.Note, WidthType.span12, true, null, "hide", "full-w")
+
+                                </div>
+                                <div id="profile" class="tab-pane">
+                                    @Html.CustomTextboxFor(model => model.ShipName, null, null, WidthType.span12)
+                                    @Html.CustomTextboxFor(model => model.ShipPhone, null, null, WidthType.span12)
+                                    @Html.CustomDropDownListFor(model => model.ShipCityId, SelectListHelper.GetSelectList_Location("0", null, "- Tỉnh/Thành phố -"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                                    @Html.CustomDropDownListFor(model => model.ShipDistrictId, new List<SelectListItem> { new SelectListItem { Text = "- Quận/Huyện -", Value = "" } }, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                                    @Html.CustomDropDownListFor(model => model.ShipWardId, new List<SelectListItem> { new SelectListItem { Text = "- Xã/Phường -", Value = "" } }, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                                    @Html.CustomTextboxFor(model => model.ShipAddress, null, null, WidthType.span12)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p></p>
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title"><i class="fa fa-cc-paypal"></i> Thông tin thanh toán</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @Html.CustomTextboxFor(model => model.TotalAmount, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.TaxFee, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.TongTienSauVAT, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" onclick="Check();">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+@section Scripts {
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script src="/Scripts/combojax.js?=vs1.01211"></script>
+    @*<script src="/Scripts/combojax.js?=vs1.01211"></script>*@
+    <script type="text/javascript">
+
+        document.getElementById("ProductInvoiceOldCode_DisplayText1").onclick = function () {
+            var CustomerCode = $("#CustomerCode").val();
+            //alert(CustomerCode);
+            OpenPopup('@Url.Action("IndexSearch_return", "ProductInvoice", new { area = "Sale" })?txtCustomerCode=' + CustomerCode + '&IsPopup=true', 'Tìm đơn hàng trả', 0, 420);
+        };
+
+        $(function () {
+            $('#Total_Discount').attr("disabled", "disabled");
+            $('#PlusPoint').attr("disabled", "disabled");
+
+            $("#Total_Discount").val($('#PlusPoint').val());
+            var Discount_KM = 0;
+            var Discount_VIP = 0;
+            var Discount_DB = 0;
+            var PlusPoin = 0;
+            $(window).click(function (event) {
+                Discount_KM = (isNaN(parseFloat($('#Discount_KM').val())) ? 0 : parseFloat($('#Discount_KM').val()));
+                PlusPoint = (isNaN(parseFloat($('#PlusPoint').val())) ? 0 : parseFloat($('#PlusPoint').val()));
+                Discount_VIP = (isNaN(parseFloat($('#Discount_VIP').val())) ? 0 : parseFloat($('#Discount_VIP').val()));
+                Discount_DB = (isNaN(parseFloat($('#Discount_DB').val())) ? 0 : parseFloat($('#Discount_DB').val()));
+
+                var totalDiscount = 0;
+                totalDiscount = (parseFloat(Discount_KM) + parseFloat(Discount_VIP) + parseFloat(Discount_DB) + parseFloat(PlusPoint));
+
+                totalDiscount = parseFloat(totalDiscount);
+                //$('#Total_Discount').val(totalDiscount);
+                $('#Total_Discount').val(totalDiscount);
+                var total = 0;
+                total += parseFloat(removeComma($('#TotalAmount').val()));
+                var vat = parseFloat(removeComma($('#TaxFee').val()));
+                var totalVAT = (total + total * vat / 100) * ((100 - totalDiscount) / 100);
+                $('#mask-TongTienSauVAT').val(numeral(totalVAT).format('0,0'));
+                $('#TongTienSauVAT').val(numeral(totalVAT).format('0,0'));
+            });
+            //$('#Discount_KM').keypress(function () {
+            //    $(window).click(function (event) {
+            //        $('#Discount_DB').removeAttr('disabled');
+            //        $('#Discount_VIP').removeAttr('disabled');
+            //    });
+            //});
+        });
+
+        function Check() {
+            ShowLoading();
+            var item_countForBrand = $("#CountForBrand").val();
+            var CustomerId = $("#CustomerId").val();
+            var messagge = "";
+            if (CustomerId == '') {
+                messagge += "Chưa chọn khách hàng<br>";
+            }
+            if (item_countForBrand == '') {
+                messagge += "Thêm cho nhãn hàng không được rỗng";
+            }
+            if (messagge != '') {
+                alertPopup('Lỗi!', messagge, 'error');
+                HideLoading();
+            }
+            else {
+                ClearFormatBeforeSubmit($("#SaleOrder"));
+                $("#SaleOrder").submit();
+            }
+        }
+
+
+        function selectItemCustomer(id, name, customername, customerid) {
+            //alert(customerid);
+            $("#ProductInvoiceOldCode_DisplayText").val(name);
+            $("#ProductInvoiceOldId").val(id);
+            $("#CustomerId").val(customerid);
+            $("#CustomerId_DisplayText").val(customername);
+            
+            
+            ClosePopup();
+        }
+
+
+        function selectItem_CustomerId(id, name, pluspoint, code, phone) {
+            console.log("hoangngocduc")
+            var id = id;
+            $.ajax({
+                type: 'GET',
+                url: '/ProductInvoice/GetLoyaltyPoint',
+                data: { id: id },
+                success: function (result) {
+
+                    console.log(result[0].Value);
+
+                    $('#Discount_VIP').val(result[0].Value).trigger('change');
+
+                },
+                error: function (errorData) {
+                    console.log(errorData)
+                    alert("loi !!!!")
+                }
+            });
+            $("#CustomerId_DisplayText").val(name).trigger('change');
+            $("#CustomerId").val(id).trigger('change');
+            $("#CustomerId_DisplayText").focus().blur();
+            ClosePopup();
+            $('#CustomerCode').val(code);
+            $('#CustomerId').val(id);
+            $('#Phone').val(phone)
+
+        }
+
+
+    </script>
+
+    <script src="~/Scripts/area_sale/product_invoiceNT.js?vs=1.1"></script>
+    @*<script src="~/Scripts/area_sale/SaleReturn.js?=vs1.001"></script>*@
+}

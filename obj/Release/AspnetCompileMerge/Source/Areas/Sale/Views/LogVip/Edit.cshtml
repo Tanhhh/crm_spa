@@ -1,0 +1,87 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model LogVipViewModel
+
+@{
+    ViewBag.Title = Wording.PageEdit_LogVip;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    SelectList rating = SelectListHelper.GetSelectList_Rating(Model.Ratings, null);
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "LogVip",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    @Html.HiddenFor(model => model.AssignedUserId)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.HiddenFor(model => model.Year)
+
+    @Html.CustomDropDownListFor(model => model.CustomerId, SelectListHelper.GetSelectList_Customer(Model.CustomerId, Wording.CustomerName), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)
+    //@Html.CustomTextboxFor(model => model.Status, null, null, WidthType.span12)
+    <div class="control-group form-group">
+        <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Đã sử dụng</label>
+        <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+            <label class="radio"><input type="radio" value="Đã sử dụng" class="group_choice ace" data-target="#group_choice_wrap1" checked name="group_choice" />  <span class="lbl"></span></label>
+        </div>
+    </div>
+        <div class="control-group form-group">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Đang sử dụng</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+                <label class="radio"><input type="radio" value="Đang sử dụng" class="group_choice ace" data-target="#group_choice_wrap2" name="group_choice" /> <span class="lbl"></span></label>
+            </div>
+        </div>
+        @Html.CustomDropDownListFor(model => model.LoyaltyPointId, SelectListHelper.GetSelectList_Rating(Model.LoyaltyPointId, Wording.Ratings), null, null)
+
+    //@Html.CustomTextboxFor(model => model.Ratings, null, null, WidthType.span12)
+    //@Html.CustomTextboxFor(model => model.ApprovedDate, null, null, WidthType.span12)
+    @*@Html.CustomTextboxFor(model => model.ApprovedDate, "{0:dd / MM / yyyy}", null, WidthType.span12)*@
+
+
+    @Html.DateInput(model => model.ApprovedDate, "dd/MM/yyyy", "99/99/9999", true, WidthType.span12)
+
+    @Html.CustomTextboxFor(model => model.TotalAmount, null, null, WidthType.span12)
+    @Html.CustomSwitchesFor(model => model.is_approved, SwitchesStyle.CheckboxStyle, true)
+
+
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+@Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+
+}

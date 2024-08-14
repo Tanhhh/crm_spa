@@ -1,0 +1,192 @@
+﻿@model IEnumerable<DM_TIN_KHUYENMAIViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = "Danh sách Tin khuyến mãi";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "DM_TIN_KHUYENMAI",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        AdvancedSearch = false,
+        SearchOjectAttr = ViewBag.ListOjectAttrSearch
+    };
+}
+
+@helper GridColumnCommand(int id)
+{
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "DM_TIN_KHUYENMAI", "Sale"))
+    {
+        <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+            <button name="Delete" value="Delete" type="submit" class="btn btn-minier btn-danger">
+                <i class="ace-icon fa fa-trash"></i>
+            </button>
+        </div>
+    }
+}
+
+@helper GridColumnName(int id, string TIEUDE)
+{
+    TIEUDE = string.IsNullOrEmpty(TIEUDE) ? "No Title" : TIEUDE;
+    <a href="@Url.Action("Edit", "DM_TIN_KHUYENMAI", new { Id = id })"><b>@TIEUDE</b>   </a>
+    <br />
+
+}
+@helper ShowImage(int id, string banner)
+{
+    var bannersrc = Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Erp.BackOffice.Helpers.Common.CurrentUser.MA_DVIQLY,banner, "tinkhuyenmai-image-folder", "tinkhuyenmai");
+    //if (!string.IsNullOrEmpty(banner))
+    //{
+    //    bannersrc = "~" + bannersrc;
+    //}
+    <div class="text-center ace-thumbnails">
+        <a id="showimage_@id" name="showimage" href="@bannersrc" data-rel="colorbox" class="cboxElement">
+            <span class="glyphicon glyphicon-picture"></span>Xem
+        </a>
+    </div>
+}
+
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper isshow(int id, int? is_show)
+{
+    <label>
+        <input id="is_show_table" class="ace class-is-show text-center" type="checkbox" name="is-show-table" value="@is_show" checked="@(is_show == 1? "checked":null)">
+        <span class="lbl"></span>
+    </label>
+}
+
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@if (ViewBag.errors != null && ViewBag.errors != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.errors
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+<p>Tổng số: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan(Model.Count())</b></p>
+
+@using (Html.BeginForm("Delete", "DM_TIN_KHUYENMAI", FormMethod.Post))
+{
+    <div class="table-responsive">
+        <div id="test">
+            @Html.Grid(Model).Columns(columns =>
+            {
+                columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(40).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.TIN_KHUYENMAI_ID));
+                columns.Add(u => u.STT).Titled("STT").Sanitized(false).Encoded(false).RenderValueAs(u => u.STT.ToString()).SetWidth(85);
+                columns.Add().Titled("Hình ảnh").Sanitized(false).Encoded(false).RenderValueAs(u => ShowImage(u.TIN_KHUYENMAI_ID, u.ANH_DAIDIEN));
+                columns.Add().Titled("Tiêu Đề").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.TIN_KHUYENMAI_ID, u.TIEUDE));
+                columns.Add().Titled("Hiện").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => isshow(u.TIN_KHUYENMAI_ID, u.IS_SHOW));
+                columns.Add(u => u.CreatedDate).Titled(Wording.CreatedDate).SetWidth(130).Format("{0:dd/MM/yyyy HH:mm}");
+                columns.Add(u => u.ModifiedDate).Titled(Wording.ModifiedDate).SetWidth(130).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+                columns.Add(u => u.TIN_KHUYENMAI_ID).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.TIN_KHUYENMAI_ID)).SetWidth(85);
+            }).WithPaging(10)
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "DM_TIN_KHUYENMAI", "Sale"))
+        {
+            <a class="btn btn-mini btn-primary" href="@Url.Action("Create", pageSetting.ModuleName)">
+                <i class="ace-icon fa fa-plus"></i>
+                @Wording.CreateNew
+            </a>
+        }
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "DM_TIN_KHUYENMAI", "Sale"))
+        {
+            <button class="btn btn-white btn-sm btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                <i class="ace-icon fa fa-trash"></i>
+                @Wording.Delete
+            </button>
+        }
+    }
+}
+<script>
+
+    $('#test').find('table.table.table-striped.grid-table').first().attr('id', 'CTable');
+
+
+</script>
+
+<script src="~/Scripts/jquery.floatThead.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#CTable").floatThead({ top: 30 });
+    });
+</script>
+@section Scripts {
+
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+    </script>
+}

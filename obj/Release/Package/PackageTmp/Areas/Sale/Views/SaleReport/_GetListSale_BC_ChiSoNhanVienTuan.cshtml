@@ -1,0 +1,361 @@
+﻿@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Areas.Sale.Models
+@{
+    Layout = null;
+    int index1 = 1;
+    int index2 = 1;
+    int index3 = 1;
+    int index4 = 1;
+    int checkrow1 = 0;
+    int checkrow2 = 0;
+    int checkrow3 = 0;
+    int checkrow4 = 0;
+    var tuan1 = ViewBag.BC_ChiSoNhanVienTuan1 as List<ChiSoNhanVienViewModel>;
+    var tuan2 = ViewBag.BC_ChiSoNhanVienTuan2 as List<ChiSoNhanVienViewModel>;
+    var tuan3 = ViewBag.BC_ChiSoNhanVienTuan3 as List<ChiSoNhanVienViewModel>;
+    var tuan4 = ViewBag.BC_ChiSoNhanVienTuan4 as List<ChiSoNhanVienViewModel>;
+}
+<table id="BaoCaoChiSoNhanVienTheoTuan" class="table table-bordered">
+    <thead>
+        <tr class="" style="display:none">
+            <th class="" colspan="10" style="text-align:center"><h4>Báo cáo chỉ số nhân viên trong thời gian lựa chọn</h4></th>
+        </tr>
+
+        <tr>
+            <th style="width:100px;text-align:center">#</th>
+            <th style="width:40px;text-align:center">STT</th>
+            <th style="width:100px;text-align:center">Nhân Viên</th>
+            <th style="width:200px;text-align:center">Nguồn khách mới</th>
+            <th style="width:100px;text-align:center">SL lên mới</th>
+            <th style="width:150px;text-align:center">SL mua mới</th>
+            <th style="width:100px;text-align:center">DS ảo ORLANE mới</th>
+            <th style="width:100px;text-align:center">DS thực ORLANE mới</th>
+            <th style="width:100px;text-align:center">TB DS ORLANE ảo mới</th>
+            <th style="width:100px;text-align:center">Trung bình DS ORLANE thực mới</th>
+            <th style="width:100px;text-align:center">SL hẹn cũ</th>
+            <th style="width:100px;text-align:center">SL lên cũ</th>
+            <th style="width:100px;text-align:center">SL mua cũ</th>
+            <th style="width:100px;text-align:center">DS ảo ORLANE cũ</th>
+            <th style="width:100px;text-align:center">DS thực ORLANE cũ</th>
+            <th style="width:100px;text-align:center">Trung bình DS ORLANE ảo cũ</th>
+            <th style="width:100px;text-align:center">Trung bình DS ORLANE thực cũ</th>
+            <th style="width:100px;text-align:center">Tổng ảo ORLANE</th>
+            <th style="width:100px;text-align:center">Tổng thực ORLANE NVKD</th>
+            <th style="width:100px;text-align:center">DS ảo ANNAYAKE</th>
+            <th style="width:100px;text-align:center">DS thực ANNAYAKE</th>
+            <th style="width:100px;text-align:center">DS ảo LEONOR GREYL</th>
+            <th style="width:100px;text-align:center">DS thực LEONOR GREYL</th>
+        </tr>
+    </thead>
+    @if (tuan1 != null)
+    {
+        <tbody>
+
+            @foreach (var item in tuan1)
+            {
+                checkrow1++;
+                <tr class="@(index1 % 2 == 0 ? "alert-warning" : "")">
+                    @if (checkrow1 == 1)
+                    {
+                        <td style="vertical-align: middle;" rowspan="@tuan1.Count()"> Tuần 1</td>
+                    }
+
+                    <td>
+                        <span>@(index1++)</span>
+                    </td>
+                    <td>@item.ManagerStaffName</td>
+                    <td>@item.NguonKhach</td>
+                    <td>@item.SLLenMoi</td>
+                    <td>@item.SLMuaMoi</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoOrlaneMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucOrlaneMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneAoMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneThucMoi, null))</td>
+                    <td>@item.SLHenCu</td>
+                    <td>@item.SLLenCu</td>
+                    <td>@item.SLMuaCu</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoOrlaneCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucOrlaneCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneAoCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneThucCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TongAoOrlane, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TongThucOrlaneNVKD, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoAnnayake, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucAnnayake, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoLeonorGreyl, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucLeonorGreyl, null))</td>
+
+
+                </tr>
+
+            }
+
+
+
+        </tbody>
+    }
+    @if (tuan1 != null)
+    {
+        <thead>
+            <tr>
+
+                <td colspan="4" style="text-align:left"><b>Tổng:</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.SLLenMoi), null))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan1.Sum(x => x.SLMuaMoi)))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan1.Sum(x => x.DSAoOrlaneMoi)))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan1.Sum(x => x.DSThucOrlaneMoi)))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBAoMoi1, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBThucMoi1, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.SLHenCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.SLLenCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.SLMuaCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.DSAoOrlaneCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.DSThucOrlaneCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBAoCu1, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBThucCu1, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.TongAoOrlane), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.TongThucOrlaneNVKD), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.DSAoAnnayake), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.DSThucAnnayake), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.DSAoLeonorGreyl), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan1.Sum(x => x.DSThucLeonorGreyl), null))</b></td>
+            </tr>
+
+        </thead>
+    }
+
+    @if (tuan2 != null)
+    {
+        <tbody>
+
+            @foreach (var item in tuan2)
+            {
+                checkrow2++;
+                <tr class="@(index2 % 2 == 0 ? "alert-warning" : "")">
+                    @if (checkrow2 == 1)
+                    {
+                        <td style="vertical-align: middle;" rowspan="@tuan2.Count()"> Tuần 2</td>
+                    }
+                    <td>
+                        <span>@(index2++)</span>
+                    </td>
+                    <td>@item.ManagerStaffName</td>
+                    <td>@item.NguonKhach</td>
+                    <td>@item.SLLenMoi</td>
+                    <td>@item.SLMuaMoi</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoOrlaneMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucOrlaneMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneAoMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneThucMoi, null))</td>
+                    <td>@item.SLHenCu</td>
+                    <td>@item.SLLenCu</td>
+                    <td>@item.SLMuaCu</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoOrlaneCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucOrlaneCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneAoCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneThucCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TongAoOrlane, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TongThucOrlaneNVKD, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoAnnayake, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucAnnayake, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoLeonorGreyl, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucLeonorGreyl, null))</td>
+
+
+                </tr>
+            }
+
+
+        </tbody>
+    }
+    @if (tuan2 != null)
+    {
+        <thead>
+            <tr>
+
+                <td colspan="4" style="text-align:left"><b>Tổng:</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.SLLenMoi), null))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan2.Sum(x => x.SLMuaMoi)))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan2.Sum(x => x.DSAoOrlaneMoi)))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan2.Sum(x => x.DSThucOrlaneMoi)))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBAoMoi2, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBThucMoi2, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.SLHenCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.SLLenCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.SLMuaCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.DSAoOrlaneCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.DSThucOrlaneCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBAoCu2, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBThucCu2, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.TongAoOrlane), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.TongThucOrlaneNVKD), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.DSAoAnnayake), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.DSThucAnnayake), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.DSAoLeonorGreyl), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan2.Sum(x => x.DSThucLeonorGreyl), null))</b></td>
+            </tr>
+        </thead>
+    }
+
+    @if (tuan3 != null)
+    {
+        <tbody>
+
+            @foreach (var item in tuan3)
+            {
+                checkrow3++;
+                <tr class="@(index3 % 2 == 0 ? "alert-warning" : "")">
+                    @if (checkrow3 == 1)
+                    {
+                        <td style="vertical-align: middle;" rowspan="@tuan3.Count()"> Tuần 3</td>
+                    }
+                    <td>
+                        <span>@(index3++)</span>
+                    </td>
+                    <td>@item.ManagerStaffName</td>
+                    <td>@item.NguonKhach</td>
+                    <td>@item.SLLenMoi</td>
+                    <td>@item.SLMuaMoi</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoOrlaneMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucOrlaneMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneAoMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneThucMoi, null))</td>
+                    <td>@item.SLHenCu</td>
+                    <td>@item.SLLenCu</td>
+                    <td>@item.SLMuaCu</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoOrlaneCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucOrlaneCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneAoCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneThucCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TongAoOrlane, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TongThucOrlaneNVKD, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoAnnayake, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucAnnayake, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoLeonorGreyl, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucLeonorGreyl, null))</td>
+
+
+                </tr>
+            }
+
+
+        </tbody>
+    }
+    @if (tuan3 != null)
+    {
+        <thead>
+            <tr>
+
+                <td colspan="4" style="text-align:left"><b>Tổng:</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.SLLenMoi), null))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan3.Sum(x => x.SLMuaMoi)))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan3.Sum(x => x.DSAoOrlaneMoi)))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan3.Sum(x => x.DSThucOrlaneMoi)))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBAoMoi3, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBThucMoi3, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.SLHenCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.SLLenCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.SLMuaCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.DSAoOrlaneCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.DSThucOrlaneCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBAoCu3, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBThucCu3, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.TongAoOrlane), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.TongThucOrlaneNVKD), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.DSAoAnnayake), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.DSThucAnnayake), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.DSAoLeonorGreyl), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan3.Sum(x => x.DSThucLeonorGreyl), null))</b></td>
+            </tr>
+        </thead>
+    }
+
+    @if (tuan4 != null)
+    {
+        <tbody>
+
+
+            @foreach (var item in tuan4)
+            {
+                checkrow4++;
+                <tr class="@(index4 % 2 == 0 ? "alert-warning" : "")">
+                    @if (checkrow4 == 1)
+                    {
+                        <td style="vertical-align: middle;" rowspan="@tuan4.Count()"> Tuần 4</td>
+                    }
+                    <td>
+                        <span>@(index4++)</span>
+                    </td>
+                    <td>@item.ManagerStaffName</td>
+                    <td>@item.NguonKhach</td>
+                    <td>@item.SLLenMoi</td>
+                    <td>@item.SLMuaMoi</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoOrlaneMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucOrlaneMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneAoMoi, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneThucMoi, null))</td>
+                    <td>@item.SLHenCu</td>
+                    <td>@item.SLLenCu</td>
+                    <td>@item.SLMuaCu</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoOrlaneCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucOrlaneCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneAoCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TBDSOrlaneThucCu, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TongAoOrlane, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.TongThucOrlaneNVKD, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoAnnayake, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucAnnayake, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSAoLeonorGreyl, null))</td>
+                    <td>@(CommonSatic.ToCurrencyStr(item.DSThucLeonorGreyl, null))</td>
+
+
+                </tr>
+            }
+
+
+
+        </tbody>
+    }
+    @if(tuan4!=null)
+    {
+        <thead>
+            <tr>
+                <td colspan="4" style="text-align:left"><b>Tổng:</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.SLLenMoi), null))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan4.Sum(x => x.SLMuaMoi)))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan4.Sum(x => x.DSAoOrlaneMoi)))</b></td>
+                <td style="text-align:left"><b>@(Common.PhanCachHangNgan2(tuan4.Sum(x => x.DSThucOrlaneMoi)))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBAoMoi4, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBThucMoi4, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.SLHenCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.SLLenCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.SLMuaCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.DSAoOrlaneCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.DSThucOrlaneCu), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBAoCu4, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(@ViewBag.TBThucCu4, null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.TongAoOrlane), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.TongThucOrlaneNVKD), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.DSAoAnnayake), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.DSThucAnnayake), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.DSAoLeonorGreyl), null))</b></td>
+                <td style="text-align:left"><b>@(CommonSatic.ToCurrencyStr(tuan4.Sum(x => x.DSThucLeonorGreyl), null))</b></td>
+            </tr>
+        </thead>
+    }
+    
+    @*<thead>
+            <tr>
+                <td colspan="9" style="text-align:right"><b>Tổng</b></td>
+                <td style="text-align:right">@(Common.PhanCachHangNgan2(Model.Sum(x => x.Quantity)))</td>
+            </tr>
+        </thead>*@
+</table>
+<script src="~/Scripts/jquery.floatThead.js"></script>
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+        $("#CTable").floatThead({ top: 30 });
+    });
+</script>

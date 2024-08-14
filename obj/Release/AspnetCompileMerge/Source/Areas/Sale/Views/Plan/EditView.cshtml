@@ -1,0 +1,429 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Sale.Models
+@model KH_TUONGTACViewModel
+
+@{
+    ViewBag.Title = "Xem tình trạng khách hàng";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Plan",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    int index = 0;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    //DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+
+    IEnumerable<KH_TUONGTACViewModel> KH_TUONGTAC = (IEnumerable<KH_TUONGTACViewModel>)ViewBag.KH_TUONGTAC;
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <style type="text/css">
+        .has_error {
+            border: 1px #f2a696 solid !important;
+            color: #D68273;
+        }
+
+        .mini-popup {
+            position: relative;
+            display: inline;
+        }
+
+        #popup_archive {
+            position: absolute;
+            bottom: 34px;
+            left: -154px;
+            width: 410px;
+            height: 235px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+
+        #myImg {
+            outline: none;
+        }
+
+        tr.bt {
+            background-color: yellowgreen;
+        }
+    </style>
+}
+@helper CheckDeleteColumns(int? KH_TUONGTAC_ID)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_TUONGTAC_ID">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper GridColumnCommand(int? KH_TUONGTAC_ID)
+{
+    <p>
+        <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+            <i class="ace-icon fa fa-trash bigger-120"></i>
+        </button>
+    </p>
+
+}
+@helper GridColumnName(string HINH_ANH)
+{
+
+    <div class="itemdiv commentdiv">
+        <div class="user">
+            <div class="ace-thumbnails">
+                <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(HINH_ANH,"Plan","user"))" data-rel="colorbox" class="cboxElement">
+                    <img id="myImg" style="text-align:center" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(HINH_ANH, "Plan", "user"))">
+                </a>
+            </div>
+        </div>
+    </div>
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "CreatePlan", @class = "form-horizontal clearfix", enctype = "multipart/form-data" }))
+{
+    //@Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+    <input type="hidden" name="Type" value="plan" />
+    @Html.HiddenFor(model => model.KH_TUONGTAC_ID)
+
+   
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Delete", pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    <div style="padding-bottom: 50px;" id="" class="table-responsive top-10 ">
+        <table id="CTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th rowspan="2">#</th>
+                    <th rowspan="2">Stt</th>
+                    <th rowspan="2">Mã KH</th>
+                    <th rowspan="2">Tên KH</th>
+                    <th rowspan="2">Số ĐT</th>
+                    <th rowspan="2">Ngày tương tác</th>
+                    <th rowspan="2">Giờ tương tác</th>
+                    <th rowspan="2">Hình thức</th>
+                    <th colspan="4" style="text-align:center">Thông tin kỹ thuật</th>
+                    <th rowspan="2">Ghi chú</th>
+                    <th rowspan="2">Giải pháp</th>
+                    <th rowspan="2">Lịch tiếp theo</th>
+                    <th rowspan="2">Mức cảnh báo</th>
+                    <th rowspan="2">Kết quả sau tương tác</th>
+                    <th rowspan="2">Hình đính kèm</th>
+                 
+                </tr>
+                <tr>
+                    <th>Loại</th>
+                    <th>Phân loại</th>
+                    <th>Tình trạng</th>
+                    <th>Đánh giá mức độ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var i in KH_TUONGTAC)
+                {
+
+
+                    <tr class="@(i.MUCCANHBAO_TUONGTAC == "bt" ? null : index % 2 == 0 ? "alert-warning" : "")">
+                        <td>@CheckDeleteColumns(i.KH_TUONGTAC_ID)</td>
+                        <td>@(index += 1)</td>
+                        <td>@i.CustomerCode</td>
+                        <td>@i.CustomerName</td>
+                        <td>@i.Phone</td>
+                        <td>@i.NGAYLAP</td>
+                        <td>@i.GIO_TUONGTAC</td>
+                        <td>@i.HINHTHUC_TUONGTAC</td>
+                        <td>@i.LOAI_TUONGTAC</td>
+                        <td>@i.PHANLOAI_TUONGTAC</td>
+                        <td>@i.TINHTRANG_TUONGTAC</td>
+                        <td>@i.MUCDO_TUONGTAC</td>
+                        <td>@i.GHI_CHU</td>
+                        <td>@i.GIAIPHAP_TUONGTAC</td>
+                        <td>@i.NGAYTUONGTAC_TIEP</td>
+                        <td>@i.MUCCANHBAO_TUONGTAC</td>
+                        <td>@i.KETQUA_SAUTUONGTAC</td>
+                        <td style="text-align:center">
+                            @GridColumnName(i.HINH_ANH)
+                        </td>
+                        
+
+                    </tr>
+
+                }
+            </tbody>
+            <thead>
+            </thead>
+        </table>
+    </div>
+}
+@section Scripts {
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            //$('#PHANLOAI_TUONGTAC').attr("disabled", "disabled");
+            //$('#TINHTRANG_TUONGTAC').attr("disabled", "disabled");
+
+            $('#LOAI_TUONGTAC').each(function (i) {
+                var selectedEventType = this.options[this.selectedIndex].value;
+                var PLTT = $('#PHANLOAI_TUONGTAC').val();
+                if (this.value != 'TOC') {
+                    $('#PHANLOAI_TUONGTAC').attr("disabled", "disabled");
+                    $('.TINHTRANG').hide().filter('#' + selectedEventType).show();
+                } else {
+                    $('#PHANLOAI_TUONGTAC').removeAttr('disabled');
+                    $('.TINHTRANG').hide().filter('#' + PLTT).show();
+
+                }
+            });
+
+            $('#LOAI_TUONGTAC').change(function () {
+                var selectedEventType = this.options[this.selectedIndex].value;
+                if (selectedEventType != "TOC") {
+                    $('.TINHTRANG').hide().filter('#' + selectedEventType).show();
+                    $('#PHANLOAI_TUONGTAC').attr("disabled", "disabled");
+                    $('#TINHTRANG_TUONGTAC').removeAttr('disabled');
+                    $('#PHANLOAI_TUONGTAC').val("");
+                    $('#TINHTRANG_TUONGTAC').val("");
+                }
+                else {
+                    $('.TINHTRANG').hide().filter('#' + selectedEventType).show();
+                    $('#PHANLOAI_TUONGTAC').removeAttr('disabled');
+                }
+            });
+            $('#PHANLOAI_TUONGTAC').change(function () {
+                var selectedEventType = this.options[this.selectedIndex].value;
+                if (selectedEventType != null) {
+                    $('.TINHTRANG').hide().filter('#' + selectedEventType).show();
+                    $('#TINHTRANG_TUONGTAC').removeAttr("disabled");
+                } else {
+                    $('#TINHTRANG_TUONGTAC').attr("disabled", "disabled");
+                }
+            });
+
+            $('#NGAYTUONGTAC_TIEP').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+
+            $('#NGAYLAP').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+            $('#GIO_TUONGTAC').datetimepicker({
+                format: 'HH:mm'
+            });
+            $('#GIOTUONGTAC_TIEP').datetimepicker({
+                format: 'HH:mm'
+            });
+        });
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+        function initCkeditor() {
+            $('.ckeditor').ckeditor({
+                "extraPlugins": 'imagebrowser',
+                "imageBrowser_listUrl": "@Url.Action("ListJson","Images")",
+                // Define the toolbar groups as it is a more accessible solution.
+                toolbarGroups: [
+                    { "name": "document", "groups": ["mode", "document", "doctools"] },
+                    { "name": "editing", "groups": ["find", "selection", "spellchecker"] },
+                    { "name": "forms" },
+                    { "name": "tools" },
+                    { "name": "basicstyles", "groups": ["basicstyles", "cleanup"] },
+                    { "name": "clipboard", "groups": ["clipboar", "undo"] },
+                    { "name": "links", "groups": ["links"] },
+                    { "name": "paragraph", "groups": ["list", "blocks"] },
+                    { "name": "insert", "groups": ["insert"] },
+                    { "name": "styles", "groups": ["styles"] },
+                    //{ "name": "about", "groups": ["about"] },
+                    { "name": "styles" },
+                    { "name": "colors" },
+                    { "name": "align", "groups": ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+
+                ],
+                // Remove the redundant buttons from toolbar groups defined above.
+                removeButtons: 'Underline,Strike,Subscript,Superscript,Anchor,Styles,Specialchar'
+            });
+        }
+
+        $(document).ready(function () {
+            //init rcb chọn sản phẩm
+            $('#productSelectList').radComboBox({
+                colTitle: 'ID, Hình, Tên khách hàng',
+                colValue: 1,
+                colImage: 2,
+                colHide: '1',
+                colSize: '0px,50px,',
+                colClass: ',,',
+                //width: 600,
+                height: 300,
+                boxSearch: true,
+                colSearch: 2
+            });
+            //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+            $('#productSelectList').on('change', function () {
+                var $this = $(this);
+                var selected = $this.find("option:selected");
+
+                if (selected.val() == '' || $('#product_item_' + selected.val()).length > 0)
+                    return;
+                $('#KHACHHANG_ID').val(selected.val());
+                //$('#CustomerName').val(selected.text());
+                $('#CustomerName').val(selected.text());
+
+            });
+            $('#CustomerName').keypress(function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $('#CustomerName').trigger('change');
+                }
+            });
+
+            //khi nhập barcode
+            $('#CustomerName').change(function () {
+                var $this = $(this);
+                if ($this.val() != '') {
+
+                    var barcode = $this.val();
+                    //đặt lại giá trị rỗng
+                    $this.val('').focus();
+
+                    var valueSearch = searchProductByBarCodeContain(barcode);
+                    if (valueSearch == undefined) {
+                        alert('Không tìm thấy sản phẩm với mã code trên!');
+                        return;
+                    }
+
+                    $('#productSelectList').val(valueSearch).trigger("change");
+                }
+            });
+        });
+        function searchProductByBarCodeContain(barcode) {
+            barcode = barcode.toLowerCase();
+            //var $productSelect = $('.detail_item_id').first();
+
+            var $optionList = $("#productSelectList").find('option');
+
+            var arrResulft = [];
+            for (var i = 0; i < $optionList.length; i++) {
+                var data_code = $($optionList[i]).data('code') != undefined ? $($optionList[i]).data('code').toString().toLowerCase() : undefined;
+                if (barcode.indexOf(data_code) != -1)
+                    arrResulft.push($($optionList[i]).attr('value'));
+
+                if (arrResulft.length == 1) {
+                    return arrResulft[0];
+                }
+            }
+
+            return arrResulft[0];
+        };
+        $("#Save").click(function () {
+            var endDate = new Date();
+            endDate = document.getElementById("NGAYTUONGTAC_TIEP").value;
+
+            //var today = new Date();
+            //var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+            //var time = today.getHours() + ":" + today.getMinutes();
+            //var dateTime = date + ' ' + time;
+
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+            if (mm < 10) {
+                mm = '0' + mm
+            }
+            var hh = today.getHours();
+            var MM = today.getMinutes();
+            today = dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + MM;
+
+            if (endDate == "") {
+                return true;
+            }
+            else {
+                if ((endDate < today)) {
+                    alert("Ngày tương tác tiếp phải lớn hơn ngày hiện tại");
+                    document.getElementById("NGAYTUONGTAC_TIEP").value = "";
+                    return false;
+                }
+            }
+            var startDate = document.getElementById("NGAYLAP").value;
+            if (endDate < startDate) {
+                alert("End date should be greater than Start date");
+                document.getElementById("NGAYTUONGTAC_TIEP").value = "";
+                return false;
+            }
+            return true;
+        });
+    </script>
+}

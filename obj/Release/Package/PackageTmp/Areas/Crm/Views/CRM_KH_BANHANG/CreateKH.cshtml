@@ -1,0 +1,834 @@
+﻿
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@model CRM_KH_BANHANGViewModel
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+
+}
+
+@{
+    ViewBag.Title = "Thêm mới khách hàng";
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CRM_KH_BANHANG",
+        ActionName = "CreateKH",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.ToString("MM/yyyy");
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    //int checkLTT = Request["checkLTT"] != null ? Convert.ToInt32(Request["checkLTT"]) : 0;
+    //int checkMB = Request["checkMB"] != null ? Convert.ToInt32(Request["checkMB"]) : 0;
+    //int checkDVSHH = Request["checkDVSHH"] != null ? Convert.ToInt32(Request["checkDVSHH"]) : 0;
+    //int checkSPSHH = Request["checkSPSHH"] != null ? Convert.ToInt32(Request["checkSPSHH"]) : 0;
+    string checkTK = Request["checkTK"] != null ? Request["checkTK"] : "";
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    int index = 0;
+    IEnumerable<SelectListItem> BrandList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin", null, "value");
+    
+    IEnumerable<ProductInvoiceViewModel> ProductInvoice = (IEnumerable<ProductInvoiceViewModel>)ViewBag.ProductInvoice;
+    IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;
+}
+
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+<style>
+    .popover {
+        width: 100% !important;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 10px;
+    }
+
+    .tabbable {
+        padding-bottom: 50px;
+    }
+</style>
+@helper CheckDeleteColumns(int? KH_GIOITHIEU_ID)
+{
+/**/
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_GIOITHIEU_ID">
+        <span class="lbl"></span>
+    </label>
+}
+@helper GridColumnCommand(int? id)
+{
+/**/
+    <p>
+        <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+            <i class="ace-icon fa fa-trash bigger-120"></i>
+        </button>
+    </p>
+/**/
+}
+
+@helper GridColumnName(int? KH_GIOITHIEU_ID, string name, bool isPopup = true, string jsCallback = null)
+{
+    <a onclick="OpenPopup('@Url.Action("Create", "KH_GIOITHIEU", new { area = "Crm", KH_GIOITHIEU_ID = KH_GIOITHIEU_ID, IsPopup = true })', '', 0, 0)">@name</a>
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    @Html.HiddenFor(model => model.KH_BANHANG_ID)
+    @Html.TextBox("Month", Request["Month"], new { @class = "", autocomplete = "off", style = "width:150px", hidden = true })
+    @Html.TextBox("Year", Request["Year"], new { @class = "", autocomplete = "off", style = "width:150px", hidden = true })
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+    <p>
+        <select class="chzn-select" style="width:250px !important; float:left" name="SalerId">
+            <option value="">- Nhân viên QL -</option>
+            @foreach (var item in user)
+            {
+                <option @(Request["SalerId"] == item.Id.ToString() ? "Selected" : "") value="@item.Id">@item.FullName</option>
+            }
+        </select>
+        @*<label style="padding-left:10px">Mã khách hàng</label>*@
+        @Html.TextBox("CustomerCode", Request["CustomerCode"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng", style = "width:150px" })
+        @*<label style="padding-left:10px">Tên khách hàng</label>*@
+        @Html.TextBox("CustomerName", Request["CustomerName"], new { @class = "", autocomplete = "off", placeholder = "Tên khách hàng", style = "width:150px" })
+        @*<label style="padding-left:10px">SĐT</label>*@
+        @Html.TextBox("Phone", Request["Phone"], new { @class = "", autocomplete = "off", placeholder = "SDT", style = "width:150px" })
+    </p>
+    <p>
+        <label>
+            <input id="checkAllCustomer" name="checkTK" type="radio" class="ace" value="All">
+            <span class="lbl">Tất cả khách hàng</span>
+        </label>
+        <label>
+            <input @(Model.checkTK == "checkSPSHH" ? "checked" : "") id="checkSPSHH" name="checkTK" type="radio" class="ace" value="checkSPSHH">
+            <span class="lbl">SP sắp hết hạn</span>
+        </label>
+        <label>
+            <input @(Model.checkTK == "checkDVSHH" ? "checked" : "") id="checkDVSHH" name="checkTK" type="radio" class="ace" value="checkDVSHH">
+            <span class="lbl">Sắp hết số lần DV</span>
+        </label>
+        <label>
+            <input @(Model.checkTK == "checkMB" ? "checked" : "") id="checkMB" name="checkTK" type="radio" class="ace" value="checkMB">
+            <span class="lbl">Khách sắp hết hạn MemberShip</span>
+        </label>
+        <label>
+            <input @(Model.checkTK == "checkLTT" ? "checked" : "") id="checkLTT" name="checkTK" type="radio" class="ace" value="checkLTT">
+            <span class="lbl">Khách có hẹn tương tác</span>
+        </label>
+    </p>
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.KH_BANHANG_ID)
+
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+    <div class="tabbable">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab" style="height:30px">
+            <li>Kế hoạch bán hàng từ ngày @aDateTime.ToString("dd/MM/yyyy") đến @retDateTime.ToString("dd/MM/yyyy")</li>
+        </ul>
+
+        <div class="tab-content clear-fix">
+
+            <div id="listOrderDetail" class="table-responsive top-10 ">
+
+                <table id="All" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width:40px">
+                                <input id="checkAllCustomerList" name="checkAllCustomerList" type="checkbox" class="ace" value="1">
+                                <span class="lbl"></span>
+                            </th>
+                            <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                            <th rowspan="2" style="width:250px;text-align:center"> Tên khách hàng</th>
+                            <th rowspan="2" style="width:100px;text-align:center">Mã KH</th>
+                            <th rowspan="2" style="width:100px;text-align:center">Điện thoại </th>
+                            <th rowspan="2" style="width:250px;text-align:center">Nhân viên quản lý</th>
+                            <th rowspan="2" style="width:400px;text-align:center">Thông tin lưu ý</th>
+                            <th rowspan="2">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody class="productInvoiceList">
+                        @if (Model.CustomerList != null && Model.CustomerList.Count > 0)
+                        {
+                            for (int i = 0; i < Model.CustomerList.Count(); i++)
+                            {
+                                <tr role="@(i + 1)" id="@(i + 1)">
+                                    <td>
+                                        <input id="CustomerList_@(i)__is_checked" name="CustomerList[@(i)].is_checked" type="checkbox" class="ace item_is_checked" value="1">
+                                        <span class="lbl"></span>
+                                    </td>
+                                    <td class="text-center">
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        <input class="id" type="hidden" id="CustomerList_@(i)__Id" name="CustomerList[@(i)].Id" value="@Model.CustomerList[i].Id" />
+                                        <span>@Model.CustomerList[i].CompanyName</span>
+                                    </td>
+                                    <td>
+                                        <input class="name" type="hidden" id="CustomerList_@(i)__Code" name="CustomerList[@(i)].Code" value="@Model.CustomerList[i].Code" readonly="readonly" />
+                                        <span class="code" id="CustomerList_@(i)__Code" name="CustomerList[@(i)].Code" value="@Model.CustomerList[i].Code">@Model.CustomerList[i].Code</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="CustomerList_@(i)__Phone" name="CustomerList[@(i)].Phone" value="@Model.CustomerList[i].Phone" readonly="readonly" />
+                                        <span>@Model.CustomerList[i].Phone</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="CustomerList_@(i)__ManagerStaffId" name="CustomerList[@(i)].ManagerStaffId" value="@Model.CustomerList[i].ManagerStaffId" readonly="readonly" />
+                                        <span>@Model.CustomerList[i].ManagerUserName</span>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <input style="width:300px" class="" type="text" id="CustomerList_@(i)__GHI_CHU" name="CustomerList[@(i)].GHI_CHU" value="" />
+                                    </td>
+
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    @*<tbody hidden class="KH_SAPHETSP">
+                            @if (Model.vwKH_SAPHETSP != null)
+                            {
+                                for (int i = 0; i < Model.vwKH_SAPHETSP.Count(); i++)
+                                {
+                            <tr role="@(i + 1)" id="@(i + 1)">
+                                <td>
+                                    <input id="vwKH_SAPHETSP_@(i)__is_checked" name="vwKH_SAPHETSP[@(i)].is_checked" type="checkbox" class="ace item_is_checked" value="1">
+                                    <span class="lbl"></span>
+                                </td>
+                                <td class="text-center">
+                                    @(i + 1)
+                                </td>
+                                <td>
+                                    <input class="id" type="hidden" id="vwKH_SAPHETSP_@(i)__CustomerId" name="vwKH_SAPHETSP[@(i)].CustomerId" value="@Model.vwKH_SAPHETSP[i].CustomerId" />
+                                    <span>@Model.vwKH_SAPHETSP[i].CompanyName</span>
+                                </td>
+                                <td>
+                                    <input class="name" type="hidden" id="vwKH_SAPHETSP_@(i)__CustomerCode" name="vwKH_SAPHETSP[@(i)].CustomerCode" value="@Model.vwKH_SAPHETSP[i].CustomerCode" readonly="readonly" />
+                                    <span class="code" id="vwKH_SAPHETSP_@(i)__CustomerCode" name="vwKH_SAPHETSP[@(i)].CustomerCode" value="@Model.vwKH_SAPHETSP[i].CustomerCode">@Model.vwKH_SAPHETSP[i].CustomerCode</span>
+                                </td>
+                                <td>
+                                    <input class="phone" type="hidden" id="vwKH_SAPHETSP_@(i)__Phone" name="vwKH_SAPHETSP[@(i)].Phone" value="@Model.vwKH_SAPHETSP[i].Phone" readonly="readonly" />
+                                    <span>@Model.vwKH_SAPHETSP[i].Phone</span>
+                                </td>
+                                <td>
+                                    @if(@Model.vwKH_SAPHETSP[i].SPSAPHETHAN != null)
+                                    {
+                                        <input class="phone" type="hidden" id="vwKH_SAPHETSP_@(i)__SPSAPHETHAN" name="vwKH_SAPHETSP[@(i)].SPSAPHETHAN" value="Khách hàng sắp hết hạn, ngày hết hạn @Model.vwKH_SAPHETSP[i].SPSAPHETHAN DV  @Model.vwKH_SAPHETSP[i].ProductName, Ngày mua @Model.vwKH_SAPHETSP[i].Ngay_xuatkho" readonly="readonly" />
+                                        <span>Khách hàng sắp hết hạn, ngày hết hạn @Model.vwKH_SAPHETSP[i].SPSAPHETHAN SP  @Model.vwKH_SAPHETSP[i].ProductName, Ngày mua @Model.vwKH_SAPHETSP[i].Ngay_xuatkho</span>
+                                    }
+                                </td>
+                                <td>
+                                    <input style="width:300px" class="" type="text" id="CustomerList_@(i)__GHI_CHU" name="CustomerList[@(i)].GHI_CHU" value="" />
+                                </td>
+                            </tr>
+                                }
+                            }
+                        </tbody>
+                        <tbody hidden class="KH_TUONGTACList">
+                            @if (Model.KH_TUONGTACList != null)
+                            {
+                                for (int i = 0; i < Model.KH_TUONGTACList.Count(); i++)
+                                {
+                            <tr role="@(i + 1)" id="@(i + 1)">
+                                <td>
+                                    <input id="KH_TUONGTACList_@(i)__is_checked" name="KH_TUONGTACList[@(i)].is_checked" type="checkbox" class="ace item_is_checked" value="1">
+                                    <span class="lbl"></span>
+                                </td>
+                                <td class="text-center">
+                                    @(i + 1)
+                                </td>
+                                <td>
+                                    <input class="id" type="hidden" id="KH_TUONGTACList_@(i)__KHACHHANG_ID" name="KH_TUONGTACList[@(i)].KHACHHANG_ID" value="@Model.KH_TUONGTACList[i].KHACHHANG_ID" />
+                                    <span>@Model.KH_TUONGTACList[i].CustomerName</span>
+                                </td>
+                                <td>
+                                    <input class="name" type="hidden" id="KH_TUONGTACList_@(i)__CustomerCode" name="vwKH_SAPHETSP[@(i)].CustomerCode" value="@Model.KH_TUONGTACList[i].CustomerCode" readonly="readonly" />
+                                    <span class="code" id="KH_TUONGTACList_@(i)__CustomerCode" name="KH_TUONGTACList[@(i)].CustomerCode" value="@Model.KH_TUONGTACList[i].CustomerCode">@Model.KH_TUONGTACList[i].CustomerCode</span>
+                                </td>
+                                <td>
+                                    <input class="phone" type="hidden" id="KH_TUONGTACList_@(i)__Phone" name="KH_TUONGTACList[@(i)].Phone" value="@Model.KH_TUONGTACList[i].Phone" readonly="readonly" />
+                                    <span>@Model.KH_TUONGTACList[i].Phone</span>
+                                </td>
+                                <td>
+                                        <input class="phone" type="hidden" id="KH_TUONGTACList_@(i)__NGAYTUONGTAC_TIEP" name="KH_TUONGTACList[@(i)].NGAYTUONGTAC_TIEP" value="Khách hẹn tương tác ngày @Model.KH_TUONGTACList[i].NGAYTUONGTAC_TIEP" readonly="readonly" />
+                                        <span>Khách hẹn tương tác ngày @Model.KH_TUONGTACList[i].NGAYTUONGTAC_TIEP</span>
+                                </td>
+
+                                <td>
+                                    <input style="width:300px" class="" type="text" id="CustomerList_@(i)__GHI_CHU" name="CustomerList[@(i)].GHI_CHU" value="" />
+                                </td>
+                            </tr>
+                                }
+                            }
+                        </tbody>
+                        <tbody hidden class="MBSAPHETHANList">
+                            @if (Model.MBSAPHETHANList != null)
+                            {
+                                for (int i = 0; i < Model.MBSAPHETHANList.Count(); i++)
+                                {
+                            <tr role="@(i + 1)" id="@(i + 1)">
+                                <td>
+                                    <input id="MBSAPHETHANList_@(i)__is_checked" name="MBSAPHETHANList[@(i)].is_checked" type="checkbox" class="ace item_is_checked" value="1">
+                                    <span class="lbl"></span>
+                                </td>
+                                <td class="text-center">
+                                    @(i + 1)
+                                </td>
+                                <td>
+                                    <input class="id" type="hidden" id="MBSAPHETHANList_@(i)__CustomerId" name="MBSAPHETHANList[@(i)].CustomerId" value="@Model.MBSAPHETHANList[i].CustomerId" />
+                                    <span>@Model.MBSAPHETHANList[i].CustomerName</span>
+                                </td>
+                                <td>
+                                    <input class="name" type="hidden" id="MBSAPHETHANList_@(i)__CustomerCode" name="vwKH_SAPHETSP[@(i)].CustomerCode" value="@Model.MBSAPHETHANList[i].CustomerCode" readonly="readonly" />
+                                    <span class="code" id="MBSAPHETHANList_@(i)__CustomerCode" name="MBSAPHETHANList[@(i)].CustomerCode" value="@Model.MBSAPHETHANList[i].CustomerCode">@Model.MBSAPHETHANList[i].CustomerCode</span>
+                                </td>
+                                <td>
+                                    <input class="phone" type="hidden" id="MBSAPHETHANList_@(i)__Phone" name="MBSAPHETHANList[@(i)].Phone" value="@Model.MBSAPHETHANList[i].Phone" readonly="readonly" />
+                                    <span>@Model.MBSAPHETHANList[i].Phone</span>
+                                </td>
+                                <td>
+                                    <input class="ExpiryDate" type="hidden" id="MBSAPHETHANList_@(i)__ExpiryDate" name="MBSAPHETHANList[@(i)].ExpiryDate" value="Ngày hết hạn MemberShip @Model.MBSAPHETHANList[i].ExpiryDate" readonly="readonly" />
+                                    <span>Ngày hết hạn MemberShip @Model.MBSAPHETHANList[i].ExpiryDate</span>
+                                </td>
+                                <td>
+                                    <input style="width:300px" class="" type="text" id="MBSAPHETHANList_@(i)__GHI_CHU" name="MBSAPHETHANList[@(i)].GHI_CHU" value="" />
+                                </td>
+                            </tr>
+                                }
+                            }
+                        </tbody>
+                        <tbody hidden class="vwKH_SAPHETDV">
+                            @if (Model.vwKH_SAPHETDV != null)
+                            {
+                                for (int i = 0; i < Model.vwKH_SAPHETDV.Count(); i++)
+                                {
+                            <tr role="@(i + 1)" id="@(i + 1)">
+                                <td>
+                                    <input id="vwKH_SAPHETDV_@(i)__is_checked" name="vwKH_SAPHETDV[@(i)].is_checked" type="checkbox" class="ace item_is_checked" value="1">
+                                    <span class="lbl"></span>
+                                </td>
+                                <td class="text-center">
+                                    @(i + 1)
+                                </td>
+                                <td>
+                                    <input class="id" type="hidden" id="vwKH_SAPHETDV_@(i)__CustomerId" name="vwKH_SAPHETDV[@(i)].CustomerId" value="@Model.vwKH_SAPHETDV[i].CustomerId" />
+                                    <span>@Model.vwKH_SAPHETDV[i].CompanyName</span>
+                                </td>
+                                <td>
+                                    <input class="name" type="hidden" id="vwKH_SAPHETDV_@(i)__CustomerCode" name="vwKH_SAPHETDV[@(i)].CustomerCode" value="@Model.vwKH_SAPHETDV[i].CustomerCode" readonly="readonly" />
+                                    <span class="code" id="vwKH_SAPHETDV_@(i)__CustomerCode" name="vwKH_SAPHETDV[@(i)].CustomerCode" value="@Model.vwKH_SAPHETDV[i].CustomerCode">@Model.vwKH_SAPHETDV[i].CustomerCode</span>
+                                </td>
+                                <td>
+                                    @if(Model.vwKH_SAPHETDV[i].Phone !=null)
+                                    {
+                                        <input class="phone" type="hidden" id="vwKH_SAPHETDV_@(i)__Phone" name="vwKH_SAPHETDV[@(i)].Phone" value="@Model.vwKH_SAPHETDV[i].Phone" readonly="readonly" />
+                                        <span>@Model.vwKH_SAPHETDV[i].Phone</span>
+                                    }
+
+                                </td>
+                                <td>
+                                    <input class="ExpiryDate" type="hidden" id="vwKH_SAPHETDV_@(i)__ExpiryDate" name="vwKH_SAPHETDV[@(i)].ExpiryDate" value="Khách hàng sắp hết hạn, ngày hết hạn @Model.vwKH_SAPHETDV[i].SPSAPHETHAN DV  @Model.vwKH_SAPHETDV[i].ProductName, Ngày mua @Model.vwKH_SAPHETDV[i].Ngay_xuatkho" readonly="readonly" />
+                                    <span>Khách hàng sắp hết hạn, ngày hết hạn @Model.vwKH_SAPHETDV[i].SPSAPHETHAN DV  @Model.vwKH_SAPHETDV[i].ProductName, Ngày mua @Model.vwKH_SAPHETDV[i].Ngay_xuatkho</span>
+                                </td>
+                                <td>
+                                    <input style="width:300px" class="" type="text" id="vwKH_SAPHETDV_@(i)__GHI_CHU" name="vwKH_SAPHETDV[@(i)].GHI_CHU" value="" />
+                                </td>
+                            </tr>
+                                }
+                            }
+                        </tbody>*@
+                    <thead>
+
+
+                    </thead>
+                </table>
+                <table hidden id="KH_SAPHETSP" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width:40px">
+                                <input id="checkAllKH_SAPHETSP" name="checkAll" type="checkbox" class="ace" value="1">
+                                <span class="lbl"></span>
+                            </th>
+                            <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                            <th rowspan="2" style="width:250px;text-align:center"> Tên khách hàng</th>
+                            <th rowspan="2" style="width:100px;text-align:center">Mã KH</th>
+                            <th rowspan="2" style="width:100px;text-align:center">Điện thoại </th>
+                            <th rowspan="2" style="width:250px;text-align:center">Nhân viên quản lý</th>
+                            <th rowspan="2" style="width:400px;text-align:center">Thông tin lưu ý</th>
+                            <th rowspan="2">Ghi chú</th>
+                        </tr>
+
+
+                    </thead>
+                    <tbody class="">
+                        @if (Model.vwKH_SAPHETSP != null)
+                        {
+                            for (int i = 0; i < Model.vwKH_SAPHETSP.Count(); i++)
+                            {
+                                <tr role="@(i + 1)" id="@(i + 1)">
+                                    <td>
+                                        <input id="vwKH_SAPHETSP_@(i)__is_checkedSAPHETSP" name="vwKH_SAPHETSP[@(i)].is_checkedSAPHETSP" type="checkbox" class="ace item_is_checkedSAPHETSP" value="1">
+                                        <span class="lbl"></span>
+                                    </td>
+                                    <td class="text-center">
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        <input class="id" type="hidden" id="vwKH_SAPHETSP_@(i)__CustomerId" name="vwKH_SAPHETSP[@(i)].CustomerId" value="@Model.vwKH_SAPHETSP[i].CustomerId" />
+                                        <span>@Model.vwKH_SAPHETSP[i].CompanyName</span>
+                                    </td>
+                                    <td>
+                                        <input class="name" type="hidden" id="vwKH_SAPHETSP_@(i)__CustomerCode" name="vwKH_SAPHETSP[@(i)].CustomerCode" value="@Model.vwKH_SAPHETSP[i].CustomerCode" readonly="readonly" />
+                                        <span class="code" id="vwKH_SAPHETSP_@(i)__CustomerCode" name="vwKH_SAPHETSP[@(i)].CustomerCode" value="@Model.vwKH_SAPHETSP[i].CustomerCode">@Model.vwKH_SAPHETSP[i].CustomerCode</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="vwKH_SAPHETSP_@(i)__Phone" name="vwKH_SAPHETSP[@(i)].Phone" value="@Model.vwKH_SAPHETSP[i].Phone" readonly="readonly" />
+                                        <span>@Model.vwKH_SAPHETSP[i].Phone</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="vwKH_SAPHETSP_@(i)__ManagerStaffId" name="vwKH_SAPHETSP[@(i)].ManagerStaffId" value="@Model.vwKH_SAPHETSP[i].ManagerStaffId" readonly="readonly" />
+                                        <span>@Model.vwKH_SAPHETSP[i].ManagerStaffName</span>
+                                    </td>
+                                    <td>
+                                        @if (@Model.vwKH_SAPHETSP[i].SPSAPHETHAN != null)
+                                        {
+                                            <input class="phone" type="hidden" id="vwKH_SAPHETSP_@(i)__SPSAPHETHAN" name="vwKH_SAPHETSP[@(i)].SPSAPHETHAN" value="Khách hàng sắp hết hạn, ngày hết hạn @Model.vwKH_SAPHETSP[i].SPSAPHETHAN DV  @Model.vwKH_SAPHETSP[i].ProductName, Ngày mua @Model.vwKH_SAPHETSP[i].Ngay_xuatkho" readonly="readonly" />
+                                            <span>Khách hàng sắp hết hạn, ngày hết hạn @Model.vwKH_SAPHETSP[i].SPSAPHETHAN SP  @Model.vwKH_SAPHETSP[i].ProductName, Ngày mua @Model.vwKH_SAPHETSP[i].Ngay_xuatkho</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <input style="width:300px" class="" type="text" id="CustomerList_@(i)__GHI_CHU" name="CustomerList[@(i)].GHI_CHU" value="" />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    <thead>
+                    </thead>
+                </table>
+                <table hidden id="KH_TUONGTACList" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width:40px">
+                                <input id="checkAllKH_TUONGTACList" name="checkAllKH_TUONGTACList" type="checkbox" class="ace" value="1">
+                                <span class="lbl"></span>
+                            </th>
+                            <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                            <th rowspan="2" style="width:250px;text-align:center"> Tên khách hàng</th>
+                            <th rowspan="2" style="width:100px;text-align:center">Mã KH</th>
+                            <th rowspan="2" style="width:100px;text-align:center">Điện thoại </th>
+                            <th rowspan="2" style="width:250px;text-align:center">Nhân viên quản lý</th>
+                            <th rowspan="2" style="width:400px;text-align:center">Thông tin lưu ý</th>
+                            <th rowspan="2">Ghi chú</th>
+                        </tr>
+
+
+                    </thead>
+                    <tbody class="">
+                        @if (Model.KH_TUONGTACList != null)
+                        {
+                            for (int i = 0; i < Model.KH_TUONGTACList.Count(); i++)
+                            {
+                                <tr role="@(i + 1)" id="@(i + 1)">
+                                    <td>
+                                        <input id="KH_TUONGTACList_@(i)__is_checkedKH_TUONGTAC" name="KH_TUONGTACList[@(i)].is_checkedKH_TUONGTAC" type="checkbox" class="ace item_is_checkedKH_TUONGTAC" value="1">
+                                        <span class="lbl"></span>
+                                    </td>
+                                    <td class="text-center">
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        <input class="id" type="hidden" id="KH_TUONGTACList_@(i)__KHACHHANG_ID" name="KH_TUONGTACList[@(i)].KHACHHANG_ID" value="@Model.KH_TUONGTACList[i].KHACHHANG_ID" />
+                                        <span>@Model.KH_TUONGTACList[i].CustomerName</span>
+                                    </td>
+                                    <td>
+                                        <input class="name" type="hidden" id="KH_TUONGTACList_@(i)__CustomerCode" name="vwKH_SAPHETSP[@(i)].CustomerCode" value="@Model.KH_TUONGTACList[i].CustomerCode" readonly="readonly" />
+                                        <span class="code" id="KH_TUONGTACList_@(i)__CustomerCode" name="KH_TUONGTACList[@(i)].CustomerCode" value="@Model.KH_TUONGTACList[i].CustomerCode">@Model.KH_TUONGTACList[i].CustomerCode</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="KH_TUONGTACList_@(i)__Phone" name="KH_TUONGTACList[@(i)].Phone" value="@Model.KH_TUONGTACList[i].Phone" readonly="readonly" />
+                                        <span>@Model.KH_TUONGTACList[i].Phone</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="KH_TUONGTACList_@(i)__ManagerStaffId" name="KH_TUONGTACList[@(i)].ManagerStaffId" value="@Model.KH_TUONGTACList[i].ManagerStaffId" readonly="readonly" />
+                                        <span>@Model.KH_TUONGTACList[i].ManagerStaffName</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="KH_TUONGTACList_@(i)__NGAYTUONGTAC_TIEP" name="KH_TUONGTACList[@(i)].NGAYTUONGTAC_TIEP" value="Khách hẹn tương tác ngày @Model.KH_TUONGTACList[i].NGAYTUONGTAC_TIEP" readonly="readonly" />
+                                        <span>Khách hẹn tương tác ngày @Model.KH_TUONGTACList[i].NGAYTUONGTAC_TIEP</span>
+                                    </td>
+
+                                    <td>
+                                        <input style="width:300px" class="" type="text" id="CustomerList_@(i)__GHI_CHU" name="CustomerList[@(i)].GHI_CHU" value="" />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    <thead>
+                    </thead>
+                </table>
+                <table hidden id="MBSAPHETHANList" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width:40px">
+                                <input id="checkAllMBSAPHETHANList" name="checkAllMBSAPHETHANList" type="checkbox" class="ace" value="1">
+                                <span class="lbl"></span>
+                            </th>
+                            <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                            <th rowspan="2" style="width:250px;text-align:center"> Tên khách hàng</th>
+                            <th rowspan="2" style="width:100px;text-align:center">Mã KH</th>
+                            <th rowspan="2" style="width:100px;text-align:center">Điện thoại </th>
+                            <th rowspan="2" style="width:250px;text-align:center">Nhân viên quản lý</th>
+                            <th rowspan="2" style="width:400px;text-align:center">Thông tin lưu ý</th>
+                            <th rowspan="2">Ghi chú</th>
+                        </tr>
+
+
+                    </thead>
+                    <tbody class="">
+                        @if (Model.MBSAPHETHANList != null)
+                        {
+                            for (int i = 0; i < Model.MBSAPHETHANList.Count(); i++)
+                            {
+                                <tr role="@(i + 1)" id="@(i + 1)">
+                                    <td>
+                                        <input id="MBSAPHETHANList_@(i)__is_checkedMBSAPHETHAN" name="MBSAPHETHANList[@(i)].is_checkedMBSAPHETHAN" type="checkbox" class="ace item_is_checkedMBSAPHETHAN" value="1">
+                                        <span class="lbl"></span>
+                                    </td>
+                                    <td class="text-center">
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        <input class="id" type="hidden" id="MBSAPHETHANList_@(i)__CustomerId" name="MBSAPHETHANList[@(i)].CustomerId" value="@Model.MBSAPHETHANList[i].CustomerId" />
+                                        <span>@Model.MBSAPHETHANList[i].CustomerName</span>
+                                    </td>
+                                    <td>
+                                        <input class="name" type="hidden" id="MBSAPHETHANList_@(i)__CustomerCode" name="vwKH_SAPHETSP[@(i)].CustomerCode" value="@Model.MBSAPHETHANList[i].CustomerCode" readonly="readonly" />
+                                        <span class="code" id="MBSAPHETHANList_@(i)__CustomerCode" name="MBSAPHETHANList[@(i)].CustomerCode" value="@Model.MBSAPHETHANList[i].CustomerCode">@Model.MBSAPHETHANList[i].CustomerCode</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="MBSAPHETHANList_@(i)__Phone" name="MBSAPHETHANList[@(i)].Phone" value="@Model.MBSAPHETHANList[i].Phone" readonly="readonly" />
+                                        <span>@Model.MBSAPHETHANList[i].Phone</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="MBSAPHETHANList_@(i)__ManagerStaffId" name="MBSAPHETHANList[@(i)].ManagerStaffId" value="@Model.MBSAPHETHANList[i].ManagerStaffId" readonly="readonly" />
+                                        <span>@Model.MBSAPHETHANList[i].ManagerStaffName</span>
+                                    </td>
+                                    <td>
+                                        <input class="ExpiryDate" type="hidden" id="MBSAPHETHANList_@(i)__ExpiryDate" name="MBSAPHETHANList[@(i)].ExpiryDate" value="Ngày hết hạn MemberShip @Model.MBSAPHETHANList[i].ExpiryDate" readonly="readonly" />
+                                        <span>Ngày hết hạn MemberShip @Model.MBSAPHETHANList[i].ExpiryDate</span>
+                                    </td>
+                                    <td>
+                                        <input style="width:300px" class="" type="text" id="MBSAPHETHANList_@(i)__GHI_CHU" name="MBSAPHETHANList[@(i)].GHI_CHU" value="" />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    <thead>
+                    </thead>
+                </table>
+                <table hidden id="KH_SAPHETDV" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width:40px">
+                                <input id="checkAllKH_SAPHETDV" name="checkAllKH_SAPHETDV" type="checkbox" class="ace" value="1">
+                                <span class="lbl"></span>
+                            </th>
+                            <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                            <th rowspan="2" style="width:250px;text-align:center"> Tên khách hàng</th>
+                            <th rowspan="2" style="width:100px;text-align:center">Mã KH</th>
+                            <th rowspan="2" style="width:100px;text-align:center">Điện thoại </th>
+                            <th rowspan="2" style="width:250px;text-align:center">Nhân viên quản lý</th>
+                            <th rowspan="2" style="width:400px;text-align:center">Thông tin lưu ý</th>
+                            <th rowspan="2">Ghi chú</th>
+                        </tr>
+
+                    </thead>
+                    <tbody class="vwKH_SAPHETDV">
+                        @if (Model.vwKH_SAPHETDV != null)
+                        {
+                            for (int i = 0; i < Model.vwKH_SAPHETDV.Count(); i++)
+                            {
+                                <tr role="@(i + 1)" id="@(i + 1)">
+                                    <td>
+                                        <input id="vwKH_SAPHETDV_@(i)__is_checkedKH_SAPHETDV" name="vwKH_SAPHETDV[@(i)].is_checkedKH_SAPHETDV" type="checkbox" class="ace item_is_checkedKH_SAPHETDV" value="1">
+                                        <span class="lbl"></span>
+                                    </td>
+                                    <td class="text-center">
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        <input class="id" type="hidden" id="vwKH_SAPHETDV_@(i)__CustomerId" name="vwKH_SAPHETDV[@(i)].CustomerId" value="@Model.vwKH_SAPHETDV[i].CustomerId" />
+                                        <span>@Model.vwKH_SAPHETDV[i].CustomerName</span>
+                                    </td>
+                                    <td>
+                                        <input class="name" type="hidden" id="vwKH_SAPHETDV_@(i)__CustomerCode" name="vwKH_SAPHETDV[@(i)].CustomerCode" value="@Model.vwKH_SAPHETDV[i].CustomerCode" readonly="readonly" />
+                                        <span class="code" id="vwKH_SAPHETDV_@(i)__CustomerCode" name="vwKH_SAPHETDV[@(i)].CustomerCode" value="@Model.vwKH_SAPHETDV[i].CustomerCode">@Model.vwKH_SAPHETDV[i].CustomerCode</span>
+                                    </td>
+                                    <td>
+                                        @if (Model.vwKH_SAPHETDV[i].Phone != null)
+                                        {
+                                            <input class="phone" type="hidden" id="vwKH_SAPHETDV_@(i)__Phone" name="vwKH_SAPHETDV[@(i)].Phone" value="@Model.vwKH_SAPHETDV[i].Phone" readonly="readonly" />
+                                            <span>@Model.vwKH_SAPHETDV[i].Phone</span>
+                                        }
+
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="vwKH_SAPHETDV_@(i)__ManagerStaffId" name="vwKH_SAPHETDV[@(i)].ManagerStaffId" value="@Model.vwKH_SAPHETDV[i].ManagerStaffId" readonly="readonly" />
+                                        <span>@Model.vwKH_SAPHETDV[i].ManagerStaffName</span>
+                                    </td>
+                                    <td>
+                                        <input class="ExpiryDate" type="hidden" id="vwKH_SAPHETDV_@(i)__ExpiryDate" name="vwKH_SAPHETDV[@(i)].ExpiryDate" value="Khách hàng sắp hết hạn, ngày hết hạn @Model.vwKH_SAPHETDV[i].SPSAPHETHAN DV  @Model.vwKH_SAPHETDV[i].ProductName" readonly="readonly" />
+                                        <span>Khách hàng sắp hết hạn, ngày hết hạn @Model.vwKH_SAPHETDV[i].ExpiryDate DV  @Model.vwKH_SAPHETDV[i].ProductName</span>
+                                    </td>
+                                    <td>
+                                        <input style="width:300px" class="" type="text" id="vwKH_SAPHETDV_@(i)__GHI_CHU" name="vwKH_SAPHETDV[@(i)].GHI_CHU" value="" />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    <thead>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" onclick="Check();">
+            <i class="ace-icon fa fa-save"></i>
+            Chọn
+        </a>
+    }
+}
+
+
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    @Html.ScriptBottom_ChosenStyle()
+    <script type="text/javascript">
+
+        $(function () {
+
+            $('#checkAllCustomerList').click(function (event) {
+                var $that = $(this);
+                $('.item_is_checked').each(function () {
+                    this.checked = $that.is(':checked');
+                });
+            });
+            $('#checkAllKH_SAPHETSP').click(function (event) {
+                var $that = $(this);
+                $('.item_is_checkedSAPHETSP').each(function () {
+                    this.checked = $that.is(':checked');
+                });
+            });
+            $('#checkAllKH_TUONGTACList').click(function (event) {
+                var $that = $(this);
+                $('.item_is_checkedKH_TUONGTAC').each(function () {
+                    this.checked = $that.is(':checked');
+                });
+            });
+            $('#checkAllMBSAPHETHANList').click(function (event) {
+                var $that = $(this);
+                $('.item_is_checkedMBSAPHETHAN').each(function () {
+                    this.checked = $that.is(':checked');
+                });
+            });
+            $('#checkAllKH_SAPHETDV').click(function (event) {
+                var $that = $(this);
+                $('.item_is_checkedKH_SAPHETDV').each(function () {
+                    this.checked = $that.is(':checked');
+                });
+            });
+
+
+            $("#checkSPSHH").on("click", function (e) {
+                var arr = [];
+                $('#checkSPSHH:checked').each(function (i) {
+                    $('#All').attr("hidden", "hidden");
+                    $('#KH_TUONGTACList').attr("hidden", "hidden");
+                    $('#KH_SAPHETSP').removeAttr("hidden");
+                    $('#KH_SAPHETDV').attr("hidden", "hidden");
+                    $('#MBSAPHETHANList').attr("hidden", "hidden");
+                });
+            });
+            $("#checkLTT").on("click", function (e) {
+                var arr = [];
+                $('#checkLTT:checked').each(function (i) {
+                    $('#All').attr("hidden", "hidden");
+                    $('#KH_TUONGTACList').removeAttr("hidden");
+                    $('#KH_SAPHETSP').attr("hidden", "hidden");
+                    $('#KH_SAPHETDV').attr("hidden", "hidden");
+                    $('#MBSAPHETHANList').attr("hidden", "hidden");
+                });
+            });
+            $("#checkDVSHH").on("click", function (e) {
+                var arr = [];
+                $('#checkDVSHH:checked').each(function (i) {
+                    $('#All').attr("hidden", "hidden");
+                    $('#KH_TUONGTACList').attr("hidden", "hidden");
+                    $('#KH_SAPHETSP').attr("hidden", "hidden");
+                    $('#KH_SAPHETDV').removeAttr("hidden");
+                    $('#MBSAPHETHANList').attr("hidden", "hidden");
+                });
+            });
+            $("#checkMB").on("click", function (e) {
+                var arr = [];
+                $('#checkMB:checked').each(function (i) {
+                    $('#All').attr("hidden", "hidden");
+                    $('#KH_TUONGTACList').attr("hidden", "hidden");
+                    $('#KH_SAPHETSP').attr("hidden", "hidden");
+                    $('#KH_SAPHETDV').attr("hidden", "hidden");
+                    $('#MBSAPHETHANList').removeAttr("hidden");
+                });
+            });
+            $("#checkAllCustomer").on("click", function (e) {
+                var arr = [];
+                $('#checkAllCustomer:checked').each(function (i) {
+                    $('#All').removeAttr("hidden");
+                    $('#KH_TUONGTACList').attr("hidden", "hidden");
+                    $('#KH_SAPHETSP').attr("hidden", "hidden");
+                    $('#KH_SAPHETDV').attr("hidden", "hidden");
+                    $('#MBSAPHETHANList').attr("hidden", "hidden");
+                });
+            });
+
+            $('#checkMB:checked').each(function (i) {
+                $('#All').attr("hidden", "hidden");
+                $('#KH_TUONGTACList').attr("hidden", "hidden");
+                $('#KH_SAPHETSP').attr("hidden", "hidden");
+                $('#KH_SAPHETDV').attr("hidden", "hidden");
+                $('#MBSAPHETHANList').removeAttr("hidden");
+            });
+            $('#checkDVSHH:checked').each(function (i) {
+                $('#All').attr("hidden", "hidden");
+                $('#KH_TUONGTACList').attr("hidden", "hidden");
+                $('#KH_SAPHETSP').attr("hidden", "hidden");
+                $('#KH_SAPHETDV').removeAttr("hidden");
+                $('#MBSAPHETHANList').attr("hidden", "hidden");
+            });
+            $('#checkLTT:checked').each(function (i) {
+                $('#All').attr("hidden", "hidden");
+                $('#KH_TUONGTACList').removeAttr("hidden");
+                $('#KH_SAPHETSP').attr("hidden", "hidden");
+                $('#KH_SAPHETDV').attr("hidden", "hidden");
+                $('#MBSAPHETHANList').attr("hidden", "hidden");
+            });
+            $('#checkSPSHH:checked').each(function (i) {
+                $('#All').attr("hidden", "hidden");
+                $('#KH_TUONGTACList').attr("hidden", "hidden");
+                $('#KH_SAPHETSP').removeAttr("hidden");
+                $('#KH_SAPHETDV').attr("hidden", "hidden");
+                $('#MBSAPHETHANList').attr("hidden", "hidden");
+            });
+        });
+
+
+        $('#month').datetimepicker({
+            format: 'MM/YYYY'
+        });
+
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+        function Check() {
+            ShowLoading();
+            var TARGET_BRAND = $("#TARGET_BRAND").val();
+            var CountForBrand = $("#CountForBrand").val()
+            var messagge = "";
+            if (TARGET_BRAND == '') {
+                messagge += "Chưa nhập Taget<br>";
+            } if (CountForBrand == '') {
+                messagge += "Chưa chọn nhãn hàng";
+            }
+            if (messagge != '') {
+                alertPopup('Lỗi!', messagge, 'error');
+                HideLoading();
+            } else {
+                ClearFormatBeforeSubmit($("#SaleOrder"));
+                $("#SaleOrder").submit();
+            }
+        }
+        $('#listOrderDetail').on('click', '.btn-delete-item', function () {
+            $(this).closest('tr').remove();
+            $('.productInvoiceList tr').each(function (index, tr) {
+                $(tr).attr('role', index);
+                $(tr).find('td:first-child').text(index);
+                $(tr).find('.id').attr('name', 'CRM_KH_BANHANG_CTIETList[' + index + '].Id').attr('id', 'CRM_KH_BANHANG_CTIETList_' + index + '__Id');
+                $(tr).find('.code').attr('name', 'CRM_KH_BANHANG_CTIETList[' + index + '].Code').attr('id', 'CRM_KH_BANHANG_CTIETList_' + index + '__Code');
+                $(tr).find('.phone').attr('name', 'CRM_KH_BANHANG_CTIETList[' + index + '].Phone').attr('id', 'CRM_KH_BANHANG_CTIETList_' + index + '__Phone');
+                $(tr).find('.item_price').attr('name', 'InvoiceList[' + index + '].Price').attr('id', 'InvoiceList_' + index + '__Price');
+                $(tr).find('.item_locode').attr('name', 'InvoiceList[' + index + '].LoCode').attr('id', 'InvoiceList_' + index + '__LoCode');
+                $(tr).find('.is_checked').attr('name', 'CustomerList[' + index + '].is_checked').attr('id', 'CustomerList_' + index + '__is_checked');
+
+            });
+        });
+    </script>
+}

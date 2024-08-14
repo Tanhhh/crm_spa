@@ -1,0 +1,158 @@
+﻿@model List<ComplainViewModel>
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using PagedList;
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Thống kê số lượng complain";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Plan",
+        ActionName = "CountComplain",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        AdvancedSearch = false,
+        //SearchOjectAttr = ViewBag.ListOjectAttrSearch
+    };
+    
+   
+   
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.category;
+    
+  
+}
+
+@helper GridColumnschedule(int id, string code)
+{
+    <a href="@Url.Action("Detail", "Customer", new {Area = "Account", Id = id })">@code</a>
+}
+@helper GridTuongtac(int? id, string NgayLap, int? nvkd)
+{
+
+    @*<a target="_blank" href='@Url.Action("LichSuTuongTac", "Plan", new { NGUOILAP_ID=nvkd,KHACHHANG_ID=id})'>@NgayLap</a>*@
+    <a onclick="OpenPopup('@Url.Action("LichSuTuongTac", "Plan", new {NGUOILAP_ID=nvkd,KHACHHANG_ID= id , IsPopup = true })', '', 0, 0)">@NgayLap</a>
+
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+   
+    <select class="chzn-select" style="width:250px; float:left" name="UserId">
+        <option value="">- Nhân viên QL -</option>
+        @foreach (var item in SelectListHelper.GetSelectList_User(null, null))
+                {
+            <option @(Request["UserId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+        }
+    </select>
+    <span class="input-daterange input-group" style="z-index:1002">
+        @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : aDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Từ ngày" })
+        <span class="input-group-addon">
+            <i class="fa fa-exchange"></i>
+        </span>
+        @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : retDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Đến ngày" })
+    </span>
+
+
+        @*@Html.DropDownList("HINHTHUC_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("HINHTHUC_GIOITHIEU", Request["HINHTHUC_TUONGTAC"], "-Hình thức-"), new { style = "width: 150px;/* padding-right: 0px; */margin-right: 100px;margin-left:1px;" })*@
+
+}
+
+<div class="table-responsive">
+  <table class="table-responsive table table-bordered" id="cTable">
+      <thead>
+          <tr>
+              <td>COMPLAIN</td>
+              <td>SỐ LƯỢNG</td>
+              <td>MỨC ĐỘ</td>
+              <td>KẾT QUẢ</td>
+              <td>ĐỘ HÀI LÒNG</td>
+          </tr>
+      </thead>
+      <tbody>
+          @foreach(var item in Model)
+          {
+              <tr>
+                  <td>@item.LOAI_TUONGTAC</td>
+                  <td>@item.TONG</td>
+                  <td>@item.MUCDO_TUONGTAC</td>
+                  <td>@item.KETQUA_SAUTUONGTAC</td>
+                  <td>@item.DOHAILONG</td>
+              </tr>
+          }
+      </tbody>
+  </table>
+
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <a class="btn btn-white btn-success btn-sm" type="button" value="Export" href="@Url.Action("ExportListComplain","Plan", new { @Area = "Sale"})">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </a>
+    @*<a>Tổng KHBH:</a> <input type="text" readonly align="right" size="10" id="tongtien" style="color:red" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.TONGKHBH)" name="tongbh" />
+    <a>Tổng thực KHBH:</a> <input type="text" readonly align="right" size="10" id="tongtien" style="color:red" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.TONGTHUCKHBH)" name="tongthucbh" />
+    <a>Tổng KHCDS:</a> <input type="text" readonly align="right" size="10" id="tongthu" style="color:lightseagreen" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.TONGKHDS)" name="tongds" />
+    <a>Tổng thực KHCDS:</a> <input type="text" readonly align="right" size="10" id="tongthu" style="color:lightseagreen" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.TONGTHUCKHDS)" name="tongthucds" />*@
+}
+<script src="~/Scripts/jquery.table.marge.js"></script>
+
+<script>
+    //$('.table').margetable({
+    //    type: 1,
+    //    colindex: [{
+    //        index: 5,
+    //        dependent: [0,4]
+    //    }]
+    //});
+
+    //$('.table').margetable({
+    //    type: 1,
+    //    colindex: [{
+    //        index: 8,
+    //        dependent: [0, 4]
+    //    }]
+    //});
+
+    //$('.table').margetable({
+    //        type: 2,
+    //colindex: [0] // column 1, 2
+    //});
+</script>
+
+@section Scripts {
+
+    @*@Html.ScriptBottom_ChosenStyle()*@
+
+    <script type="text/javascript">
+       function GetPrint(type) {
+            var Month = $('#Month').val();
+            var Year = $('#Year').val();
+            var branchId = $('#branchId').val();
+            var txtCusInfo = $('#txtCusInfo').val();
+            var SalerId = $('#SalerId').val();
+            var Brand = $('#Brand').val();
+            var HINHTHUC_TUONGTAC = $('#HINHTHUC_TUONGTAC').val();
+            OpenPopup('/Plan/PrintGeneralCusPlan?Month=' + Month + '&Year=' + Year +'&branchId=' + branchId+ '&txtCusInfo=' + txtCusInfo + '&SalerId=' + SalerId + '&Brand=' + Brand + '&HINHTHUC_TUONGTAC=' + HINHTHUC_TUONGTAC + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 20000);
+            HideLoading();
+        };
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

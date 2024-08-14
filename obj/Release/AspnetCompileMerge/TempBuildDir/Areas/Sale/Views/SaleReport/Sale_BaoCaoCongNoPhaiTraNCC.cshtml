@@ -1,0 +1,113 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+
+@{
+    ViewBag.Title = "Báo cáo công nợ chưa trả nhà cung cấp";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "Sale_BaoCaoCongNoPhaiTraNCC",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        SearchButtonText = "Xem báo cáo"
+    };
+
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+}
+
+@section HeadOfPage {
+    <style type="text/css">
+    </style>
+}
+
+<div id="page_header" class="widget-box">
+    <div class="widget-header">
+        <h5 class="widget-title">
+            <i class="ace-icon fa fa-star orange"></i>
+            @ViewBag.Title
+        </h5>
+        <div class="widget-toolbar">
+            <a class="btn-search" href="#" data-action="collapse">
+                <i class="ace-icon fa fa-search blue"></i>
+            </a>
+            <a class="btn-setting"></a>
+        </div>
+    </div>
+
+    <div class="widget-body" style="display: block;">
+        <div class="widget-main">
+            <div class="search-view form-inline" id="SaleReport">
+                <p>
+                    <span class="input-daterange input-group">
+                        @Html.TextBox("StartDate", Request["StartDate"] != null ? Request["StartDate"] : aDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Từ ngày" })
+                        <span class="input-group-addon">
+                            <i class="fa fa-exchange"></i>
+                        </span>
+                        @Html.TextBox("EndDate", Request["EndDate"] != null ? Request["EndDate"] : retDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Đến ngày" })
+                    </span>
+                    @Html.TextBox("BranchId", Request["BranchId"], new { autocomplete = "off", placeholder = "Chi nhánh..." })
+                        @Html.TextBox("SupplierId", Request["SupplierId"], new { autocomplete = "off", placeholder = "Nhà cung cấp..." })
+
+                </p>
+                <p style="margin:0px;">
+                    <button class="btn btn-mini btn-primary" name="search" onclick="searchreact()" type="submit" value="Search">
+                        Xem báo cáo
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="padding-top: 5px;">
+    <div class="col-xs-12">
+        <div id="react_report" class="table-responsive">
+
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportThis()">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+
+}
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+    <script src="/Scripts/combojax.js"></script>
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <script>
+        searchreact();
+        function searchreact() {
+            GetDatatable('/SaleReport/_GetListSale_BaoCaoCongNoPhaiTraNCC', '@Html.Raw(ViewBag.Title)');
+        };
+        function GetDatatable(url, title) {
+            var StartDate = $('#StartDate').val();
+            var EndDate = $('#EndDate').val();
+            var BranchId = $('#BranchId').val();
+            var SupplierId = $('#SupplierId').val();
+
+            var formdata = {
+                StartDate: StartDate,
+                EndDate: EndDate,
+                BranchId: BranchId,
+                SupplierId: SupplierId
+
+            };
+            //$("#react_report").html("");
+            ClickEventHandlerHTML(true, "/SaleReport/_GetListSale_BaoCaoCongNoPhaiTraNCC", "#react_report", formdata, function () {
+            });
+        };
+    </script>
+}

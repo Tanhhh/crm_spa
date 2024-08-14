@@ -1,0 +1,65 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Crm.Models
+
+@model ImageViewModel
+
+@{
+    ViewBag.Title = "Cập nhật hình ảnh";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Image",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.Images)
+    @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span12, true);
+    @*@Html.CustomDropDownListFor(model => model.Name, SelectListHelper.GetSelectList_Category("NameREProductImage", Model.Name, null), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)*@
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="wrap-btn-upload top-10">
+                <a class="btn btn-primary btn-mini"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                <input type="file" id="file-image" name="file-image" class="file-image" onchange="previewFileImage(event, '#display-image img')" />
+            </div>
+            <div class="text-center" id="display-image" style="max-width:500px;max-height:300px">
+                <img src="@Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.Images,"upload_path_Image","product",Model.TargetModule)" tit title="@Model.Name" id="" style="width:100%" />
+            </div>
+        </div>
+    </div>
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    <scripts>
+    </scripts>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

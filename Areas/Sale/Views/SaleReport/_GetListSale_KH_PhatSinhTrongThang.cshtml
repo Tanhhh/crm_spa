@@ -1,0 +1,62 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Areas.Sale.Models
+@model List<Sale_BaoCaoKH_PhatSinh>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            <tr class="" style="display:none">
+                <th class="" colspan="10" style="text-align:center"><h4>Thống kê SL KH phát sinh trong tháng</h4></th>
+            </tr>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th style="width:100px;text-align:center">NGƯỜI QUẢN LÝ</th>
+                <th style="width:200px;text-align:center">NHÓM HƯỞNG DS</th>
+                <th style="width:200px;text-align:center">TỔNG SL KHÁCH MỚI PHÁT SINH</th>
+                <th style="width:100px;text-align:center">SL KHÁCH MỚI GD TIẾP</th>
+                <th style="width:150px;text-align:center">SL KHÁCH MỚI CHỈ GD MỘT LẦN</th>
+                <th style="width:100px;text-align:center">SL KHÁCH CŨ TẠM NGƯNG TRONG THỜI GIAN NÀY</th>
+                <th style="width:100px;text-align:center">TỔNG SL KHÁCH CŨ TẠM NGƯNG</th>
+                <th style="width:100px;text-align:center">SL KHÁCH CŨ ACTIVE HIỆN TẠI</th>
+                <th style="width:100px;text-align:center">TỔNG SỐ LƯỢNG KHÁCH CỦA NHÓM</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(index%2==0?"alert-warning":"")">
+                    <td>
+                        <span>@(index++)</span>
+                    </td>
+                    <td>@item.ManagerStaffName</td>
+                    <td>@item.NhomNVKD</td>
+                    <td>@item.TongPhatSinhMoi</td>
+                    <td>@item.TongMoiGd</td>
+                    <td>@item.TongMoiGdMotLan</td>
+                    <td>@item.TongTamNgung</td>
+                    <td>@item.TongTamNgungS</td>
+                    <td>@item.TongActive</td>
+                    <td>@item.ToTal</td>
+
+                </tr>
+            }
+        </tbody>
+        @*<thead>
+                <tr>
+                    <td colspan="9" style="text-align:right"><b>Tổng</b></td>
+                    <td style="text-align:right">@(Common.PhanCachHangNgan2(Model.Sum(x => x.Quantity)))</td>
+                </tr>
+            </thead>*@
+    </table>
+    <script src="~/Scripts/jquery.floatThead.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+            $("#CTable").floatThead({ top: 30 });
+        });
+    </script>

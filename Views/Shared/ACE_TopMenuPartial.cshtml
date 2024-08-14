@@ -1,0 +1,983 @@
+﻿@model IEnumerable<Erp.BackOffice.Areas.Administration.Models.PageMenuViewModel>
+
+    @using Erp.BackOffice.Areas.Administration.Models;
+    @using Erp.Domain.Staff.Repositories;
+    @using Erp.BackOffice.App_GlobalResources;
+    @using Erp.BackOffice.Helpers
+    @{
+        if (Model == null)
+        {
+            return;
+        }
+
+        int IdMenuItem = 0;
+        if (ViewBag.IdMenuItem != null)
+        {
+            IdMenuItem = (int)ViewBag.IdMenuItem;
+        }
+        int idMenuParent = IdMenuItem;
+        IEnumerable<Erp.BackOffice.Areas.Administration.Models.PageMenuViewModel> Parent = null;
+
+        List<int> idParentsActiveOpen = new List<int>();
+
+        if (Model != null)
+        {
+            int idParent = idMenuParent;
+            while (idParent > 0)
+            {
+                var item = Model.Where(p => p.Id == idParent).FirstOrDefault();
+
+                var parentItem = item != null && item.ParentId.HasValue ? Model.Where(p => p.Id == item.ParentId.Value).FirstOrDefault() : null;
+                if (parentItem != null)
+                {
+                    idParentsActiveOpen.Add(parentItem.Id);
+                    idParent = parentItem.Id;
+                    idMenuParent = idParent;
+                }
+                else
+                {
+                    idParent = 0;
+                }
+            }
+
+        }
+    }
+    <style>
+        .alert-message {
+            color: #007bff; /* Màu văn bản xanh dương */
+            cursor: pointer; /* Con trỏ chuột khi hover */
+            text-decoration: none; /* Gạch chân */
+        }
+
+        #alert-box .alert-title {
+            font-weight: bold;
+            font-size: 16px;
+            padding: 0 5px;
+            text-transform: capitalize;
+        }
+
+        #alert-box {
+            padding: 1.2rem;
+        }
+
+        #alert-box.alert-box {
+            width: 390px !important;
+            right: -9%;
+            position: fixed;
+            top: 12%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            background: #fff;
+        }
+        #facebookNotificationModal.alert-box {
+            width: 370px !important;
+            right: -6%;
+            position: fixed;
+            top: 12.5%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+/*facebook*/
+        p#facebookNotificationMessage {
+            color: #333 !important;
+        }
+
+        h5.alert-title {
+            color: #333 !important;
+        }
+
+        .alert-postURL {
+            color: #337ab7 !important;
+        }
+/*--*/
+
+        #alert-box.alert-content {
+            display: flex;
+            align-items: center;
+        }
+
+        #alert-box.alert-message {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        #alert-box.alert-message-container {
+            max-height: 200px; /* Đặt chiều cao tối đa cho container */
+            overflow-y: auto;
+        }
+
+        .avatar {
+            vertical-align: middle;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            margin-top: 15px;
+            border: .2rem solid #3988f9;
+        }
+
+
+        #alert-box.alert-content .text-wrapper {
+            flex-grow: 1;
+        }
+
+        #alert-box.close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            color: #f37e98;
+            padding: 5px !important;
+        }
+
+        #zaloNotificationModal.alert-box {
+            right: -30px;
+            position: fixed;
+            top: 12%;
+            transform: translateY(-50%);
+            z-index: 9999;
+        }
+
+        #zaloNotificationModal {
+            display: none;
+        }
+
+        #call-incomingdiv {
+            width: 370px !important;
+            right: -9%;
+            position: fixed;
+            top: 12%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+            background-color: white;
+        }
+
+        #closeAlertInComing {
+            padding: 0px;
+            cursor: pointer;
+            color: #ff5858;
+            font-size: 30px;
+        }
+
+        .close {
+            text-align: left !important;
+            font-size: 25px !important;
+            padding: 1px 5px !important;
+            position: absolute;
+            top: 0px !important;
+            right: 7px !important;
+            z-index: 9999;
+            opacity: unset !important;
+            color: #dbdbdb !important;
+        }
+
+        a#closeAlert {
+            cursor: pointer;
+        }
+
+        #call-incomingdiv .alert-message-container {
+            margin-right: 20px;
+        }
+
+        #notificationCallInComing {
+            color: #428BCA !important;
+            cursor: pointer;
+        }
+    </style>
+    <div class="collapse navbar-collapse pull-left" id="topmenu">
+        <ul class="nav navbar-nav">
+            @foreach (var item in Model.Where(p => p.ParentId == null && p.PageUrl != "/Home/Index").OrderBy(item => item.OrderNo))
+            {
+                var subList = Model.Where(p => p.ParentId == item.Id).OrderBy(i => i.OrderNo).ToList();
+                var hasSubList = subList != null && subList.Count > 0;
+
+                if (hasSubList)
+                {
+                    var url = item.PageUrl;
+                    if (item.PageId == null)
+                    {
+                        url = item.Url;
+                    }
+
+                    var cssClassActiveOpen = "";
+                    if (item.Id == idMenuParent)
+                    {
+                        cssClassActiveOpen = "active";
+                    }
+
+                    <li>
+                        <a class="@cssClassActiveOpen" href="@url">
+                            @*<i class="@item.CssClassIcon"></i>*@
+                            @item.Name
+                        </a>
+                    </li>
+                }
+            }
+            <!--<li>-->
+            @*//Bán hàng bằng FB*@
+            <!--<a href="/Home/FacebookLogin" target="_blank" id="FB" style="color: white;float: right;right: auto;"> <i class="fa fa-slideshare"></i> Facebook</a>
+
+        </li>-->
+            <li>
+                <a href="@Url.Action("LoginFacebook", "Home")" id="facebook_login" style="color: white; float: right; right: auto;">
+                    <i class="fa fa-facebook"></i>
+                    Đăng nhập Facebook
+                </a>
+            </li>
+
+            @if ((Erp.BackOffice.Helpers.Common.CurrentUser.BranchId != null) && (Erp.BackOffice.Helpers.Common.CurrentUser.BranchId != 0))
+            {
+                @Html.DropDownList("BRANCH_ID", SelectListHelper.GetSelectList_Branch_byID(Erp.BackOffice.Helpers.Common.CurrentUser.BranchId, "Chi nhánh"))
+            }
+            else
+            {
+                @Html.DropDownList("BRANCH_ID", SelectListHelper.GetSelectList_Branch(0, "Chi nhánh"))
+            }
+
+        </ul>
+
+        <div class="alert-box" id="zaloNotificationModal" aria-hidden="true" data-customer-id="">
+            <div class="alert-content">
+                <div class="modal-dialog-nofications" role="document" style="width: 420px !important; top: 29px !important; right: 95px !important; box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .2); ">
+                    <div class="modal-content-nofications" style="width: 420px; ">
+                        <div class="modal-header" style="width: 420px; background-color: #f5f5f5; color: #fff; position: relative; ">
+                            <a class="close" aria-label="Close" id="closeModalZalo" style="color: #f37e98; position: absolute; top: 50% !important; transform: translateY(-50%); right: 10px;">
+                                <span aria-hidden="true">&times;</span>
+                            </a>
+                        </div>
+
+                        <div class="modal-body" style="width: 420px; padding: 10px 20px; background-color: #f5f5f5;">
+                            <audio controls="controls" id="zaloNotificationSound" style="display: none">
+                                <source src="~/assets/thongbaozalo.mp3" type="audio/mpeg" />
+                            </audio>
+                            <div class="row align-items-center">
+                                <div class="col-md-2 text-center">
+                                    <img src="~/assets/images/zalo-icon.png" alt="User Avatar" class="user-avatar" style="width: 42px; height: 42px; cursor: pointer !important;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="flex-line" style="display: flex; align-items: center; width: 30rem; gap: 2rem; justify-content: space-between;">
+                                        <h5 class="modal-title" id="zaloNotificationModalLabel" style="font-weight:bold; width: 20rem; font-size:15px;">Thông báo từ Zalo</h5>
+                                        <div id="timeRemaining" style="font-size: 13px; width: 16.5rem; color: #2c9e80; ">Time</div>
+                                    </div>
+                                    <p style="font-size: 13px; margin-bottom: 5px;">Tin nhắn mới từ khách hàng:</p>
+                                    <p class="notification-message overflow-hidden" id="zaloNotificationMessage" style="font-size: 15px; color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis ipsum vel lorem aliquam eleifend ut id neque.</p>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                               
+                                <div class="modal-button" style="text-align: right;">
+                                    <a href="#" id="openZaloChat">Xem chi tiết</a>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="alert-box" id="alert-box">
+            <div class="alert-content" style="display: flex;">
+                <a class="close" aria-label="Close" id="closeAlert" style="">&times;</a>
+                <div class="avatar-wrapper">
+                    <img src="" alt="User Avatar" class="user-avatar">
+                </div>
+                <div class="text-wrapper">
+                    <div style="display: flex; margin-top: 5px; align-items: center; justify-content: space-between;">
+                        <h5 class="alert-title">Thông báo 1</h5>
+                        <span style="color: #2c9e80;" id="timeAction" data-lead-id></span>
+                    </div>
+                  
+                    <div class="alert-message-container">
+                        <p class="alert-message" id="notificationMessageLeadMeeting" data-lead-id></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*của facebook*@
+        <div class="alert-box" id="facebookNotificationModal">
+            <div class="alert-content" style="display: flex;">
+                <a class="close" aria-label="Close" id="closeFacebookAlert" style="color: #ff5858;">&times;</a>
+                <div class="avatar-wrapper" style="cursor: pointer; height: 65px;">
+                    <img src="https://img.icons8.com/?size=256&id=118568&format=png" alt="Facebook Icon" class="user-avatar" style="cursor: pointer !important; width: 65px; height: 65px;">
+                </div>
+                <div class="text-wrapper">
+                    <h5 class="alert-title" style="color: white"><strong>FACEBOOK</strong></h5>
+                    <div class="alert-message-container">
+                        <p class="alert-message" id="facebookNotificationMessage" style="color: white">Notification message here</p>
+                    </div>
+                    <div class="alert-postURL-container">
+                        <a class="alert-postURL" id="postURLFB" style="color: white; text-decoration: underline;">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <audio id="notificationSound" style="display: none;">
+            <source src="~/assets/thongbaongan.mp3" type="audio/mpeg" />
+        </audio>
+        <audio id="notificationSoundFacebook" style="display: none;">
+            <source src="~/assets/Facebook_Pling.mp3" type="audio/mpeg" />
+        </audio>
+        <div class="alert-box" id="call-incomingdiv">
+            <div class="alert-content">
+                <a class="close" aria-label="Close" id="closeAlertInComing">&times;</a>
+                <div class="text-wrapper">
+                    <div class="alert-message-container">
+                        <img src="~/assets/img/bell-ring.gif" alt="In Coming" style="width:35px" />
+                        <span class="alert-message">In Coming <span id="notificationCallInComing" data-id=""> </span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <audio controls="controls" id="InCominNotificationSound" style="display: none">
+            <source src="~/assets/phone-ring.mp3" type="audio/mpeg" />
+        </audio>
+
+        <div id="oaidData" data-oaid="@System.Configuration.ConfigurationManager.AppSettings["ZaloOA:OAId"]" style="display: none;"></div>
+        <div id="FBidData" data-FBidData="@System.Configuration.ConfigurationManager.AppSettings["FacebookAppId"]" style="display: none;"></div>
+
+
+    </div><!-- /.navbar-collapse -->
+    <link href="~/assets/css/notification-topmenu.css" rel="stylesheet" />
+
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script type="text/javascript">
+        function setCookie(c_name, value, expiredays) {
+
+            var exdate = new Date();
+            exdate.setDate(exdate.getDate() + expiredays);
+            document.cookie = c_name + "=" + value + ";path=/" + ((expiredays == null) ? "" : ";expires=" + exdate.toGMTString());
+        }
+
+
+
+
+
+        $('#BRANCH_ID').change(function () {
+            $(this).find(":selected").each(function () {
+                //alert($(this).val());
+                setCookie("BRANCH_ID_SPA_CookieName", $(this).val(), 1);
+                location.reload();
+            });
+
+
+        });
+
+        $(function () {
+            var connection = $.connection.hub;
+
+
+            var chat = $.connection.meetingHub;
+
+            chat.client.SendMeetingNotificationToUser = function (message, leadId, profileImage, isPartial, idTask, customerId) {
+                console.log('đây là signalR gửi proImage:', profileImage);
+                showNotificationModal(message, leadId, profileImage, isPartial, idTask, customerId);
+
+            };
+            chat.client.notificationOfFacebook = function (leadId, message, permalinkUrl, taskId) {
+                console.log('đây là signalR gửi facebook:', message);
+                showFacebookNotificationModal(leadId, message, permalinkUrl, taskId);
+
+            };
+            chat.client.upadteListNotificationOfLeadTaskCall = function () {
+                console.log("vô đây");
+                $.ajax({
+                    url: '/Home/NotificationsLogOfLeadMeeting',
+                    method: "get",
+                    dataType: "html",
+                    success: function (data) {
+                        // Cập nhật lại nội dung của placeholder
+                        $('.notificationsLeedMeeting').html(data);
+                                        console.log("vô đây lần 2");
+
+                    }
+                });
+            };
+
+            if (chat.connection.state !== $.signalR.connectionState.connected) {
+                $.connection.hub.start().done(function () {
+                    var clientId = chat.connection.id;
+                    //console.log(clientId);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/LeadMeeting/SaveClientId',
+                        data: { clientId: clientId },
+                        success: function (response) {
+                            // Xử lý kết quả trả về từ server nếu cần
+                            console.log(response.message);
+                        },
+                        error: function (error) {
+                            // Xử lý lỗi nếu có
+                            console.error('Error while sending clientId to server: ' + error);
+                        }
+                    });
+
+
+                });
+            }
+
+
+            var callIn = connection.createHubProxy('callInComingHub');
+            callIn.on('CallInComingNotificationToUser', function (message, idUs) {
+                showCallInNotificationModal(message, idUs);
+            });
+
+            if (connection.state !== $.signalR.connectionState.connected) {
+                connection.start().done(function () {
+                    var clientId = connection.id;
+                    console.log('text', clientId);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/LeadMeeting/SaveClientId',
+                        data: { clientId: clientId },
+                        success: function (response) {
+                            // Xử lý kết quả trả về từ server nếu cần
+                            console.log(response.message);
+                        },
+                        error: function (error) {
+                            // Xử lý lỗi nếu có
+                            console.error('Error while sending clientId to server: ' + error);
+                        }
+                    });
+                });
+            }
+        });
+
+        $.connection.hub.disconnected(function () {
+            setTimeout(function () {
+                $.connection.hub.start().done(function () {
+                    var clientId = chat.connection.id;
+                    console.log(clientId);
+                    $.ajax({
+                        type: 'POST',
+                        url: '/LeadMeeting/SaveClientId',
+                        data: { clientId: clientId },
+                        success: function (response) {
+                            // Xử lý kết quả trả về từ server nếu cần
+                            console.log(response.message);
+                        },
+                        error: function (error) {
+                            // Xử lý lỗi nếu có
+                            console.error('Error while sending clientId to server: ' + error);
+                        }
+                    });
+
+
+                });
+            }, 5000); // Restart connection after 5 seconds.
+        });
+
+        function showNotificationModal(message, leadId, profileImage, isPartial, idTask, customerId) {
+           
+            var messageParts = message.split('-');
+
+            
+            var messageToShow = messageParts[0];
+
+            
+            $('#notificationMessageLeadMeeting').text(messageToShow);
+
+            
+            var lastHyphenIndex = message.lastIndexOf('-');
+            
+            var lastText = message.substring(lastHyphenIndex + 1).trim();
+
+            $('#timeAction').text("Thời gian " + lastText);
+            $('#notificationMessageLeadMeeting').attr('data-lead-id', leadId);
+            $('#notificationMessageLeadMeeting').attr('data-ispartial', isPartial);
+            $('#notificationMessageLeadMeeting').attr('data-task', idTask);
+            $('#notificationMessageLeadMeeting').attr('data-customerid', customerId);
+
+            // Thêm hình ảnh
+            if (profileImage === null) {
+                $('.user-avatar').attr('src', '/assets/avatars/avatar3.png');
+                $('.user-avatar').attr('class', 'avatar');
+            } else {
+                $('.user-avatar').attr('src', '/Uploads/User/' + profileImage);
+                $('.user-avatar').attr('class', 'avatar');
+            }
+
+            // Hiển thị modal
+            $('#alert-box').css('display', 'block');
+            $('.navbar-fixed-top').css('z-index', '1031');
+
+            var audio = document.getElementById('notificationSound');
+            audio.play();
+        }
+
+
+        function redirectToLeadDetail(leadId, customerId) {
+            debugger
+            if (window.location.href.indexOf('/AdviseCard/LeadIndex') !== -1 && customerId == -1) {
+                DetailLead(leadId);
+            } else {
+                if (customerId > 0)
+                    window.location.href = '/Customer/Detail?detailLeadChanceId=' + leadId + '&customerId=' + customerId;
+                else 
+                    window.location.href = '/AdviseCard/LeadIndex?detailLeadId=' + leadId;
+
+            }
+        }
+        function redirectToCustomerDetail(leadId) {
+            if (window.location.href.indexOf('/Customer/Detail/' + leadId) !== -1) {
+                return;
+            } else {
+                window.open(
+                    '/Customer/Detail/' + leadId,
+                    '_blank' // <- This is what makes it open in a new window.
+                );
+            }
+        }
+        $(document).ready(function () {
+            // Thêm sự kiện click cho phần tử có id là notificationMessage
+            $('#notificationMessageLeadMeeting').click(function () {
+                // Lấy leadId từ thuộc tính data-lead-id của phần tử p
+                var leadId = $(this).data('lead-id');
+                var isPartial = $(this).data('ispartial');
+                debugger
+                var idTask = $(this).data('task');
+                var customerId = $(this).data('customerid');
+
+                $('#alert-box').css('display', 'none');
+                $.ajax({
+                    url: '/LeadMeeting/UpdateIsSendNotifications',
+                    method: 'POST',
+                    data: { idTaskNew: idTask },
+                    success: function (data) {
+                        // Xử lý kết quả nếu cần
+                        console.log(data);
+                        console.log('Cập nhật thành công');
+                    },
+                    error: function () {
+                        console.log('Đã xảy ra lỗi khi cập nhật');
+                    }
+                });
+                // Thực hiện hành động sau khi bấm vào notificationMessage
+                if (isPartial === 1)
+                    redirectToCustomerDetail(leadId);
+                else
+                    redirectToLeadDetail(leadId, customerId);
+            });
+        });
+
+        $(document).ready(function () {
+
+            var strVal = getCookie("BRANCH_ID_SPA_CookieName");
+            //alert(strVal);
+            $('#BRANCH_ID').val(strVal);
+
+
+        }); //cuoi
+        document.getElementById('closeAlert').addEventListener('click', function () {
+            // Lấy phần tử modal
+            $('#alert-box').css('display', 'none');
+            $('.navbar-fixed-top ').css('z-index', '1029');
+        });
+
+
+
+        //thanh
+        function showCallInNotificationModal(message, Id) {
+            // Cập nhật nội dung của modal với thông báo nhận được
+            $('#notificationCallInComing').text(message);
+            $('#notificationCallInComing').data('id', Id);
+            // Hiển thị modal
+            $('#call-incomingdiv').css('display', 'block');
+            $('.navbar-fixed-top').css('z-index', '1031');
+            // Phát âm thanh thông báo
+            var notificationSound = document.getElementById('InCominNotificationSound');
+            notificationSound.play();
+        }
+        $('#notificationCallInComing').on('click', function () {
+            var value = $('#notificationCallInComing').data('id');
+            console.log('dataId:' + value);
+            if (window.location.pathname !== '/AdviseCard/LeadIndex') {
+                //Ẩn thông báo
+                $('#call-incomingdiv').css('display', 'none');
+                $('.navbar-fixed-top ').css('z-index', '1029');
+                window.location.href = '/AdviseCard/LeadIndex?detailLeadId=' + value;
+            } else {
+                //Ẩn thông báo
+                $('#call-incomingdiv').css('display', 'none');
+                $('.navbar-fixed-top ').css('z-index', '1029');
+                DetailLead(value);
+            }
+        });
+        document.getElementById('closeAlertInComing').addEventListener('click', function () {
+            // Lấy phần tử modal
+            $('#call-incomingdiv').css('display', 'none');
+            $('.navbar-fixed-top ').css('z-index', '1029');
+        });
+
+
+        $(function () {
+            var zaloHubProxy = $.connection.zaloHub;
+            var globalLeadId;
+            // Xử lý khi nhận được thông báo từ Zalo
+            zaloHubProxy.client.SendZaloNotification = function (message, customerID, formattedTime) {
+                showZaloNotificationModal(message, customerID, formattedTime);
+                globalLeadId = customerID;
+
+            };
+
+            // Kết nối đến SignalR Hub
+            $.connection.hub.start().done(function () {
+                console.log('SignalR connected for zaloHub.');
+                $('#connectionStatus').text('Connected');
+            }).fail(function (error) {
+                console.error('SignalR connection error for zaloHub: ' + error);
+                $('#connectionStatus').text('Connection error');
+            });
+
+            // Hàm để lấy giá trị ZaloOAId
+            function getZaloOaId(callback) {
+                $.ajax({
+                    url: '/Answer/GetZaloOaId',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        // Gọi callback với giá trị ZaloOAId nhận được từ server
+                        callback(data);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error getting ZaloOAId:', error);
+                    }
+                });
+            }
+            function getLeadId(customerID) {
+                return $.ajax({
+                    url: '/Answer/GetLeadIdByUserIdZalo',
+                    type: 'GET',
+                    data: { UserIdZalo: customerID }, // Truyền customerID vào trong request
+                    dataType: 'json',
+                    success: function (response) {
+                        return response;
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Error getting leadId:', error);
+                        return null; // hoặc xử lý lỗi tùy ý
+                    }
+                });
+            }
+            // Hiển thị cửa sổ thông báo Zalo
+            function showZaloNotificationModal(message, customerID, formattedTime) {
+                // Hiển thị thông điệp và thời gian còn lại
+                $('#zaloNotificationMessage').text(message);
+                $('#zaloNotificationModal').attr('data-customer-id', customerID);
+                $('#timeRemaining').text(formattedTime);
+
+                // Phát âm thanh thông báo
+                var notificationSound = document.getElementById('zaloNotificationSound');
+                notificationSound.play();
+
+                // Hiển thị cửa sổ thông báo nếu chưa hiển thị
+                if (!$('#zaloNotificationModal').is(':visible')) {
+                    $('#zaloNotificationModal').show();
+                }
+
+                // Gọi hàm để lấy ZaloOAId và xử lý tiếp
+                getZaloOaId(function (oaid) {
+                    // Sự kiện click cho nút "Xem tin nhắn trong Zalo OA"
+                    $('#openZaloChat').click(function () {
+                        var customerID = $('#zaloNotificationModal').attr('data-customer-id');
+                        console.log(oaid);
+                        var link = "https://oa.zalo.me/chatv2?uid=" + customerID + "&oaid=" + oaid;
+                        console.log(link);
+
+                        window.open(link, '_blank');
+                    });
+                });
+
+                $('#zaloNotificationModal').on('click', ':not(#closeModalZalo):not(#openZaloChat)', function (event) {
+                    // Kiểm tra xem phần tử được click có nằm trong phần tử có class là 'modal-button' không
+                    if (!$(event.target).closest('.modal-button').length) {
+                        var customerID = $('#zaloNotificationModal').attr('data-customer-id');
+
+                        getLeadId(customerID).done(function (leadId) {
+                            console.log(leadId);
+                            $('#zaloNotificationModal').css('display', 'none');
+                            redirectToLeadDetail(leadId);
+                        }).fail(function (xhr, status, error) {
+                            console.error('Error:', error);
+                        });
+                    }
+                });
+
+            }
+
+            // Gắn sự kiện click cho nút "Đóng cửa sổ thông báo Zalo"
+            $(document).on('click', '#closeModalZalo', function () {
+                $('#zaloNotificationModal').hide();
+            });
+        });
+
+
+
+    </script>
+    @*Cho Facebook*@
+                  <script>
+
+        $(document).ready(function () {
+            var fBidData = document.getElementById('FBidData').getAttribute('data-FBidData');
+            window.fbAsyncInit = function () {
+                FB.init({
+                    appId: fBidData,
+                    xfbml: true,
+                    version: 'v19.0'
+                });
+                FB.AppEvents.logPageView();
+                performFacebookAjaxRequest();
+            };
+
+            (function (d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) { return; }
+                js = d.createElement(s); js.id = id;
+                js.src = "https://connect.facebook.net/en_US/sdk.js";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));
+
+            function performFacebookAjaxRequest() {
+                $.ajax({
+                    url: '/Home/GetExpiredAccessTokenFacebook',
+                    type: 'GET',
+                    success: function (response) {
+                        var tokenInfo = response.tokenInfo;
+                        var token = tokenInfo.token;
+                        var isActive = tokenInfo.isActive;
+                        if (isActive) {
+                            getFanPagesForDeleteWebhook(token, function (success) {
+                                if (success) {
+                                    // Nếu hàm getFanPagesForDeleteWebhook hoàn thành thành công, thực hiện các hành động khác
+                                    subscribeWebhooksForFanpages();
+                                    var loginButton = document.getElementById("facebook_login");
+                                    loginButton.innerHTML = '<i class="fa fa-sign-out"></i> Đăng xuất Facebook';
+                                    loginButton.setAttribute("onclick", "logout();");
+                                    loginButton.removeAttribute("target");
+                                    loginButton.removeAttribute("href");
+                                }
+                                else {
+                                    var loginButton = document.getElementById("facebook_login");
+                                    loginButton.innerHTML = '<i class="fa fa-facebook"></i> Đăng nhập Facebook';
+                                    loginButton.removeAttribute("onclick");
+                                    loginButton.removeAttribute("target");
+                                    loginButton.setAttribute("href", "@Url.Action("LoginFacebook", "Home")");
+                                }
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Xử lý khi có lỗi xảy ra trong quá trình gửi yêu cầu
+                        console.error('Lỗi khi gửi yêu cầu:', error);
+                    }
+                });
+            }
+
+        });
+
+        function logout() {
+            // Thực hiện xóa webhook trước khi kiểm tra trạng thái đăng nhập
+            deleteWebhooks(function() {
+            localStorage.removeItem('accessToken_User');
+            localStorage.removeItem('userId_FB');
+            updateActiveAccessToken();
+            });
+        }
+        function updateActiveAccessToken() {
+            $.ajax({
+                url: '/Home/UpdateActiveAcessToken',
+                type: 'GET',
+                success: function(response) {
+                    window.location.href = '/Home/LoginFacebook';
+                },
+                error: function(xhr, status, error) {
+                    console.error('Lỗi khi gửi yêu cầu:', error);
+                }
+            });
+        }
+        function showFacebookNotificationModal(leadId, message, permalinkUrl, taskId) {
+            // Cập nhật nội dung của modal với thông báo nhận được
+            $('#facebookNotificationMessage').text(message);
+            $('#facebookNotificationMessage').attr('data-lead-id', leadId);
+            $('#facebookNotificationMessage').attr('data-task-id', taskId);
+            // Gán URL cho thẻ a
+            $('#postURLFB').attr('href', permalinkUrl);
+            // Thêm thuộc tính target="_blank" để mở liên kết trong tab hoặc cửa sổ mới
+            $('#postURLFB').attr('target', '_blank');
+            // Hiển thị modal
+            $('#facebookNotificationModal').css('display', 'block');
+            $('.navbar-fixed-top').css('z-index', '1031');
+            var audio = document.getElementById('notificationSoundFacebook');
+            audio.play();
+        }
+
+        $(document).ready(function () {
+            // Thêm sự kiện click cho phần tử có id là closeFacebookAlert
+            $('#closeFacebookAlert').click(function () {
+                $('#facebookNotificationModal').css('display', 'none');
+                $('.navbar-fixed-top ').css('z-index', '1029');
+            });
+        });
+        $('#facebookNotificationMessage').click(function () {
+            var leadId = $(this).data('lead-id');
+            var taskNewId = $(this).data('task-id');
+            $.ajax({
+                url: '/LeadMeeting/UpdateIsSendNotifications',
+                method: 'POST',
+                data: { idTaskNew: taskNewId },
+                success: function (data) {
+                    // Xử lý kết quả nếu cần
+                    console.log(data);
+                    console.log('Cập nhật thành công');
+                },
+                error: function () {
+                    console.log('Đã xảy ra lỗi khi cập nhật');
+                }
+            });
+            $('#facebookNotificationModal').css('display', 'none');
+            redirectToLeadDetail(leadId);
+        });
+        function deleteWebhooks(callback) {
+
+            // Lấy dữ liệu fanpage từ localStorage
+            var storedFanpageInfo = localStorage.getItem('fanpageInfoMap');
+            if (storedFanpageInfo) {
+                // Thực hiện yêu cầu POST đến endpoint DeleteWebhooks trên máy chủ
+                $.ajax({
+                    url: '/Home/DeleteWebhooks',
+                    type: 'POST',
+                    data: { fanpageInfoMap: storedFanpageInfo },
+                    success: function (response) {
+                        console.log('Đã xóa các webhook thành công');
+                        // Xóa dữ liệu fanpage khỏi localStorage sau khi đã xóa webhook
+                        localStorage.removeItem('fanpageInfoMap');
+                        // Gọi hàm callback để thông báo rằng đã hoàn thành xóa webhook
+                        if (typeof callback === 'function') {
+                            callback();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Lỗi khi xóa webhook:', error);
+                        // Gọi hàm callback ngay cả khi có lỗi để tiếp tục quá trình đăng xuất
+                        if (typeof callback === 'function') {
+                            callback();
+                        }
+                    }
+                });
+            } else {
+                console.log('Không có dữ liệu về fanpage trong localStorage.');
+                // Gọi hàm callback ngay cả khi không có dữ liệu để tiếp tục quá trình đăng xuất
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            }
+        }
+
+
+        function getFanPagesForDeleteWebhook(accessToken, callback) {
+            var fanpageInfoMap = {};
+            // Gửi yêu cầu lấy thông tin các fanpage sử dụng accessToken
+            FB.api(
+                '/me/accounts',
+                'GET',
+                { access_token: accessToken, fields: 'id,name,access_token' },
+                function (response) {
+                    // Kiểm tra xem có dữ liệu trả về hay không
+                    console.log(response);
+                    if (response && response.data) {
+                        // Lặp qua mỗi fanpage trong dữ liệu trả về
+                        response.data.forEach(function (fanpage) {
+                            // Lưu thông tin fanpage vào đối tượng fanpageInfoMap
+                            fanpageInfoMap[fanpage.id] = {
+                                id: fanpage.id,
+                                name: fanpage.name,
+                                accessToken: fanpage.access_token
+                            };
+                        });
+
+                        console.log("dô getFanPagesForDeleteWebhook thành công");
+                        localStorage.setItem('fanpageInfoMap', JSON.stringify(fanpageInfoMap));
+                        localStorage.setItem('accessToken_User', JSON.stringify(fanpageInfoMap));
+
+                        callback(true);
+                    } else {
+                        //var confirmLogout = confirm('Thời gian truy cập FACEBOOK đã hết hạn. Bạn có muốn đăng nhập lại không?');
+
+                        console.log("dô getFanPagesForDeleteWebhook thất bại");
+
+                        callback(false);
+                    }
+                }
+            );
+        }
+        function subscribeWebhook(fanpageId, fanpageAccessToken) {
+            // Đường dẫn của API để đăng ký webhook
+            var subscribedFields = [
+                "feed",
+                "messages",
+                "message_reactions",
+                "messaging_customer_information",
+                "message_deliveries",
+                "message_echoes",
+                "message_edits",
+                "message_reads",
+                "messaging_optins",
+                "messaging_policy_enforcement",
+                "messaging_postbacks"
+            ];
+
+            var webhookUrl = 'https://graph.facebook.com/' + fanpageId + '/subscribed_apps?subscribed_fields=' + subscribedFields.join(',') + '&access_token=' + fanpageAccessToken;
+
+
+            // Gọi AJAX để đăng ký webhook
+            $.ajax({
+                url: webhookUrl,
+                type: 'POST',
+                success: function (response) {
+                    console.log('Đăng ký webhook thành công');
+                },
+                error: function (xhr, status, error) {
+                    console.error('Lỗi khi đăng ký webhook:', error);
+                }
+            });
+        }
+        function subscribeWebhooksForFanpages() {
+            // Lấy thông tin fanpage từ localStorage
+            var fanpageInfoMapString = localStorage.getItem('fanpageInfoMap');
+            if (fanpageInfoMapString) {
+                var fanpageInfoMap = JSON.parse(fanpageInfoMapString);
+                // Lặp qua các fanpage và đăng ký webhook cho mỗi fanpage
+                for (var fanpageId in fanpageInfoMap) {
+                    if (fanpageInfoMap.hasOwnProperty(fanpageId)) {
+                        var fanpage = fanpageInfoMap[fanpageId];
+                        // Gọi hàm subscribeWebhook() để đăng ký webhook cho fanpage
+                        subscribeWebhook(fanpage.id, fanpage.accessToken);
+                    }
+                }
+            } else {
+                console.log('Không có dữ liệu về các fanpage trong localStorage.');
+            }
+        }
+                  </script>

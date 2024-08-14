@@ -1,0 +1,406 @@
+﻿@model CRM_BH_DOANHSOViewModel
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+
+}
+
+@{
+    ViewBag.Title = "Thông tin tìm kiếm";
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "BH_DOANHSO",
+        ActionName = "CreateKH",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    List<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (List<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;
+    int index = 1;
+    IEnumerable<SelectListItem> BrandList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin    ", null, "value");
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.category;
+
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+<style>
+    .popover {
+        width: 100% !important;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 10px;
+    }
+</style>
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    @Html.HiddenFor(model => model.KH_BANHANG_DOANHSO_ID)
+    <p>
+        <div>
+            <label>Nhân viên quản lý:</label>
+            <select class="chzn-select" style="width:250px !important; float:left" name="SalerId">
+                <option value="">- Nhân viên QL -</option>
+                @foreach (var item in SelectListHelper.GetSelectList_FullUserName(null, null))
+                {
+                <option @(Request["SalerId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+                }
+            </select>
+            
+            <label style="">Nhãn hàng: </label>
+            <select style="text-align-last:center;float:initial;width:125px" class="item_origin" name="item_origin" id="item_origin">
+               <option value="">Chọn nhãn hàng</option>
+                @foreach (var item in origin)
+                {
+                    if (item.Value == Model.CountForBrand)
+                    {
+                        <option @(Request["item_origin"] == item.Value ? "Selected" : "") value="@item.Value">@item.Name</option>
+
+                    }
+                }
+
+                @foreach (var item in origin)
+                {
+
+                    if (item.Value != Model.CountForBrand)
+                    {
+                        <option @(Request["item_origin"] == item.Value ? "Selected" : "") value="@item.Value">@item.Name</option>
+                    }
+
+                }
+            </select>
+           
+            <span class="input-daterange input-group">
+                @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : "", new { autocomplete = "off", placeholder = "Ngày mua từ..." })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : "", new { autocomplete = "off", placeholder = "đến ngày..." })
+            </span>
+             </div>
+        <div>
+            <label style="padding-left:10px">Mã khách hàng:</label>
+            @Html.TextBox("CustomerCode", Request["CustomerCode"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng", style = "width:150px" })
+            <label style="padding-left:10px">Tên khách hàng:</label>
+            @Html.TextBox("CustomerName", Request["CustomerName"], new { @class = "", autocomplete = "off", placeholder = "Tên khách hàng", style = "width:150px" })
+            <label style="padding-left:10px">SĐT:</label>
+            @Html.TextBox("Phone", Request["Phone"], new { @class = "", autocomplete = "off", placeholder = "SĐT", style = "width:150px" })
+
+
+            <label style="padding-left:10px">Đơn hàng:</label>
+            @Html.TextBox("MA_DONHANG", Request["MA_DONHANG"], new { @class = "", autocomplete = "off", placeholder = "Mã đơn hàng", style = "width:150px" })
+
+
+        </div>
+    </p>
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @*@Html.AntiForgeryToken()*@
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.KH_BANHANG_DOANHSO_ID)
+    <div class="tabbable">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab" style="height:30px">
+            <li>Thông tin chung</li>
+        </ul>
+        <div class="tab-content clear-fix">
+
+            <div id="tab1" class="tab-pane active" style="margin-left:20px">
+            </div>
+            <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+            <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+            <div id="listOrderDetail" class="table-responsive top-10 ">
+                <table id="CTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width:40px">
+                                <input id="checkAll" name="checkAll" type="checkbox" class="ace" value="1">
+                                <span class="lbl"></span>
+                            </th>
+                            <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                            <th rowspan="2" style="width:200px;text-align:center">Tên KH</th>
+                            <th rowspan="2" style="text-align:center">Mã KH</th>
+                            <th rowspan="2" style="text-align:center">Điện thoại</th>
+                            <th rowspan="2" style="text-align:center">Nhân viên QL</th>
+                            <th colspan="4" style="text-align:center">Đơn hàng </th>
+                            @*<th rowspan="2" style="width: 150px; text-align: center">Tỷ lệ thành công(%)</th>*@
+                            <th rowspan="2" style="text-align:center">Nhãn hàng</th>
+                            <th rowspan="2" style="text-align:center">Có đơn hàng</th>
+                            @*<th rowspan="2" style="width: 150px; text-align: center">Đánh giá lại(%)</th>*@
+                            @*<th rowspan="2" style="text-align:center"></th>*@
+                        </tr>
+
+                        <tr>
+                            <th style="text-align:center">Đơn hàng</th>
+                            <th style="text-align:center">Số tiền</th>
+                            <th style="text-align:center">Đã trả</th>
+                            <th style="text-align:center">Còn lại</th>
+                        </tr>
+
+                    </thead>
+                    <tbody class="productInvoiceList">
+                        @if (Model.CRM_BH_DOANHSO_CTIETList != null && Model.CRM_BH_DOANHSO_CTIETList.Count > 0)
+                        {
+                            for (int i = 0; i < Model.CRM_BH_DOANHSO_CTIETList.Count(); i++)
+                            {
+                                <tr role="@(i+1)" id="@(i+1)">
+                                    <td>
+                                        <input id="CRM_BH_DOANHSO_CTIETList_@(i)__is_checked" name="CRM_BH_DOANHSO_CTIETList[@(i)].is_checked" type="checkbox" class="ace item_is_checked" value="1">
+                                        <span class="lbl"></span>
+                                    </td>
+                                    <td class="text-center">
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        <input class="id" type="hidden" id="CRM_BH_DOANHSO_CTIETList_@(i)__CustomerId" name="CRM_BH_DOANHSO_CTIETList[@(i)].CustomerId" value="@Model.CRM_BH_DOANHSO_CTIETList[i].CustomerId" />
+                                        <span>@Model.CRM_BH_DOANHSO_CTIETList[i].CustomerName</span>
+                                    </td>
+                                    <td>
+                                        <input class="name" type="hidden" id="CRM_BH_DOANHSO_CTIETList_@(i)__CustomerCode" name="CRM_BH_DOANHSO_CTIETList[@(i)].CustomerCode" value="@Model.CRM_BH_DOANHSO_CTIETList[i].CustomerCode" readonly="readonly" />
+                                        <span class="code" id="CRM_BH_DOANHSO_CTList@(i)__CustomerCode" name="CRM_BH_DOANHSO_CTList[@(i)].CustomerCode" value="@Model.CRM_BH_DOANHSO_CTIETList[i].CustomerCode">@Model.CRM_BH_DOANHSO_CTIETList[i].CustomerCode</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="CRM_BH_DOANHSO_CTIETList_@(i)__CustomerPhone" name="CRM_BH_DOANHSO_CTIETList[@(i)].CustomerPhone" value="@Model.CRM_BH_DOANHSO_CTIETList[i].CustomerPhone" readonly="readonly" />
+                                        <span>@Model.CRM_BH_DOANHSO_CTIETList[i].Phone</span>
+                                    </td>
+                                    <td>
+                                        <input class="ManagerStaffName" type="hidden" id="CRM_BH_DOANHSO_CTIETList_@(i)__ManagerStaffName" name="CRM_BH_DOANHSO_CTIETList[@(i)].ManagerStaffName" value="@Model.CRM_BH_DOANHSO_CTIETList[i].ManagerStaffName" readonly="readonly" />
+                                        <span>@Model.CRM_BH_DOANHSO_CTIETList[i].ManagerStaffName</span>
+                                    </td>
+                                    <td>
+                                        <input class="phone" type="hidden" id="CRM_BH_DOANHSO_CTIETList_@(i)__Code" name="CRM_BH_DOANHSO_CTIETList[@(i)].Code" value="@Model.CRM_BH_DOANHSO_CTIETList[i].Code" readonly="readonly" />
+                                        <span style="text-decoration: underline;"><a onclick="OpenPopup('@Url.Action("Detail", "ProductInvoice", new {area = "Sale",Id = @Model.CRM_BH_DOANHSO_CTIETList[i].Id, IsPopup = "true" })', 'Trang chi tiết doanh số', 0, 500)">@Model.CRM_BH_DOANHSO_CTIETList[i].Code</a><br></span>
+                                        <input class="phone" type="hidden" id="CRM_BH_DOANHSO_CTIETList_@(i)__CreatedDate" name="CRM_BH_DOANHSO_CTIETList[@(i)].CreatedDate" value="@Model.CRM_BH_DOANHSO_CTIETList[i].CreatedDate" readonly="readonly" />
+                                        <span style="color: #ff0000; text-decoration: underline;">(@Model.CRM_BH_DOANHSO_CTIETList[i].CreatedDate.Value.ToString("dd/MM/yyyy"))</span>
+                                    </td>
+
+                                    <td>
+                                        <input class="TotalDebit" type="hidden" id="CRM_BH_DOANHSO_CTIETList_@(i)__TotalDebit" name="CRM_BH_DOANHSO_CTIETList[@(i)].TotalDebit" value="@Model.CRM_BH_DOANHSO_CTIETList[i].TotalDebit" readonly="readonly" />
+                                        <span>@Model.CRM_BH_DOANHSO_CTIETList[i].TotalDebit</span>
+                                    </td>
+                                    <td>
+                                        <input class="TotalCredit" type="hidden" id="CRM_BH_DOANHSO_CTIETList_@(i)__TotalCredit" name="CRM_BH_DOANHSO_CTIETList[@(i)].TotalCredit" value="@Model.CRM_BH_DOANHSO_CTIETList[i].TotalCredit" readonly="readonly" />
+                                        <span>@Model.CRM_BH_DOANHSO_CTIETList[i].TotalCredit</span>
+                                    </td>
+                                    <td>
+                                        <input class="TongConNo" type="hidden" id="CRM_BH_DOANHSO_CTIETList_@(i)__TongConNo" name="CRM_BH_DOANHSO_CTIETList[@(i)].TongConNo" value="@Model.CRM_BH_DOANHSO_CTIETList[i].TongConNo" readonly="readonly" />
+                                        <span style="color:#ff0000">@Model.CRM_BH_DOANHSO_CTIETList[i].TongConNo</span>
+                                    </td>
+
+                                    @*<td>
+                                            <input style="width:50px" class="nr" type="text" id="CRM_BH_DOANHSO_CTIETList_@(i)__TYLE_THANHCONG" name="CRM_BH_DOANHSO_CTIETList[@(i)].TYLE_THANHCONG" value="0" readonly="readonly" />
+                                            <input style="width:30px" class="btn-mini btn-CONG" type="button" value="+" />
+                                            <input style="width:30px" class="btn-mini btn-TRU" type="button" value="-" />
+                                        </td>*@
+                                    <td>
+                                        <span>@Model.CRM_BH_DOANHSO_CTIETList[i].CountForBrand</span>
+                                    </td>
+                                    <td>
+                                        <input class="Code" type="hidden" id="CRM_BH_DOANHSO_CTIETList@(i)__Code" name="CRM_BH_DOANHSO_CTIETList[@(i)].Code" value="@Model.CRM_BH_DOANHSO_CTIETList[i].Code" readonly="readonly" />
+                                        <span style="text-decoration: underline;"><a onclick="OpenPopup('@Url.Action("Detail", "ProductInvoice", new {area = "Sale",Id = @Model.CRM_BH_DOANHSO_CTIETList[i].Id, IsPopup = "true" })', 'Trang chi tiết doanh số', 0, 500)">@Model.CRM_BH_DOANHSO_CTIETList[i].Code</a><br></span>
+                                    </td>
+                                    @*<td>
+                                            <input style="width:50px" class="nr-REVIEW" type="text" id="CRM_BH_DOANHSO_CTIETList_@(i)__TYLE_THANHCONG_REVIEW" name="CRM_BH_DOANHSO_CTIETList[@(i)].TYLE_THANHCONG_REVIEW" value="0" readonly="readonly" />
+                                            <input style="width:30px" class="btn-mini btn-CONG-REVIEW" type="button" value="+" />
+                                            <input style="width:30px" class="btn-mini btn-TRU-REVIEW" type="button" value="-" />
+                                        </td>*@
+
+                                    @*<td class="text-center">
+                                            <a class="btn-delete-item">
+                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                            </a>
+                                        </td>*@
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                    <thead>
+
+                    </thead>
+                </table>
+            </div>
+
+        </div>
+    </div>
+    <br />
+    <br />
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" onclick="Check();">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    @Html.ScriptBottom_ChosenStyle()
+    <script type="text/javascript">
+        function CheckIsval() {
+            $(function () {
+                $('th > :checkbox').click(function () {
+                    $(this).closest('table')
+                        .find('td > :checkbox')
+                        .attr('checked', $(this).is(':checked'));
+                });
+            });
+
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+        $('#listOrderDetail').on('click', '.btn-delete-item', function () {
+            $(this).closest('tr').remove();
+            $('.productInvoiceList tr').each(function (index, tr) {
+                $(tr).attr('role', index);
+                $(tr).find('td:first-child').text(index);
+                $(tr).find('.id').attr('name', 'CRM_BH_DOANHSO_CTIETList[' + index + '].Id').attr('id', 'CRM_BH_DOANHSO_CTIETList' + index + '__Id');
+                $(tr).find('.code').attr('name', 'CRM_BH_DOANHSO_CTIETList[' + index + '].Code').attr('id', 'CRM_BH_DOANHSO_CTIETList' + index + '__Code');
+                $(tr).find('.phone').attr('name', 'CRM_BH_DOANHSO_CTIETList[' + index + '].Phone').attr('id', 'CRM_BH_DOANHSO_CTIETList' + index + '__Phone');
+                $(tr).find('.TotalDebit').attr('name', 'CRM_BH_DOANHSO_CTIETList[' + index + '].TotalDebit').attr('id', 'CRM_BH_DOANHSO_CTIETList_' + index + '__TotalDebit');
+                $(tr).find('.TotalCredit').attr('name', 'CRM_BH_DOANHSO_CTIETList[' + index + '].TotalCredit').attr('id', 'CRM_BH_DOANHSO_CTIETList_' + index + '__TotalCredit');
+                $(tr).find('.TongConNo').attr('name', 'CRM_BH_DOANHSO_CTIETList[' + index + '].TongConNo').attr('id', 'CRM_BH_DOANHSO_CTIETList_' + index + '__TongConNo');
+                $(tr).find('.is_checked').attr('name', 'CRM_BH_DOANHSO_CTIETList[' + index + '].is_checked').attr('id', 'CRM_BH_DOANHSO_CTIETList_' + index + '__is_checked');
+            });
+        });
+        $('#listOrderDetail').on('click', '.btn-CONG', function () {
+            var $row = $(this).closest("tr");    // Find the row
+            var $text = $row.find(".nr").val(); // Find the text
+            var w = parseFloat($text);
+            if (w < 0) {
+                w = -1;
+            }
+            if (w > 0) {
+                w += 10;
+            } if (w == 0) {
+                w += 10;
+            }
+            if (w == -1) {
+                w = 0;
+            }
+            if (w > 100) {
+                w = 100;
+                alert('Tỷ lệ thành công không được quá 100%');
+            }
+            $row.find(".nr").val(w);
+        });
+        $('#listOrderDetail').on('click', '.btn-TRU', function () {
+            var $row = $(this).closest("tr");    // Find the row
+            var $text = $row.find(".nr").val(); // Find the text
+            var w = parseFloat($text);
+            if (w == 0) {
+                w = -1;
+            }
+            if (w < 0) {
+                w = -1;
+            } if (w == -1) {
+                w = -1;
+            } if (w > 0) {
+                w += -10;
+            }
+            $row.find(".nr").val(w);
+        });
+        $('#listOrderDetail').on('click', '.btn-CONG-REVIEW', function () {
+            var $row = $(this).closest("tr");    // Find the row
+            var $text = $row.find(".nr-REVIEW").val(); // Find the text
+            var w = parseFloat($text);
+            if (w < 0) {
+                w = -1;
+            }
+            if (w > 0) {
+                w += 10;
+            } if (w == 0) {
+                w += 10;
+            }
+            if (w == -1) {
+                w = 0;
+            }
+            if (w > 100) {
+                w = 100;
+                alert('Tỷ lệ thành công không được quá 100%');
+            }
+            $row.find(".nr-REVIEW").val(w);
+        });
+        $('#listOrderDetail').on('click', '.btn-TRU-REVIEW', function () {
+            var $row = $(this).closest("tr");    // Find the row
+            var $text = $row.find(".nr-REVIEW").val(); // Find the text
+            var w = parseFloat($text);
+            if (w == 0) {
+                w = -1;
+            }
+            if (w < 0) {
+                w = -1;
+            } if (w == -1) {
+                w = -1;
+            } if (w > 0) {
+                w += -10;
+            }
+            $row.find(".nr-REVIEW").val(w);
+        });
+
+        function Check() {
+            ShowLoading();
+            var TARGET_BRAND = $("#TARGET_BRAND").val();
+            var CountForBrand = $("#CountForBrand").val()
+            var messagge = "";
+            if (TARGET_BRAND == '') {
+                messagge += "Chưa nhập Taget<br>";
+            } if (CountForBrand == '') {
+                messagge += "Chưa chọn nhãn hàng";
+            }
+            if (messagge != '') {
+                alertPopup('Lỗi!', messagge, 'error');
+                HideLoading();
+            } else {
+                ClearFormatBeforeSubmit($("#SaleOrder"));
+                $("#SaleOrder").submit();
+            }
+        }
+    </script>
+}

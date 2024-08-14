@@ -1,0 +1,2669 @@
+﻿@model IEnumerable<CustomerViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Account.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Sale.Controllers
+
+    @using Erp.BackOffice.Crm.Models
+    @*@model CustomerViewModel*@
+
+    @{
+        ViewBag.Title = Wording.PageIndex_Customer;
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+
+        var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Customer",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        var path = Erp.BackOffice.Helpers.Common.GetSetting("Customer");
+        var pageSize = ViewBag.PageSize;
+
+        var pagingSize = pageSize == 50 ? 50 :
+                         pageSize == 100 ? 100 :
+                         pageSize == 200 ? 200 :
+                         pageSize == 500 ? 500 :
+                         15;
+    }
+
+                      <div id="gridBody">
+
+                          <link href="@Url.Content("~/assets/css/ .css")" rel="stylesheet" type="text/css" />
+                          <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+                          <style>
+                              .popover {
+                                  width: 100% !important;
+                              }
+
+                              .itemdiv > .body > .text {
+                                  padding-bottom: 0px !important;
+                                  /* padding-left: 7px; */
+                                  /* font-size: 13px; */
+                              }
+
+                              .itemdiv {
+                                  padding-right: 3px;
+                                  min-height: 10px;
+                              }
+
+                              .btn-search {
+                                  visibility: hidden;
+                              }
+                              /*[H_N]*/
+
+                              div#myModal {
+                                  background: rgba(0, 0, 0, 0.5);
+                              }
+
+                              .input-daterange, .input-group {
+                                  z-index: 1002;
+                              }
+
+                              @@media (min-width: 768px) {
+                                  .modal-dialog {
+                                      margin: 10px auto;
+                                  }
+
+                                  table > tbody > tr:hover {
+                                      background: #d2e4ff !important;
+                                  }
+                              }
+
+                              .file-item {
+                                  display: flex;
+                                  align-items: center;
+                                  margin-right: 10px;
+                                  margin-bottom: 10px;
+                                  padding: 5px;
+                                  border: 1px solid #ccc;
+                                  background-color: #f9f9f9;
+                                  border-radius: 5px;
+                                  max-width: 300px;
+                                  overflow: hidden;
+                              }
+
+                                  .file-item a {
+                                      text-decoration: none;
+                                  }
+
+
+                                  .file-item a {
+                                      flex-grow: 1;
+                                      overflow: hidden;
+                                      text-overflow: ellipsis;
+                                      white-space: nowrap;
+                                      color: #007bff;
+                                      cursor: pointer;
+                                  }
+
+                                  .file-item .file-size {
+                                      margin-left: 10px;
+                                      font-size: 12px;
+                                      color: #000;
+                                  }
+
+                                  .file-item button {
+                                      margin-left: 5px;
+                                      background-color: #dc3545;
+                                      color: #fff;
+                                      border: none;
+                                      border-radius: 50%;
+                                      width: 20px;
+                                      height: 20px;
+                                      font-size: 12px;
+                                      cursor: pointer;
+                                  }
+
+                                      .file-item button:hover {
+                                          cursor: pointer;
+                                      }
+
+                              .header-title #modalEmailHangfireTotalLead,
+                              .header-title #modalSmsHangfireTotalLead,
+                              .header-title #modalZnsHangfireTotalLead, .modalEmailHangfireTotalLead {
+                                  padding: 0 !important;
+                                  margin: 0;
+                                  font-size: 1.4rem;
+                              }
+
+                              .header-title {
+                                  display: flex;
+                                  align-items: center;
+                                  gap: 1rem;
+                              }
+
+                                  .header-title .modal-title {
+                                      text-transform: uppercase;
+                                      font-size: 1.5rem;
+                                  }
+
+                                  .header-title #modalEmailHangfireTotalLead,
+                                  .header-title #modalSmsHangfireTotalLead,
+                                  .header-title #modalZnsHangfireTotalLead, .modalEmailHangfireTotalLead {
+                                      padding: 0 !important;
+                                      margin: 0;
+                                      font-size: 1.4rem;
+                                  }
+                          </style>
+
+                          @helper GridColumnAdviseCard(int Id, string name, bool IsPopup)
+                          {
+                              <a name="Id" value="Id" onclick="OpenPopup('@Url.Action("Create", "AdviseCard",new { area="Sale",Id=Id,name=name, IsPopup =false})','',0,0)">Lập phiếu tư vấn</a>
+
+                          }
+                          @helper GridColumnEconomicStatus(int Id, bool IsPopup)
+                          {
+                              <a name="Id" value="Id" onclick="OpenPopup('@Url.Action("EditNT", "Customer",new { area="Account",Id=Id, IsPopup =false})','',0,0)">Đánh giá KH</a>
+
+                          }
+
+                          @helper GridColumnAction(int? Id, string TargetModule, string TargetCode, string TargetName, bool isPopup)
+                          {
+                              if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("LiabilitiesDetail", "TransactionLiabilities", "Account"))
+                              {
+                                  <a class="btn btn-white btn-danger btn-minier" onclick="OpenPopup('@Url.Action("LiabilitiesDetail", "TransactionLiabilities", new { TargetModule = TargetModule, TargetCode = TargetCode, TargetName = TargetName, popup = true })', 'Chi tiết công nợ', 0, 500)">
+                                      <i class="ace-icon fa fa-money"></i> Công nợ
+                                  </a>
+                              }
+                              @*if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "CommisionCustomer", "Sale"))
+            {
+                <a class="btn btn-white btn-success btn-minier" onclick="OpenPopup('@Url.Action("Create", "CommisionCustomer", new { area = "Sale", CustomerId = Id, popup = true })', 'Cài đặt chiết khấu', 500, 700)">
+                    <i class="ace-icon fa fa-cog"></i>
+                    Chiết khấu
+                </a>
+            }*@
+                          }
+
+                          @helper GridColumnAction2(int CustomerId, bool isPopup)
+                          {
+
+                          }
+
+                          @*@helper GridColumnBranch(int? Id)
+        {
+        }*@
+                          @helper GridColumnschedule(int id)
+                          {
+                              <a href="@Url.Action("DetailSearch", "Customer", new { Id = id })">Xem lịch hẹn</a>
+                          }
+
+                          @helper GridColumnName(string name, string code, int id, string note, string Image, int? pluspoint, string phone, bool isPopup = false, string jsCallback = null)
+                          {
+
+                              name = string.IsNullOrEmpty(name) == false ? name : "No Title";
+                              <div class="itemdiv commentdiv">
+                                  <div class="user">
+
+                                      <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image,"Customer","user"))" title="@name" data-rel="colorbox" class="cboxElement">
+                                          <img id="myImg" alt="@name" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))">
+                                      </a>
+
+                                  </div>
+                                  <div class="body">
+                                      <div class="name" data-toggle="tooltip" title="Tên khách hàng">
+                                          @if (!isPopup)
+                                          {
+                                              <a href="@Url.Action("Detail", "Customer", new { Id = id })" target="_blank">@name</a>
+                                          }
+                                          else
+                                          {
+                                              if (string.IsNullOrEmpty(jsCallback))
+                                              {
+                                                  <a onclick="parent.selectItem_Customer(@id,'@code','@name','@pluspoint')">@name</a>
+                                              }
+                                              else
+                                              {
+                                                  <a onclick="parent.@(jsCallback)(@id, '@name','@pluspoint','@code','@phone')">@name</a>
+                                              }
+                                          }
+                                          @if (!string.IsNullOrEmpty(note))
+                                          {
+                                              <span class="help-button" data-rel="tooltip" data-placement="bottom" data-original-title="@note">?</span>
+                                          }
+                                      </div>
+                                      <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+                                          @code
+                                      </div>
+                                  </div>
+                              </div>
+                          }
+                          @helper GridColumnNote(string note)
+                          {
+                              <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+                                  @note
+                              </div>
+                          }
+                          @helper GridColumnNameAddress(string DistrictName, string WardName, string ProvinceName, string Address)
+                          {
+                              <p data-toggle="tooltip" title="Địa chỉ - Phường/Xã">
+                                  <i class="fa fa-map-marker"></i> @(Address == null ? "chưa có" : Address) - @(WardName == null ? "chưa có" : WardName)
+                              </p>
+                              <span data-toggle="tooltip" title="Quận/huyện - Thành phố/Tỉnh">
+                                  <i class="fa fa-globe"></i> @(DistrictName == null ? "chưa có" : DistrictName) - @(ProvinceName == null ? "chưa có" : ProvinceName)
+                              </span>
+
+                          }
+
+                          @helper GridColumnContact(string Phoneghep, string Email)
+                          {
+                              <p data-toggle="tooltip" title="Số điện thoại">
+                                  <i class="fa fa-mobile-phone"></i> @(Phoneghep == null ? "chưa có" : Phoneghep.EndsWith("-") ? Phoneghep.Remove(Phoneghep.Length - 1) : Phoneghep)
+
+                              </p>
+                              <span data-toggle="tooltip" title="Email">
+                                  <i class="fa fa-envelope"></i> @(Email == null ? "chưa có" : Email)
+                              </span>
+
+                          }
+                          @helper GridColumnDateName(DateTime? CreateDate, DateTime? DateOfIssue)
+                          {
+                              <p data-toggle="tooltip" title="Ngày tạo">
+                                  <i class="fa fa-calendar-plus-o"></i> @CreateDate.Value.ToString("dd/MM/yyyy HH:mm")
+                              </p>
+                              <span data-toggle="tooltip" title="Ngày cập nhật"><i class="fa fa-calendar-check-o"></i> @(DateOfIssue.HasValue ? DateOfIssue.Value.ToString("dd/MM/yyyy HH:mm") : "chưa có")</span>
+                          }
+                          @helper CheckDeleteColumns(int Id)
+                          {
+                              <label>
+                                  <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+                                  <span class="lbl"></span>
+                              </label>
+                          }
+
+                          @helper BuildCheckAll()
+                          {
+                              <label>
+                                  <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+                                  <span class="lbl"></span>
+                              </label>
+                          }
+
+                          @using (Html.BeginPageHeaderContainer(pageSetting))
+                          {
+                              <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+                              <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+
+                              <select class="chzn-select" style="width:250px; float:left" id="SalerId" name="SalerId">
+                                  <option value="">- Nhân viên QL -</option>
+                                  @foreach (var item in SelectListHelper.GetSelectList_FullUserName(null, null))
+                                  {
+                                      <option @(Request["SalerId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+                                  }
+                              </select>
+                              <p>
+                                  <span class="input-daterange input-group">
+                                      @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : "", new { @class = "", autocomplete = "off", placeholder = "Từ ngày..." })
+                                      <span class="input-group-addon">
+                                          <i class="fa fa-exchange"></i>
+                                      </span>
+                                      @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : "", new { @class = "", autocomplete = "off", placeholder = "Đến ngày..." })
+                                  </span>
+
+                                  @Html.TextBox("Phone", Request["Phone"], new { @class = "", autocomplete = "off", placeholder = "Số điện thoại..." })
+                                  @*@Html.TextBox("txtCode", Request["txtCode"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng..." })
+                @Html.TextBox("txtCusName", Request["txtCusName"], new { @class = "", autocomplete = "off", placeholder = "Tên khách hàng..." })*@
+                                  @Html.TextBox("txtCusInfo", Request["txtCusInfo"], new { @class = "", autocomplete = "off", placeholder = "Mã hoặc Tên khách hàng..." })
+                                  @*@Html.TextBox("CardCode", Request["CardCode"], new { @class = "", autocomplete = "off", type = "hidden", placeholder = "Mã thẻ khách hàng..." })*@
+
+                                  <select class="chzn-select" style="width:250px; float:left" id="NguonKhach" name="NguonKhach">
+                                      <option value="">- Nguồn Khách -</option>
+                                      @foreach (var item in SelectListHelper.GetSelectList_AllNguonKhach(null, null))
+                                      {
+                                          <option @(Request["NguonKhach"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+                                      }
+                                  </select>
+                              </p>
+
+
+                              <p>
+                                  @Html.DropDownList("ProvinceId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Location("0", Request["ProvinceId"], "Thành phố/Tỉnh"), new Dictionary<string, object> { { "class", "form-control" }, { "data-val-required", "Bắt buộc chọn." } })
+                                  @Html.DropDownList("DistrictId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Location(Request["ProvinceId"], Request["DistrictId"], "Quận/Huyện"), new Dictionary<string, object> { { "class", "form-control" }, { "data-val-required", "Bắt buộc chọn." } })
+                                  @Html.DropDownList("WardId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Location(Request["DistrictId"], Request["WardId"], "Phường/Xã"), new Dictionary<string, object> { { "class", "form-control" }, { "data-val-required", "Bắt buộc chọn." } })
+                                  <label>
+                                      <input type="radio" name="pLOAIKH" class="ace" value="ISLEAD" checked="checked" @(Request["pLOAIKH"] == "ISLEAD" ? "checked=checked" : "")>
+                                      <span class="lbl">Lead</span>
+                                  </label>
+                                  <label>
+                                      <input id="single5" name="pLOAIKH" type="radio" class="ace" value="COGD" @(Request["pLOAIKH"] == "COGD" ? "checked=checked" : "")>
+                                      <span class="lbl">Khách hàng có giao dịch</span>
+                                  </label>
+                                  <label>
+                                      <input id="single3" name="pLOAIKH" type="radio" class="ace" value="TATCA" @(Request["pLOAIKH"] == "TATCA" ? "checked=checked" : "")>
+                                      <span class="lbl"> Tất cả khách hàng</span>
+                                  </label>
+                                  <label>
+                                      <input id="single2" name="pLOAIKH" type="radio" class="ace" value="KHCU" @(Request["pLOAIKH"] == "KHCU" ? "checked=checked" : "")>
+                                      <span class="lbl"> KH Cũ</span>
+                                  </label>
+                                  <label>
+                                      <input id="single1" name="pLOAIKH" type="radio" class="ace" value="KHMOI" @(Request["pLOAIKH"] == "KHMOI" ? "checked=checked" : "")>
+                                      <span class="lbl"> KH Mới(CRM)</span>
+                                  </label>
+                                  <label>
+                                      <input id="single4" name="nTHEODOI" type="checkbox" class="ace" value="TDOI" @(Request["nTHEODOI"] == "TDOI" ? "checked=checked" : "")>
+                                      <span class="lbl"> Ngừng Theo Dõi</span>
+                                  </label>
+
+                                  <input type="hidden" id="LoaiKh" value="@Request["pLOAIKH"]" />
+                                  <input type="hidden" id="NTD" value="@Request["nTHEODOI"]" />
+                              </p>
+
+
+                          }
+
+                          @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+                          {
+                              <div class="alert alert-block alert-success">
+                                  <button class="close" data-dismiss="alert" type="button">
+                                      <i class="ace-icon fa fa-times"></i>
+                                  </button>
+                                  <i class="ace-icon fa fa-check green"></i>
+                                  @ViewBag.SuccessMessage
+                              </div>
+                          }
+
+                          @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+                          {
+                              <div class="alert alert-block alert-danger">
+                                  <button class="close" data-dismiss="alert" type="button">
+                                      <i class="ace-icon fa fa-times"></i>
+                                  </button>
+                                  <i class="ace-icon fa fa-warning red"></i>
+                                  @ViewBag.FailedMessage
+                              </div>
+                          }
+
+                          @if (ViewBag.AdviseTypeError != null && ViewBag.AdviseTypeError != "")
+                          {
+                              <div class="alert alert-block alert-danger">
+                                  <button class="close" data-dismiss="alert" type="button">
+                                      <i class="ace-icon fa fa-times"></i>
+                                  </button>
+                                  <i class="ace-icon fa fa-warning red"></i>
+                                  @ViewBag.AdviseTypeError
+                              </div>
+                          }
+
+
+                          @if (!isPopup)
+                          {
+
+                              if (Model != null)
+                              {
+                                  <p>Tổng số: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.TotalCustomers)</b></p>
+
+                                  if (Model.Count() > 0)
+                                  {
+                                      @Html.Grid(Model).Columns(columns =>
+                                 {
+                                     columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+                                     columns.Add(model => model.BranchName).Titled(Wording.BranchName).Sortable(true).Sanitized(false).Encoded(false);
+
+                                     columns.Add(u => u.CompanyName).Titled(Wording.CustomerName).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.CompanyName, u.Code, u.Id, u.Note, u.Image, u.PlusPoint, u.Phone));
+                                     columns.Add().Titled("Lập phiếu tư vấn").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(x => GridColumnAdviseCard(x.Id, x.CompanyName, isPopup));
+                                     columns.Add().Titled("Xem lịch hẹn").Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(x => GridColumnschedule(x.Id));
+
+                                     columns.Add().Titled("Đánh giá KH").Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(x => GridColumnEconomicStatus(x.Id, isPopup));
+                                     columns.Add(u => u.Phoneghep).Titled(Wording.ContactId).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => "<span data-phone='" + u.Phoneghep + "' data-email='" + u.Email + "'>" + GridColumnContact(u.Phoneghep, u.Email) + "</span>");
+                                     columns.Add(u => u.Address).Titled(Wording.Address).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnNameAddress(u.DistrictName, u.WardName, u.ProvinceName, u.Address));
+                                     columns.Add(u => u.Note).Titled(Wording.Note).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnNote(u.Note));
+                                     columns.Add(model => model.Birthday).Titled("Ngày sinh").Sanitized(false).Encoded(false);
+                                     columns.Add(model => model.CustomerType).Titled(Wording.CustomerType).Sortable(true).Sanitized(false).Encoded(false);
+                                     columns.Add(model => model.NguonKhach).Titled("Nguồn khách").Sanitized(false).Encoded(false);
+                                     columns.Add(model => model.ManagerStaffName).Titled(Wording.ManagerStaffName).Sortable(true).Sanitized(false).Encoded(false);
+                                     columns.Add(model => model.TenNhomHuong).Titled("Nhóm hưởng DS").Sortable(true).Sanitized(false).Encoded(false);
+                                     columns.Add(u => u.CreatedDate).Titled("Thời gian").Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnDateName(u.CreatedDate, u.ModifiedDate));
+                                     columns.Add().Titled("Hoạt động").Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnAction(u.Id, "Customer", u.Code, u.CompanyName, isPopup)).SetWidth(80);
+
+                                     // Thêm cột ẩn cho Id
+                                     columns.Add(u => u.Id).Titled("").Sanitized(false).Encoded(false).SetWidth(0).RenderValueAs(u => "<span class='hidden-id' style='display:none;'>" + u.Id + "</span><span class='hidden-name' style='display:none;' data-name='" + u.CompanyName + "'></span>");
+                                      }).WithPaging(pagingSize);
+
+
+                                  }
+                              }
+
+
+                              using (Html.BeginButtonContainer(pageSetting))
+                              {
+
+                                  if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CreateNT", "Customer", "Account"))
+                                  {
+                                      <a class="btn btn-primary btn-mini" onclick="OpenPopup('@Url.Action("CreateNT", "Customer", new { IsPopup = true, Phone = Request["Phone"] })', 'Thêm mới khách hàng', 590, 590);">
+                                          <i class="ace-icon fa fa-plus"></i>
+                                          @Resources.Wording.CreateNew
+                                      </a>
+                                      <a class="btn btn-white btn-success btn-sm" id="Save" name="Save" value="Save" onclick="GetPrint(true)">
+                                          <i class="ace-icon fa fa-file-excel-o"></i>
+                                          Xuất Excel
+                                      </a>
+                                  }
+                                  if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("TransferManager", "Customer", "Account"))
+                                  {
+                                      <a class="btn btn-primary btn-mini" onclick="OpenPopup('@Url.Action("TransferManager", "Customer", new { IsPopup = true, Phone = Request["Phone"] })', 'Chuyển đổi quản lý', 0, 0);">
+                                          <i class="ace-icon fa fa-recycle"></i>
+                                          Chuyển đổi quản lý
+                                      </a>
+                                  }
+                                  <div style="display: inline-block; visibility: hidden; position: relative" id="assignResponsi" class="dropdown-modal">
+                                      <button class="btn btn-primary btn-mini dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" style=" background-color: #fff;height:25px">
+                                          <i class="fa fa-paper-plane" aria-hidden="true"></i>
+                                          <i class="fa fa-angle-up"></i>
+                                      </button>
+                                      <ul style="position: absolute; top: -9.5rem; left: 0rem; width: 2rem; display: block;" class="dropdown-menu-right dropdown-menu dropdown-yellow dropdown-close">
+                                          <li style="background:white">
+                                              <a id="btnShowEmailModalHangfire">Gửi Email</a>
+                                          </li>
+                                          <li style="background:white">
+                                              <a id="btnShowSMSlModalHangfire">Gửi SMS</a>
+                                          </li>
+                                          <li style="background:white">
+                                              <a id="btnShowZNSModalHangfire">Gửi ZNS</a>
+                                          </li>
+                                      </ul>
+                                  </div>
+
+                                  <div style="display: inline-block; position: relative; margin-left: 680px" class="dropdown-modal">
+                                      <select id="customerPerPage" onchange="changeCustomerDisplay(this.value)">
+                                          <option value="15" @(Request.QueryString["pageSize"] == null || Request.QueryString["pageSize"] == "15" ? "selected" : "")>15</option>
+                                          <option value="50" @(Request.QueryString["pageSize"] == "50" ? "selected" : "")>50</option>
+                                          <option value="100" @(Request.QueryString["pageSize"] == "100" ? "selected" : "")>100</option>
+                                          <option value="200" @(Request.QueryString["pageSize"] == "200" ? "selected" : "")>200</option>
+                                          <option value="500" @(Request.QueryString["pageSize"] == "500" ? "selected" : "")>500</option>
+                                      </select>
+                                  </div>
+
+
+                              }
+
+                          }
+                          else
+                          {
+
+                              if (Model != null)
+                              {
+                                  <p>Tổng số: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Model.Count())</b></p>
+                                  if (Model.Count() > 0)
+                                  {
+                                      @Html.Grid(Model).Columns(columns =>
+                                 {
+                                     columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+
+                                     //columns.Add().Titled(Wording.Code).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCustomerCode(u.Code, u.Image, path, u.CompanyName, u.Birthday, u.IdCardNumber, u.IdCardDate, u.CardIssuedName)).SetWidth(150);
+                                     columns.Add(model => model.BranchId).Titled("BranchId").Sortable(false).Sanitized(false).Encoded(false);
+                                     columns.Add(u => u.CompanyName).Titled(Wording.CustomerName).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.CompanyName, u.Code, u.Id, u.Note, u.Image, u.PlusPoint, u.Phone));
+                                     columns.Add(u => u.Phoneghep).Titled(Wording.ContactId).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => "<span data-phone='" + u.Phoneghep + "' data-email='" + u.Email + "'>" + GridColumnContact(u.Phoneghep, u.Email) + "</span>");
+                                     columns.Add(u => u.Address).Titled(Wording.Address).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnNameAddress(u.DistrictName, u.WardName, u.ProvinceName, u.Address));
+                                     columns.Add(u => u.Id).Titled("").Sanitized(false).Encoded(false).SetWidth(0).RenderValueAs(u => "<span class='hidden-id' style='display:none;'>" + u.Id + "</span><span class='hidden-name' style='display:none;' data-name='" + u.CompanyName + "'></span>");
+
+                                 }).WithPaging(pagingSize);
+                                  }
+
+                                  <p style="margin-top:60px"></p>
+                              }
+                              using (Html.BeginButtonContainer(pageSetting))
+                              {
+                                  if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CreateNT", "Customer", "Account"))
+                                  {
+                                      <a class="btn btn-primary btn-mini" href="@Url.Action("CreateNT", pageSetting.ModuleName, new { IsPopup = true, Phone = Request["Phone"] })">
+                                          <i class="ace-icon fa fa-plus"></i>
+                                          @Resources.Wording.CreateNew
+                                      </a>
+                                  }
+
+
+                              }
+                          }
+                      </div>
+
+    @* Email Modal Hangfire*@
+    <div class="modal fade emailModal" id="EmailModalHangfireIndex" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 9999;">
+        <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseEmailModalHangfire"></div>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close btnCloseEmailModalHangfire" aria-hidden="true">×</button>
+                    <div class="header-title">
+                        <h5 class="modal-title">Soạn Email</h5>
+                        <span style="font-size: 2rem;">-</span>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4 id="modalEmailHangfireTotalLead"></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="container-fluid setHeighEmail">
+                            <div class="row" style="display:none;">
+                                <div class="col-md-12">
+                                    <h4 id="modalEmailHangfireTotalLead"></h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 ">
+                                    <div class="mb-3">
+                                        <label for="emailSender" class="form-label">Người gửi</label>
+                                        <input disabled type="email" class="form-control" id="emailSenderHangfire">
+                                    </div>
+                                    <div class="mb-3" hidden>
+                                        <label for="emailReceiver" class="form-label">Người nhận</label>
+                                        <input disabled type="email" class="form-control" id="emailReceiverHangfire">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="emailTitle" class="form-label">Tiêu đề</label>
+                                        <input type="text" class="form-control" id="emailTitleHangfire">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="emailTemplate" class="form-label">Chọn Template</label>
+                                        <select class="form-select" id="emailTemplateHangfire" style="height:34px;"></select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="emailCampaign" class="form-label">Chọn chiến dịch</label>
+                                        <select class="form-select" id="emailCampaignHangfire" style="height:34px;"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-lg-12">
+                                    <textarea id="emailInputHangfire" class="ckeditor"></textarea>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 10px;">
+                                <div class="mb-file">
+                                    <label for="formFileSm" class="form-label" style="font-weight:bold;margin-left:15px">Chọn file</label>
+                                    <input class="form-control form-control-sm" id="formFileSm" type="file" style="margin-left:20px;width:50%; height: 34px !important" multiple>
+                                </div>
+
+                            </div>
+
+                            <div id="fileList" class="row" style="margin-top: 10px; display: none;">
+                                <div class="col-lg-12" style="display: flex; flex-wrap: wrap;" id="fileContainer"></div>
+                            </div>
+                            <div id="validateDivHangfire" class="row text-danger" style="display:none;">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer text-center" style="display:flex;">
+                    <div style="margin-right:auto;display:flex;align-items:center;">
+                        <div>
+                            <input type="radio" id="sendMailNow" name="nowOrScheduled" value="now" checked>
+                            <label for="sendMailNow">Gửi ngay</label><br>
+                        </div>
+                        <div style="margin-left:5px;">
+                            <input type="radio" id="sendMailScheduled" name="nowOrScheduled" value="scheduled">
+                            <label for="sendMailScheduled">Gửi theo lịch</label><br>
+                        </div>
+                    </div>
+                    <div style="margin:auto;" id="dateToSendEmail" hidden>
+                        <label>Ngày gửi: </label>
+                        <input type="date" id="DateAction">
+                        <label>Giờ gửi: </label>
+                        <input type="time" id="TimeAction">
+                    </div>
+                    <div style="margin-left:auto;">
+                        <button class="btn btn-primary" style="margin-right:0%;" type="button" id="btnSendEmailHangfire">Gửi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* End Email Modal *@
+    @* SMS Modal  *@
+    <div class="fade modal" id="SMSModalHangfire" tabindex="-1" role="dialog" aria-labelledby="modalConLabel" aria-hidden="true" style="z-index: 9999">
+        <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseSMSModalHangfire"></div>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <div class="header-title">
+                            <h3 class="modal-title" id="modalConLabelHangfire">Gửi SMS</h3>
+                            <span style="font-size: 2rem;">-</span>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4 id="modalSmsHangfireTotalLead"></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="close btnCloseSMSModalHangfire" aria-hidden="true">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <span hidden id="smsReceiverHangfire"></span>
+
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <h4 id="modalSmsHangfireTotalLead" style="display:none;"></h4>
+                        </div>
+                        <div class="row">
+                            <label>Chọn chiến dịch :</label>
+                            <select id="smsCampaignHangfire" style="width:20%; height: 28px; border-radius: 3px">
+                            </select>
+                        </div>
+                        <div class="row" id="sms-dropdown-row">
+                            <label>Chọn mẫu SMS :</label>
+                            <select id="smsTemplateHangfire" style="width:100%;">
+                            </select>
+                        </div>
+                        <div class="row">
+                            <textarea id="idContentSMSHangfire" style="width:100%;" rows="10"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer text-center" style="display:flex;">
+                    <div style="margin-right:auto;display:flex;align-items:center;">
+                        <div>
+                            <input type="radio" id="sendSMSNow" name="nowOrScheduledSMS" value="now" checked>
+                            <label for="sendSMSNow">Gửi ngay</label><br>
+                        </div>
+                        <div style="margin-left:5px;">
+                            <input type="radio" id="sendSMSScheduled" name="nowOrScheduledSMS" value="scheduled">
+                            <label for="sendSMSScheduled">Gửi theo lịch</label><br>
+                        </div>
+                    </div>
+                    <div style="margin:auto;" id="dateToSendSMS" hidden>
+                        <label>Ngày gửi: </label>
+                        <input type="date" id="DateActionSMS">
+                        <label>Giờ gửi: </label>
+                        <input type="time" id="TimeActionSMS">
+                    </div>
+                    <div style="margin-left:auto;">
+                        <button style="margin-right:0%;" type="button" id="btnSendSMSHangfire"><i class="fa fa-send-o" id="icon-sendsms"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* End SMS Modal *@
+    <div id="meetingModal2" class="modal fade" role="dialog">
+        <div style="box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);" class="modal-dialog modal-lg">
+            @*Modal content*@
+            <div class="modal-content">
+                <div class="modal-header modal-meeting">
+                    <h4 class="modalEmailHangfireTotalLead"></h4>
+                    <button type="button" class="close close-meetingModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    @*Div to hold meeting content loaded via AJAX*@
+                    <div id="meetingContent2">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*ZNS modal*@
+    <div class="fade modal" id="ZNSModalHangfire" tabindex="-1" role="dialog" aria-labelledby="modalConLabel" aria-hidden="true" style="z-index: 9999">
+        <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseZNSModalHangfire"></div>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <div class="header-title">
+                            <h3 class="modal-title" id="modalConLabelHangfire">Gửi ZNS</h3>
+                            <span style="font-size: 2rem;">-</span>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4 id="modalZnsHangfireTotalLead"></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="close btnCloseZNSModalHangfire" aria-hidden="true">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <span hidden id="znsReceiverHangfire"></span>
+
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <h4 id="modalZnsHangfireTotalLead" style="display: none;"></h4>
+                        </div>
+                        <div class="row">
+                            <label>Chọn chiến dịch :</label>
+                            <select id="znsCampaignHangfire" style="width: 20%; height: 28px; border-radius: 3px">
+                            </select>
+                        </div>
+                        <div class="row" id="zns-dropdown-row">
+                            <label>Chọn mẫu ZNS :</label>
+                            <select id="znsTemplateHangfire" style="width:100%;">
+                            </select>
+                        </div>
+                        <div class="row">
+                            <textarea id="idContentZNSHangfire" style="width:100%;" rows="10"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer text-center" style="display:flex;">
+                    <div style="margin-right:auto;display:flex;align-items:center;">
+                        <div>
+                            <input type="radio" id="sendZNSNow" name="nowOrScheduledZNS" value="now" checked>
+                            <label for="sendZNSNow">Gửi ngay</label><br>
+                        </div>
+                        <div style="margin-left:5px;">
+                            <input type="radio" id="sendZNSScheduled" name="nowOrScheduledZNS" value="scheduled">
+                            <label for="sendZNSScheduled">Gửi theo lịch</label><br>
+                        </div>
+                    </div>
+                    <div style="margin:auto;" id="dateToSendZNS" hidden>
+                        <label>Ngày gửi: </label>
+                        <input type="date" id="DateActionZNS">
+                        <label>Giờ gửi: </label>
+                        <input type="time" id="TimeActionZNS">
+                    </div>
+                    <div style="margin-left:auto;">
+                        <button style="margin-right:0%;" type="button" id="btnSendZNSHangfire"><i class="fa fa-send-o" id="icon-sendzns"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*end ZNS modal*@
+    @section Scripts {
+        <script src="~/Scripts/jquery.floatThead.js"></script>
+        <script src="~/Scripts/script.js"></script>
+        <script>
+            //$(document).ready(function () {
+            //    $(".grid-table").floatThead({ top: 30 });
+            //});
+function changeCustomerDisplay(pageSize) {
+    ShowLoading();
+
+    var Name = $('#Name').val();
+    var StartDate = $('#startDate').val();
+    var EndDate = $('#endDate').val();
+    var Phone = $('#Phone').val();
+    var txtCusInfo = $('#txtCusInfo').val();
+    var CardCode = $('#CardCode').val();
+    var ProvinceId = $('#ProvinceId').val();
+    var DistrictId = $('#DistrictId').val();
+    var WardId = $('#WardId').val();
+    var pLOAIKH = $('#LoaiKh').val();
+    var SalerId = $('#SalerId').val();
+    var nTHEODOI = $('#NTD').val();
+    var NguonKhach = $('#NguonKhach').val();
+
+    // Gửi AJAX request
+    $.ajax({
+        url: '@Url.Action("Index", "Customer")',
+        type: 'POST',
+        data: {
+            pageSize: pageSize,
+            startDate: StartDate,
+            endDate: EndDate,
+            CardCode: CardCode,
+            txtCusInfo: txtCusInfo,
+            Phone: Phone,
+            ProvinceId: ProvinceId,
+            DistrictId: DistrictId,
+            WardId: WardId,
+            pLOAIKH: pLOAIKH,
+            nTHEODOI: nTHEODOI,
+            SalerId: SalerId,
+            NguonKhach: NguonKhach
+        },
+        beforeSend: function() {
+            ShowLoading();
+        },
+        success: function (response) {
+            HideLoading();
+
+            $('#gridBody').html(response);
+            $('#customerPerPage').val(pageSize);
+
+            // Cập nhật URL với pageSize mới
+            var newUrl = updatePageSizeInUrl(pageSize);
+            window.history.replaceState(null, null, newUrl);
+        },
+        error: function (xhr, status, error) {
+            console.error(xhr.responseText);
+        },
+        complete: function() {
+            HideLoading();
+        }
+    });
+}
+
+
+            function updatePageSizeInUrl(pageSize) {
+                var currentUrl = window.location.href;
+                var regexPageSize = /pageSize=\d+/i;
+                var regexGridPage = /&?grid-page=\d+/i; 
+                var newUrl = '';
+
+                if (regexPageSize.test(currentUrl)) {
+                    currentUrl = currentUrl.replace(regexPageSize, '');
+                }
+
+                // Xóa tham số grid-page nếu đã tồn tại
+                if (regexGridPage.test(currentUrl)) {
+                    currentUrl = currentUrl.replace(regexGridPage, '');
+                }
+
+                // Xóa ký tự "?" hoặc "&" dư thừa nếu có
+                if (currentUrl.endsWith('?') || currentUrl.endsWith('&')) {
+                    currentUrl = currentUrl.slice(0, -1);
+                }
+
+                // Tạo URL mới với pageSize
+                if (currentUrl.includes('?')) {
+                    newUrl = currentUrl + '&pageSize=' + pageSize;
+                } else {
+                    newUrl = currentUrl + '?pageSize=' + pageSize;
+                }
+
+                return newUrl;
+            }
+
+
+            $(document).ready(function () {
+                $(document).on('click', '.pagination a', function (e) {
+                    e.preventDefault();
+
+                    var pageUrl = $(this).attr('href');
+                    var pageSize = $('#customerPerPage').val();
+                    changePage(pageUrl, pageSize);
+                });
+            });
+
+            function changePage(pageUrl, pageSize) {
+                // Lấy số trang từ href
+                var pageNumberMatch = pageUrl.match(/grid-page=(\d+)/);
+                var pageNumber = pageNumberMatch ? pageNumberMatch[1] : 1;
+                ShowLoading();
+
+                // Lấy các giá trị từ các input khác nếu cần
+                var StartDate = $('#startDate').val();
+                var EndDate = $('#endDate').val();
+                var Phone = $('#Phone').val();
+                var txtCusInfo = $('#txtCusInfo').val();
+                var CardCode = $('#CardCode').val();
+                var ProvinceId = $('#ProvinceId').val();
+                var DistrictId = $('#DistrictId').val();
+                var WardId = $('#WardId').val();
+                var pLOAIKH = $('#LoaiKh').val();
+                var SalerId = $('#SalerId').val();
+                var nTHEODOI = $('#NTD').val();
+                var NguonKhach = $('#NguonKhach').val();
+
+                // Gửi AJAX request
+                $.ajax({
+                     url: '@Url.Action("Index", "Customer")',
+                    type: 'GET',
+                    data: {
+                        pageSize: pageSize,
+                        startDate: StartDate,
+                        endDate: EndDate,
+                        CardCode: CardCode,
+                        txtCusInfo: txtCusInfo,
+                        Phone: Phone,
+                        ProvinceId: ProvinceId,
+                        DistrictId: DistrictId,
+                        WardId: WardId,
+                        pLOAIKH: pLOAIKH,
+                        nTHEODOI: nTHEODOI,
+                        SalerId: SalerId,
+                        NguonKhach: NguonKhach,
+                        'grid-page': pageNumber
+                    },
+                    beforeSend: function () {
+                        ShowLoading();
+                    },
+                    success: function (response) {
+                        HideLoading();
+
+                        $('#gridBody').html(response);
+                        $('#customerPerPage').val(pageSize);
+
+                        // Cập nhật lại URL với grid-page mới
+                        var newUrl = updateGridPageInUrl(pageNumber);
+                        window.history.replaceState(null, null, newUrl);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                    },
+                     complete: function () {
+                        HideLoading();
+                    }
+                });
+            }
+
+            // Hàm để cập nhật grid-page trong URL
+            function updateGridPageInUrl(pageNumber) {
+                var currentUrl = window.location.href;
+                var regex = /(\?|&)grid-page=\d+/i;
+                var newUrl = '';
+
+                if (regex.test(currentUrl)) {
+                    newUrl = currentUrl.replace(regex, '$1grid-page=' + pageNumber);
+                } else {
+                    if (currentUrl.includes('?')) {
+                        newUrl = currentUrl + '&grid-page=' + pageNumber;
+                    } else {
+                        newUrl = currentUrl + '?grid-page=' + pageNumber;
+                    }
+                }
+
+                return newUrl;
+            }
+
+
+        </script>
+
+        <script type="text/javascript">
+
+            function CheckIsval() {
+                if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+
+            $('[name="Delete"]').click(function () {
+                if (confirm('Bạn có chắc muốn xóa item ?')) {
+                    $(this).closest('tr').children('td').each(function (i, e) {
+                        $(this).find("input.class-delete-all").prop("checked", true);
+                        return true;
+                    })
+                }
+                else {
+                    return false;
+                }
+            })
+
+            $(function () {
+                $("#Phone").focus().select();
+                $('[data-rel=tooltip]').tooltip({ container: 'body' });
+                $("#Phone").click(function () {
+                    $("#Phone").select();
+                });
+            });
+
+            var url = '/api/BackOfficeServiceAPI/FetchLocation';
+            var districts = $("#DistrictId"); // cache it
+            var ward = $("#WardId");
+
+            $("#ProvinceId").change(function () {
+                ShowLoading();
+                var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+                $.getJSON(url, { parentId: id }, function (response) {
+                    districts.empty(); // remove any existing options
+                    ward.empty();
+                    $(document.createElement('option'))
+                        .attr('value', '')
+                        .text('- Rỗng -')
+                        .appendTo(ward).trigger('chosen:updated');
+                    $(response).each(function () {
+                        $(document.createElement('option'))
+                            .attr('value', this.Id)
+                            .text(capitalizeFirstAllWords(this.Name.toLowerCase().replace('huyện', '').replace('quận', '')))
+                            .appendTo(districts).trigger('chosen:updated');
+                        HideLoading();
+                    });
+                });
+            });
+
+            $("#DistrictId").change(function () {
+                ShowLoading();
+                var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+                $.getJSON(url, { parentId: id }, function (response) {
+                    ward.empty(); // remove any existing options
+                    $(response).each(function () {
+                        $(document.createElement('option'))
+                            .attr('value', this.Id)
+                            .text(capitalizeFirstAllWords(this.Name.toLowerCase()))
+                            .appendTo(ward).trigger('chosen:updated');
+                        HideLoading();
+                    });
+                });
+            });
+            $('.popover-dismiss').popover({
+                trigger: 'focus'
+            })
+            $(document).ready(function () {
+                $('[data-rel=popover]').popover({ html: true });
+            });
+
+
+
+            $(document).click(function () {
+                $("#tabCustomer").tabs({ active: 2 });
+                $("#action").on("click", function () { });
+            });
+
+
+            function GetPrint(type) {
+                debugger
+                var Name = $('#Name').val();
+                var StartDate = $('#startDate').val();
+                var EndDate = $('#endDate').val();
+                var Phone = $('#Phone').val();
+                //var txtCode = $('#txtCode').val();
+                //var txtCusName = $('#txtCusName').val();
+                var txtCusInfo = $('#txtCusInfo').val();
+                var CardCode = $('#CardCode').val();
+                var ProvinceId = $('#ProvinceId').val();
+                var DistrictId = $('#DistrictId').val();
+                var WardId = $('#WardId').val();
+                var pLOAIKH = $('#LoaiKh').val();
+                var SalerId = $('#SalerId').val();
+                var nTHEODOI = $('#NTD').val();
+                var NguonKhach = $('#NguonKhach').val();
+                OpenPopup('/Customer/ExportExcel?Name=' + Name + '&ExportExcel=' + type + '&startDate=' + StartDate +
+                    '&endDate=' + EndDate + '&Phone=' + Phone + '&txtCusInfo=' + txtCusInfo +
+                    '&CardCode=' + CardCode + '&ProvinceId=' + ProvinceId + '&DistrictId=' + DistrictId + '&WardId=' + WardId +
+                    '&pLOAIKH=' + pLOAIKH + '&nTHEODOI=' + nTHEODOI + '&SalerId=' + SalerId + '&NguonKhach=' + NguonKhach + '&IsPopup=true', '', 0, 100);
+
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 200000);
+                HideLoading();
+            };
+
+        </script>
+        <script>
+            $(document).ready(function () {
+
+
+                // Event handler for individual checkbox and 'checkAll' checkbox click
+                $('input[name="DeleteId-checkbox"], input[name="checkAll"]').on('change', function () {
+                    var anyChecked = $('input[name="DeleteId-checkbox"]:checked').length > 0;
+                    $('#assignResponsi').css('visibility', anyChecked ? 'visible' : 'hidden');
+                });
+
+                // Select/deselect all checkboxes when 'checkAll' checkbox is changed
+                $('#checkAll').on('change', function () {
+                    var isChecked = $(this).is(':checked');
+                    $('input[name="DeleteId-checkbox"]').prop('checked', isChecked).trigger('change');
+                });
+
+                // Show dropdown menu when send button is clicked
+                $('#assignResponsi button').on('click', function (event) {
+                    event.stopPropagation(); // Prevent the click event from propagating to the document
+                    var dropdownMenu = $(this).siblings('.dropdown-menu');
+                    dropdownMenu.toggle();
+                });
+
+                // Hide dropdown when clicking outside
+                $(document).on('click', function () {
+                    $('.dropdown-menu').hide();
+                });
+
+                // Prevent hiding the dropdown when clicking inside the dropdown menu
+                $('.dropdown-menu').on('click', function (event) {
+                    event.stopPropagation();
+                });
+            });
+
+
+        </script>
+        <script>
+            //show Email Modal
+            $(document).ready(function () {
+                $('#btnShowEmailModalHangfire').click(ShowEmailModalHangfire);
+                //  var emailSelecction = $("input[name='nowOrScheduled']:checked").val();
+
+                $('#sendMailNow').change(function () {
+                    if ($(this).is(':checked')) {
+                        $('#dateToSendEmail').prop('hidden', true);
+                    }
+                });
+                $('#sendMailScheduled').change(function () {
+                    if ($(this).is(':checked')) {
+                        $('#dateToSendEmail').prop('hidden', false);
+                    }
+                });
+
+                $('.btnCloseEmailModalHangfire').click(CloseEmailModalHangfire);
+
+                $('body').on('hidden.bs.modal', function () {
+                    // This function is for handling the problem of disabling the scrolling bar when any modal is closed.
+                    // It checks if there is any modal still open, and if so, adds back the 'modal-open' class to the body of the document.
+                    if ($('.modal.in').length > 0) {
+                        $('body').addClass('modal-open');
+                    }
+                });
+
+
+            });
+            let initialEmailFooterContent = '';
+            var selectedId = [];
+
+            function ShowEmailModalHangfire() {
+                let proceedWithAjax = true;
+                let selectedEmail = [];
+                selectedId = [];
+
+
+
+                var selectedRowsDataEmail = getSelectedRowsEmailData();
+                selectedRowsDataEmail.forEach(function (row) {
+                    selectedId.push(row.id);
+                    selectedEmail.push(row.email);
+                });
+                console.log("Selected IDs:", selectedId);
+                console.log("Selected Emails:", selectedEmail);
+
+                if (selectedEmail.some(email => email === undefined)) {
+                    toastr.clear();
+                    toastr.warning('Chỉ có thể gửi mail cho những khách hàng có thông tin Email!');
+                    return false;
+                }
+                if (selectedEmail.length <= 0) {
+                    toastr.clear();
+                    toastr.warning('Chỉ có thể gửi mail cho những khách hàng có thông tin Email!');
+                    return false;
+                }
+                if (!proceedWithAjax) {
+                    toastr.clear();
+                    toastr.warning('Chỉ có thể gửi mail cho những khách hàng có thông tin Email!');
+                    return false;
+                }
+
+                $.ajax({
+                    url: "/AdviseCard/ShowEmailModalHangfire",
+                    method: "GET",
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data != null) {
+                            if (data.errorMessageEmail === "") {
+                                populateDropdownEmailHangfire(data, selectedEmail);
+                                $('#modalEmailHangfireTotalLead').text('Tổng số Lead: ' + selectedEmail.length);
+                                $('#emailTitleHangfire').val("");
+                                if (data.EmailFooter && data.EmailFooter.length > 0) {
+                                    initialEmailFooterContent = data.EmailFooter[0].Logs || '';
+
+                                    CKEDITOR.instances['emailInputHangfire'].setData(data.EmailFooter[0].Logs || '');
+                                }
+                                var EmailReceiver = $('#emailReceiverHangfire').val();
+                                console.log(EmailReceiver);
+                                $('#emailTemplateHangfire').val(JSON.stringify({ 'TileEmail': '', 'ContentEmail': '' }));
+                                $('#sendMailNow').prop('checked', true);
+                                $('#dateToSendEmail').prop('hidden', true);
+                                $('#DateAction').val("");
+                                $('#TimeAction').val("");
+                                $("#EmailModalHangfireIndex").modal("show");
+                            } else {
+                                toastr.clear();
+                                toastr.warning(data.errorMessageEmail);
+                            }
+                        } else {
+                            toastr.clear();
+                            toastr.warning('Có lỗi xảy ra');
+                        }
+                    }
+                });
+            }
+            $('#emailTemplateHangfire').on('change', function () {
+                var selectedValue = JSON.parse($('#emailTemplateHangfire').val());
+                var newFooterContent = selectedValue.ContentEmail;
+                var footer = CKEDITOR.instances['emailInputHangfire'].getData();
+
+                // Nếu footer chưa từng được thay đổi, gán giá trị mới
+                if (!footer.includes(selectedValue)) {
+                    footer = newFooterContent + '\n' + initialEmailFooterContent;
+                } else {
+                    // Nếu footer đã được thay đổi, thay thế selectedValue cũ bằng selectedValue mới
+                    footer = footer.replace(selectedValue, newFooterContent);
+                }
+
+                // Set dữ liệu cho CKEditor
+                CKEDITOR.instances['emailInputHangfire'].setData(footer);
+
+                // Gán tiêu đề vào input #emailTitle
+                $('#emailTitleHangfire').val(selectedValue.TileEmail);
+            });
+
+
+            function CloseEmailModalHangfire() {
+                $("#EmailModalHangfireIndex").modal("hide");
+            }
+            function populateDropdownEmailHangfire(data, selectedEmail) {
+                $('#emailSenderHangfire').val(data.EmailSender);
+                $('#emailReceiverHangfire').val(selectedEmail.join(';'));
+                $('#emailTemplateHangfire').empty().append($('<option>').val(JSON.stringify({ 'TileEmail': '', 'ContentEmail': '' })).text('Chọn tiêu đề')).prop('selected', true);
+                data.EmailTemplate.forEach(x => {
+                    $('#emailTemplateHangfire').append($('<option>').val(JSON.stringify(x)).text(x.TileEmail));
+                });
+                $('#emailCampaignHangfire').empty();//.append($('<option>').val(JSON.stringify({ 'Id': '0', 'Name': '' })).text('Không chiến dịch')).prop('selected', true);
+                data.Campaign.forEach(x => {
+                    if (x.Id == 3) {
+                        $('#emailCampaignHangfire').append($('<option>').val(JSON.stringify(x)).text(x.Name)).prop('selected', true);
+                    }
+                    else {
+                        $('#emailCampaignHangfire').append($('<option>').val(JSON.stringify(x)).text(x.Name));
+                    }
+
+
+                });
+            }
+
+
+            // Function to get email content and IDs of selected rows
+            function getSelectedRowsEmailData() {
+                var selectedRowsData = [];
+                $('input[name="DeleteId-checkbox"]:checked').each(function () {
+                    var $row = $(this).closest('tr');
+                    var id = $row.find('.hidden-id').text();
+                    var email = $row.find('[data-email]').data('email');
+
+                    var rowData = { id: id };
+                    if (email) {
+                        rowData.email = email;
+                    }
+
+                    selectedRowsData.push(rowData);
+                });
+                return selectedRowsData;
+            }
+
+            function getSelectedRowsPhoneData() {
+                var selectedRowsData = [];
+                $('input[name="DeleteId-checkbox"]:checked').each(function () {
+                    var $row = $(this).closest('tr');
+                    var id = $row.find('.hidden-id').text();
+                    var phone = $row.find('[data-phone]').data('phone');
+                    var name = $row.find('.hidden-name').data('name');
+                    if (id) {
+                        var rowData = { id: id, name: name };
+                        if (phone) {
+                            rowData.phone = phone;
+                        }
+                        selectedRowsData.push(rowData);
+                    }
+                });
+                return selectedRowsData;
+            }
+
+            $(document).ready(function () {
+                // Configure CKEditor with custom toolbar for email composition
+                CKEDITOR.replace('emailInputHangfire', {
+                    toolbar: [
+                        { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                        { name: 'styles', items: ['Format', 'FontSize'] },
+                        { name: 'colors', items: ['TextColor', 'BGColor'] },
+                        { name: 'paragraph', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                        { name: 'links', items: ['Link', 'Unlink'] },
+                        { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] }
+                    ],
+                    // Remove unwanted plugins
+                    removePlugins: 'elementspath',
+                    // Set default CKEditor height
+                    height: 300,
+                });
+            });
+
+            var selectedFiles = [];
+
+            document.getElementById('formFileSm').addEventListener('change', function (event) {
+                var files = event.target.files;
+                var fileContainer = document.getElementById('fileContainer');
+
+                // Bắt đầu tải file đầu tiên
+                uploadFile(0, files, fileContainer);
+            });
+
+            function uploadFile(index, files, fileContainer) {
+                if (index >= files.length) {
+                    // Khi đã tải xong tất cả các file
+                    document.getElementById('fileList').style.display = 'block';
+                    return;
+                }
+
+                var file = files[index];
+                var fileName = file.name.toLowerCase();
+
+
+
+                if (!fileName.endsWith('.exe')) {
+                    selectedFiles.push(file);
+
+                    var fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.style.marginRight = '10px';
+                    fileItem.style.marginBottom = '10px';
+                    fileItem.style.padding = '5px';
+                    fileItem.style.border = '1px solid #ccc';
+                    fileItem.style.display = 'flex';
+                    fileItem.style.alignItems = 'center';
+
+                    var fileNameElement = document.createElement('a');
+                    fileNameElement.textContent = shortenFileName(file.name);
+                    fileNameElement.href = URL.createObjectURL(file); // Sử dụng URL.createObjectURL để tạo đường dẫn tạm thời cho file
+                    fileNameElement.setAttribute('download', file.name); // Thiết lập thuộc tính download để tải file
+                    fileNameElement.style.flexGrow = '1';
+                    fileNameElement.style.overflow = 'hidden';
+                    fileNameElement.style.textOverflow = 'ellipsis';
+                    fileNameElement.style.whiteSpace = 'nowrap';
+                    fileNameElement.style.color = '#007bff';
+                    fileNameElement.title = file.name;
+
+                    var fileSizeElement = document.createElement('span');
+                    fileSizeElement.textContent = '(' + formatBytes(file.size) + ')';
+                    fileSizeElement.className = 'file-size';
+                    fileSizeElement.style.marginLeft = '10px';
+                    fileSizeElement.style.fontSize = '12px';
+                    fileSizeElement.style.color = '#000';
+
+                    var progressBar = document.createElement('progress');
+                    progressBar.value = 0;
+                    progressBar.max = 100;
+                    progressBar.style.flexGrow = '1';
+                    progressBar.style.marginLeft = '10px';
+                    progressBar.style.height = '10px';
+                    progressBar.style.display = 'block';
+
+                    var removeButton = document.createElement('button');
+                    removeButton.textContent = 'X';
+                    removeButton.style.marginLeft = '5px';
+                    removeButton.addEventListener('click', createRemoveHandler(fileItem, file));
+                    removeButton.style.cursor = 'pointer'; // Thay đổi con trỏ chuột khi rê đến nút xóa
+
+                    fileItem.appendChild(fileNameElement);
+                    fileItem.appendChild(fileSizeElement);
+                    fileItem.appendChild(progressBar);
+                    fileItem.appendChild(removeButton);
+                    fileContainer.appendChild(fileItem);
+
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', URL.createObjectURL(file), true);
+                    xhr.responseType = 'blob';
+
+                    xhr.onload = function () {
+                        if (this.status === 200) {
+                            progressBar.style.display = 'none';
+                            // Sau khi tải xong file hiện tại, tiến hành tải file tiếp theo
+                            uploadFile(index + 1, files, fileContainer);
+                        }
+                    };
+
+                    xhr.onprogress = function (e) {
+                        if (e.lengthComputable) {
+                            var percent = (e.loaded / e.total) * 100;
+                            progressBar.value = percent;
+                        }
+                    };
+
+                    xhr.send();
+                } else {
+                    toastr.clear();
+                    toastr.warning('Vui lòng không chọn các file cài đặt (ví dụ: file exe).');
+                    // Bỏ qua file này và tiến hành tải file tiếp theo
+                    uploadFile(index + 1, files, fileContainer);
+                }
+            }
+
+            function createRemoveHandler(itemToRemove, fileToRemove) {
+                return function () {
+                    itemToRemove.remove();
+                    var index = selectedFiles.indexOf(fileToRemove);
+                    if (index !== -1) {
+                        selectedFiles.splice(index, 1);
+                    }
+                };
+            }
+
+            function formatBytes(bytes, decimals = 2) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const dm = decimals < 0 ? 0 : decimals;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+            }
+
+            function shortenFileName(fileName, maxLength = 25) {
+                if (fileName.length > maxLength) {
+                    return fileName.substring(0, maxLength - 3) + '...';
+                }
+                return fileName;
+            }
+            // Hàm để xóa danh sách các tệp đã chọn
+            function resetSelectedFiles() {
+                selectedFiles = [];
+                // Xóa tất cả các phần tử con trong #fileContainer
+                var fileContainer = document.getElementById('fileContainer');
+                while (fileContainer.firstChild) {
+                    fileContainer.removeChild(fileContainer.firstChild);
+                }
+            }
+            function resetInputFile() {
+                document.getElementById('formFileSm').value = '';
+            }
+            $('#EmailModalHangfireIndex').on('hidden.bs.modal', function () {
+                resetSelectedFiles();
+                resetInputFile();
+            });
+            //Handle Send Email
+            $(document).ready(function () {
+                $('#btnSendEmailHangfire').click(() => {
+                    SendEmailRequest();
+                })
+
+            });
+            function SendEmailRequest() {
+
+                console.log(selectedFiles);
+                if (selectedFiles.length > 0) {
+
+                    SendEmailWithFilesHangfire(selectedFiles);
+
+                } else {
+
+                    SendEmailHangfire();
+
+                }
+            }
+
+            function SendEmailHangfire() {
+                var DateAction = "";
+                var TimeAction = "";
+                const date = new Date(); //get current date
+                var successMessage = "";
+                // var myDate = date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear();
+                if ($('#sendMailNow').is(':checked')) {
+                    DateAction = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                    TimeAction = date.getHours() + ':' + (date.getMinutes());
+                    successMessage = 'Gửi Email thành công!'
+                }
+                if ($('#sendMailScheduled').is(':checked')) {
+                    DateAction = $('#DateAction').val();
+                    TimeAction = $('#TimeAction').val();
+                    var testDateAction = DateAction.split('-');
+                    var testTimeAction = TimeAction.split(':');
+                    var selectedDate = new Date(testDateAction[0], testDateAction[1] - 1, testDateAction[2], testTimeAction[0], testTimeAction[1])
+                    if (selectedDate < date) {
+                        toastr.clear();
+                        toastr.warning('Thời điểm gửi Email không hợp lệ!');
+                        return;
+                    }
+                    successMessage = 'Lên lịch gửi Email thành công!'
+                }
+                var EmailSender = $('#emailSenderHangfire').val();
+                var EmailTitle = $('#emailTitleHangfire').val();
+                var EmailBody = CKEDITOR.instances['emailInputHangfire'].getData();
+                var EmailReceiver = $('#emailReceiverHangfire').val();
+                var Campaign = JSON.parse($('#emailCampaignHangfire').val());
+                if (!DateAction || !TimeAction || !EmailSender || !EmailTitle || !EmailBody || !EmailReceiver) {
+                    toastr.clear();
+                    toastr.warning('Vui lòng điền đủ các thông tin cần thiết để gửi Email');
+                    return;
+                }
+                console.log(DateAction);
+                console.log(TimeAction);
+
+                console.log(Campaign);
+                console.log(Campaign.Id);
+                console.log(Campaign.Name);
+                ShowLoading();
+                $.ajax({
+                    url: "/AdviseCard/SendEmailHangfireCustomer",
+                    method: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        DateAction: DateAction,
+                        TimeAction: TimeAction,
+                        EmailSender: EmailSender,
+                        EmailTitle: EmailTitle,
+                        EmailBody: EmailBody,
+                        EmailReceiver: EmailReceiver,
+                        EmailId: selectedId.join(';'),
+                        CampaignId: Campaign.Id,
+                        CampaignName: Campaign.Name,
+                    }),
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success) {
+                            HideLoading();
+                            toastr.clear();
+                            toastr.success(successMessage);
+                            CloseEmailModalHangfire();
+                        } else {
+                            toastr.warning('Có lỗi xảy ra khi gửi Email!');
+                        }
+                    }
+                });
+            }
+
+
+            async function SendEmailWithFilesHangfire(files) {
+                var DateAction = "";
+                var TimeAction = "";
+                const date = new Date(); //get current date
+                var successMessage = "";
+                // var myDate = date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear();
+                if ($('#sendMailNow').is(':checked')) {
+                    DateAction = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                    TimeAction = date.getHours() + ':' + (date.getMinutes());
+                    successMessage = 'Gửi Email thành công!'
+                }
+                if ($('#sendMailScheduled').is(':checked')) {
+                    DateAction = $('#DateAction').val();
+                    TimeAction = $('#TimeAction').val();
+                    var testDateAction = DateAction.split('-');
+                    var testTimeAction = TimeAction.split(':');
+                    var selectedDate = new Date(testDateAction[0], testDateAction[1] - 1, testDateAction[2], testTimeAction[0], testTimeAction[1])
+                    if (selectedDate < date) {
+                        toastr.clear();
+                        toastr.warning('Thời điểm gửi Email không hợp lệ!');
+                        return;
+                    }
+                    successMessage = 'Lên lịch gửi Email thành công!'
+                }
+                var EmailSender = $('#emailSenderHangfire').val();
+                var EmailTitle = $('#emailTitleHangfire').val();
+                var EmailBody = CKEDITOR.instances['emailInputHangfire'].getData();
+                var EmailReceiver = $('#emailReceiverHangfire').val();
+                var Campaign = JSON.parse($('#emailCampaignHangfire').val());
+                if (!DateAction || !TimeAction || !EmailSender || !EmailTitle || !EmailBody || !EmailReceiver) {
+                    toastr.clear();
+                    toastr.warning('Vui lòng điền đủ các thông tin cần thiết để gửi Email');
+                    return;
+                }
+                var formData = new FormData();
+                formData.append('EmailSender', EmailSender);
+                formData.append('EmailTitle', EmailTitle);
+                var encodedMessage = encodeURIComponent(EmailBody);
+                formData.append('EmailBody', encodedMessage);
+                formData.append('EmailReceiver', EmailReceiver);
+                formData.append('EmailId', selectedId.join(';'));
+                formData.append('CampaignId', Campaign.Id);
+                formData.append('CampaignName', Campaign.Name);
+                formData.append('DateAction', DateAction);
+                formData.append('TimeAction', TimeAction);
+
+
+                var totalFileSizeMB = 0; // Biến để lưu tổng dung lượng các tệp
+
+                // Tính tổng dung lượng của tất cả các tệp
+                for (var i = 0; i < files.length; i++) {
+                    totalFileSizeMB += files[i].size / (1024 * 1024); // Chuyển đổi dung lượng sang MB
+                }
+
+                // Kiểm tra xem tổng dung lượng có vượt quá 50MB không
+                if (totalFileSizeMB > 50) {
+                    toastr.clear();
+                    toastr.error("Tổng dung lượng tệp vượt quá dung lượng tối đa cho phép (50MB)");
+                    return;
+                }
+
+                // Thêm tất cả các tệp vào FormData
+                for (var i = 0; i < files.length; i++) {
+                    formData.append("files" + i, files[i]);
+                }
+
+                console.log(DateAction);
+                console.log(TimeAction);
+
+                console.log(Campaign);
+                console.log(Campaign.Id);
+                console.log(Campaign.Name);
+                ShowLoading();
+
+                await new Promise((resolve, reject) => {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/AdviseCard/SendEmailWithFilesHangFireCustomer', true);
+                    xhr.onload = function () {
+                        if (xhr.status === 200) {
+                            toastr.clear();
+                            toastr.success(successMessage);
+                            CloseEmailModalHangfire();
+
+                            resolve();
+                        } else {
+                            console.error('An error occurred:', xhr.responseText);
+                            toastr.clear();
+                            toastr.warning('Có lỗi xảy ra khi gửi Email!');
+                            reject();
+                        }
+                    };
+                    xhr.onerror = function () {
+                        console.error('Network error');
+                        reject();
+                    };
+                    xhr.send(formData);
+                });
+                HideLoading();
+                resetInputFile();
+            }
+
+
+
+        </script>
+
+
+        <script>
+            //Show SMS Hangfire Modal
+            $(document).ready(function () {
+
+                $('#smsTemplateHangfire').select2({
+                    dropdownParent: $('#sms-dropdown-row')
+                });
+                $('#btnShowSMSlModalHangfire').click(ShowSMSModalHangfire);
+
+                $('#sendSMSNow').change(function () {
+                    if ($(this).is(':checked')) {
+                        $('#dateToSendSMS').prop('hidden', true);
+                    }
+                });
+
+                $('#sendSMSScheduled').change(function () {
+                    if ($(this).is(':checked')) {
+                        $('#dateToSendSMS').prop('hidden', false);
+                    }
+                });
+
+                $('.btnCloseSMSModalHangfire').click(CloseSMSModalHangfire);
+
+
+
+                $('#smsTemplateHangfire').on('select2:select', function (e) {
+                    var selectedOption = e.params.data;
+                    var contentSMS = selectedOption.text;
+                    if (contentSMS) {
+                        $('#idContentSMSHangfire').val(contentSMS);
+                    }
+                });
+            });
+
+            var selectedIds = [];
+            var selectedPhones = [];
+
+            function ShowSMSModalHangfire() {
+                let proceedWithAjax = true;
+                selectedPhones = [];
+                selectedIds = [];
+                let selectedNames = [];
+
+                var ele = $('#LeadTblR').find('.checkbox.child:checked');
+
+                var selectedRowsDataPhone = getSelectedRowsPhoneData();
+                selectedRowsDataPhone.forEach(function (row) {
+                    selectedIds.push(row.id);
+                    selectedPhones.push(row.phone);
+                    selectedNames.push(row.name)
+                });
+                var selectedPhoneNumber = processPhoneArray(selectedPhones);
+                if (selectedPhoneNumber.some(phone => phone === undefined)) {
+                    toastr.clear();
+                    toastr.warning('Chỉ có thể gửi SMS cho những khách hàng có thông tin số điện thoại!');
+                    return false;
+                }
+                if (selectedPhoneNumber.length <= 0 || selectedPhoneNumber.length !== selectedIds.length) {
+                    toastr.clear();
+                    toastr.warning('Chỉ có thể gửi SMS cho những khách hàng có thông tin số điện thoại!');
+                    return false;
+                }
+                if (!proceedWithAjax) {
+                    toastr.clear();
+                    toastr.warning('Chỉ có thể gửi SMS cho những khách hàng có thông tin số điện thoại!');
+                    return false;
+                }
+
+                console.log("Selected IDs:", selectedIds);
+                console.log("Selected Phones:", selectedPhones);
+                console.log("Selected Names:", selectedNames);
+
+                $.ajax({
+                    url: "/AdviseCard/GetSMSListHangfire",
+                    method: "GET",
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data != null) {
+                            if (!data.errorMessageSendSMS) {
+                                populateDropdownSMSHangfire(data, selectedPhones, selectedNames);
+                                $('#modalSmsHangfireTotalLead').text('Tổng số Lead: ' + selectedPhones.length);
+                                $('#idContentSMSHangfire').val("");
+                                $('#sendSMSNow').prop('checked', true);
+                                $('#dateToSendSMS').prop('hidden', true);
+                                $('#DateActionSMSHangfire').val("");
+                                $('#TimeActionSMSHangfire').val("");
+                                $("#SMSModalHangfire").modal("show");
+                            } else {
+                                toastr.clear();
+                                toastr.warning(data.errorMessageSendSMS);
+
+                            }
+                        } else {
+                            toastr.clear();
+                            toastr.warning('Có lỗi xảy ra');
+                        }
+                    }
+                });
+            }
+
+            function populateDropdownSMSHangfire(data, selectedPhoneNumber, selectedLeadName) {
+                let receiverInfos = [];
+                for (let i = 0; i < selectedPhoneNumber.length; i++) {
+                    receiverInfos.push(selectedLeadName[i] + ': ' + selectedPhoneNumber[i]);
+                }
+                $('#smsReceiverHangfire').text('Người nhận: ' + receiverInfos.join(';'));
+
+
+                //$('#smsTemplateHangfire').empty().append($('<option></option>').val("").text('Chọn mẫu tin nhắn')).prop('selected', true);
+                //data.smsMessages.forEach(x => {
+                //    $('#smsTemplateHangfire').append($('<option></option>').val(x.ContentRule).text(x.ContentRule));
+                var dropdown = $('#smsTemplateHangfire');
+                dropdown.empty();
+                dropdown.append($('<option></option>').val("").text("Chọn mẫu SMS")).prop('selected', true);
+                $.each(data.smsMessages, function (index, item) {
+                    dropdown.append($('<option></option>').val(item.ContentRule).text(item.ContentRule));
+                });
+
+                var dropdownCampaign = $('#smsCampaignHangfire');
+                dropdownCampaign.empty();
+                $.each(data.Campaign, function (index, item) {
+                    if (item.Id == 3) {
+                        dropdownCampaign.append($('<option></option>').val(JSON.stringify(item)).text(item.Name)).prop('selected', true);
+                    }
+                    else {
+                        dropdownCampaign.append($('<option></option>').val(JSON.stringify(item)).text(item.Name));
+                    }
+
+                });
+
+            }
+
+            function CloseSMSModalHangfire() {
+                $("#SMSModalHangfire").modal("hide");
+            }
+
+            $(document).ready(function () {
+                $('#btnSendSMSHangfire').click(SendSMSHangfire)
+            });
+
+            function SendSMSHangfire() {
+                var DateAction = "";
+                var TimeAction = "";
+                const date = new Date(); //get current date
+                var successMessage = "";
+                //   var myDate = date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear();
+                if ($('#sendSMSNow').is(':checked')) {
+                    DateAction = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                    TimeAction = date.getHours() + ':' + (date.getMinutes());
+                    successMessage = 'Gửi SMS thành công!'
+                }
+                if ($('#sendSMSScheduled').is(':checked')) {
+                    DateAction = $('#DateActionSMS').val();
+                    TimeAction = $('#TimeActionSMS').val();
+                    var testDateAction = DateAction.split('-');
+                    var testTimeAction = TimeAction.split(':');
+                    var selectedDate = new Date(testDateAction[0], testDateAction[1] - 1, testDateAction[2], testTimeAction[0], testTimeAction[1])
+                    if (selectedDate < date) {
+                        toastr.clear();
+                        toastr.warning('Thời điểm gửi SMS không hợp lệ!');
+                        return;
+                    }
+                    successMessage = 'Lên lịch gửi SMS thành công!'
+                }
+                // var EmailSender = $('#emailSenderHangfire').val();
+                // var EmailTitle = $('#emailTitleHangfire').val();
+                var smsBody = $('#idContentSMSHangfire').val();
+                var processedPhones = processPhoneArray(selectedPhones);
+
+                console.log('processedPhones', processedPhones);
+                var smsReceiver = processedPhones.join(';');
+                console.log('smsReceiver', smsReceiver);
+                var Campaign = JSON.parse($('#smsCampaignHangfire').val());
+
+                if (!DateAction || !TimeAction || !smsBody || !smsReceiver) {
+                    toastr.clear();
+                    toastr.warning('Vui lòng điền đủ các thông tin cần thiết để gửi SMS');
+                    return;
+                }
+                if (!processedPhones.every(x => isValidPhoneNumberHangfire(x))) {
+                    toastr.clear();
+                    toastr.warning('Số điện thoại không hợp lệ');
+                    return;
+                }
+                ShowLoading();
+                $.ajax({
+                    url: "/AdviseCard/SendApiSMSHangfireCustomer",
+                    method: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        DateAction: DateAction,
+                        TimeAction: TimeAction,
+                        ContentSMS: smsBody,
+                        Phones: smsReceiver,
+                        Ids: selectedIds.join(';'),
+                        CampaignId: Campaign.Id,
+                        CampaignName: Campaign.Name,
+                    }),
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success) {
+                            setTimeout(function () {
+                                HideLoading();
+                            }, 1000);
+                            toastr.clear();
+                            toastr.success(successMessage);
+                            CloseSMSModalHangfire();
+                        } else {
+                            toastr.clear();
+                            toastr.warning('Có lỗi xảy ra khi gửi SMS!');
+                        }
+                    }
+                });
+            }
+
+            function isValidPhoneNumberHangfire(phoneNumber) {
+                const patternVN = /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/;
+                const pattern = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+                if (!phoneNumber) {
+                    return false;
+                } else if (patternVN.test(phoneNumber)) {
+                    return true;
+                } else if (pattern.test(phoneNumber)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            function processPhoneArray(selectedPhones) {
+                var result = [];
+
+                selectedPhones.forEach(function (phoneString) {
+                    // Tách chuỗi bằng dấu gạch nối (-) và chỉ lấy phần tử đầu tiên
+                    var phone = phoneString.split('-')[0].trim();
+
+                    // Thêm vào mảng kết quả nếu không phải là chuỗi rỗng
+                    if (phone !== '') {
+                        result.push(phone);
+                    }
+                });
+
+                return result;
+            }
+
+        </script>
+
+
+        <script>
+        var template_dataZNS = {};
+
+        var selectedPhoneNumber = [];
+         var selectedIdZNS = [];
+            var balanceCheckDisplayed = false;
+            var success = false;
+
+        $(document).ready(function () {
+          $('#btnShowZNSModalHangfire').click(ShowZNSModalHangfire);
+
+
+
+            $('#znsTemplateHangfire').select2({
+                dropdownParent: $('#zns-dropdown-row')
+            });
+
+
+            $('#sendZNSNow').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#dateToSendZNS').prop('hidden', true);
+                }
+            });
+
+            $('#sendZNSScheduled').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#dateToSendZNS').prop('hidden', false);
+                }
+            });
+            $('.btnCloseZNSModalHangfire').click(CloseZNSModalHangfire);
+            $('#btnSendZNSHangfire').click(function () {
+                var idContentZNSHangfire = $('#idContentZNSHangfire').val();
+                var campaignId = JSON.parse($('#znsCampaignHangfire').val());
+                var selectedId = $('#znsTemplateHangfire').find(':selected').data('id');
+                var selectedZNSId = $('#znsTemplateHangfire').find(':selected').data('znsId');
+                if (!idContentZNSHangfire) {
+                    toastr.warning("Vui lòng chọn mẫu ZNS");
+                    return false;
+                }
+
+                if ($('#sendZNSNow').is(':checked')) {
+                    //Code test thôi nha, chưa có dữ liệu thực
+                    var errorCodes = [];
+                    var completedRequests = 0; // Số lượng yêu cầu đã hoàn thành
+
+                    selectedPhoneNumber.forEach(function (phoneNumber, index) {
+                        var convertedPhone = convertPhoneNumberLead(phoneNumber);
+                        var extractedContent = extractValues(idContentZNSHangfire);
+
+                        console.log('Processing user at index', index);
+                        console.log('convertedPhone', convertedPhone);
+                        console.log('extractedContent', extractedContent);
+
+                        // Hiển thị loading trước khi gửi yêu cầu AJAX
+                        ShowLoading();
+
+                        updateZNSTemplateIndex(selectedId, extractedContent, function () {
+                            console.log('updateZNSTemplate callback called for index', index);
+                            // Gọi sendZNSIndex với một hàm callback để lưu trữ mã lỗi
+                            sendZNSIndex(convertedPhone, selectedZNSId, template_dataZNS, selectedIdZNS[index], idContentZNSHangfire, phoneNumber, campaignId, function (errorCode) {
+                                // Lưu trữ mã lỗi vào mảng
+                                errorCodes.push(errorCode);
+                                completedRequests++;
+
+                                // Kiểm tra xem tất cả các yêu cầu đã hoàn thành chưa
+                                if (completedRequests === selectedPhoneNumber.length) {
+                                    // Ẩn loading khi tất cả các yêu cầu đã hoàn thành
+                                    HideLoading();
+
+                                    // Kiểm tra xem có mã lỗi nào bằng 0 hay không
+                                    var success = errorCodes.includes(0);
+                                    if (success) {
+                                        setTimeout(function () {
+                                            toastr.success('Gửi ZNS thành công.');
+                                            CloseZNSModalHangfire();
+                                        }, 1000);
+                                    } else {
+                                        setTimeout(function () {
+                                            toastr.error('Gửi ZNS thât bại.');
+                                        }, 1000);
+                                    }
+                                }
+                            });
+                        });
+                    });
+                }
+                    else if ($('#sendZNSScheduled').is(':checked')) {
+                    var scheduleDate = $('#DateActionZNS').val();
+                    var scheduleTime = $('#TimeActionZNS').val();
+
+                    // Kiểm tra nếu ngày hoặc giờ không được chọn
+                    if (!scheduleDate || !scheduleTime) {
+                        toastr.clear();
+                        toastr.warning('Vui lòng chọn cả ngày và giờ để đặt lịch gửi ZNS');
+                        return;
+                    }
+
+                    var scheduleDateTime = scheduleDate + ' ' + scheduleTime;
+                    // Lấy giờ từ thời gian đặt lịch
+                    var scheduleHour = parseInt(scheduleTime.split(':')[0]);
+
+                    // Lấy ngày hiện tại
+                    var currentDate = new Date();
+                    // Kiểm tra nếu thời gian đặt lịch nhỏ hơn thời gian hiện tại thì hiển thị thông báo lỗi
+                    var selectedDate = new Date(scheduleDateTime);
+                    if (selectedDate < currentDate) {
+                        toastr.warning('Không thể đặt lịch vào thời gian của quá khứ ');
+                        return;
+                    }
+                    // Kiểm tra nếu giờ đặt lịch từ 10pm đến 6am thì hiển thị thông báo lỗi
+                    if (scheduleHour >= 22 || scheduleHour < 6) {
+                        toastr.warning('Không thể gửi vào khung giờ từ 10PM đến 6AM');
+                        return;
+                    }                    var errorCodes2 = [];
+                    var completedRequests2 = 0;
+
+                    selectedPhoneNumber.forEach(function (phoneNumber, index) {
+                        var convertedPhone = convertPhoneNumberLead(phoneNumber);
+                        var extractedContent = extractValues(idContentZNSHangfire);
+
+                        console.log('Processing user at index', index);
+                        console.log('convertedPhone', convertedPhone);
+                        console.log('extractedContent', extractedContent);
+
+                        // Hiển thị loading trước khi gửi yêu cầu AJAX
+                        ShowLoading();
+
+                        updateZNSTemplateIndex(selectedId, extractedContent, function () {
+                            console.log('updateZNSTemplate callback called for index', index);
+                            // Gọi sendZNSIndex với một hàm callback để lưu trữ mã lỗi
+                            sendZNSScheduleIndex(convertedPhone, selectedZNSId, template_dataZNS, selectedIdZNS[index], idContentZNSHangfire, phoneNumber, scheduleDateTime, campaignId, function (errorCode2) {
+
+                                errorCodes2.push(errorCode2);
+                                completedRequests2++;
+
+                                // Kiểm tra xem tất cả các yêu cầu đã hoàn thành chưa
+                                if (completedRequests2 === selectedPhoneNumber.length) {
+                                    // Ẩn loading khi tất cả các yêu cầu đã hoàn thành
+                                    HideLoading();
+
+                                    // Kiểm tra xem có mã lỗi nào bằng 0 hay không
+                                    var success2 = errorCodes2.includes(0);
+                                    console.log(errorCodes2);
+                                    if (success2) {
+                                        setTimeout(function () {
+                                            toastr.success('Lên lịch gửi ZNS thành công.');
+                                            CloseZNSModalHangfire();
+                                        }, 1000);
+                                    } else {
+                                        setTimeout(function () {
+                                            toastr.error('Gửi ZNS thât bại.');
+                                        }, 1000);
+                                    }
+                                }
+                            });
+                        });
+                    });
+                }
+            });
+
+            $('#znsTemplateHangfire').on('select2:select', function (e) {
+                var selectedOption = e.params.data;
+                var contentZNS = selectedOption.text;
+                var isFirstOption = $('#znsTemplateHangfire option:first-child').is(':selected');
+
+                if (contentZNS && !isFirstOption) {
+                    //    $('#idContentZNSHangfire').val(contentZNS).prop('readonly', true);
+                    $('#idContentZNSHangfire').val(contentZNS);
+                }
+            });
+        });
+
+            function extractValues(str) {
+                const regex = /{{(.*?)}}/g;
+                let matches;
+                const values = [];
+
+                while ((matches = regex.exec(str)) !== null) {
+                    values.push(matches[1].trim());
+                }
+
+                return values.join(',');
+            }
+
+        function sendZNSQuickIndex() {
+            var idContentZNSHangfire = $('#idContentZNSHangfire').val();
+            var campaignId = JSON.parse($('#znsCampaignHangfire').val());
+
+            if (idContentZNSHangfire.trim() === '') {
+                toastr.clear();
+                toastr.warning('Vui lòng chọn mẫu ZNS');
+                return;
+            }
+            console.log("znsContent: " + idContentZNSHangfire);
+            console.log(selectedId);
+            $.ajax({
+                url: "/AdviseCard/GetZNSListForMultipleUsers",
+                method: "POST",
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ userIds: selectedId, znsContent: idContentZNSHangfire}),
+                success: function (response) {
+                    if (response != null && response.success) {
+                        console.log('UserData:', response.userData);
+                        var selectedId = $('#znsTemplateHangfire').find(':selected').data('id');
+                        var selectedZNSId = $('#znsTemplateHangfire').find(':selected').data('znsId');
+                        console.log(selectedZNSId);
+
+                        console.log(selectedId);
+
+                        var users = Object.keys(response.userData); // Lấy danh sách user IDs
+
+                        // Hàm đệ qui để xử lý từng user một
+                        var processUser = function (index) {
+                            if (index < users.length) {
+                                var userId = users[index];
+                                var userTemplates = response.userData[userId];
+                                var contentRule = userTemplates[0].ContentRule;
+                                var leadName = userTemplates[0].LeadName;
+                                var leadPhone = userTemplates[0].LeadPhone;
+                                var convertedPhone = convertPhoneNumberLead(leadPhone);
+
+                                console.log(leadName);
+                                console.log(convertedPhone);
+
+                                console.log(contentRule);
+                                // Lấy danh sách giá trị thực đã được thay thế cho từng người dùng
+                                var realValues = response.userRealValues[userId];
+                                var formattedRealValues = realValues.join(',');
+                                updateZNSTemplateIndex(selectedId, formattedRealValues, function () {
+                                    //Lấy tạm nội dung trong text area
+                                    sendZNSIndex(convertedPhone, selectedZNSId, template_dataZNS, userId, contentRule, leadPhone, campaignId);
+                                    // Gọi đệ qui để xử lý user tiếp theo
+                                    processUser(index + 1);
+                                });
+                            }
+                        };
+                        if (response.errorCode === -137) {
+                            toastr.error('Mẫu ZNS không thể gửi vào lúc (10PM-6AM)');
+                        }
+
+                        else {
+                            toastr.success('Thành công');
+                            CloseZNSModalHangfire();
+                        }
+                        processUser(0);
+                    } else {
+                        toastr.warning('Có lỗi xảy ra');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log('Error:', errorThrown);
+                    // Xử lý khi có lỗi xảy ra trong quá trình gọi API
+                }
+            });
+        }
+        function scheduleZNSIndex() {
+            var idContentZNSHangfire = $('#idContentZNSHangfire').val();
+            var campaignId = JSON.parse($('#znsCampaignHangfire').val());
+            if (idContentZNSHangfire.trim() === '') {
+                toastr.warning('Vui lòng chọn mẫu ZNS');
+                return;
+            }
+            console.log("znsContent: " + idContentZNSHangfire);
+            console.log(selectedId);
+            $.ajax({
+                url: "/AdviseCard/GetZNSListForMultipleUsers",
+                method: "POST",
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ userIds: selectedId, znsContent: idContentZNSHangfire}),
+                success: function (response) {
+                    if (response != null && response.success) {
+                        console.log('UserData:', response.userData);
+                        var selectedId = $('#znsTemplateHangfire').find(':selected').data('id');
+                        var selectedZNSId = $('#znsTemplateHangfire').find(':selected').data('znsId');
+                        console.log(selectedZNSId);
+
+                        console.log(selectedId);
+
+                        var users = Object.keys(response.userData); // Lấy danh sách user IDs
+                        var scheduleDate = $('#DateActionZNS').val();
+                        var scheduleTime = $('#TimeActionZNS').val();
+
+                        // Kiểm tra nếu ngày hoặc giờ không được chọn
+                        if (!scheduleDate || !scheduleTime) {
+                            toastr.clear();
+                            toastr.warning('Vui lòng chọn cả ngày và giờ để đặt lịch gửi ZNS');
+                            return;
+                        }
+
+                        var scheduleDateTime = scheduleDate + ' ' + scheduleTime;
+                        // Lấy giờ từ thời gian đặt lịch
+                        var scheduleHour = parseInt(scheduleTime.split(':')[0]);
+
+                        // Lấy ngày hiện tại
+                        var currentDate = new Date();
+                        // Kiểm tra nếu thời gian đặt lịch nhỏ hơn thời gian hiện tại thì hiển thị thông báo lỗi
+                        var selectedDate = new Date(scheduleDateTime);
+                        if (selectedDate < currentDate) {
+                            toastr.warning('Không thể đặt lịch vào thời gian của quá khứ ');
+                            return;
+                        }
+                        // Kiểm tra nếu giờ đặt lịch từ 10pm đến 6am thì hiển thị thông báo lỗi
+                        if (scheduleHour >= 22 || scheduleHour < 6) {
+                            toastr.warning('Không thể gửi vào khung giờ từ 10PM đến 6AM');
+                            return;
+                        }
+
+
+
+                        // Hàm đệ qui để xử lý từng user một
+                        var processUser = function (index) {
+                            if (index < users.length) {
+                                var userId = users[index];
+                                var userTemplates = response.userData[userId];
+                                var contentRule = userTemplates[0].ContentRule;
+                                var leadName = userTemplates[0].LeadName;
+                                var leadPhone = userTemplates[0].LeadPhone;
+                                var convertedPhone = convertPhoneNumberLead(leadPhone);
+
+                                console.log(leadName);
+                                console.log(convertedPhone);
+
+                                console.log(contentRule);
+                                // Lấy danh sách giá trị thực đã được thay thế cho từng người dùng
+                                var realValues = response.userRealValues[userId];
+                                var formattedRealValues = realValues.join(',');
+                                updateZNSTemplateIndex(selectedId, formattedRealValues, function () {
+                                    sendZNSScheduleIndex(convertedPhone, selectedZNSId, template_dataZNS, userId, contentRule, leadPhone, scheduleDateTime, campaignId)
+                                    processUser(index + 1);
+                                });
+                            }
+                        };
+                        if (response.success) {
+                            toastr.success('Thành công');
+                            CloseZNSModalHangfire();
+
+                        }
+
+                        else {
+                            toastr.error('Lên lịch không thành công');
+
+                        }
+                        processUser(0);
+                    } else {
+                        toastr.warning('Có lỗi xảy ra');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log('Error:', errorThrown);
+                    // Xử lý khi có lỗi xảy ra trong quá trình gọi API
+                }
+            });
+        }
+        function updateZNSTemplateIndex(id, realValues, callback) {
+            $.ajax({
+                url: '/AdviseCard/GetZNSTemplate',
+                type: 'GET',
+                data: {
+                    id: id
+                },
+                dataType: 'json',
+                success: function (response) {
+                    var fieldZnsList = response.fieldZnsList;
+                    var extractedData = extractDataAndFormatTime(fieldZnsList, realValues);
+                    template_dataZNS = extractedData;
+                    console.log("Mẫu nè", template_dataZNS);
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching ZNS template:', error);
+                }
+            });
+        }
+
+
+        function convertPhoneNumberLead(phone) {
+            // Kiểm tra xem số điện thoại đã có đầu số 84 (Việt Nam) chưa
+            if (phone.startsWith("0")) {
+                // Nếu chưa có, thêm đầu số 84 vào trước số điện thoại
+                return "84" + phone.slice(1);
+            } else {
+                // Nếu đã có đầu số 84, không cần thay đổi
+                return phone;
+            }
+            }
+
+      function sendZNSIndex(convertedPhone, selectedZNSId, template_data, userId, contentRule, leadPhone, CampaignId, callback) {
+    console.log('template_data', template_data);
+    console.log('convertedPhone', convertedPhone);
+    console.log('selectedZNSId', selectedZNSId);
+    console.log('userId', userId);
+    console.log('contentRule', contentRule);
+    console.log('leadPhone', leadPhone);
+    console.log('CampaignId', CampaignId);
+
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("SendZNS", "AdviseCard", new { area = "Sale"})',
+        data: JSON.stringify({
+            phoneNumber: convertedPhone,
+            templateId: selectedZNSId,
+            templateData: template_data
+        }),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+            // Xử lý kết quả trả về từ controller
+            if (response.error === 0) {
+                if (typeof callback === 'function') {
+                    callback(response.error);
+                }
+                createZNSLeadLogsIndex(userId, contentRule, 1, leadPhone, CampaignId.Id, "");
+            } else {
+                if (typeof callback === 'function') {
+                    callback(response.error);
+                }
+                createZNSLeadLogsIndex(userId, contentRule, 0, leadPhone, CampaignId.Id, response.error);
+            }
+        },
+        error: function(xhr, status, error) {
+            // Xử lý lỗi khi gửi request
+            toastr.error('Có lỗi xảy ra');
+            // Đóng modal
+            CloseZNSModalHangfire();
+            if (typeof callback === 'function') {
+                callback(error);
+            }
+        }
+    });
+}
+            function sendZNSScheduleIndex(convertedPhone, selectedZNSId, template_data, userId, contentRule, leadPhone, scheduleDateTime, CampaignId, callback) {
+    //ví dụ bỏ cặp {} template data
+      // Nếu tất cả các giá trị đều đã được cung cấp, gửi request AJAX
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("ScheduleZNS", "AdviseCard", new { area = "Sale" })',
+        data: JSON.stringify({
+            phoneNumber: convertedPhone,
+            templateId: selectedZNSId,
+            templateData: template_data,
+            scheduleTime: scheduleDateTime // Thêm dữ liệu thời gian lên lịch
+        }),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function(response) {
+            // Xử lý kết quả trả về từ controller
+            if (response.success) {
+                if (typeof callback === 'function') {
+                    callback(0);
+                }
+                createZNSLeadLogsIndex(userId, contentRule, 1, leadPhone, CampaignId.Id, '');
+            } else {
+                if (typeof callback === 'function') {
+                    callback(-1);
+                }
+                createZNSLeadLogsIndex(userId, contentRule, 0, leadPhone, CampaignId.Id, response.error);
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            // Xử lý lỗi khi gửi request
+            toastr.error('Có lỗi xảy ra');
+            // Đóng modal
+            CloseZNSModalHangfire();
+            if (typeof callback === 'function') {
+                callback(-2);
+            }
+        }
+    });
+}
+
+
+
+
+        function checkTemplateData(template_data) {
+            for (var key in template_data) {
+                if (template_data.hasOwnProperty(key)) {
+                    if (!template_data[key] || template_data[key].trim() === "") {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+
+        function ShowZNSModalHangfire() {
+            let proceedWithAjax = true;
+            selectedPhoneNumber = [];
+            let selectedLeadName = [];
+            selectedIdZNS = [];
+            var ele = $('#LeadTblR').find('.checkbox.child:checked');
+
+            var selectedRowsDataPhone = getSelectedRowsPhoneData();
+            selectedRowsDataPhone.forEach(function (row) {
+                selectedIdZNS.push(row.id);
+                selectedPhoneNumber.push(row.phone);
+                selectedLeadName.push(row.name)
+            });
+             selectedPhoneNumber = processPhoneArray(selectedPhoneNumber);
+
+            console.log('selectedIdZNS', selectedIdZNS);
+            console.log('selectedPhoneNumber',selectedPhoneNumber);
+            console.log('selectedLeadName',selectedLeadName);
+
+            if (selectedPhoneNumber.length <= 0 || selectedPhoneNumber.length !== selectedIdZNS.length) {
+                toastr.clear();
+                toastr.warning('Chỉ có thể gửi ZNS cho những khách hàng có thông tin số điện thoại!');
+                return false;
+            }
+            if (!proceedWithAjax) {
+                toastr.clear();
+                toastr.warning('Chỉ có thể gửi ZNS cho những khách hàng có thông tin số điện thoại!');
+                return false;
+            }
+
+            $.ajax({
+                url: "/AdviseCard/GetZNSListHangfire",
+                method: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data != null) {
+                        if (!data.errorMessageSendZNS) {
+                            populateDropdownZNSHangfire(data, selectedPhoneNumber, selectedLeadName);
+                            $('#modalZnsHangfireTotalLead').text('Tổng số Lead: ' + selectedPhoneNumber.length);
+                            $('#idContentZNSHangfire').val("");
+                            $('#sendZNSNow').prop('checked', true);
+                            $('#dateToSendZNS').prop('hidden', true);
+                            $('#DateActionZNSHangfire').val("");
+                            $('#TimeActionZNSHangfire').val("");
+                            $("#ZNSModalHangfire").modal("show");
+                        } else {
+                            toastr.clear();
+                            toastr.warning(data.errorMessageSendZNS);
+
+                        }
+                    } else {
+                        toastr.clear();
+                        toastr.warning('Có lỗi xảy ra');
+                    }
+                }
+            });
+        }
+        function populateDropdownZNSHangfire(data, selectedPhoneNumber, selectedLeadName) {
+            let receiverInfos = [];
+            for (let i = 0; i < selectedPhoneNumber.length; i++) {
+                receiverInfos.push(selectedLeadName[i] + ': ' + selectedPhoneNumber[i]);
+            }
+            $('#znsReceiverHangfire').text('Người nhận: ' + receiverInfos.join(';'));
+
+            var dropdown = $('#znsTemplateHangfire');
+            dropdown.empty();
+            dropdown.append($('<option></option>').val("").text("Chọn mẫu ZNS")).prop('selected', true);
+            $.each(data.znsMessages, function (index, item) { // Sửa từ smsMessages thành znsMessages
+                var option = $('<option></option>'); // Khai báo biến option ở đây
+                option.val(item.ContentRule).text(item.ContentRule).val(item.ZNSId).val(item.Id);
+                option.data('znsId', item.ZNSId);
+                option.data('id', item.Id);
+                dropdown.append(option);
+            });
+            var dropdownCampaign = $('#znsCampaignHangfire');
+            dropdownCampaign.empty();
+            $.each(data.Campaign, function (index, item) {
+                if (item.Id == 3) {
+                    dropdownCampaign.append($('<option></option>').val(JSON.stringify(item)).text(item.Name)).prop('selected', true);
+                }
+                else {
+                    dropdownCampaign.append($('<option></option>').val(JSON.stringify(item)).text(item.Name));
+                }
+
+            });
+
+            // Lọc và log Id của mẫu được chọn
+            dropdown.on('change', function () {
+                var selectedOption = $(this).find(':selected');
+                var selectedZNSId = selectedOption.data('znsId');
+                var selectedId = selectedOption.data('id'); // Lấy giá trị của thuộc tính data-id
+                console.log('Template Id:', selectedId);
+                console.log('ZNS Id:', selectedZNSId);
+
+
+
+            });
+        }
+            function extractDataAndFormatTime(fieldZnsList, dataString) {
+                // Tạo một mảng từ chuỗi dữ liệu
+                var dataArray = dataString.split(',');
+
+                // Tạo một đối tượng JSON trống
+                var extractedData = {};
+
+                // Lặp qua từng trường fieldZns và gán giá trị tương ứng từ mảng dữ liệu
+                var fieldZns = fieldZnsList.split(',');
+                for (var i = 0; i < fieldZns.length; i++) {
+                    extractedData[fieldZns[i]] = dataArray[i];
+                }
+
+                // Set giá trị datetime cố định cho schedule_time
+                extractedData['schedule_time'] = "2024-06-10T10:00:00";
+
+                // Tìm trường có giá trị giống định dạng ngày tháng
+                var timeFieldName = findDateTimeField(extractedData);
+
+                // Chuyển đổi định dạng thời gian nếu trường thời gian được phát hiện
+                if (timeFieldName) {
+                    var dateTime = extractedData[timeFieldName];
+                    var formattedDateTime = formatDateTime(dateTime);
+                    extractedData[timeFieldName] = formattedDateTime;
+                }
+
+                return extractedData;
+            }
+
+        function formatDateTime(dateTime) {
+            if (!(dateTime instanceof Date)) {
+                dateTime = new Date(dateTime);
+            }
+
+            if (isNaN(dateTime.getTime())) {
+                return null; // Trả về null nếu không thể chuyển đổi thành ngày tháng
+            }
+
+            var hours = dateTime.getHours();
+            var minutes = dateTime.getMinutes();
+            var day = dateTime.getDate();
+            var month = dateTime.getMonth() + 1;
+            var year = dateTime.getFullYear();
+
+            // Chuyển đổi giờ và phút thành chuỗi có dạng hh:mm
+            var timeString = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+
+            // Chuyển đổi ngày và tháng thành chuỗi có dạng dd/MM/yyyy
+            var dateString = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year;
+
+            // Trả về chuỗi kết quả
+            return timeString + ' ' + dateString;
+        }
+
+
+        // Hàm kiểm tra xem trường nào trong đối tượng chứa giá trị có dạng ngày tháng
+        function findDateTimeField(dataObject) {
+            for (var key in dataObject) {
+                if (isDateTime(dataObject[key])) {
+                    return key;
+                }
+            }
+            return null;
+        }
+
+        // Hàm kiểm tra xem một chuỗi có định dạng ngày tháng hợp lệ không
+        function isDateTime(value) {
+            var regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+            return regex.test(value);
+        }
+        function convertPhoneNumber(phone) {
+            // Kiểm tra xem số điện thoại đã có đầu số 84 (Việt Nam) chưa
+            if (phone.startsWith("0")) {
+                // Nếu chưa có, thêm đầu số 84 vào trước số điện thoại
+                return "84" + phone.slice(1);
+            } else {
+                // Nếu đã có đầu số 84, không cần thay đổi
+                return phone;
+            }
+        }
+        function convertISOToDateTime(isoString) {
+            // Tạo một đối tượng Date từ chuỗi ISO 8601
+            var date = new Date(isoString);
+
+            // Lấy thông tin ngày, tháng, năm, giờ và phút
+            var day = date.getDate();
+            var month = date.getMonth() + 1; // Tháng bắt đầu từ 0 nên cần cộng thêm 1
+            var year = date.getFullYear();
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+
+            // Định dạng lại các giá trị thành chuỗi
+            var formattedDateTime = hours + ':' + minutes + ' ' + day + '/' + month + '/' + year;
+
+            // Trả về chuỗi đã được định dạng
+            return formattedDateTime;
+        }
+
+        function formatDateTimeInText(text) {
+            // Biểu thức chính quy để tìm kiếm các chuỗi thời gian có định dạng ISO 8601 trong văn bản
+            var isoRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/g;
+
+            // Tìm tất cả các chuỗi thời gian trong văn bản
+            var isoMatches = text.match(isoRegex);
+
+            // Nếu có các chuỗi thời gian được tìm thấy, chuyển đổi và thay thế chúng
+            if (isoMatches) {
+                isoMatches.forEach(function (match) {
+                    var formattedDateTime = convertISOToDateTime(match);
+                    text = text.replace(match, formattedDateTime);
+                });
+            }
+
+            // Trả về văn bản đã được định dạng
+            return text;
+        }
+        function createZNSLeadLogsIndex(Id, Content, Status, Mobile, CampaignId,ErrorCode) {
+            debugger
+            var formattedText = formatDateTimeInText(Content);
+
+            $.ajax({
+                type: 'POST',
+                url: '/AdviseCard/CreateZNSLeadLogs',
+                data: JSON.stringify({
+                    Id: Id,
+                    Content: formattedText,
+                    Status: Status,
+                    Mobile: Mobile,
+                    CampaignId: CampaignId,
+                    ErrorCode: ErrorCode,
+                    isPartial: 0
+                }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        // Xử lý thành công (nếu cần)
+                        console.log('CreateZNSLeadLogs success');
+                    } else {
+                        // Xử lý khi có lỗi (nếu cần)
+                        console.error('CreateZNSLeadLogs error');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Xử lý khi gặp lỗi request
+                    console.error('Error sending CreateZNSLeadLogs request:', error);
+                }
+            });
+        }
+
+                    function CloseZNSModalHangfire() {
+            $("#ZNSModalHangfire").modal("hide");
+        }
+
+
+
+        </script>
+
+
+
+    }
+    @*@Html.ScriptBottom_ChosenStyle()*@
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")

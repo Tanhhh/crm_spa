@@ -1,0 +1,53 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_Get_ProductInvoiceDetailViewModel>
+    @{
+        Layout = null;
+        int index = 0;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+
+                <th class="text-center">Tên khách hàng</th>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Mã khách hàng</th>
+                <th class="text-center">Mã sản phẩm</th>
+                <th class="text-center">Tên sản phẩm</th>
+                <th class="text-center">Số lượng</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var qq in Model.GroupBy(x => x.CustomerName))
+            {
+                var row_count = 0;
+                foreach (var item in Model.Where(x => x.CustomerName == qq.Key))
+                {
+                    index++;
+
+                    <tr class="@(index%2==0?"alert-warning":"")">
+                        @if (row_count == 0)
+                        {
+                            row_count++;
+                            <td rowspan="@Model.Where(x=>x.CustomerName==qq.Key).Count()" data-name="" style="width:100px;text-align:center">@item.CustomerName</td>
+                        }
+                        <td style="width:40px;text-align:center">@(index)</td>
+                        <td style="text-align:center">@item.CustomerCode</td>
+                        <td style="text-align:center">@item.ProductCode</td>
+                        <td style="text-align:center">@item.ProductName</td>
+                        <td style="text-align:center">@item.Quantity</td>
+                    </tr>
+
+                }
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" style="text-align:right"><b>Tổng</b></td>
+                <td style="text-align:center">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Quantity), null))</td>
+            </tr>
+        </tfoot>
+    </table>

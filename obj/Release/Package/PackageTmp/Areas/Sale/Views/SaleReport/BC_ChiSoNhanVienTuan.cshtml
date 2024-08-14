@@ -1,0 +1,246 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+
+@{
+    ViewBag.Title = "Báo cáo chỉ số nhân viên theo tuần";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "BC_ChiSoNhanVienTuan",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        SearchButtonText = "Xem báo cáo"
+    };
+    IEnumerable<SelectListItem> NguonKhach = Erp.BackOffice.Helpers.Common.GetSelectList_Category("NguonKhach", null, "value");
+    //DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    //// Cộng thêm 1 tháng và trừ đi một ngày.
+    //DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+  
+}
+
+@section HeadOfPage {
+    <style type="text/css">
+        .cell-center {
+            text-align: center;
+        }
+
+        .tr-bold {
+            font-weight: 700;
+        }
+
+        .ctl {
+            position: relative;
+            /*float: left;*/
+            margin-right: 3px;
+        }
+
+            .ctl .error {
+                position: absolute;
+                background: #de2a2a;
+                left: 0px;
+                top: 28px;
+                padding: 2px 5px;
+                color: #fff;
+                z-index: 999;
+            }
+
+                .ctl .error:before {
+                    border-bottom: 7px solid #de2a2a;
+                    border-left: 7px solid transparent;
+                    border-right: 7px solid transparent;
+                    left: 9px;
+                    top: -6px;
+                    content: "";
+                    display: inline-block;
+                    position: absolute;
+                }
+
+        .icon-add {
+            margin-top: 0px !important;
+        }
+
+        .combojax {
+            display: inline-block;
+            position: initial !important;
+            float: none !important;
+        }
+    </style>
+
+}
+
+<div id="page_header" class="widget-box">
+    <div class="widget-header">
+        <h5 class="widget-title">
+            <i class="ace-icon fa fa-star orange"></i>
+            @ViewBag.Title
+        </h5>
+        <div class="widget-toolbar">
+            <a class="btn-search" href="#" data-action="collapse">
+                <i class="ace-icon fa fa-search blue"></i>
+            </a>
+            <a class="btn-setting"></a>
+        </div>
+    </div>
+
+    <div class="widget-body" style="display: block;">
+        <div class="widget-main">
+            <div class="search-view form-inline" id="SaleReport">
+                <p>
+                    <select id="week" name="week">
+                        <option>Chọn tuần</option>
+                        @for (int i = 1; i <= 4; i++)
+                        {
+                            <option @(Request["week"] == i.ToString() ? "Selected" : "") value="@i">Tuần @i</option>
+                        }
+                    </select>
+                    <select id="month" name="month">
+                        @for (int i = 1; i <= 12; i++)
+                        {
+                            <option @(Month == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+                        }
+                    </select>
+                    <select id="year" name="year">
+                        @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+                        {
+                            <option @(Year == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+                        }
+                    </select>
+
+                    <select class="chzn-select" style="width:250px; float:left" id="ManagerStaffId">
+                        <option value="">- Nhân viên QL -</option>
+                        @foreach (var item in SelectListHelper.GetSelectList_FullUserNameKD(null, null))
+                        {
+                            <option @(Request["ManagerStaffId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                    <select class="chzn-select" style="width:250px; float:left" id="NK">
+                        <option value="">- Nguồn Khách -</option>
+                        @foreach (var item in SelectListHelper.GetSelectList_AllNguonKhach(null, null))
+                        {
+                            <option @(Request["NK"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </p>
+                <p style="margin:0px;">
+                    <button class="btn btn-mini btn-primary" name="search" onclick="searchreact()" type="submit" value="Search">
+                        Xem báo cáo
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="padding-top: 5px;">
+    <div class="col-xs-12">
+        <div class="table-responsive" id="BCNV" style="margin-bottom:40px">
+            @*@Html.Partial("_GetListSale_BC_ChiSoNhanVien")*@
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="tableToExcel('BaoCaoChiSoNhanVienTheoTuan','BaoCaoChiSoNhanVienTuan')" @*onclick="GetPrint(true)"*@>
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+
+}
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+    <script src="/Scripts/combojax.js"></script>
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <script>
+
+        $(function () {
+            searchreact();
+            $("#ProductName").combojax({
+                url: "/CommissionCus/GetListJsonAll",
+                onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+                    //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+                },
+                onSelected: function (obj) {
+                    if (obj) {
+
+                    }
+                }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+                , onShowImage: false                  //hiển thị hình ảnh
+                , onSearchSaveSelectedItem: true    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+                , onRemoveSelected: false  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+            });
+        });
+        function searchreact() {
+            GetDatatable('/SaleReport/_GetListSale_BC_ChiSoNhanVienTuan');
+        };
+        function GetDatatable(url) {
+            debugger
+            var Month = $('#month').val();
+            var Year = $('#year').val();
+            var ManagerStaffId = $('#ManagerStaffId').val();
+            var NguonKhach = $('#NK').val();
+            var Week = $("#week").val();
+            //var ProductGroup = $('#ProductGroup').val();
+            //var CategoryCode = $('#CategoryCode').val();
+            //var Manufacturer = $('#Manufacturer').val();
+            //var WarehouseId = $('#WarehouseId').val();
+            //var txtOrId = $('#txtOrId').val();
+            var formdata = {
+                week: Week,
+                month: Month,
+                year: Year,
+                ManagerStaffId: ManagerStaffId,
+                NguonKhach: NguonKhach
+                //ProductGroup: ProductGroup,
+                //CategoryCode: CategoryCode,
+                //Manufacturer: Manufacturer,
+                //WarehouseId: WarehouseId,
+                //txtOrId: txtOrId
+            };
+            //$("#react_report").html("");
+            ClickEventHandlerHTML(true, url, '#BCNV', formdata, function () {
+               
+            });
+        };
+        function GetPrint(type) {
+            debugger
+            var StartdDate = $('#month').val();
+            var EndDate = $('#year').val();
+            var ProductGroup = $('#ProductGroup').val();
+            var CategoryCode = $('#CategoryCode').val();
+
+            OpenPopup('/SaleReport/PrintSale_BC_ChiSoNhanVienTuan?StartdDate=' + StartdDate + '&EndDate=' + EndDate + '&ProductGroup=' + ProductGroup + '&CategoryCode=' + CategoryCode + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 2000);
+            HideLoading();
+        };
+    </script>
+
+        <script type="text/javascript">
+
+            var tableToExcel=(function () {
+                var uri = 'data:application/vnd.ms-excel;base64,'
+                    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                    , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                    , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+                
+                return function (table, name) {
+                    if (!table.nodeType) table = document.getElementById(table)
+                    var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+                    window.location.href = uri + base64(format(template, ctx))
+                }
+            })()
+        </script>
+    
+}

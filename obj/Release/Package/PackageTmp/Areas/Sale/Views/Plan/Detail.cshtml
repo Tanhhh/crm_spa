@@ -1,0 +1,606 @@
+﻿@model List<KH_TUONGTACViewModel>
+
+    @using Erp.BackOffice.Account.Models
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Areas.Cms.Models
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = "Kế hoạch chăm sóc kỹ thuật";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Plan",
+            ActionName = "Detail",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = false,
+            IsPopup = false,
+            DisplayBackButton = true
+        };
+
+
+        int index = 0;
+        int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+        string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        IEnumerable<KH_TUONGTACViewModel> KH_TUONGTAC = (IEnumerable<KH_TUONGTACViewModel>)ViewBag.KH_TUONGTAC;
+
+    }
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    <style type="text/css">
+        .modal-full .modal-dialog {
+            width: 89% !important;
+            margin: 0 auto;
+        }
+        #SaleReport label {
+            color: #0555be;
+            font-weight: bold;
+        }
+        #SaleReport input {
+            border: 1px solid #03295c40;
+            background-color: #fff !important;
+        }
+        button:hover {
+            background-color: #008CBA;
+            color: #FFF !important;
+        }
+
+        button {
+            height: 30px;
+            background-color: #337ab7;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+
+        .has_error {
+            border: 1px #f2a696 solid !important;
+            color: #D68273;
+        }
+
+        .mini-popup {
+            position: relative;
+            display: inline;
+        }
+
+        #popup_archive {
+            position: absolute;
+            bottom: 34px;
+            left: -154px;
+            width: 410px;
+            height: 235px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+
+        #myImg {
+            outline: none;
+            width: 27px;
+            height: 27px;
+        }
+
+        textarea {
+            background: #fee18826 !important;
+            width: 100% !important;
+        }
+
+        
+    </style>
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+    @helper GridColumnName2(int id, string HINH_ANH)
+    {
+
+        <div id="@id" class="itemdiv commentdiv">
+            <div class="user">
+                <div class="ace-thumbnails">
+                    <a href="~/@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(HINH_ANH,"Plan","user"))" data-rel="colorbox" class="cboxElement">
+                        <img id="myImg" style="text-align:center" src="~/@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(HINH_ANH, "Plan", "user"))">
+
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    @helper GridColumnCommand(int KH_TUONGTAC_ID)
+    {
+        <p>
+            @*<button id="Delete" name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                </button>*@
+
+            <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+            </button>
+        </p>
+
+    }
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+    }
+    @helper CheckDeleteColumns(int KH_TUONGTAC_ID)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_TUONGTAC_ID">
+            <span class="lbl"></span>
+        </label>
+    }
+
+
+    @*@helper CheckDeleteColumns(int? KH_TUONGTAC_ID)
+                {
+                    <label>
+                        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_TUONGTAC_ID">
+                        <span class="lbl"></span>
+                    </label>
+        }*@
+    @helper GridColumnName(int? NGUOILAP_ID, string NGAYLAP, int? KHACHHANG_ID, int? KH_TUONGTAC_ID, string CustomerName, string jsCallback = null)
+    {
+        @*<a href="@Url.Action("Edit", "Plan", new { KH_TUONGTAC_ID = KH_TUONGTAC_ID,CustomerName=CustomerName })">@CustomerName</a>*@
+        <a onclick="OpenPopup('@Url.Action("Edit", "Plan", new { area = "Sale",NGUOILAP_ID=NGUOILAP_ID, KH_TUONGTAC_ID = KH_TUONGTAC_ID,CustomerName=CustomerName,NGAYLAP=NGAYLAP,KHACHHANG_ID=KHACHHANG_ID , IsPopup = true })', '', 0, 0)">@CustomerName</a>
+    }
+    @helper GridColumnLSTT(int? NGUOILAP_ID, string NGAYLAP, int? KHACHHANG_ID, int? KH_TUONGTAC_ID, string CustomerName, string jsCallback = null)
+    {
+        @*<a href="@Url.Action("Edit", "Plan", new { KH_TUONGTAC_ID = KH_TUONGTAC_ID,CustomerName=CustomerName })">@CustomerName</a>*@
+        <a onclick="OpenPopup('@Url.Action("LichSuTuongTac", "Plan", new { area = "Sale",NGUOILAP_ID=NGUOILAP_ID, KH_TUONGTAC_ID = KH_TUONGTAC_ID,CustomerName=CustomerName,NGAYLAP=NGAYLAP,KHACHHANG_ID=KHACHHANG_ID , IsPopup = true })', '', 0, 0)">Xem</a>
+    }
+    @helper GridColumnNGUOILAP(int? NGUOILAP)
+    {
+        <a href="@Url.Action("Index", "Plan", new { NGUOILAP = NGUOILAP})">Xem</a>
+
+    }
+    <div id="page_header" class="widget-box">
+        <div class="widget-header">
+            <h5 class="widget-title">
+                <i class="ace-icon fa fa-star orange"></i>
+                <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+                <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+                <a href="/Plan/Index" style="padding-right:5px"><i class="fa fa-arrow-left" aria-hidden="true"></i></a>
+                @ViewBag.Title
+            </h5>
+            <div class="widget-toolbar">
+                <a class="btn-search" href="#" data-action="collapse">
+                    <i class="ace-icon fa fa-search blue"></i>
+                </a>
+                <a class="btn-setting"></a>
+            </div>
+        </div>
+
+        <div class="widget-body" style="display: block;">
+            <div class="widget-main">
+                <div class="search-view form-inline" id="SaleReport">
+                    <div style=" margin-bottom: 20px;">
+                        <label>Người lập</label>
+                        @Html.TextBox("FullName", Request["FullName"] != null ? Request["FullName"] : "", new { autocomplete = "off", placeholder = "Người lập", style = "width:15%", text = Request.QueryString["FullName"], disabled = "disabled" })
+                   
+                        <label style="padding-left:57px;">Ngày lập</label>
+                        @Html.TextBox("NGAYLAP", Request["NGAYLAP"] != null ? Request["NGAYLAP"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("dd/MM/yyyy"), new { @readonly = "readonly", autocomplete = "off", placeholder = "Ngày lập", style = "width:10%" })
+                        
+                        <span class="input-daterange" style="padding-left: 58px; margin-right: 31px;">
+                            <label>Ngày KH</label>
+                            @Html.TextBox("NGAYKH", Request["NGAYLAP"] != null ? Request["NGAYLAP"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("dd/MM/yyyy"), new { @readonly = "readonly", autocomplete = "off", placeholder = "Ngày lập", style = "width:10%;margin-right:20px;", text = Request.QueryString["NGAYLAP"] })
+                        </span>
+                        <label>Tương tác đạt (%)</label>
+                        @Html.TextBox("TUONGTACDAT", Request["TUONGTACDAT"], new { @class = "", autocomplete = "off", placeholder = "Tương tác đạt", style = "width:10%" })
+                 
+                    </div>
+                    <p>
+                        @*<label style="padding-left:59px;">Ghi chú</label>*@
+                        @Html.TextArea("GHI_CHU", Request["GHI_CHU"], new { @class = "", autocomplete = "off", placeholder = "Ghi chú", style = "width:100%;margin-left:5px;" })
+                    </p>
+                    <p>
+
+                        <button onclick="OpenPopup('@Url.Action("Create", "Plan", new { area = "Sale",NGAYLAP=Request["NGAYLAP"], NGUOILAP_ID = Request["NGUOILAP_ID"], IsPopup = true })', '', 0, 0)" id="save" class="btn-mini" type="submit" name="Submit" value="ADD">
+                            <i class="ace-icon fa"></i>
+                            Thêm mới KH
+                        </button>
+
+                        <button class="btn btn-mini btn-primary" onclick="KETHUA()" id="save" type="submit" name="SubmitKETHUA" value="KETHUA" style="float:right">
+                            <i class="ace-icon fa"></i>
+                            Lấy KH dự kiến
+                        </button>
+                        @*location.href='@Url.Action("ViewKeThua", "Plan", new { NGAYLAP = Request["NGAYLAP"] })'*@
+
+                        <input autocomplete="off" class="" id="txtSearch" name="txtCode" placeholder="Tìm theo Khách hàng..." type="text" value="" style="margin-top:10px;">
+
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tab-content clear-fix">
+
+        <div id="" class="table-responsive top-10 ">
+            @using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Delete", pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+            {
+                @Html.TextBox("NGAYKH_hidden", Request["NGAYLAP"] != null ? Request["NGAYLAP"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("dd/MM/yyyy"), new { text = Request.QueryString["NGAYLAP"], hidden = "hidden" })
+                @Html.TextBox("FullName_hidden", Request["FullName"] != null ? Request["FullName"] : "", new { text = Request.QueryString["FullName"], hidden = "hiden" })
+                @Html.TextBox("NGUOILAP_ID_hidden", Request["NGUOILAP_ID"] != null ? Request["NGUOILAP_ID"] : "", new { autocomplete = "off", placeholder = "Người lập", style = "width:300px", text = Request.QueryString["NGUOILAP_ID"], hidden = "hidden" })
+                <div style="overflow-x:auto;">
+                    <table id="CTable" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th hidden rowspan="2">#</th>
+                                <th rowspan="2">Stt</th>
+                                <th rowspan="2">Mã khách hàng</th>
+                                <th rowspan="2">Tên khách hàng</th>
+                                <th rowspan="2">Điện thoại</th>
+                                <th colspan="2" style="text-align:center">Tương tác</th>
+                                <th colspan="4" style="text-align:center">Thông tin kỹ thuật</th>
+                                <th rowspan="2" style="min-width:600px; text-align:center">Ghi chú</th>
+                                <th rowspan="2">Giải pháp</th>
+                                <th rowspan="2">Lịch tiếp theo</th>
+                                <th rowspan="2">Mức cảnh báo</th>
+                                <th rowspan="2">Kết quả sau tương tác</th>
+                                <th rowspan="2">Hình đính kèm</th>
+                                <th rowspan="2"></th>
+                            </tr>
+                            <tr>
+                                <th>Hình thức</th>
+                                <th>Giờ</th>
+                                <th>Loại</th>
+                                <th>Phân loại</th>
+                                <th>Tình trạng</th>
+                                <th>Đánh giá mức độ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td hidden>@CheckDeleteColumns(item.KH_TUONGTAC_ID)</td>
+                                    <td>@(index += 1)</td>
+                                    <td>@item.CustomerCode</td>
+                                    <td>
+                                        @GridColumnName(item.NGUOILAP_ID, item.NGAYLAP, item.CustomerId, item.KH_TUONGTAC_ID, item.CustomerName)
+                                    </td>
+                                    <td>@item.Phone</td>
+                                    <td>@item.HINHTHUC_TUONGTAC</td>
+                                    <td>@item.GIO_TUONGTAC</td>
+                                    <td>@item.LOAI_TUONGTAC</td>
+                                    <td>@item.PHANLOAI_TUONGTAC</td>
+                                    <td>@item.TINHTRANG_TUONGTAC</td>
+                                    <td>@item.MUCDO_TUONGTAC</td>
+                                    <td><textarea readonly>@item.GHI_CHU</textarea></td>
+                                    @*<td>@Html.TextArea("Ghichu",item.GHI_CHU)</td>*@
+                                    <td>@item.GIAIPHAP_TUONGTAC</td>
+                                    <td>@item.NGAYTUONGTAC_TIEP</td>
+                                    @if (item.MUCCANHBAO_TUONGTAC == "1")
+                                    {
+                                        <td style="color:cyan">@item.MUCCANHBAO_TUONGTAC</td>
+                                    }
+                                    else if (item.MUCCANHBAO_TUONGTAC == "2")
+                                    {
+                                        <td style="color:darkorange">@item.MUCCANHBAO_TUONGTAC</td>
+                                    }
+                                    else if (item.MUCCANHBAO_TUONGTAC == "3")
+                                    {
+                                        <td style="color:red">@item.MUCCANHBAO_TUONGTAC</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@item.MUCCANHBAO_TUONGTAC</td>
+                                    }
+
+                                    <td>@item.KETQUA_SAUTUONGTAC</td>
+                                    <td>@GridColumnName2(item.KH_TUONGTAC_ID, item.HINH_ANH)</td>
+                                    <td>@GridColumnCommand(item.KH_TUONGTAC_ID)</td>
+
+                                </tr>
+
+
+                            }
+                        </tbody>
+                        <thead>
+                            <tr>
+                                <td hidden id="KQ_STT" colspan="3">@(Model.Count(x => x.KETQUA_SAUTUONGTAC != null))</td>
+                                <td hidden id="KH_TT" colspan="2">@(Model.Count(x => x.KH_TUONGTAC_ID != 0))</td>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+
+            }
+        </div>
+    </div>
+    @*@using (Html.BeginButtonContainer(pageSetting))
+        {
+
+            <button name="DeleteAll" value="DeleteAll" type="submit" class="btn btn-mini btn-danger" onclick="return CheckIsval();">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+                @Wording.Delete
+            </button>
+        }*@
+    @*<td hidden id="KQ_STT" colspan="3">@(Model.Count(x => x.KETQUA_SAUTUONGTAC!=null))</td>
+        <td hidden id="KH_TT" colspan="2">@(Model.Count(x => x.KH_TUONGTAC_ID!=0))</td>*@
+
+    @*<input hidden id="KQ_STT" @CommonSatic.ToCurrencyStr(Model.Count(x=>x.KETQUA_SAUTUONGTAC!=null),null)>
+        <input hidden id="KH_TT" @CommonSatic.ToCurrencyStr(Model.Count(x => x.KH_TUONGTAC_ID != 0), null)>*@
+
+    @section Scripts {
+
+        <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+        <script src="/Scripts/ckeditor/ckeditor.js"></script>
+        <script src="/Scripts/combojax.js"></script>
+        <link href="/assets/css/combojax.css" rel="stylesheet" />
+        <script src="/assets/js/moment.min.js"></script>"
+        <script type="text/javascript">
+            //Tìm theo tên sản phẩm
+            $("#txtSearch").on("keyup", function () {
+                var value = $(this).val().trim();
+                if (value != '') {
+                    $("table tbody tr").hide();
+                } else {
+                    $("table tbody tr").show();
+                }
+                $('table tbody tr td:contains("' + value + '")').parent('tr').show();
+            });
+
+            function KETHUA() {
+                //debugger
+                var NGUOILAP_ID= @Request["NGUOILAP_ID"];
+                var NGAYLAP = '@Request["NGAYLAP"]';
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Plan/ViewKeThua",
+                    data: JSON.stringify({ NGUOILAP_ID: NGUOILAP_ID, NGAYLAP: NGAYLAP}),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        if(result == 1){
+                            alert("Lấy khách hàng dự kiến thành công.");
+                            window.location.reload();
+                        }
+                       
+                    }
+                });
+                @*//window.location.href = '@Url.Action("Index", "Plan")';*@
+            }
+            @*@Url.Action("ViewKeThua", "Plan", new { NGAYLAP = @Request["NGAYLAP"], NGUOILAP_ID = @Request["NGUOILAP_ID"] })*@
+
+            $("#search").on("click", function (e) {
+                searchs = 1;
+                if (searchs = 1) {
+                    var NGAYLAP = $('#NGAYLAP').val();
+                    var dateString = NGAYLAP;
+
+                    var dateParts = dateString.split("/");
+                    var dateObject = new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0]);
+
+                    var newdate = new Date(dateObject);
+                    var d = newdate.toISOString("dd/MM/yyyy").slice(0, 10).split('-');
+                    var day = d[2] + '/' + d[1] + '/' + d[0];
+
+                    $('#NGAYLAP').val(day);
+                    searchreac();
+                }
+            });
+            $('#NGAYLAP').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+
+            $('#NGAYKH').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+            $('#NGAYTUONGTAC_TIEP').datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+
+            $('#GIOTUONGTAC_TIEP').datetimepicker({
+                format: 'HH:mm'
+            });
+            $(function () {               
+                //searchreac();
+            });
+            function searchreac() {
+                GetDatatable('/Plan/GetGETListKH_TUONGTAC');
+            };
+            var searchs = null;
+
+            $('#NGAYLAP').on('keydown', function (e) {
+                if (e.which == 13) {
+                    searchreac();
+                }
+            });
+
+            function GetDatatable(url) {
+                var search = searchs;
+                var FullName = $('#FullName').val();
+                var NGAYKH = $('#NGAYKH').val();
+                var NGAYLAP = $('#NGAYLAP').val();
+                var THANG = $('#THANG').val();
+                var NAM = $('#NAM').val();
+                var HINHTHUC_TUONGTAC = $('#HINHTHUC_TUONGTAC').val();
+                var LOAI_TUONGTAC = $('#LOAI_TUONGTAC').val();
+                var TINHTRANG_TUONGTAC = $('#TINHTRANG_TUONGTAC').val();
+                var MUCDO_TUONGTAC = $('#MUCDO_TUONGTAC').val();
+                var GIAIPHAP_TUONGTAC = $('#GIAIPHAP_TUONGTAC').val();
+                var NGAYTUONGTAC_TIEP = $('#NGAYTUONGTAC_TIEP').val();
+                var GIOTUONGTAC_TIEP = $('#GIOTUONGTAC_TIEP').val();
+                var MUCCANHBAO_TUONGTAC = $('#MUCCANHBAO_TUONGTAC').val();
+                var PHANLOAI_TUONGTAC = $('#PHANLOAI_TUONGTAC').val();
+                var HINH_ANH = $('#HINH_ANH').val();
+                var BranchId = $('#BranchId').val();
+                var FullName = $('#FullName').val();
+                var ModifiedDate = $('#ModifiedDate').val();
+                //var CreatedDate = $('#CreatedDate').val();
+                var LICHTUONGTATIEP = $('#LICHTUONGTATIEP').val();
+                var GIO_TUONGTAC = $('#GIO_TUONGTAC').val();
+                var NGUOILAP_ID = $('#NGUOILAP_ID').val();
+                var formdata = {
+                    FullName:FullName,
+                    search: search,
+                    NGAYKH: NGAYKH,
+                    NGAYLAP: NGAYLAP,
+                    THANG: THANG,
+                    NAM: NAM,
+                    HINHTHUC_TUONGTAC: HINHTHUC_TUONGTAC,
+                    LOAI_TUONGTAC: LOAI_TUONGTAC,
+                    PHANLOAI_TUONGTAC: PHANLOAI_TUONGTAC,
+                    TINHTRANG_TUONGTAC: TINHTRANG_TUONGTAC,
+                    MUCDO_TUONGTAC: MUCDO_TUONGTAC,
+                    //GHI_CHU: GHI_CHU,
+                    GIAIPHAP_TUONGTAC: GIAIPHAP_TUONGTAC,
+                    NGAYTUONGTAC_TIEP: NGAYTUONGTAC_TIEP,
+                    GIOTUONGTAC_TIEP: GIOTUONGTAC_TIEP,
+                    MUCCANHBAO_TUONGTAC: MUCCANHBAO_TUONGTAC,
+                    HINH_ANH: HINH_ANH,
+                    BranchId: BranchId,
+                    FullName: FullName,
+                    ModifiedDate: ModifiedDate,
+                    //CreatedDate =CreatedDate,
+                    LICHTUONGTATIEP: LICHTUONGTATIEP,
+                    GIO_TUONGTAC: GIO_TUONGTAC,
+                    NGUOILAP_ID: NGUOILAP_ID
+                };
+                ClickEventHandlerHTML(true, url, "#react_report", formdata, function () {
+                });
+            };
+
+            function initCkeditor() {
+            $('.ckeditor').ckeditor({
+                "extraPlugins": 'imagebrowser',
+                "imageBrowser_listUrl": "@Url.Action("ListJson","Images")",
+                // Define the toolbar groups as it is a more accessible solution.
+                toolbarGroups: [
+                    { "name": "document", "groups": ["mode", "document", "doctools"] },
+                    { "name": "editing", "groups": ["find", "selection", "spellchecker"] },
+                    { "name": "forms" },
+                    { "name": "tools" },
+                    { "name": "basicstyles", "groups": ["basicstyles", "cleanup"] },
+                    { "name": "clipboard", "groups": ["clipboar", "undo"] },
+                    { "name": "links", "groups": ["links"] },
+                    { "name": "paragraph", "groups": ["list", "blocks"] },
+                    { "name": "insert", "groups": ["insert"] },
+                    { "name": "styles", "groups": ["styles"] },
+                    //{ "name": "about", "groups": ["about"] },
+                    { "name": "styles" },
+                    { "name": "colors" },
+                    { "name": "align", "groups": ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+
+                ],
+                // Remove the redundant buttons from toolbar groups defined above.
+                removeButtons: 'Underline,Strike,Subscript,Superscript,Anchor,Styles,Specialchar'
+                });
+            }
+            //function CheckIsval() {
+            //    if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+            //        alert("Phải chọn ít nhất 1 item.");
+            //        return false;
+            //    }
+            //    else {
+            //        if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+            //            return true;
+            //        }
+            //        else {
+            //            return false;
+            //        }
+            //    }
+            //}
+
+            //$('[name="Delete"]').click(function () {
+            //    if (confirm('Bạn có chắc muốn xóa item ?')) {
+            //        $(this).closest('tr').children('td').each(function (i, e) {
+            //            $(this).find("input.class-delete-all").prop("checked", true);
+            //            return true;
+            //        })
+            //    }
+            //    else {
+            //        return false;
+            //    }
+
+            //})
+
+            function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+            $(function () {
+                var KQ_STT = parseFloat(removeComma($('#KQ_STT').text()));
+                var KH_TT = parseFloat(removeComma($('#KH_TT').text()));
+                var sum = 0;
+
+                sum = (KQ_STT / KH_TT) * 100;
+                //var n = parseFloat(sum); sum = Math.round(n * 1000) / 1000;
+                //sum.toFixed(2);
+                //sum.toPrecision(4);
+                //Math.round(sum, 2);
+                var n = sum.toPrecision(3);
+                $('#TUONGTACDAT').val(n);
+
+
+            });
+        </script>
+    }

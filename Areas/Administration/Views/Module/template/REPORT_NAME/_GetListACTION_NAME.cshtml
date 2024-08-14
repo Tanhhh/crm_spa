@@ -1,0 +1,34 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<<ACTION_NAME>ViewModel>
+    @{
+    Layout = null;
+    int index = 1;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <LIST_TITLE_TABLE>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+                <LIST_ITEM_TABLE>
+            </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+              <LIST_SUM_ITEM_TABLE>
+            </tr>
+        </tfoot>
+    </table>

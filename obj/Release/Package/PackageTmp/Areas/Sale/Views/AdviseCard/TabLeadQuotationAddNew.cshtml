@@ -1,0 +1,610 @@
+﻿@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Filters;
+@using Erp.BackOffice.Areas.Cms.Models
+@{
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.categoryOr;
+    IEnumerable<CategoryViewModel> statusls = (IEnumerable<CategoryViewModel>)ViewBag.categorySt;
+    var datalist = ViewBag.DataList as IEnumerable<LeadProduct>;
+    var datamodel = ViewBag.DataModel as LeadQuotationPopupIndex;
+    var user = ViewBag.user as Erp.Domain.Repositories.UserRepository;
+    IEnumerable<Erp.Domain.Entities.User> users = user.GetAllUsers();
+    List<SelectListItem> lstcus = new List<SelectListItem>();
+    foreach (var item2 in users)
+    {
+        SelectListItem selectListItem = new SelectListItem() { Text = item2.FullName, Value = item2.Id.ToString() };
+        lstcus.Add(selectListItem);
+    }
+    var i = 0;
+    decimal totalt = 0;
+    decimal totalsl = 0;
+    decimal thanh_tien = 0;
+}
+<link href="/assets/css/combojax.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+    .form-group > label {
+        min-width: 170px;
+    }
+
+    .form-group {
+        display: flex;
+        margin-right: 40px;
+    }
+
+        .form-group input {
+            border-radius: 4px !important;
+            padding: 5px 8px 5px 16px !important;
+        }
+
+    .input-group {
+        display: contents;
+    }
+
+        .input-group input {
+            border-bottom-right-radius: 0 !important;
+            border-top-right-radius: 0 !important;
+            padding: 5px 8px 5px 16px !important;
+        }
+
+        .input-group span {
+            border: 1px solid #D5D5D5;
+            padding: 5px 8px 5px;
+            font-size: 14px;
+            font-family: inherit;
+            border-left: 0px;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+    .table > tbody > tr > td, .table > tfoot > tr > td, .table > thead > tr > th {
+        border-right: unset !important;
+        border-left: unset !important;
+        align-content: center;
+    }
+
+    .table > thead > tr > th {
+        border-top: 1px solid #ddd !important;
+    }
+
+    #idadditemproductlead {
+        padding: 3px 14px;
+        background: none;
+        border-radius: 4px;
+    }
+
+        #idadditemproductlead:hover {
+            color: #3F51B5;
+            border: 1px solid #3F51B5;
+        }
+
+    .input-group-append .dropdown-menu-right {
+        left: auto;
+        right: 0;
+    }
+
+    select#item_origin {
+        height: 27px !important;
+        border-radius: 3px !important;
+    }
+
+</style>
+<div style="margin: 0px 50px;">
+    <div>
+        <div>
+            <h4 style="margin-bottom: 30px; font-weight: bold;">Thông tin chi tiết</h4>
+        </div>
+        <div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Số báo giá</label>
+                        <input class="form-control" id="lqtCode" placeholder="Mã tự sinh" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Ngày báo giá</label>
+                        <input class="form-control" id="lqtCreateDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" placeholder="Ngày báo giá" type="date" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Hiệu lực đến ngày</label>
+                        <input class="form-control" id="lqttUntilDate" placeholder="Hiệu lực đến ngày" type="date" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Tình trạng</label>
+                        <div class="input-group">
+                            <select class="form-control" id="lqtStatus">
+                                @if (statusls != null)
+                                {
+                                    foreach (var item in statusls)
+                                    {
+                                        <option value="@item.Name">@item.Name</option>
+                                    }
+                                }
+                            </select>
+                            <span class="input-group-text"><i class="fa fa-signal"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Khách hàng</label>
+                        <div class="input-group">
+                            <input type="text" id="lqtLeadName" class="form-control" placeholder="Khách hàng" value="@(datamodel.LeadName!=null ? datamodel.LeadName : "")">
+                            <span class="input-group-text"><i class="fa fa-user"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Mã số thuế</label>
+                        <input class="form-control" id="lqtTaxcode" placeholder="Mã số thuế" type="text" value="@(datamodel.Taxcode!=null ? datamodel.Taxcode : "")" />
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Địa chỉ</label>
+                        <div class="input-group">
+                            <input class="form-control" id="lqtAddress" placeholder="Địa chỉ" type="text" value="@(datamodel.Address!=null ? datamodel.Address : "")" />
+                            <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Liên hệ</label>
+                        <div class="input-group">
+                            <select class="form-control" id="lqtReceptionStaffId">
+                                @foreach (var item2 in lstcus)
+                                {
+                                    <option value="@item2.Value" @(datamodel.ReceptionStaffId == int.Parse(item2.Value) ? "selected" : "")>@item2.Text</option>
+                                }
+                            </select>
+                            <span class="input-group-text"><i class="fa fa-book"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div>
+            <h4 style="margin-bottom: 30px; margin-top:40px; font-weight: bold;">Thông tin hàng hóa</h4>
+        </div>
+        <div>
+            <div id="listOrderDetail" class="table-responsive " style="border-radius: 4px;">
+                <table class="table" id="productleadtable">
+                    <thead>
+                        <tr>
+                            <th class="grid-header" width="4%">STT</th>
+                            <th class="grid-header" width="27%">Tên SP/DV</th>
+                            <th class="grid-header" width="10%">Nhãn hàng</th>
+                            <th class="grid-header" width="9%">SL</th>
+                            <th class="grid-header" width="9%">Đơn giá</th>
+                            <th class="grid-header" width="9%">Thành tiền</th>
+                            <th class="grid-header" width="20%">Ghi chú</th>
+                            <th class="grid-header" width="4%">Tặng</th>
+                            <th class="grid-header" width="6%">Chỉnh sửa</th>
+                            <th class="grid-header" width="2%">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody class="productInvoiceList">
+                        <tr role="0" id="0" hidden>
+                            <td class="text-center pilstt">
+                                1
+                            </td>
+                            <td>
+                                <input class="item_product_id" type="hidden" id="InvoiceList_0__ProductId" name="InvoiceList[0].ProductId" value="0" />
+                                <span class="item_product_name"></span>
+                            </td>
+                            <td>
+                                <span class="item_product_origin"></span>
+                            </td>
+                            <td>
+                                <input type="hidden" name="InvoiceList[0].Unit" id="InvoiceList_0__Unit" value="" class="item_unit" />
+                                <input class="item_quantity numberinput2 text-right" type="text" id="InvoiceList_0__Quantity" name="InvoiceList[0].Quantity" value="0" style="width:100%" />
+                                <span class="txt item_quantity_txt" hidden></span>
+                            </td>
+                            <td>
+                                <span class="item_price numberinput2 text-right" type="text" id="InvoiceList_0__Price" name="InvoiceList[0].Price" style="width:100%"></span>
+                            </td>
+                            <td id="InvoiceList_0__Total"><span class="item_total"></span></td>
+                            <td>
+                                <input class="item_note valid_null" type="text" id="InvoiceList_0__Note" name="InvoiceList[0].Note" value="" style="width: 100%; text-align: end;" />
+                                <span class="txt item_note_txt" hidden></span>
+                            </td>
+                            <td class="text-center" style="align-content: center;">
+                                <div class="clearfix">
+                                    <label style="margin-top:5px">
+
+                                        <input id="InvoiceList_0__is_TANG" name="InvoiceList[0].is_TANG" type="checkbox" class="item_is_TANG" value="1">
+                                        <span class="lbl">
+                                        </span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="text-center" style="align-content: center;">
+                                <input type="checkbox" class="checkbox_edit" checked="checked" />
+                            </td>
+                            <td class="text-center" style="align-content: center;">
+                                <a class="btn-delete-item">
+                                    <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                </a>
+                            </td>
+                            <td style="display:none">
+                                <input class="hidden_price numberinput2 text-right" type="text" id="hidden_0__Price" name="hidden[0].Price" value="" style="width:100%" />
+                            </td>
+
+                            <td style="display:none" align="right" id="hidden_0__Total"><span class="hidden_total" align="right"></span></td>
+                        </tr>
+                        @if (datalist != null)
+                        {
+                            foreach (var leadProduct in datalist)
+                            {
+                                if (leadProduct.is_TANG == false)
+                                {
+                                    thanh_tien = leadProduct.Price * leadProduct.Quantity;
+                                    totalt = totalt + thanh_tien;
+                                }
+                                totalsl = totalsl + leadProduct.Quantity;
+                                <tr role="0" id="@(i+1)">
+
+                                    <td class="text-center">
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        <input class="item_id" type="hidden" id="InvoiceList_@(i+1)__Id" name="InvoiceList[@(i+1)].Id" value="@leadProduct.Id" />
+                                        <input class="item_product_id" type="hidden" id="InvoiceList_@(i+1)__ProductId" name="InvoiceList[@(i+1)].ProductId" value="@leadProduct.ProductId" />
+                                        <span class="item_product_name">@(leadProduct.Name ?? "")</span>
+                                    </td>
+                                    <td>
+                                        <input class="item_product_origin" type="hidden" id="InvoiceList_@(i+1)__Origin" name="InvoiceList[@(i+1)].Origin" value="@leadProduct.Origin" />
+                                        <span class="item_product_origin">@(leadProduct.Origin ?? "")</span>
+                                    </td>
+                                    <td>
+                                        <input type="hidden" name="InvoiceList@(i+1).Unit" id="InvoiceList_@(i+1)__Unit" value="@leadProduct.Unit" class="item_unit" />
+                                        <input class="item_quantity numberinput2 text-right" type="text" id="InvoiceList_@(i+1)__Quantity" name="InvoiceList[@(i+1)].Quantity" value="@leadProduct.Quantity" style="width: 100%;" hidden />
+                                        <span class="txt item_quantity_txt">@leadProduct.Quantity</span>
+                                    </td>
+                                    <td>
+                                        <span class="item_price numberinput2 text-right" id="InvoiceList_@(i+1)__Price" name="InvoiceList[@(i+1)].Price">@FormatNumber.FormatNumberv(leadProduct.Price)</span>
+                                    </td>
+                                    <td id="InvoiceList_@(i+1)__Total"><span class="item_total" id="item_@(i+1)__Total">@FormatNumber.FormatNumberv(leadProduct.TotalAmount)</span></td>
+                                    <td>
+                                        <input class="item_note" type="text" id="InvoiceList_@(i+1)__Note" name="InvoiceList[@(i+1)].Note" value="@leadProduct.Note" style="width:100%;" hidden />
+                                        <span class="txt item_note_txt">@leadProduct.Note</span>
+                                    </td>
+                                    <td class="text-center" style="align-content: center;">
+                                        @if (leadProduct.is_TANG == true)
+                                        {
+                                            <div class="clearfix">
+                                                <label style="margin-top:5px">
+                                                    <input id="InvoiceList_@(i + 1)__is_TANG" name="InvoiceList[@(i + 1)].is_TANG" type="checkbox" class="item_is_TANG" value="@leadProduct.is_TANG" checked="checked" disabled>
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="clearfix">
+                                                <label style="margin-top:5px">
+                                                    <input id="InvoiceList_@(i + 1)__is_TANG" name="InvoiceList[@(i + 1)].is_TANG" type="checkbox" class="item_is_TANG" value="@leadProduct.is_TANG" disabled>
+                                                    <span class="lbl"></span>
+                                                </label>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td class="text-center" style="align-content: center;">
+                                        <input type="checkbox" class="checkbox_edit" />
+                                    </td>
+                                    <td class="text-center" style="align-content: center;">
+                                        <a class="btn-delete-item">
+                                            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                        </a>
+                                    </td>
+                                    <td style="display:none">
+                                        <input class="hidden_price numberinput2 text-right" type="text" id="hidden_@(i+1)__Price" name="hidden[@(i+1)].Price" value="@leadProduct.Price" style="width:100%" />
+                                    </td>
+                                    <td style="display:none" align="right" id="hidden_@(i+1)__Total"><span class="hidden_total" align="right">@FormatNumber.FormatNumberv(thanh_tien)</span></td>
+                                    <td style="display:none">
+                                        @(i++)
+                                    </td>
+                                </tr>
+                            }
+                        }
+
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="red"><span id="status" style="margin-left: 60px;">Tổng cộng</span></td>
+                            <td class="productInvoiceList_SL" style="font-weight:bold">@totalsl</td>
+                            <td></td>
+                            <td class="productInvoiceList_Amount" style="font-weight:bold">@(FormatNumber.FormatNumberv(totalt != 0 ? totalt : 0))</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div style="padding-top: 20px; width: 100%; padding-bottom: 60px; display: flex; ">
+            <div>
+                <button style="" id="idadditemproductlead">Chọn hàng hóa</button>
+            </div>
+
+            <div style="margin-left: auto;" id="saveLeadQuotationPP">
+                <button type="button" class="btn btn-primary2" style="padding: 2px 25px !important;">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="chooseProductModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:800px">
+            <div class="modal-header modal-meeting" style="padding: 0px 4px !important; display: flex; ">
+                <p style="margin: 0; font-weight: bold; padding: 2px 8px; color: #438EB9 ">Chọn hàng hóa</p>
+                <button type="button" class="close close-chooseProductModal" style="font-size: 24px !important; color: #3F51B5; margin-left: auto; }">&times;</button>
+            </div>
+            <div class="modal-body" style="height: 400px; overflow-y: auto;">
+                <div>
+                    <div class="check">
+                        <label style="font-weight:bold">Nhãn hàng: </label>
+                        <select style=" text-align-last: center; width: 200px; height: 27px !important;border-radius: 3px !important;" class="item_origin" id="item_origin">
+                            <option value="">Chọn nhãn hàng </option>
+                            @if (origin != null)
+                            {
+                                foreach (var item in origin)
+                                {
+                                    <option value="@item.Value">@item.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <input type="text" class="test" id="test" hidden />
+                <div id="chooseProduct">
+                    <div class="product-search-box clearfix " style="margin-bottom:10px">
+                        <span class="label label-warning" style="padding: 8px 6px; float: left; height: 30px; margin-top: 5px; border-top-left-radius: 3px !important; border-bottom-left-radius: 3px !important; ">[F4]</span>
+                        <div id="product_search_control">
+                            <span class="ctl">
+                                @Html.TextBox("Product", "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "off", style = "width:420px;padding: 4px 1.5rem; margin-top: 4px; border-top-right-radius: .5rem !important;border-bottom-right-radius: .5rem !important; background: #fff !important; ", disabled = "true" })
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/Scripts/combojax.js?=vs1.01211"></script>
+<script src="~/Scripts/tabLeadProduct.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+    var table = document.getElementById("productleadtable");
+
+    // Gắn sự kiện click vào bảng
+    table.addEventListener('click', function (e) {
+        if ($(e.target).is('.checkbox_edit')) {
+            var currentRow = $(e.target).closest('tr');
+            if ($(e.target).prop('checked')) {
+                currentRow.find('.item_quantity').prop('hidden', false);
+                currentRow.find('.item_note').prop('hidden', false);
+                currentRow.find('.item_is_TANG').attr('disabled', false);
+                currentRow.find('.txt').prop('hidden', true);
+            } else {
+                currentRow.find('.item_quantity').prop('hidden', true);
+                currentRow.find('.item_note').prop('hidden', true);
+                currentRow.find('.item_is_TANG').attr('disabled', true);
+                currentRow.find('.txt').prop('hidden', false);
+            }
+        }
+    });
+
+    $('#idadditemproductlead').on('click', function () {
+        $('#chooseProductModal').removeClass("fade");
+        $('#chooseProductModal').addClass("show");
+        $('.modal-dialog').css({
+            'position': 'static'
+        });
+    });
+    $('.close-chooseProductModal').click(function () {
+        $('#chooseProductModal').removeClass("show");
+        $('.modal-dialog').css({
+            'position': 'relative'
+        });
+    });
+    var idLead = @ViewBag.LeadId;
+    var quotationItems = [];
+    var invoiceqtItems = [];
+    var quotation = [];
+    $('#saveLeadQuotationPP').click(function () {
+        debugger;
+        var untilDate = $('#lqttUntilDate').val();
+        var createDate = $('#lqtCreateDate').val();
+        if (!untilDate) {
+            toastr.warning('Chưa nhập "Hiệu lực đến ngày" !')
+            return;
+        } else {
+            if (untilDate < createDate) {
+                toastr.warning('"Hiệu lực đến ngày" không được nhỏ hơn "Ngày báo giá" !');
+                $('#lqttUntilDate').val('');
+                return;
+            } else {
+                debugger;
+                var code = $('#lqtCode').val();
+                if (code != "") {
+                    checkCode(code, function (isValid) {
+                        if (isValid) {
+                            toastr.warning('Đã tồn tại "Số báo giá : ' + code + '"!')
+                            return;
+                        } else {
+                            var status = $('#lqtStatus').val();
+                            var leadName = $('#lqtLeadName').val();
+                            var taxCode = $('#lqtTaxcode').val();
+                            var address = $('#lqtAddress').val();
+                            var receptionStaffId = $('#lqtReceptionStaffId').val();
+                            var totalAmount = $('.productInvoiceList_Amount').text();
+                            $('.productInvoiceList tr').each(function () {
+                                if ($(this).attr('id') !== '0') {
+                                    var item = {
+                                        LeadId: idLead,
+                                        ProductId: $(this).find('.item_product_id').val(),
+                                        Quantity: $(this).find('.item_quantity').val(),
+                                        Price: $(this).find('.item_price').text(),
+                                        TotalAmount: $(this).find('.item_total').text(),
+                                        Note: $(this).find('.item_note').val(),
+                                        IsTang: $(this).find('.item_is_TANG').is(':checked'),
+                                    };
+                                    invoiceqtItems.push(item);
+                                }
+                            });
+                            var quotationdetail = {
+                                LeadId: idLead,
+                                Code: code,
+                                CreateDate: createDate,
+                                UntilDate: untilDate,
+                                Status: status,
+                                LeadName: leadName,
+                                TaxCode: taxCode,
+                                Address: address,
+                                ReceptionStaffId: receptionStaffId,
+                                TotalAmount: totalAmount,
+                                LeadProductLQ: invoiceqtItems
+                            }
+
+                            $.ajax({
+                                url: '/AdviseCard/CreateLeadQuotation',
+                                type: 'POST',
+                                data: JSON.stringify(quotationdetail),
+                                contentType: 'application/json; charset=utf-8',
+                                dataType: 'json',
+                                success: function (result) {
+                                    if (result.success) {
+                                        window.parent.postMessage({
+                                            type: 'reloadTabLeadQuotationAndOpenPoupDetail',
+                                            id: result.data,
+                                        }, '*');
+                                        window.parent.ClosePopup();
+                                        console.log('Thành công');
+                                        console.log('Thành công');
+                                    } else {
+                                        console.log('Thất bại');
+                                    }
+
+                                },
+                                error: function (xhr, status, error) {
+                                    // Xử lý lỗi
+                                }
+                            });
+                        }
+                    });
+                } else {
+                    var createDate = $('#lqtCreateDate').val();
+                    var status = $('#lqtStatus').val();
+                    var leadName = $('#lqtLeadName').val();
+                    var taxCode = $('#lqtTaxcode').val();
+                    var address = $('#lqtAddress').val();
+                    var receptionStaffId = $('#lqtReceptionStaffId').val();
+                    var totalAmount = $('.productInvoiceList_Amount').text();
+                    $('.productInvoiceList tr').each(function () {
+                        if ($(this).attr('id') !== '0') {
+                            var item = {
+                                LeadId: idLead,
+                                ProductId: $(this).find('.item_product_id').val(),
+                                Quantity: $(this).find('.item_quantity').val(),
+                                Price: $(this).find('.item_price').text(),
+                                TotalAmount: $(this).find('.item_total').text(),
+                                Note: $(this).find('.item_note').val(),
+                                IsTang: $(this).find('.item_is_TANG').is(':checked'),
+                            };
+                            invoiceqtItems.push(item);
+                        }
+                    });
+                    var quotationdetail = {
+                        LeadId: idLead,
+                        Code: code,
+                        CreateDate: createDate,
+                        UntilDate: untilDate,
+                        Status: status,
+                        LeadName: leadName,
+                        TaxCode: taxCode,
+                        Address: address,
+                        ReceptionStaffId: receptionStaffId,
+                        TotalAmount: totalAmount,
+                        LeadProductLQ: invoiceqtItems
+                    }
+
+                    $.ajax({
+                        url: '/AdviseCard/CreateLeadQuotation',
+                        type: 'POST',
+                        data: JSON.stringify(quotationdetail),
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function (result) {
+                            if (result.success) {
+                                debugger;
+                                window.parent.postMessage({
+                                    type: 'reloadTabLeadQuotationAndOpenPoupDetail',
+                                    id: result.data,
+                                }, '*');
+                                window.parent.ClosePopup();
+                                console.log('Thành công');
+                            } else {
+                                console.log('Thất bại');
+                            }
+
+                        },
+                        error: function (xhr, status, error) {
+                            // Xử lý lỗi
+                        }
+                    });
+                }
+            }
+
+
+
+        }
+
+
+
+    });
+    $(document).ready(function () {
+        checkAndToggleSaveButton();
+    })
+
+    function checkAndToggleSaveButton() {
+        if ($('#productleadtable tbody tr').length === 1 && $('#productleadtable tbody tr').is(':hidden')) {
+            $('#saveLeadQuotationPP').css('visibility', 'hidden');
+        } else {
+            $('#saveLeadQuotationPP').css('visibility', 'visible');
+        }
+    }
+    function checkCode(codec, callback) {
+        $.ajax({
+            url: '/AdviseCard/CheckCodeQuotation',
+            type: 'POST',
+            data: { codec: codec },
+            success: function (rs) {
+                callback(rs.success);
+            }
+        });
+    }
+</script>

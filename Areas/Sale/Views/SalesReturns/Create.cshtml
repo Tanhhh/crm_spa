@@ -1,0 +1,751 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model SalesReturnsViewModel
+
+@{
+    if (Model.Id > 0)
+    {
+        ViewBag.Title = "Cập nhật hóa đơn hàng bán trả lại";
+    }
+    else
+    {
+        ViewBag.Title = Wording.PageCreate_SalesReturns;
+    }
+    int SLGoc = 0;
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SalesReturns",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+}
+
+<style type="text/css">
+    .has_error {
+        border: 1px #f2a696 solid !important;
+        color: #D68273;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+        /* padding-left: 7px; */
+        /* font-size: 13px; */
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 42px;
+    }
+
+        .itemdiv > .body > .name {
+            color: black;
+        }
+</style>
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.ValidationSummary(true)
+    <div class="row">
+        <div class="col-sm-7 ">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#return" aria-expanded="true"><i class="fa fa-spinner"></i>Trả sản phẩm</a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="return" class="tab-pane active">
+                                    <div id="search_content_invoice"></div>
+                                    <div id="listReturnDetail" class="table-responsive top-10 ">
+                                        <table class="table table-bordered grid-table bottom-5">
+                                            <thead>
+                                                <tr>
+                                                    <th class="grid-header" width="50">STT</th>
+                                                    <th class="grid-header">Tên SP/DV</th>
+                                                    <th class="grid-header">Lô/Hạn SD</th>
+                                                    <th class="grid-header" width="60">SL</th>
+                                                    <th class="grid-header" width="100">Đơn giá</th>
+                                                    <th class="grid-header" width="90">Thành tiền</th>
+                                                    <th class="grid-header" width="20"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="detailList">
+                                                <tr role="0" hidden>
+                                                    <td class="text-center">
+                                                        1
+                                                    </td>
+                                                    <td>
+                                                        <input class="item_id" type="hidden" id="DetailList_0__Id" name="DetailList[0].Id" value="0" />
+                                                        <input class="item_product_id" type="hidden" id="DetailList_0__ProductId" name="DetailList[0].ProductId" value="0" />
+                                                        <span class="item_product_name"></span>
+                                                    </td>
+                                                    <td class="detail_locode">
+                                                        <input class="item_locode" type="text" id="DetailList_0__LoCode" name="DetailList[0].LoCode" value="" style="width:80px" />
+                                                        <input class="input-mask-date item_expiry_date" type="text" id="DetailList_0__ExpiryDate" name="DetailList[0].ExpiryDate" value="" style="width:80px;">
+                                                    </td>
+                                                    <td>
+                                                        <input type="hidden" name="DetailList[0].Unit" id="DetailList_0__Unit" value="" class="item_unit" />
+                                                        <input class="item_quantity numberinput2 text-right" type="text" id="DetailList_0__Quantity" name="DetailList[0].Quantity" value="0" style="width:100%" />
+                                                    </td>
+                                                    <td>
+                                                        <input class="item_price numberinput2 text-right" type="text" id="DetailList_0__Price" name="DetailList[0].Price"  value="" style="width:100%" />
+                                                        <input class="item_OriginalPrice numberinput2 text-right" type="hidden" id="DetailList_0__OriginalPrice" name="DetailList[0].OriginalPrice" value="" style="width:100%" readonly />
+                                                        <input class="item_OriginQuantity numberinput2 text-right" type="hidden" id="DetailList_0__OriginQuantity" value="" style="width:100%" readonly />
+                                                        <input class="item_CountForBrand numberinput2 text-right" type="hidden" id="DetailList_0__CountForBrand" value="" style="width:100%" readonly />
+                                                        <input class="item_OriginalAmount numberinput2 text-right" type="hidden" id="DetailList_0__OriginalAmount" value="" style="width:100%" readonly />
+                                                    </td>
+                                                    <td align="right"><span class="item_total" align="right"></span></td>
+                                                    <td class="text-center">
+                                                        <a class="btn-delete-item">
+                                                            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                @for (int i = 0; i < Model.DetailList.Count(); i++)
+                                                {
+                                                    var thanh_tien = Model.DetailList[i].Price * Model.DetailList[i].Quantity;
+                                                    <tr role="@(i+1)">
+                                                        <td class="text-center">
+                                                            @(i + 1)
+                                                        </td>
+                                                        <td>
+                                                            <input class="item_id" type="hidden" id="DetailList_@(i+1)__Id" name="DetailList[@(i+1)].Id" value="@Model.DetailList[i].Id" />
+                                                            <input class="item_product_id" type="hidden" id="DetailList_@(i+1)__ProductId" name="DetailList[@(i+1)].ProductId" value="@Model.DetailList[i].ProductId" />
+                                                            <span class="item_product_name">@Model.InvoiceList[i].ProductName</span>
+                                                        </td>
+                                                        <td class="detail_locode">
+                                                            <input class="item_locode" type="text" id="DetailList_@(i+1)__LoCode" name="DetailList[@(i+1)].LoCode" value="@Model.DetailList[i].LoCode" style="width:80px" />
+                                                            <input class="input-mask-date item_expiry_date" type="text" id="DetailList_@(i+1)__ExpiryDate" name="DetailList[@(i+1)].ExpiryDate" value="@(Model.DetailList[i].ExpiryDate.HasValue ? Model.DetailList[i].ExpiryDate.Value.ToString("dd/MM/yyyy") : "")" style="width:80px;">
+                                                        </td>
+                                                        <td>
+                                                            <input type="hidden" name="DetailList[@(i+1)].Unit" id="DetailList_@(i+1)__Unit" value="@Model.DetailList[i].Unit" class="item_unit" />
+                                                            <input type="hidden" name="DetailList[@(i+1)].Number" id="DetailList_@(i+1)__Number" value="@Model.DetailList[i].Unit" class="item_number" />
+                                                            <input class="item_quantity numberinput2 text-right" type="text" id="DetailList_@(i+1)__Quantity" name="DetailList[@(i+1)].Quantity" value="@Model.DetailList[i].Quantity" style="width:100%" />
+                                                        </td>
+                                                        <td>
+                                                            <input class="item_price numberinput2 text-right" type="text" id="DetailList_@(i+1)__Price" name="DetailList[@(i+1)].Price" value="@Model.DetailList[i].Price" style="width:100%" readonly />
+                                                            <input class="item_OriginalPrice numberinput2 text-right" type="hidden" id="DetailList_@(i+1)__OriginalPrice" name="DetailList[@(i+1)].OriginalPrice" value="" style="width:100%" readonly />
+                                                            <input class="item_OriginQuantity numberinput2 text-right" type="hidden" id="DetailList_(@i+1)__OriginQuantity" value="" style="width:100%" readonly />
+                                                            <input class="item_CountForBrand numberinput2 text-right" type="hidden" id="DetailList_(@i+1)__CountForBrand" value="" style="width:100%" readonly />
+                                                            <input class="item_Type numberinput2 text-right" type="hidden" id="DetailList_(@i+1)__Type" value="" style="width:100%" readonly />
+                                                            <input class="item_OriginalAmount numberinput2 text-right" type="hidden" id="DetailList_0__OriginalAmount" value="" style="width:100%" readonly />
+                                                        </td>
+                                                        <td align="right"><span class="item_total" align="right">@(thanh_tien.ToCurrencyStr(null))</span></td>
+                                                        <td class="text-center">
+                                                            <a class="btn-delete-item">
+                                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+
+                                                    <td colspan="3" class="red"><span id="status"></span></td>
+                                                    <td class="detailList_SL" align="right" style="font-weight:bold"></td>
+                                                    <td></td>
+                                                    <td class="detailList_Amount" align="right" style="font-weight:bold"></td>
+                                                    <td></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+
+                                    </div>
+
+                                </div>
+                                @*<div id="invoice" class="tab-pane">
+                                        <div class="product-search-box clearfix " style="margin-bottom:10px">
+                                            <span class="label label-warning" style="padding: 6px; float: left; height: 26px; margin-left: 0px;">[F4]</span>
+                                            <div id="product_search_control">
+                                                <span class="ctl">
+                                                    @Html.TextBox("Product", "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "off", style = "width:400px;" })
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div id="listOrderDetail" class="table-responsive top-10 ">
+                                            <table class="table table-bordered grid-table bottom-5">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="grid-header" width="50">STT</th>
+                                                        <th class="grid-header">Tên SP/DV</th>
+                                                        <th class="grid-header">Lô/Hạn SD</th>
+                                                        <th class="grid-header" width="60">SL</th>
+                                                        <th class="grid-header" width="100">Đơn giá</th>
+
+                                                        <th class="grid-header" width="90">Thành tiền</th>
+
+                                                        <th class="grid-header" width="20"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="productInvoiceList">
+                                                    <tr role="0" hidden>
+                                                        <td class="text-center">
+                                                            1
+                                                        </td>
+                                                        <td>
+                                                            <input class="item_id" type="hidden" id="InvoiceList_0__Id" name="InvoiceList[0].Id" value="0" />
+                                                            <input class="item_product_id" type="hidden" id="InvoiceList_0__ProductId" name="InvoiceList[0].ProductId" value="0" />
+                                                            <span class="item_product_name"></span>
+                                                        </td>
+                                                        <td class="detail_locode">
+                                                            <input class="item_locode" type="text" id="InvoiceList_0__LoCode" name="InvoiceList[0].LoCode" value="" style="width:80px" />
+                                                            <input class="input-mask-date item_expiry_date" type="text" id="InvoiceList_0__ExpiryDate" name="InvoiceList[0].ExpiryDate" value="" style="width:80px;">
+                                                        </td>
+                                                        <td>
+                                                            <input type="hidden" name="InvoiceList[0].Unit" id="InvoiceList_0__Unit" value="" class="item_unit" />
+                                                            <input class="item_quantity numberinput2 text-right" type="text" id="InvoiceList_0__Quantity" name="InvoiceList[0].Quantity" value="0" style="width:100%" />
+                                                        </td>
+                                                        <td>
+                                                            <input class="item_price numberinput2 text-right" type="text" id="InvoiceList_0__Price" name="InvoiceList[0].Price" value="" style="width:100%" />
+                                                        </td>
+                                                        <td align="right"><span class="item_total" align="right"></span></td>
+                                                        <td class="text-center">
+                                                            <a class="btn-delete-item">
+                                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                    @for (int i = 0; i < Model.InvoiceList.Count(); i++)
+                                                    {
+                                                        var thanh_tien = Model.InvoiceList[i].Price * Model.InvoiceList[i].Quantity;
+                                                        <tr role="@(i+1)">
+                                                            <td class="text-center">
+                                                                @(i + 1)
+                                                            </td>
+                                                            <td>
+                                                                <input class="item_id" type="hidden" id="InvoiceList_@(i+1)__Id" name="InvoiceList[@(i+1)].Id" value="@Model.InvoiceList[i].Id" />
+                                                                <input class="item_product_id" type="hidden" id="InvoiceList_@(i+1)__ProductId" name="InvoiceList[@(i+1)].ProductId" value="@Model.InvoiceList[i].ProductId" />
+                                                                <span class="item_product_name">@Model.InvoiceList[i].ProductName</span>
+                                                            </td>
+                                                            <td class="detail_locode">
+                                                                <input class="item_locode" type="text" id="InvoiceList_@(i+1)__LoCode" name="InvoiceList[@(i+1)].LoCode" value="@Model.InvoiceList[i].LoCode" style="width:80px" />
+                                                                <input class="input-mask-date item_expiry_date" type="text" id="InvoiceList_@(i+1)__ExpiryDate" name="InvoiceList[@(i+1)].ExpiryDate" value="@(Model.InvoiceList[i].ExpiryDate.HasValue ? Model.InvoiceList[i].ExpiryDate.Value.ToString("dd/MM/yyyy") : "")" style="width:80px;">
+                                                            </td>
+                                                            <td>
+                                                                <input type="hidden" name="InvoiceList[@(i+1)].Unit" id="InvoiceList_@(i+1)__Unit" value="@Model.InvoiceList[i].Unit" class="item_unit" />
+                                                                <input class="item_quantity numberinput2 text-right" type="text" id="InvoiceList_@(i+1)__Quantity" name="InvoiceList[@(i+1)].Quantity" value="@Model.InvoiceList[i].Quantity" style="width:100%" />
+                                                            </td>
+                                                            <td>
+                                                                <input class="item_price numberinput2 text-right" type="text" id="InvoiceList_@(i+1)__Price" name="InvoiceList[@(i+1)].Price" value="@Model.InvoiceList[i].Price" style="width:100%" />
+                                                            </td>
+                                                            <td align="right"><span class="item_total" align="right">@(thanh_tien.ToCurrencyStr(null))</span></td>
+                                                            <td class="text-center">
+                                                                <a class="btn-delete-item">
+                                                                    <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+
+                                                        <td colspan="3" class="red"><span id="status"></span></td>
+                                                        <td class="productInvoiceList_SL" align="right" style="font-weight:bold"></td>
+                                                        <td></td>
+                                                        <td class="productInvoiceList_Amount" align="right" style="font-weight:bold"></td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+
+                                        </div>
+
+                                    </div>*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-spinner"></i> Tổng quan</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane active">
+                                    @Html.ModulePopupFor(m => m.ProductInvoiceOldId, "ProductInvoice", Model.ProductInvoiceOldCode, false, true)
+                                    @Html.HiddenFor(m => m.CustomerId)
+                                    @Html.CustomTextboxFor(model => model.CustomerName, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" }, { "id", "CustomerId_DisplayText" } })
+                                    @Html.CustomDropDownListFor(model => model.WarehouseDestinationId, SelectListHelper.GetSelectList_Warehouse(Model.WarehouseDestinationId, null), WidthType.span12, true, "- Chọn -")
+                                    @Html.CustomTextAreaFor(model => model.Note, Wording.Note, WidthType.span12, true, null, "hide", "full-w")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p></p>
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title"><i class="fa fa-cc-paypal"></i> Thông tin thanh toán</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @Html.CustomTextboxFor(model => model.TotalAmount, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.InvoiceNew.TotalAmount, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.InvoiceNew.TaxFee, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.InvoiceNew.TongTienSauVAT, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.AmountPayment, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.AmountReceipt, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+@section Scripts {
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+
+    <script src="/Scripts/combojax.js?=vs1.01211"></script>
+    @*<script src="~/Scripts/area_sale/SaleReturn.js?=vs1.001"></script>*@
+
+    <script type="text/javascript">
+        var $tr_template_invoice = $('.productInvoiceList tr:first-child');
+        $(function () {
+
+            //tính thành tiền và tổng cộng
+            $('#listReturnDetail').on('change', '.item_quantity', function () {
+                //debugger
+                var $this = $(this);
+                var id = $this.closest('tr').attr('role');
+
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(1);
+                }
+
+                var _OriginQuantity = $("#DetailList_" + id + "__OriginQuantity").val();
+                if (parseInt($(this).val()) > parseInt(_OriginQuantity)) {
+                    $(this).val(_OriginQuantity);
+                }
+                //
+                var _material_id = $("#DetailList_" + id + "__ProductId").val();
+                var _LoCode = $("#DetailList_" + id + "__LoCode").val();
+                var _ExpiryDate = $("#DetailList_" + id + "__ExpiryDate").val();
+                var _quantity_inventory = $(this).data("quantity-inventory");
+                var selector = '.detailList tr';
+                var quantity_used = 0;
+                $(selector).each(function (index, elem) {
+                    if (index != id) {
+                        var material_id = $("#DetailList_" + index + "__ProductId").val();
+                        var LoCode = $("#DetailList_" + index + "__LoCode").val();
+                        var ExpiryDate = $("#DetailList_" + index + "__ExpiryDate").val();
+                        var Quantity = $("#DetailList_" + index + "__Quantity").val();
+                        if (material_id == _material_id && LoCode == _LoCode && ExpiryDate == _ExpiryDate) { // la số thì mới tính
+                            quantity_used += parseInt(removeComma(Quantity));
+                        }
+                    }
+                });
+                var inventory_qty = parseInt(_quantity_inventory) - parseInt(quantity_used);
+                var _quantity = parseInt(removeComma($(this).val()));
+                $("#status").text("");
+                if (_quantity > inventory_qty) {
+                    $("#DetailList_" + id + "__Quantity").val(inventory_qty);
+                    $("#status").text("Tổng số lượng xuất ra không được lớn hơn số lượng tồn kho hiện tại!!");
+                }
+
+                brand = $this.closest('tr').find('.item_CountForBrand').val();
+                orginalQuantity = $this.closest('tr').find('.item_OriginQuantity').val();
+                var isNguyenGia = false;
+                console.log(brand);
+                if (brand === 'DICHVU' && parseFloat(orginalQuantity) !== parseFloat($this.val())) {
+                    isNguyenGia = true;
+                }
+
+                //tính tổng cộng
+                calcAmountItem(id, ".detailList", isNguyenGia);
+                calcTotalAmount(".detailList");
+            });
+
+            $('#listReturnDetail').on('change', '.item_price', function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(1);
+                }
+                var $this = $(this);
+                var id = $this.closest('tr').attr('role');
+                calcAmountItem(id, ".detailList");
+                calcTotalAmount(".detailList");
+            });
+
+            $('#listReturnDetail').on('keypress', '.item_price, .item_quantity', function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                }
+            });
+
+            // xóa sản phẩm
+            $('#listReturnDetail').on('click', '.btn-delete-item', function () {
+                //debugger
+                $(this).closest('tr').remove();
+                calcTotalAmount(".detailList");
+                $('.detailList tr').each(function (index, tr) {
+                    $(tr).attr('role', index);
+                    $(tr).find('td:first-child').text(index);
+                    $(tr).find('.item_product_id').attr('name', 'DetailList[' + index + '].ProductId').attr('id', 'DetailList_' + index + '__ProductId');
+                    $(tr).find('.item_id').attr('name', 'DetailList[' + index + '].Id').attr('id', 'DetailList_' + index + '__Id');
+                    $(tr).find('.item_quantity').attr('name', 'DetailList[' + index + '].Quantity').attr('id', 'DetailList_' + index + '__Quantity');
+                    $(tr).find('.item_price').attr('name', 'DetailList[' + index + '].Price').attr('id', 'DetailList_' + index + '__Price');
+                    $(tr).find('.item_locode').attr('name', 'DetailList[' + index + '].LoCode').attr('id', 'DetailList_' + index + '__LoCode');
+                    $(tr).find('.item_expiry_date').attr('name', 'DetailList[' + index + '].ExpiryDate').attr('id', 'DetailList_' + index + '__ExpiryDate');
+                    $(tr).find('.item_unit').attr('name', 'DetailList[' + index + '].Unit').attr('id', 'DetailList_' + index + '__Unit');
+                });
+            });
+        });
+        function calcAmountItem(id, tbody, isNguyenGia = true) {
+            debugger
+            var $this = $(tbody + ' tr[role="' + id + '"]');
+
+            console.log('calculate')
+            // nguyên giá khi trả một phần cho dịch vụ
+
+            var inputQuantity = parseFloat($this.find('.item_quantity').val());
+            console.log('inputQuantity:' + inputQuantity);
+            var OriginalQuantity = parseFloat($this.find('.item_OriginQuantity').val());
+            console.log('OriginalQuantity:' + OriginalQuantity);
+            Originalprice = parseFloat(removeComma($this.find('.item_price').val()));
+            console.log('Originalprice:' + Originalprice)
+            // giá của sp đã sử dụng là giá gốc
+            UsedItem_Amount = (OriginalQuantity - inputQuantity) * Originalprice;
+            brand = $this.closest('tr').find('.item_CountForBrand').val();
+            if (UsedItem_Amount > 0) {
+                if (brand == 'service') {
+                    console.log('UsedItem_Amount:' + UsedItem_Amount)
+                    // tiền trả cho khách =  tổng tiển (gồm KM nếu có) - giá gốc của sp đã sử dụng
+                    var total = parseFloat(removeComma($this.find('.item_OriginalAmount').val())) - UsedItem_Amount;
+                    $this.find('.item_total').text(numeral(total).format('0,0'));
+                    return;
+                }
+            }
+
+
+            var input_price = $this.find('.item_price');
+
+            var _price = input_price.val() != '' ? removeComma(input_price.val()) : 0;
+
+            var $qty = $this.find('.item_quantity');
+            var qty = 1;
+            if ($qty.val() == '') {
+                $qty.val(1);
+            } else {
+                qty = parseInt(removeComma($qty.val())) < 0 ? parseInt(removeComma($qty.val())) * -1 : parseInt(removeComma($qty.val()));
+            }
+            var total = _price * qty;
+            $this.find('.item_total').text(numeral(total).format('0,0'));
+        };
+
+        function calcTotalAmount(tbody) {
+            //debugger
+            var total = 0;
+            var total1 = 0;
+
+            var selector = tbody + ' tr';
+            var count_rows = $('.detailList').find('tr').length;
+            $(selector).each(function (index, elem) {
+                debugger
+                if (count_rows == 1) {
+                    $(tbody + "_Amount").text(numeral(total).format('0,0'));
+                }
+                if ($(elem).find('.item_total').text() != '') { // la số thì mới tính
+                    total += parseFloat(removeComma($(elem).find('.item_total').text()));
+                    $(tbody + "_Amount").text(numeral(total).format('0,0'));
+                }
+                if ($(elem).find('.item_quantity').val() != '') { // la số thì mới tính
+                    total1 += parseInt(removeComma($(elem).find('.item_quantity').val()));
+                    $(tbody + "_SL").text(numeral(total1).format('0,0'));
+                }
+
+
+            });
+            if (tbody == ".detailList") {
+                $('#mask-TotalAmount').val(numeral(total).format('0,0'));
+                $('#TotalAmount').val(numeral(total).format('0,0'));
+            }
+            if (tbody == ".productInvoiceList") {
+                var vat = $('#InvoiceNew_TaxFee').val();
+                var tt = total + total * parseInt(vat) / 100;
+                $('#mask-InvoiceNew_TotalAmount').val(numeral(total).format('0,0'));
+                $('#InvoiceNew_TotalAmount').val(numeral(total).format('0,0'));
+                $('#mask-InvoiceNew_TongTienSauVAT').val(numeral(tt).format('0,0'));
+                $('#InvoiceNew_TongTienSauVAT').val(numeral(tt).format('0,0'));
+            }
+            var aa = $("#InvoiceNew_TongTienSauVAT").val();
+            var bb = $("#TotalAmount").val();
+            var _amount1 = aa == "" ? 0 : aa;
+            var _amount2 = bb == "" ? 0 : bb;
+            var amount = parseFloat(removeComma(_amount1)) - parseFloat(removeComma(_amount2));
+            if (amount < 0) {
+                $('#mask-AmountPayment').val(numeral(amount * (-1)).format('0,0'));
+                $('#AmountPayment').val(numeral(amount * (-1)).format('0,0'));
+                $('#mask-AmountReceipt').val(0);
+                $('#AmountReceipt').val(0);
+            }
+            if (amount == 0) {
+                $('#mask-AmountPayment').val(0);
+                $('#AmountPayment').val(0);
+                $('#mask-AmountReceipt').val(0);
+                $('#AmountReceipt').val(0);
+            }
+            if (amount > 0) {
+                $('#mask-AmountReceipt').val(numeral(amount).format('0,0'));
+                $('#AmountReceipt').val(numeral(amount).format('0,0'));
+                $('#mask-AmountPayment').val(0);
+                $('#AmountPayment').val(0);
+            }
+
+        };
+        $(window).keydown(function (e) {
+            if (e.which == 115) {   // khi nhấn F4 trên bàn phím hiển thị dữ liệu dropdownlist
+                e.preventDefault();
+                $("#Product").focus();
+            }
+            else
+                if (e.which == 113) {
+                    e.preventDefault();
+                    $("#ProductInvoice").focus();
+                }
+        });
+        function selectItemCustomer(id, name, customername, customerid) {
+            $("#ProductInvoiceOldId").val(id).trigger('change');
+            $("#ProductInvoiceOldId_DisplayText").val(name).trigger('change');
+            $("#ProductInvoiceOldId_DisplayText").focus().blur();
+            $("#CustomerId").val(customerid).trigger('change');
+            $("#CustomerId_DisplayText").val(customername).trigger('change');
+            ClosePopup();
+            var formdata = {
+                id: id
+            };
+            $("#search_content_invoice").html("");
+            //Thêm dòng mới
+            ClickEventHandler(false, "/SalesReturns/SearchProductInvoice", "#search_content_invoice", formdata, function () { });
+        }
+    </script>
+
+    <script type="text/javascript">
+        //validation nhập vào ngày tháng năm
+        var dtCh = "/";
+        var minYear = 1900;
+        var maxYear = 2100;
+
+        function isInteger(s) {
+            var i;
+            for (i = 0; i < s.length; i++) {
+                var c = s.charAt(i);
+                if (((c < "0") || (c > "9"))) return false;
+            }
+            return true;
+        }
+
+        function stripCharsInBag(s, bag) {
+            var i;
+            var returnString = "";
+            for (i = 0; i < s.length; i++) {
+                var c = s.charAt(i);
+                if (bag.indexOf(c) == -1) returnString += c;
+            }
+            return returnString;
+        }
+
+        function daysInFebruary(year) {
+            return (((year % 4 == 0) && ((!(year % 100 == 0)) || (year % 400 == 0))) ? 29 : 28);
+        }
+        function DaysArray(n) {
+            for (var i = 1; i <= n; i++) {
+                this[i] = 31
+                if (i == 4 || i == 6 || i == 9 || i == 11) { this[i] = 30 }
+                if (i == 2) { this[i] = 29 }
+            }
+            return this
+        }
+
+        function isDate(dtStr) {
+            //debugger
+            var daysInMonth = DaysArray(12);
+            var pos1 = dtStr.indexOf(dtCh);
+            var pos2 = dtStr.indexOf(dtCh, pos1 + 1);
+            var strDay = dtStr.substring(0, pos1);
+            var strMonth = dtStr.substring(pos1 + 1, pos2);
+            var strYear = dtStr.substring(pos2 + 1);
+            strYr = strYear;
+            if (strDay.charAt(0) == "0" && strDay.length > 1)
+                strDay = strDay.substring(1);
+            if (strMonth.charAt(0) == "0" && strMonth.length > 1)
+                strMonth = strMonth.substring(1);
+            for (var i = 1; i <= 3; i++) {
+                if (strYr.charAt(0) == "0" && strYr.length > 1)
+                    strYr = strYr.substring(1);
+            }
+            month = parseInt(strMonth);
+            day = parseInt(strDay);
+            year = parseInt(strYr);
+            if (month < 1 || month > 12) {
+                alert("Vui lòng nhập một tháng hợp lệ (dd/mm/yyyy)");
+                HideLoading();
+                return false;
+            }
+            if (day < 1 || day > 31 || (month == 2 && day > daysInFebruary(year)) || day > daysInMonth[month]) {
+                alert("Vui lòng nhập một ngày hợp lệ (dd/mm/yyyy)");
+                HideLoading();
+                return false;
+            }
+            if (year < minYear || year > maxYear) {
+                alert("Vui lòng nhập một năm hợp lệ có 4 chữ số từ " + minYear + " đến " + maxYear);
+                HideLoading();
+                return false;
+            }
+            if (dtStr.indexOf(dtCh, pos2 + 1) != -1 || isInteger(stripCharsInBag(dtStr, dtCh)) == false) {
+                alert("Vui lòng nhập một ngày hợp lệ (dd/mm/yyyy)");
+                HideLoading();
+                return false;
+            }
+        }
+        //
+        function SetTextForId(ele, strName) {
+            var a = $(ele).closest('div .control-group');
+            a.find('label').html(strName);
+        }
+        $(document).ready(function () {
+            SetTextForId($('#TotalAmount'), "Tổng tiền đơn trả");
+            SetTextForId($('#InvoiceNew_TotalAmount'), "Tổng tiền mua hàng");
+        });
+        $(document).ready(function () {
+            LoadNumberInput();
+            $('#listOrderDetail').on('change', 'input', function () {
+                var value = $(this).val();
+                if (value == "") {
+                    $(this).addClass("valid_null");
+                }
+                else {
+                    $(this).removeClass("valid_null");
+                    $(this).removeClass("has_error");
+
+                }
+            });
+            $('#listOrderDetail').on('change', 'input', function () {
+                var value = $(this).val();
+                if (value == "") {
+                    $(this).addClass("valid_null");
+                }
+                else {
+                    $(this).removeClass("valid_null");
+                    $(this).removeClass("has_error");
+
+                }
+            });
+            $('#ProductInvoiceOldId_DisplayText').change(function () {
+                //debugger
+                var count_rows = $('.detailList tr').length;
+                if (count_rows > 1) {
+                    var rows = document.getElementsByClassName("btn-delete-item");
+                    for (var i = count_rows - 1; i >= 1; i--) {
+                        rows[i].click();
+                    }
+                }
+            });
+            $('#Save').click(function () {
+                //debugger
+                ShowLoading();
+                //validation nhập vào ngày tháng năm
+                var dt = document.getElementsByClassName("input-mask-date");
+                for (let i = 0; i < dt.length; i++) {
+                    if (isDate(dt[i].value) == false) {
+                        HideLoading();
+                        return false;
+                    }
+                }
+                //
+                var WarehouseDestinationId = $("#WarehouseDestinationId").val();
+                var messagge = "";
+                var count_locode = $('.item_locode.valid_null').length;
+                var expiry_date_null = $('.item_expiry_date.valid_null').length;
+
+                var count_rows = $('.detailList').find('tr').length;
+                //alert(count_product);
+
+                $('.valid_null').addClass("has_error");
+                if (count_locode > 1) {
+                    messagge += "Cần nhập đầy đủ số lô <br>";
+                }
+                if (expiry_date_null > 1) {
+                    messagge += "Cần nhập đầy đủ hạn sử dụng <br>";
+                }
+                if (WarehouseDestinationId == '') {
+                    messagge += "Kho nhận chưa có <br>";
+                }
+                if (count_rows == 1) {
+                    messagge += "chưa có sản phẩm <br>";
+                }
+                if (messagge != '') {
+                    alertPopup('Lỗi!', messagge, 'error');
+                    HideLoading();
+                }
+
+                else {
+                    ClearFormatBeforeSubmit($("#SaleOrder"));
+                    $("#SaleOrder").submit();
+                    alert('Lưu thành công');
+                    // HideLoading();
+                }
+
+                //return false;
+            });
+
+
+        });
+
+    </script>
+}

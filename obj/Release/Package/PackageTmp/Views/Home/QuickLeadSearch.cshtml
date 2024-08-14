@@ -1,0 +1,223 @@
+﻿
+
+@{
+    Layout = null;
+}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style type="text/css">
+
+    /* Define how each icon button should look like */
+    .button {
+        color: white;
+        display: inline-block; /* Inline elements with width and height. TL;DR they make the icon buttons stack from left-to-right instead of top-to-bottom */
+        position: relative; /* All 'absolute'ly positioned elements are relative to this one */
+        padding: 2px 5px; /* Add some padding so it looks nice */
+    }
+
+    /* Make the badge float in the top right corner of the button */
+    .button__badge-leadMeeting {
+        background-color: #fa3e3e;
+        border-radius: 2px;
+        color: white;
+        padding: 1px 3px;
+        font-size: 10px;
+        position: absolute; /* Position the badge within the relatively positioned button */
+        top: 0px;
+        right: 0px;
+        height: 17px;
+        line-height: 15px;
+    }
+
+    .nav .open > a:focus {
+        color: #2c5976;
+    }
+
+    .ace-nav > li > a {
+        min-width: 30px !important;
+    }
+
+    .dropdown-navbar .msg-photo {
+        max-height: 45px;
+        border-radius: 100%;
+        max-width: 45px;
+    }
+
+    .mss-style {
+        padding: 10px 2px;
+        margin: 0;
+        border-top: 1px solid;
+        font-size: 12px;
+        line-height: 16px;
+        color: #555 !important;
+        background-color: transparent !important;
+        white-space: normal;
+        border-top-color: #E4ECF3;
+    }
+
+    .dropdown-navbar .msg-photo {
+        max-width: 45px;
+        float: left;
+        margin-top: 2px;
+        max-height: 45px;
+        border-radius: 100%;
+    }
+
+    .dropdown-navbar .msg-body {
+        display: block;
+        line-height: 20px;
+        white-space: normal;
+        vertical-align: middle;
+        margin-left: 50px;
+        margin-right: 40px;
+    }
+
+    .msg-title-leadmeeting {
+        display: inline-block;
+        line-height: 14px;
+        font-size: 14px !important;
+        color: black !important;
+    }
+
+    .msg-time {
+        display: block;
+        font-size: 11px;
+        color: #777;
+    }
+
+    .dropdown-navbar {
+        padding: 0;
+        width: 400px !important;
+    }
+
+    .gritter-image {
+        border-radius: 100%;
+    }
+
+    .notifications-action a {
+        margin: 0px !important;
+        height: 25px !important;
+        max-width: 20px !important;
+    }
+
+    .notifications-action {
+        max-width: 40px;
+        margin: 0px;
+        float: right;
+        position: initial;
+        display: grid !important;
+    }
+
+    .dropdown-navbar > li {
+        padding: 10px 8px;
+        background-color: #FFF;
+    }
+
+    .dropdown-navbar > .dropdown-content {
+        padding: 0;
+        width: 400px;
+    }
+
+    .dropdown-footer {
+        padding: 0px !important;
+    }
+
+    .dropdown-navbar.navbar-pink > li.dropdown-header {
+        background-color: #ECF2F7 !important;
+        color: #8090A0 !important;
+        border-bottom-color: #BCD4E5 !important;
+    }
+
+    .background-leadmeeting > li {
+        border-top: 1px solid #E4ECF3 !important;
+        margin-top: 1px;
+    }
+
+        .background-leadmeeting > li > a {
+            border-top: 0px !important;
+        }
+
+    .clickLead {
+        padding: 0 5px !important;
+    }
+
+    .sent-notification {
+        background-color: #eefafb !important;
+    }
+    .modal-backdrop.in {
+        display: none;
+    }
+</style>
+
+<a data-toggle="dropdown" class="dropdown-toggle" href="#" aria-expanded="false">
+    <i class="ace-icon fa fa-search" style="font-size:24px;margin-top:2px"></i>
+</a>
+<ul class="dropdown-menu-right dropdown-navbar navbar-pink dropdown-menu dropdown-caret dropdown-close">
+    <li class="dropdown-header">
+        <i class="fa fa-search"></i>
+        Tìm Lead theo tên hoặc sđt
+    </li>
+    <li class="dropdown-header container-fluid" style="padding: 5px 0;display:flex; align-items:center;">
+        <div class="col-md-12">
+            <input class="form-control" type="text" id="inpquickleadsearch" />
+        </div>
+        <div class="col-md-2">
+            <button class="btn" type="button" style=" font-size: 1.3rem; line-height: 1; height: 34px !important; border-radius: 3px; " id="btnquickleadsearch"> <i class="fa fa-search"></i>Tìm</button>
+        </div>
+    </li>
+</ul>
+
+<div style="z-index: 1030; height: 110%; padding-left: 0px;" id="ContentQuickLeadSearch" class="modal fade ContentQuickLeadSearch" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#btnquickleadsearch').click(function () {
+            var searchValue = $('#inpquickleadsearch').val();
+            if (searchValue) {
+                DetailLeadQuickSearch(searchValue);
+            }
+            else {
+                toastr.warning('Hãy nhập tên hoặc sđt Lead để tìm kiếm!');
+            }
+            
+        });
+
+    })
+    $("#ContentQuickLeadSearch").on("hidden.bs.modal", function () {
+        $("#ContentQuickLeadSearch").empty();
+        $(".modal - backdrop.in").css({
+            display: none,
+        });
+    });
+    $("#inpquickleadsearch").on("keypress", function (event) {
+        if (event.which == 13) {
+            $('#btnquickleadsearch').click();
+        }
+    });
+    function DetailLeadQuickSearch(Search) {
+        ShowLoadingPopup();
+        $.ajax({
+            url: "/AdviseCard/QuickSearchLeadModal?Search=" + Search,
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                if (data.trim() !== '') {
+                    // If the returned data is not empty, update the content and show the modal
+                    $("#ContentQuickLeadSearch").html(data);
+                    $('#ContentQuickLeadSearch').modal('show');
+                } else {
+                    // If the returned data is empty, handle the error
+                    toastr.warning('Không tìm thấy Lead phù hợp');
+                    // Optionally, display an error message to the user
+                }
+            },
+            complete: function () {
+                HideLoadingPopup();
+            }
+        })
+        
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>

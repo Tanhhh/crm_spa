@@ -1,0 +1,437 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model MembershipViewModel
+
+@{
+    ViewBag.Title = "Quy đổi phiếu MBS";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Membership",
+        ActionName = "ChangeMBS",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+<style type="text/css">
+    .select2-input {
+        width:76% !important;
+    }
+    .select2-container{
+        width:76% !important;
+    }
+</style>
+
+
+
+<div class="row">
+    <div class="col-sm-6" style="">
+        <div>
+            <span>Khách hàng:</span>
+            <input id="CustomerList" class="select2-input" placeholder="Nhập Khách hàng..." name="CustomerList" />
+        </div>
+        <div>
+            <span>Phiếu MBS:</span>
+            <input id="productSelectList" class="select2-input" placeholder="Nhập mã Membership..." name="productSelectList" />
+        </div>
+        @*<div id="listOrderDetail" class="table-responsive top-10" style="max-height: 70%;margin-top: 0.4%">
+            <table id="listOrderDetail1" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width:7%">STT<p id="ProductItemCount" value="0" readonly></th>
+                        <th style="width:45%">Mã </th>
+                        <th style="width:15%;">Dịch vụ</th>
+                        <th style="width:20px;"></th>
+                    </tr>
+                </thead>
+                <tbody class="detailList"></tbody>
+
+            </table>
+
+        </div>*@
+
+
+
+        
+
+    </div>
+
+    <div class="col-sm-6" style="">
+        <input id="productSelectList2" class="select2-input" placeholder="Dịch vụ quy đổi..." name="productSelectList2" />
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            Chuyển đổi
+        </a>
+        <div id="listOrderDetail3" class="table-responsive top-10" style="max-height: 70%;margin-top: 0.4%">
+            <table id="listOrderDetail4" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="width:7%">STT</th>
+                        <th style="width:50%;">Dịch vụ</th>
+                        <th style="width:15%;">Số lượng</th>
+                        <th style="width:20px;"></th>
+                    </tr>
+                </thead>
+                <tbody class="detailList2"></tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    
+</div>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-css/1.4.6/select2-bootstrap.min.css" />
+@*<script type="text/javascript" src='//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js"></script>
+
+
+@section Scripts {
+
+<script type="text/javascript">
+    var aasp = [];
+    var aasp1 = [];
+    var aasp2 = [];
+    $(document).ready(function () {
+        initSelectsp2();
+        initSelectsp3();
+        initSelectsp(-1);
+        //LoadNumberInput();
+    });
+    //lấy memebership
+    function dropdownData(CustomerId) {
+
+        //alert("da vao day co lay duoc id kho " + WarehouseSourceId);
+        $.ajax({
+
+            url: '/Membership/GetMembershipByCus?CustomerId=' + CustomerId,
+            dataType: "json",
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+            async: false,
+            success: function (data) {
+
+                $.each(data, function (i, item) {
+                    aasp.push(item);
+
+
+                });
+
+
+            },
+            error: function (xhr) {
+                //alert('error' + xhr);
+            }
+        });
+
+        //alert(aasp);
+
+        return aasp;
+
+
+    }
+
+    //lấy khách hàng
+    function dropdownData2() {
+
+        //alert("da vao day co lay duoc id kho " + WarehouseSourceId);
+        $.ajax({
+
+            url: '/Membership/getCustomer',
+            dataType: "json",
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+            async: false,
+            success: function (data) {
+
+                $.each(data, function (i, item) {
+                    aasp1.push(item);
+
+
+                });
+
+
+            },
+            error: function (xhr) {
+                alert('error' + xhr);
+            }
+        });
+
+        //alert(aasp1);
+
+        return aasp1;
+        
+
+    }
+
+    //Lấy dịch vụ
+    function dropdownData3() {
+
+        //alert("da vao day co lay duoc id kho " + WarehouseSourceId);
+        $.ajax({
+
+            url: '/Membership/getService',
+            dataType: "json",
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+            async: false,
+            success: function (data) {
+
+                $.each(data, function (i, item) {
+                    aasp2.push(item);
+
+
+                });
+
+
+            },
+            error: function (xhr) {
+                //alert('error' + xhr);
+            }
+        });
+
+        //alert(aasp);
+
+        return aasp2;
+
+
+    }
+
+    //lấy memebership
+    function initSelectsp(WarehouseSourceId) {
+        (function () {
+            // initialize select2 dropdown
+            $('#productSelectList').select2({
+                placeholder: "Nhập mã Membership",
+                //minimumInputLength: 1,
+                data: dropdownData(WarehouseSourceId),
+                formatResult: function (item) {
+                    
+                    return '<pr style=font-size: 20px;>' + item.Code + ' - ' + item.productName + '</pr>';
+                   
+                    
+                },
+                multiple: true,
+                // creating query with pagination functionality.
+                query: function (data) {
+                    var pageSize,
+                            dataset,
+                            that = this;
+                    pageSize = 20; // Number of the option loads at a time
+                    results = [];
+                    if (data.term && data.term !== '') {
+                        // HEADS UP; for the _.filter function I use underscore (actually lo-dash) here
+                        results = _.filter(that.data, function (e) {
+                            return e.text.toUpperCase().indexOf(data.term.toUpperCase()) >= 0;
+                        });
+                    } else if (data.term === '') {
+                        results = that.data;
+                    }
+                    data.callback({
+                        results: results.slice((data.page - 1) * pageSize, data.page * pageSize),
+                        more: results.length >= data.page * pageSize,
+                    });
+                },
+            });
+        })();
+
+    }
+
+    //lấy khách hàng
+    function initSelectsp2() {
+        (function () {
+            // initialize select2 dropdown
+            $('#CustomerList').select2({
+                placeholder: "Nhập Khách hàng...",
+                //minimumInputLength: 1,
+                data: dropdownData2(),
+                formatResult: function (item) {
+
+                    return '<pr style=font-size: 20px;>' + item.Name + ' - ' + item.Code +'</pr>';
+
+
+                },
+                multiple: false,
+                // creating query with pagination functionality.
+                query: function (data) {
+                    var pageSize,
+                            dataset,
+                            that = this;
+                    pageSize = 20; // Number of the option loads at a time
+                    results = [];
+                    if (data.term && data.term !== '') {
+                        // HEADS UP; for the _.filter function I use underscore (actually lo-dash) here
+                        results = _.filter(that.data, function (e) {
+                            return e.text.toUpperCase().indexOf(data.term.toUpperCase()) >= 0;
+                        });
+                    } else if (data.term === '') {
+                        results = that.data;
+                    }
+                    data.callback({
+                        results: results.slice((data.page - 1) * pageSize, data.page * pageSize),
+                        more: results.length >= data.page * pageSize,
+                    });
+                },
+            });
+        })();
+
+    }
+
+    //Lấy dịch vụ
+    function initSelectsp3() {
+        (function () {
+            // initialize select2 dropdown
+            $('#productSelectList2').select2({
+                placeholder: "Dịch vụ quy đổi...",
+                //minimumInputLength: 1,
+                data: dropdownData3(),
+                formatResult: function (item) {
+
+                    return '<pr style=font-size: 20px;>' + item.code + ' - ' + item.name + '</pr>' ;
+
+
+                },
+                multiple: true,
+                // creating query with pagination functionality.
+                query: function (data) {
+                    var pageSize,
+                            dataset,
+                            that = this;
+                    pageSize = 20; // Number of the option loads at a time
+                    results = [];
+                    if (data.term && data.term !== '') {
+                        // HEADS UP; for the _.filter function I use underscore (actually lo-dash) here
+                        results = _.filter(that.data, function (e) {
+                            return e.text.toUpperCase().indexOf(data.term.toUpperCase()) >= 0;
+                        });
+                    } else if (data.term === '') {
+                        results = that.data;
+                    }
+                    data.callback({
+                        results: results.slice((data.page - 1) * pageSize, data.page * pageSize),
+                        more: results.length >= data.page * pageSize,
+                    });
+                },
+            });
+        })();
+
+    }
+
+
+
+    $("#CustomerList").change(function () {
+       
+        var WarehouseSourceId = $("#CustomerList").val();
+       
+        initSelectsp(WarehouseSourceId);
+    });
+
+    
+    $('#productSelectList2').on('change', function () {
+        var selected = $("#productSelectList2").select2("data");
+        if (selected == null)
+            return;
+
+        var OrderNo = $('.detailList3 tr.detail_item').length + 1;
+        var ProductId = selected[0].id;
+        var ProductName = selected[0].name;
+       
+        var Quantity = 1;
+       
+        var ProductCode = selected[0].code;
+        
+        var formdata = {
+            OrderNo: OrderNo,
+            ProductId: ProductId,
+            ProductName: ProductName,
+           
+            Quantity: Quantity,
+          
+            ProductCode: ProductCode
+            
+        };
+        $("#listOrderDetail3 TBODY TR").each(function () {
+
+            var row = $(this);
+            var w = $(window);
+            $(this).removeClass('selected_grey').addClass("text_data");
+
+            var ProductCode1 = $(this).closest('tr').find("td:eq(1) input:nth-child(2)").val();
+
+            // alert($('#product_barcode3').val());
+
+            if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                //alert(ProductCode);
+                $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val(parseInt($(this).closest('tr').find("td:eq(2) input:nth-child(2)").val()) + 1);
+                $(this).closest('tr').find("td:eq(2) input:nth-child(2)").trigger('change');
+                $(this).addClass('selected_grey');
+                var body = $("html,#listOrderDetail");
+                body.stop().animate({ scrollTop: row.offset().top - (w.height() / 1.6) }, 500, 'swing', function () {
+                    row.addClass('scrollCode');
+                });
+                formdata = {};
+                return;
+            } else {
+                $(this).removeClass("scrollCode");
+            }
+            //alert(ProductCode);
+
+        });
+
+        ClickEventHandler(true, "/Membership/LoadServiceItem", ".detailList2", formdata, function () { });
+        $("#productSelectList2").select2("val", "");
+    });
+
+    $('#listOrderDetail3').on('click', '.btn-delete-item', function () {
+        
+        $(this).closest('tr').remove();
+    });
+
+    $("#Save").click(function () {
+        ///debugger
+        ShowLoading();
+        var CustomerId = $("#CustomerList").val();
+        var serviceold = [];
+        var selected = $("#productSelectList").select2("data");
+        for (var i = 0, len = selected.length; i < len; i++) {
+            var ser = selected[i].id;
+            serviceold.push(ser);
+        }
+        var servicenew = [];
+        $("#listOrderDetail3 TBODY TR").each(function () {
+            var sernew= {};
+            var row = $(this);
+            sernew.ProductId = row.closest('tr').find("td:eq(1) input:nth-child(2)").val();
+            sernew.Quantity = row.closest('tr').find("td:eq(2) input").val();
+            servicenew.push(sernew);
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "/Membership/ChangeMBS",
+            data: JSON.stringify({ CustomerId: CustomerId, SerViceOld: serviceold, SerViceNew: servicenew }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (r) {
+                if (r == "1") {
+                    alert("Chuyển đổi thành công!!");
+                    location.reload();
+                    HideLoading();
+                }
+            }
+        });
+    });
+
+</script>
+}

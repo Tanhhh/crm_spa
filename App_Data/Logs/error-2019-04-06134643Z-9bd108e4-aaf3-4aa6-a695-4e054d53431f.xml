@@ -1,0 +1,171 @@
+﻿<error errorId="9bd108e4-aaf3-4aa6-a695-4e054d53431f" application="/LM/W3SVC/2/ROOT" host="DESKTOP-H6FQOND" type="System.InvalidOperationException" message="The view 'Action123' or its master was not found or no view engine supports the searched locations. The following locations were searched:&#xD;&#xA;~/Areas/Sale/Views/Membership/Action123.aspx&#xD;&#xA;~/Areas/Sale/Views/Membership/Action123.ascx&#xD;&#xA;~/Areas/Sale/Views/Shared/Action123.aspx&#xD;&#xA;~/Areas/Sale/Views/Shared/Action123.ascx&#xD;&#xA;~/Views/Membership/Action123.aspx&#xD;&#xA;~/Views/Membership/Action123.ascx&#xD;&#xA;~/Views/Shared/Action123.aspx&#xD;&#xA;~/Views/Shared/Action123.ascx&#xD;&#xA;~/Areas/Sale/Views/Membership/Action123.cshtml&#xD;&#xA;~/Areas/Sale/Views/Membership/Action123.vbhtml&#xD;&#xA;~/Areas/Sale/Views/Shared/Action123.cshtml&#xD;&#xA;~/Areas/Sale/Views/Shared/Action123.vbhtml&#xD;&#xA;~/Views/Membership/Action123.cshtml&#xD;&#xA;~/Views/Membership/Action123.vbhtml&#xD;&#xA;~/Views/Shared/Action123.cshtml&#xD;&#xA;~/Views/Shared/Action123.vbhtml" source="System.Web.Mvc" detail="System.InvalidOperationException: The view 'Action123' or its master was not found or no view engine supports the searched locations. The following locations were searched:&#xD;&#xA;~/Areas/Sale/Views/Membership/Action123.aspx&#xD;&#xA;~/Areas/Sale/Views/Membership/Action123.ascx&#xD;&#xA;~/Areas/Sale/Views/Shared/Action123.aspx&#xD;&#xA;~/Areas/Sale/Views/Shared/Action123.ascx&#xD;&#xA;~/Views/Membership/Action123.aspx&#xD;&#xA;~/Views/Membership/Action123.ascx&#xD;&#xA;~/Views/Shared/Action123.aspx&#xD;&#xA;~/Views/Shared/Action123.ascx&#xD;&#xA;~/Areas/Sale/Views/Membership/Action123.cshtml&#xD;&#xA;~/Areas/Sale/Views/Membership/Action123.vbhtml&#xD;&#xA;~/Areas/Sale/Views/Shared/Action123.cshtml&#xD;&#xA;~/Areas/Sale/Views/Shared/Action123.vbhtml&#xD;&#xA;~/Views/Membership/Action123.cshtml&#xD;&#xA;~/Views/Membership/Action123.vbhtml&#xD;&#xA;~/Views/Shared/Action123.cshtml&#xD;&#xA;~/Views/Shared/Action123.vbhtml&#xD;&#xA;   at System.Web.Mvc.ViewResult.FindView(ControllerContext context)&#xD;&#xA;   at System.Web.Mvc.ViewResultBase.ExecuteResult(ControllerContext context)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResult(ControllerContext controllerContext, ActionResult actionResult)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;InvokeActionResultWithFilters&gt;b__17()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilter(IResultFilter filter, ResultExecutingContext preContext, Func`1 continuation)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;&gt;c__DisplayClass1c.&lt;InvokeActionResultWithFilters&gt;b__19()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilter(IResultFilter filter, ResultExecutingContext preContext, Func`1 continuation)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;&gt;c__DisplayClass1c.&lt;InvokeActionResultWithFilters&gt;b__19()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilter(IResultFilter filter, ResultExecutingContext preContext, Func`1 continuation)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;&gt;c__DisplayClass1c.&lt;InvokeActionResultWithFilters&gt;b__19()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilter(IResultFilter filter, ResultExecutingContext preContext, Func`1 continuation)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;&gt;c__DisplayClass1c.&lt;InvokeActionResultWithFilters&gt;b__19()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilter(IResultFilter filter, ResultExecutingContext preContext, Func`1 continuation)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;&gt;c__DisplayClass1c.&lt;InvokeActionResultWithFilters&gt;b__19()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultWithFilters(ControllerContext controllerContext, IList`1 filters, ActionResult actionResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;&gt;c__DisplayClass2a.&lt;BeginInvokeAction&gt;b__20()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;BeginInvokeAction&gt;b__22(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeAction(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.&lt;&gt;c__DisplayClass1d.&lt;BeginExecuteCore&gt;b__18(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.System.Web.Mvc.Async.IAsyncController.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.&lt;&gt;c__DisplayClass8.&lt;BeginProcessRequest&gt;b__3(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.System.Web.IHttpAsyncHandler.EndProcessRequest(IAsyncResult result)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="admin" time="2019-04-06T13:46:43.9664168Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_ACCEPT:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=o3dxld2lrcf1oxatyl0fbtek; __RequestVerificationToken=oDD5njLkuyhC1Igzl3Ms6R4yDWF0Y8U0wUwA-zyRzrEtEIOX432yHjulo6tuh8AQAMg3oxMiQ_3I39MhB5XBNuxu5SdNZWNnTUjCADV0AWU1; BO=1D034ABA2503476457354345842DC7C8D8B8B440C90E9775601F37A0E0F0205BFB7C988F4ACB2C3D47837FC9314463F5F8CBE4B4C220A8683D560F7C7010598D54D6AD0E26F183270F6BDE9663F6ABCCCA17182E77D6FA96FD9761F62F2261C5&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/Membership/Index&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36&#xD;&#xA;HTTP_UPGRADE_INSECURE_REQUESTS:1&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Connection: keep-alive&#xD;&#xA;Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3&#xD;&#xA;Accept-Encoding: gzip, deflate, br&#xD;&#xA;Accept-Language: vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5&#xD;&#xA;Cookie: ASP.NET_SessionId=o3dxld2lrcf1oxatyl0fbtek; __RequestVerificationToken=oDD5njLkuyhC1Igzl3Ms6R4yDWF0Y8U0wUwA-zyRzrEtEIOX432yHjulo6tuh8AQAMg3oxMiQ_3I39MhB5XBNuxu5SdNZWNnTUjCADV0AWU1; BO=1D034ABA2503476457354345842DC7C8D8B8B440C90E9775601F37A0E0F0205BFB7C988F4ACB2C3D47837FC9314463F5F8CBE4B4C220A8683D560F7C7010598D54D6AD0E26F183270F6BDE9663F6ABCCCA17182E77D6FA96FD9761F62F2261C5&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/Membership/Index&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36&#xD;&#xA;Upgrade-Insecure-Requests: 1&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="admin" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="admin" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="admin" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="0" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/Membership/Action123" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Membership\Action123" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="23579" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="GET" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/Membership/Action123" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/Membership/Action123" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=o3dxld2lrcf1oxatyl0fbtek; __RequestVerificationToken=oDD5njLkuyhC1Igzl3Ms6R4yDWF0Y8U0wUwA-zyRzrEtEIOX432yHjulo6tuh8AQAMg3oxMiQ_3I39MhB5XBNuxu5SdNZWNnTUjCADV0AWU1; BO=1D034ABA2503476457354345842DC7C8D8B8B440C90E9775601F37A0E0F0205BFB7C988F4ACB2C3D47837FC9314463F5F8CBE4B4C220A8683D560F7C7010598D54D6AD0E26F183270F6BDE9663F6ABCCCA17182E77D6FA96FD9761F62F2261C5" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/Membership/Index" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36" />
+    </item>
+    <item name="HTTP_UPGRADE_INSECURE_REQUESTS">
+      <value string="1" />
+    </item>
+  </serverVariables>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="o3dxld2lrcf1oxatyl0fbtek" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="oDD5njLkuyhC1Igzl3Ms6R4yDWF0Y8U0wUwA-zyRzrEtEIOX432yHjulo6tuh8AQAMg3oxMiQ_3I39MhB5XBNuxu5SdNZWNnTUjCADV0AWU1" />
+    </item>
+    <item name="BO">
+      <value string="1D034ABA2503476457354345842DC7C8D8B8B440C90E9775601F37A0E0F0205BFB7C988F4ACB2C3D47837FC9314463F5F8CBE4B4C220A8683D560F7C7010598D54D6AD0E26F183270F6BDE9663F6ABCCCA17182E77D6FA96FD9761F62F2261C5" />
+    </item>
+  </cookies>
+</error>

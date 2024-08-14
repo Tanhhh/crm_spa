@@ -1,0 +1,141 @@
+﻿@model IEnumerable<SettingDisplayLeadViewModel>
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Helpers
+    @using Erp.BackOffice.Crm.Models;
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = "Cài đặt hiển thị Lead";
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SettingDisplayLead",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = false,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+    }
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    <script src="~/assets/js/jquery.2.1.1.min.js"></script>
+    <link href="~/assets/toastr/toastr.min.css" rel="stylesheet" />
+    <script src="~/assets/toastr/toastr.min.js"></script>
+
+    @helper GridColumnIsHiden(bool? isHiden, int Id)
+    {
+    <input type="checkbox" id="checkbox_@Id" @(isHiden == true ? "checked" : "") onchange="updateIsHiden(@Id, this.checked)" />
+    }
+    @helper GridColumnLeadSectionId(int leadSectionId)
+    {
+        foreach (var item in ViewBag.Data)
+        {
+            if (item.Id == leadSectionId)
+            {
+                @item.Name
+                break;
+            }
+        }
+    }
+    <div id="page_header" class="widget-box  ">
+        <div class="widget-header">
+            <h5 class="widget-title">
+                <i class="ace-icon fa fa-star orange"></i>
+                Cài đặt hiển thị Lead
+            </h5>
+            <div class="widget-toolbar">
+                <a class="btn-search" href="#" data-action="collapse">
+                    <i class="ace-icon fa"></i>
+                </a>
+                <a class="btn-setting"></a>
+            </div>
+
+        </div>
+        <div class="widget-body" style="">
+            <div class="widget-main">
+                <label style="margin-right:8px;font-weight: bold;">Vùng</label>
+                <select data-val="true" data-val-required="Bắt buộc nhập" id="iArea" name="iArea" style="height: 30px;width:300px" onchange="onAreaChange()">
+                    @foreach (var area in ViewBag.Data)
+                    {
+                        <option value="@area.Id" @(ViewBag.DataSe == @area.Id ? "selected" : "")>@area.Name</option>
+                    }
+                </select>
+                <button style="height: 29px;" onclick="onClickAll()">All</button>
+            </div>
+        </div>
+    </div>
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+    <div style="float: left">
+        @Html.Grid(Model).Columns(columns =>
+       {
+           columns.Add(u => u.NameLabel).Titled("Tên trường").SetWidth(420);
+           columns.Add(u => u.IsHiden).Titled("Ẩn").SetWidth(40).Sanitized(false).Encoded(false).RenderValueAs(n => GridColumnIsHiden(n.IsHidenList, n.Id));
+           columns.Add(u => u.LeadSectionId).Titled("Tên vùng").SetWidth(320).Sanitized(false).Encoded(false).RenderValueAs(n => GridColumnLeadSectionId(n.LeadSectionId));
+       }).WithPaging(10)
+    </div>
+
+    <script>
+        function onAreaChange() {
+            var areaId = document.getElementById("iArea").value;
+            if (areaId != 0) {
+                var newUrl = "/SettingDisplayLead/Index?areaId=" + areaId;
+                window.location.href = newUrl;
+            } else {
+                var newUrl = "/SettingDisplayLead/Index";
+                window.location.href = newUrl;
+            }
+        }
+        function onClickAll() {
+            var newUrl = "/SettingDisplayLead/Index";
+            window.location.href = newUrl;
+        }
+        function updateIsHiden(itemId, isChecked) {
+            $.ajax({
+                url: "/SettingDisplayLead/UpIsHidens",
+                type: "POST",
+                contentType: 'application/json',
+                data: JSON.stringify({ id: itemId, isHiden: isChecked }),
+                success: function (rs) {
+                    if (rs.Success) {
+                        toastr.success('Cập nhật thành công!', 'Thông báo', { timeOut: 1500 });
+                    } else {
+                        toastr.warning('Cập nhật thất bại!', 'Thông báo', { timeOut: 1500 });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert("Lỗi: " + error);
+                }
+            });
+        }
+    </script>
+

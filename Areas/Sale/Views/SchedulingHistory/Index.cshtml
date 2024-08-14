@@ -1,0 +1,269 @@
+﻿@model  SchedulingHistoryViewModel
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = Wording.PageIndex_SchedulingHistory;
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SchedulingHistory",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+}
+@section HeadOfPage {
+    <style>
+        .tools {
+            left: auto !important;
+            display: block !important;
+        }
+
+        .itemdiv.dialogdiv > .body > .text {
+            min-height: 40px !important;
+        }
+    </style>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@helper GridColumnStatusUserName(string status, string FullName)
+{
+    switch (status)
+    {
+        case "pending":
+            <span class="label label-info label-sm">@FullName - @Wording.Unconfimred</span>
+            break;
+        case "accept":
+            <span class="label-success label label-sm">@FullName - @Wording.accept</span>
+            break;
+        case "cancel":
+            <span class="label-default label label-sm">@FullName - @Wording.Cancel</span>
+            break;
+        case "refure":
+            <span class="label-danger label label-sm">@FullName - @Wording.StatusSalaryAdvance_Refure</span>
+            break;
+    }
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+<div class="row">
+    <div class="col-sm-7">
+        @Html.Partial("_PartialRoom", Model.RoomList)
+    </div>
+    <div class="col-sm-5">
+        <div class="widget-container-col ui-sortable" id="widget-container-col-10">
+            <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                <div class="widget-header widget-header-small">
+                    <h5 class="widget-title smaller"><i class="fa fa-bars"></i> DS yêu cầu</h5>
+                    <div class="widget-toolbar">
+                        <a href="#" data-action="collapse">
+                            <i class="ace-icon fa fa-chevron-up"></i>
+                        </a>
+                    </div>
+                    <div class="widget-toolbar no-border">
+                        <ul class="nav nav-tabs" id="myTab">
+                            <li id="li_category_1" class="active">
+                                <a data-toggle="tab" href="#tab_List_Task_1"><i class="fa fa-spinner"></i> Chưa xếp lịch <span class="badge badge-danger" style="position:initial!important">@Model.InquiryCardList.Count()</span></a>
+                            </li>
+                            <li id="li_category_2">
+                                <a data-toggle="tab" href="#tab_List_Task_2"><i class="fa fa-tasks"></i> Đã xếp lịch <span class="badge badge-danger" id="total_da_xep_lich" style="position:initial!important">@Model.SchedulingList.Count()</span></a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="widget-body">
+                    <div class="widget-main padding-6">
+                        <div class="tab-content">
+
+                            <div id="tab_List_Task_1" class="tab-pane active clearfix">
+                                @if (Model.InquiryCardList.Any())
+                                {
+                                    <div class="dialogs ace-scroll">
+                                        @foreach (var item in Model.InquiryCardList)
+                                        {
+                                            <div class="itemdiv dialogdiv">
+                                                <div class="user">
+                                                    <div class="ace-thumbnails">
+                                                        <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(item.CustomerImage, "Customer", "user"))" title="@item.CustomerName" data-rel="colorbox" class="cboxElement">
+                                                            <img id="myImg" alt="@item.CustomerName" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(item.CustomerImage, "Customer", "user"))">
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="body">
+                                                    <div class="time">
+                                                        <i class="ace-icon fa fa-clock-o"></i>
+                                                        <span class="green">@item.WorkDay.Value.ToString("HH:mm")</span>
+                                                    </div>
+
+                                                    <div class="name">
+                                                        <b class="red">@item.CustomerCode - @item.CustomerName</b>
+                                                    </div>
+                                                    <div class="name">
+                                                        Mã yêu cầu: <a onclick="OpenPopup('@Url.Action("Detail", "InquiryCard", new { Id = item.Id, IsPopup = true })', '', 0, 0)">@item.Code</a>
+                                                    </div>
+                                                    <div class="name">Dịch vụ: @item.ProductCode - @item.ProductName</div>
+                                                    <div class="action-buttons tools bigger-125">
+                                                        @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "SchedulingHistory", "Sale"))
+                                                        {
+                                                            <a title="Xếp lịch" onclick="OpenPopup('@Url.Action("Create", "SchedulingHistory", new { InquiryCardId = item.Id, IsPopup = true })', '', 0, 0)">
+                                                                <i class="icon-only ace-icon fa fa-calendar-plus-o blue"></i>
+                                                            </a>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-block alert-info">
+                                        Không có dữ liệu
+                                    </div>
+                                }
+                            </div>
+                            <div id="tab_List_Task_2" class="tab-pane clearfix">
+                                @if (Model.SchedulingList.Any())
+                                {
+
+                                    <div class="dialogs ace-scroll">
+                                        @foreach (var item in Model.SchedulingList)
+                                        {
+                                            <div class="itemdiv dialogdiv" id="scheduling_@item.Id">
+                                                <div class="user">
+                                                    <div class="ace-thumbnails">
+                                                        <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(item.CustomerImage,"Customer","user"))" title="@item.CustomerName" data-rel="colorbox" class="cboxElement">
+                                                            <img id="myImg" alt="@item.CustomerName" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(item.CustomerImage, "Customer", "user"))">
+                                                        </a>
+                                                    </div>
+                                                </div>
+
+                                                <div class="body">
+                                                    <div class="time">
+                                                        <i class="ace-icon fa fa-clock-o"></i>
+                                                        <span class="green">@item.ExpectedWorkDay.Value.ToString("HH:mm") - @item.ExpectedEndDate.Value.ToString("HH:mm")</span>
+                                                    </div>
+
+                                                    <div class="name">
+                                                        <b class="red">@item.CustomerCode - @item.CustomerName</b>
+                                                    </div>
+                                                    <div class="name">
+                                                        Mã xếp lịch: <a onclick="OpenPopup('@Url.Action("Detail", "SchedulingHistory", new { Id = item.Id, IsPopup = true })', '', 0, 0)">@item.Code</a> - Mã yêu cầu: <a onclick="OpenPopup('@Url.Action("Detail", "InquiryCard", new { Id = item.InquiryCardId, IsPopup = true })', '', 0, 0)">@item.InquiryCardCode</a>
+                                                    </div>
+                                                    <div class="name">Dịch vụ: @item.ProductCode - @item.ProductName</div>
+                                                    <div class="name">
+                                                        Nhân viên thực hiện:
+                                                        @if (item.StaffMadeList.Any())
+                                                        {
+                                                            foreach (var ii in item.StaffMadeList)
+                                                            {
+                                                                <div class="name">
+                                                                    @GridColumnStatusUserName(ii.Status, ii.FullName)
+                                                                </div>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <span>chưa có</span>
+                                                        }
+                                                    </div>
+                                                    <div class="action-buttons tools bigger-125">
+                                                        @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "SchedulingHistory", "Sale"))
+                                                        {
+                                                            <a title="Bắt đầu tính giờ" onclick="changeStatus(@item.Id,'inprogress','')">
+                                                                <i class="icon-only ace-icon fa fa-calendar-check-o"></i>
+                                                            </a>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-block alert-info">
+                                        Không có dữ liệu
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p></p>
+        @Html.Partial("_PartialServiceSchedule", Model.ServiceScheduleList)
+        <p></p>
+        @Html.Partial("_PartialUser")
+    </div>
+</div>
+@section Scripts {
+    @*<script src="@Url.Content("~/assets/js/jquery.countdown.min.js")" type="text/javascript"></script>*@
+    <script src="@Url.Content("~/Scripts/area_sale/SchedulingHistory.js?vs=1.00")"></script>
+    <script src="@Url.Content("~/assets/js/jquery.countdown.js")" type="text/javascript"></script>
+    <script type="text/javascript">
+        $('.dialogs,.comments').ace_scroll({
+            size: 300
+        });
+
+                //function changeStatus(id, status) {
+                //    ShowLoading();
+                //    $.ajax({
+                //        url: '/SchedulingHistory/ChangeStatus',
+                //        data: { id: id, status: status },
+                //        success: function (rs) {
+                //            if (rs.message == 'ok') {
+                //                examHub.server.changeExamStatus(status);
+                //                location.reload();
+                //            }
+                //            else
+                //                HideLoading();
+
+                //            console.log(rs.message);
+                //        }
+                //    });
+                //}
+
+    </script>
+}

@@ -1,0 +1,706 @@
+﻿@{
+    ViewBag.Title = "Các hoạt động của tôi";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "ActivitiesLead",
+        ActionName = "ActivitiesLeadIndex",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    var user = ViewBag.user as Erp.Domain.Repositories.UserRepository;
+}
+<style>
+    .body-content {
+        height: 85vh !important;
+    }
+
+    .loading {
+        cursor: progress;
+    }
+
+
+
+    .modal-body input, .select2-container {
+        margin-bottom: 10px !important;
+    }
+
+    .table-hover > tbody > tr:hover, .table > tbody > tr.active > td, .table > tbody > tr.active > th, .table > tbody > tr > td.active, .table > tbody > tr > th.active, .table > tfoot > tr.active > td, .table > tfoot > tr.active > th, .table > tfoot > tr > td.active, .table > tfoot > tr > th.active, .table > thead > tr.active > td, .table > thead > tr.active > th, .table > thead > tr > td.active, .table > thead > tr > th.active {
+        background-color: #eaf4fd !important;
+    }
+
+
+    .btn-default2, #btnCloseAdd, #QuickEditLeadDisable, #btnLeadDelete {
+        border: 2px solid #b7bbd2;
+        background-color: #b7bbd2 !important;
+        color: #fff !important;
+        font-weight: bold;
+        border-radius: 3px;
+    }
+
+        .btn-default2:hover, #btnCloseAdd:hover, #QuickEditLeadDisable:hover, #btnLeadDelete:hover {
+            opacity: 0.8;
+        }
+
+    .btn-primary2, #saveLeadModal, #QuickEditLead, #QuickEditLeadEnable {
+        border: 2px solid #3F51B5;
+        background-color: #3f51b5 !important;
+        color: #ffffff !important;
+        font-weight: bold;
+        border-radius: 3px;
+        padding: 5px 20px !important;
+    }
+
+        .btn-primary2:hover, #saveLeadModal:hover, #QuickEditLead:hover, #QuickEditLeadEnable:hover, #btnLeadOpenPpAssign:hover, #btnLeadexitoption:hover {
+            opacity: 0.8;
+        }
+
+    .modal-body section {
+        border: unset !important;
+    }
+
+    section h4 {
+        margin-bottom: -10px !important;
+        font-weight: bold;
+    }
+
+
+    .modal-header, #StatusHeader, #select2parent, #TabLeadHeader {
+        background: #7ea3c321
+    }
+
+    .modal-body section {
+        margin-bottom: 20px;
+        background: #fff;
+        padding: 15px 30px !important;
+    }
+
+    #myDiv .btn-header-cmt:hover {
+        background-color: #60c9f8 !important;
+        color: #fff !important;
+    }
+
+    #submyDiv {
+        height: 5px;
+        background-color: #f1f1f1 !important;
+        position: absolute;
+        z-index: 1;
+        margin-left: 10px;
+        margin-top: -10px;
+    }
+
+    .btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus {
+        outline: unset !important;
+    }
+
+    #myDiv {
+        background: #fff;
+        padding: 10px 10px 0 0;
+    }
+
+        #myDiv .active {
+            border-bottom: 4px solid blue !important;
+            background-color: #fff !important;
+            color: blue !important;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+    .btn-header-cmt {
+        border-top: unset;
+        border-left: unset;
+        border-right: unset;
+        margin: 0 !important;
+        background-color: #fff !important;
+        border-color: #fff !important;
+        color: #000 !important;
+        width: 10%;
+    }
+
+    .bg-info {
+        background-color: #03a9f4a1;
+    }
+
+
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+        border-right: unset;
+    }
+
+
+    #searchActInputForm span {
+        height: 86% !important;
+        background: #12e4ff;
+        display: inline-table;
+        border-radius: 3px;
+        margin: 0 2px;
+        padding-left: 5px;
+    }
+
+    #searchActInputForm button {
+        height: 100%
+    }
+
+    #searchActInputForm {
+        display: flex;
+        align-items: center;
+    }
+
+    #SearchActLeadForm {
+        box-shadow: 0px 0px 15px #000;
+    }
+
+    .width-34 {
+        width: 34%;
+    }
+
+    section label {
+        color: #3F51B5;
+    }
+
+    .custom-class {
+        color: #3f4d9d;
+        vertical-align: middle;
+    }
+
+    .modal-open .modal {
+        overflow-y: unset;
+    }
+
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .content {
+        width: 80%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    #searchActPanelContent {
+        display: flex;
+        height: 540px;
+        overflow: hidden;
+        padding-right: 0px;
+        padding-left: 0px;
+    }
+
+
+    .select2-container .select2-selection--multiple .select2-selection__rendered {
+        display: block !important;
+    }
+
+    @@media (max-width : 1480px) {
+        #modal-search {
+            left: 75px !important;
+            width: 50% !important;
+        }
+
+        .content {
+            width: 90%;
+        }
+    }
+
+    @@media (max-width : 1440px) {
+        #modal-search {
+            left: 18px !important;
+            width: 44% !important;
+        }
+    }
+
+
+    @@media (max-width : 1440px) {
+        #modal-search {
+            left: 120px !important;
+            width: 44% !important;
+        }
+
+        .content {
+            width: 65%;
+        }
+
+        .width-34 {
+            width: 80%;
+            margin-bottom: 10px;
+        }
+    }
+
+    #searchActPanelContent input {
+        border: 1px solid;
+        margin-right: 10px;
+    }
+
+    .modal-backdrop.in {
+        display: none;
+    }
+
+    .table > thead:first-child > tr:first-child > th {
+        background: #fff;
+        color: #152cad !important;
+    }
+
+    .btn-success, .btn-success.focus, .btn-success:focus {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+        border-color: #fff !important;
+        border: 0px solid !important;
+    }
+
+    .btn-search {
+        display: inline-block;
+        float: left;
+        width: 33px;
+        height: 24px;
+        cursor: pointer;
+        background: url('/assets/img/btn_title_right.gif') no-repeat;
+        margin: 0px;
+        margin-left: -33px;
+    }
+
+    .btn-search {
+        background-position: -1px -24px;
+    }
+
+    .btn-search:hover {
+        background-position: -35px -24px;
+    }
+
+    #btnSearchLead, #btnCloseSearch {
+        margin: 0;
+        border-radius: 3px;
+        padding: 3px 20px;
+    }
+
+    #searchActPanelContent span {
+        background-color: unset;
+        /* width:200px;*/
+    }
+
+    .select2-results__option[aria-selected] {
+        background: #fff;
+    }
+
+    /*thanh*/
+    .nav-item {
+        align-self: center !important;
+    }
+
+        .nav-item .active {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+    .nav-link {
+        padding: 5px 15px !important;
+        color: white !important;
+    }
+
+        .nav-item:hover,
+        .nav-link:hover {
+            background-color: #629B58 !important;
+            border-radius: 4px;
+        }
+
+    html {
+        scrollbar-width: none;
+    }
+
+    /*SEARCH*/        h4 {
+            color: #333 !important;
+            text-transform: uppercase;
+            padding-bottom: 1.5rem !important;
+        }
+
+        section h4 {
+            margin-bottom: -14px !important;
+            font-weight: bold;
+            color: #337ab7 !important;
+        }
+
+        br {
+            display: none;
+        }
+
+        label {
+            color: #333 !important;
+        }
+
+        input {
+            border-radius: 3px !important;
+        }
+
+        .checked {
+            display: inline !important;
+        }
+
+        input.select2-search__field {
+            border: none !important;
+        }
+
+
+        li.select2-results__option.select2-results__message {
+            background: #fff;
+        }
+
+        br {
+            display: none;
+        }
+
+    input#UserIdZalo,
+    input#CountForBrand {
+        display: none;
+    }
+
+        input#IsCancel {
+            border: 1px solid;
+            margin: 5px 5px 6px 8px !important;
+            width: 15px;
+            height: 14px;
+        }
+
+
+@* ----------- *@
+        .date-range-container {
+            display: flex;
+            align-items: center;
+        }
+
+        input.width-34 {
+            width: 16rem;
+            height: 3rem;
+            border-radius: 3px !important;
+        }
+
+        label.custom-class.width-100 {
+            font-weight: bolder;
+            font-size: 13px;
+        }
+
+        .content {
+            background: #eef3f7;
+            width: 100% !important;
+            padding: 15px;
+        }
+
+        #searchPanelContent {
+            height: 525px !important;
+        }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<nav class="navbar navbar-default">
+    <div style="display: flex !important; align-items: center;" class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div style="margin: 0 20px;" class="navbar-header">
+            <a class="navbar-brand" href="#" style="text-transform: capitalize; font-size: 21px">Hoạt động của tôi</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div style="display: flex !important; align-items: center;width:70% " class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <form style="width: 100%; text-align: left; display: flex; align-items: center;" class="navbar-form text-center">
+                <div style="width: 100%; text-align: left; display: flex; align-items: center; " class="form-group">
+                    <input style="width:80%;border-radius:3px !important; padding-left:20px;" type="text" id="searchActInput" class="form-control" placeholder="Tìm kiếm theo tên Lead">
+                    <label class="btn-search" for="searchInput" id="idbtnSearch">
+                        <i class="ace-icon fa"></i>
+                    </label>
+                    <div style=" position: absolute; top: 18%; width: 55%; height: 64%; overflow: hidden;">
+                        <div id="searchActInputForm" style="width: 2000px; height:100%;">
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+            <button style="display: none; border-radius: 10px !important" type="button" id="searchPanel" onclick="searchPanel()" class="btn btn-success" data-toggle="modal" data-target=".bs-searchPanel-modal-sm"></button>
+
+        </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+</nav>
+<div id="ActivitiesLeadTbl" style="min-height: 85vh;">
+
+</div>
+<div style="z-index: 1030; height: 110%; padding-left: 0px;" id="addNewContent" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+
+</div>
+<!-- Modal content -->
+<div style="top: 83px; z-index: 99999 !important; display: 0;" class="modal fade bs-searchPanel-modal-sm" id="Modelid" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div id="modal-search" class="modal-dialog modal-sm" style="left: 50px; right: 0%; position: absolute; width: 50%; top: -31px; " role="document">
+        <div class="modal-content">
+            <!-- Modal header -->
+            <div style="display:none" class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Tìm kiếm</h4>
+            </div>
+            <form id="SearchActLeadForm" action="/ActivitiesLead/SearchActivitiesLead" method="post">
+                <div id="searchActPanelContent" class="modal-body">
+                    <div class="content">
+                        <section style="margin-left: 10px; padding: 5px; border-radius: 3px; margin-bottom: 20px; " id="section1">
+                            @Html.Label("Người chịu trách nhiệm", new { style = "margin-right:10px" })
+                            <select class="js-example-basic-multiple" multiple="multiple" name='UsrValueArr'>
+                                @foreach (var item in user.GetAllUsers())
+                                {
+                                    <option value="@item.Id">@item.FullName</option>
+                                }
+                            </select>
+                            <br>
+                            <div >
+
+                                @Html.Label("Quá deadline", new { style = "margin-right:10px" })
+                                <input type="text" hidden name="HDValueArr" />
+                                <input type="checkbox" onchange="this.previousElementSibling.value= this.checked == true ? 1:0" name="HDValueArr" />
+                                </div><br>
+                                @Html.Label("Nguồn", new { style = "margin-right:10px" })
+                                <select class="js-example-basic-multiple" multiple="multiple" name='TypeValueArr'>
+                                    <option value="1">Lead</option>
+                                    <option value="0">Contact</option>
+                                </select>
+                                <br>
+                                @Html.Label("Tên hoạt động", new { style = "margin-right:10px" })
+                                <select class="js-example-basic-multiple" multiple="multiple" name='ActionValueArr'>
+                                    <option value="MEETING">MEETING</option>
+                                    <option value="CALL">CALL</option>
+                                    <option value="TASK">TASK</option>
+                                </select>
+                                <br>
+
+                                @Html.Label("Tên Lead", new { style = "margin-right:10px" })
+                                <input class="width-100" type='text' value='' name='LeadNameKey' placeholder="Nhập nội dung...">
+                                <br>
+                                @Html.Label("Trạng thái", new { style = "margin-right:10px" })
+                                <select class="js-example-basic-multiple" multiple="multiple" name='StatusValueArr'>
+                                    <option value="1">Hoàn thành</option>
+                                    <option value="0">Chưa hoàn thành</option>
+                                </select>
+                                <br />
+                                @Html.Label("Khởi tạo lúc")
+                                <div style="display: flex; width: 100%; margin-left: 15px">
+                                    @Html.Label("Bắt đầu", new { style = "margin-right:10px", @class = "block" })
+                                    @Html.TextBox("CreatedDate_Start", null, new { @class = "width-34", type = "date" })
+                                    @Html.Label("Đến ngày", new { style = "margin-right:10px", @class = "block" })
+                                    @Html.TextBox("CreatedDate_End", null, new { @class = "width-34", type = "date" })
+                                </div>
+                                <br>
+                                @Html.Label("Kết thúc")
+                                <div style="display: flex; width:100% ;margin-left:15px">
+                                    @Html.Label("Bắt đầu", new { style = "margin-right:10px", @class = "block" })
+                                    @Html.TextBox("CombinedDateTime_Start", null, new { @class = "width-34", type = "date" })
+                                    @Html.Label("Đến ngày", new { style = "margin-right:10px", @class = "block" })
+                                    @Html.TextBox("CombinedDateTime_End", null, new { @class = "width-34", type = "date" })
+                                </div>
+                                <br>
+
+                                @Html.Label("Mô tả", new { style = "margin-right:10px" })
+                                <input class="width-100" type='text' value='' name='ContentKey' placeholder="Nhập nội dung...">
+                            </section>
+</div>
+                </div>
+                <div style="position: sticky; bottom: 20px;" class="modal-footer">
+
+                    <button id="btnCloseSearch" type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                    <button id="btnSearchLead" type="button" class="btn btn-primary">Tìm kiếm</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+
+    $("#searchActInput").on('focus', function () {
+        var x = document.getElementById("Modelid");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+        if ($('#searchActPanelContent').html() != '') {
+            $('.bs-searchPanel-modal-sm').modal()
+        } else {
+            $("#searchPanel").trigger("click")
+        }
+    }); $("#searchActInputForm").on('click', function (e) {
+        if (e.target !== this)
+            return;
+        $("#searchActInput").trigger("focus")
+    });
+    $(document).ready(function () {
+        let cookiepg = getCookieLeadIndex('pageSizeAt');
+        SearchActivitiesLeadFunc(1, cookiepg);
+
+        $('.js-example-basic-multiple').select2({ dropdownParent: $("#searchActPanelContent") });
+        $('#SearchActLeadForm').on('change', 'input,select', function () {
+            debugger
+            if (![null, ''].includes($(this).val()) && $(this).prev().val() != '0' && $('#searchActInputForm').find(`button[name="del_${$(this).attr('name')}"]`).length <= 0) {
+                $('#searchActInputForm').append(`<span >${($(this).prev().text() == '' ? $(this).prev().prev().text() : $(this).prev().text() == 'Không hủy' ? $(this).prev().prev().prev().prev().text() : $(this).prev().text())}<button type='button' style='border:none;outline:none' name='del_${$(this).attr('name')}' onclick="DeleteFilter('${$(this).attr('name')}',this)">x</button></span>`)
+            }
+            else if ([null, ''].includes($(this).val()) || $(this).prev().val() == '0') {
+                $($(`button[name="del_${$(this).attr('name')}"]`).previousSibling).remove()
+                $($(`button[name="del_${$(this).attr('name')}"]`).parent()).remove()
+                $(`button[name="del_${$(this).attr('name')}"]`).remove()
+
+            }
+        });
+    })
+    function DeleteFilter(name, elem) {
+        var ele = $('#searchActPanelContent').find(`select[name="${name}"],input[name="${name}"]`)
+        $.each(ele, function () {
+            $(this).val('')
+            $(this).change()
+        })
+        $(elem.previousSibling).remove()
+        $($(elem).parent()).remove()
+        $(elem).remove()
+        $('#btnSearchLead').trigger('click')
+    }
+    function DeleteFilter(name, elem) {
+        debugger
+        var ele = $('#searchActPanelContent').find(`select[name="${name}"],input[name="${name}"]`)
+
+        $.each(ele, function () {
+            if (!$(this).is('[type=radio]')) {
+                $(this).val('')
+                $(this).change()
+            }
+
+        })
+        $(`input[name="${name}"][type=radio][value='']`).prop('checked', true)
+        $(elem.previousSibling).remove()
+        $($(elem).parent()).remove()
+        $(elem).remove()
+        $('#btnSearchLead').trigger('click')
+    }
+    function triggerbtnCloseSearch() {
+        document.getElementById("btnCloseSearch").click();
+    }
+    $('#btnSearchLead').click(function () {
+        triggerbtnCloseSearch();
+        let cookie = getCookieLeadIndex('pageSizeAt')
+        SearchActivitiesLeadFunc(1, cookie)
+        triggerbtnCloseSearch();
+    })
+    $('#btnCloseSearch').click(function () {
+        //alert("okokokok");
+        var x = document.getElementById("Modelid");
+        if (x.style.display === "none") {
+            //x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    })
+    function getdataViewSearch() {
+        debugger;
+        var actionValueArr = [];
+        $("#section1 select[name='ActionValueArr'] option:selected").each(function () {
+            actionValueArr.push($(this).val());
+        });
+        var UsrValueArr = [];
+        $("#section1 select[name='UsrValueArr'] option:selected").each(function () {
+            UsrValueArr.push($(this).val());
+        });
+        var HDValueArr = $("#section1 input[name='HDValueArr'][type=text]").val();
+        var leadNameKey = $("#section1 input[name='LeadNameKey']").val();
+        var statusValueArr = [];
+        $("#section1 select[name='StatusValueArr'] option:selected").each(function () {
+            statusValueArr.push($(this).val());
+        });
+        var typeValueArr = [];
+        $("#section1 select[name='TypeValueArr'] option:selected").each(function () {
+            typeValueArr.push($(this).val());
+        });
+        var createdDateStart = $("input[name='CreatedDate_Start']").val();
+        var createdDateEnd = $("input[name='CreatedDate_End']").val();
+        var combinedDateTimeStart = $("input[name='CombinedDateTime_Start']").val();
+        var combinedDateTimeEnd = $("input[name='CombinedDateTime_End']").val();
+        var contentKey = $("#section1 input[name='ContentKey']").val();
+        var data = {
+            actionValueArr: actionValueArr,
+            leadNameKey: leadNameKey,
+            statusValueArr: statusValueArr,
+            createdDateStart: createdDateStart,
+            createdDateEnd: createdDateEnd,
+            combinedDateTimeStart: combinedDateTimeStart,
+            combinedDateTimeEnd: combinedDateTimeEnd,
+            contentKey: contentKey,
+            typeValueArr: typeValueArr,
+            HDValueArr: HDValueArr,
+            UsrValueArr:UsrValueArr
+        };
+        return data;
+    }
+    function SearchActivitiesLeadFunc(pageNumber, pageSize, columnsort, sortdir) {
+        debugger;
+        ShowLoading();
+        var formData = new FormData();
+        var datas = getdataViewSearch();
+        var hasValues = Object.keys(datas).some(function (key) {
+            var value = datas[key];
+            if (Array.isArray(value)) {
+                return value.length > 0;
+            } else {
+                return value !== '';
+            }
+        });
+        formData.append('datars', JSON.stringify(datas));
+        formData.append('isSearch', hasValues);
+        formData.append('pageNumber', pageNumber);
+        formData.append('pageSize', pageSize);
+        formData.append('columnsort', columnsort);
+        formData.append('sortdir', sortdir);
+        $.ajax({
+            type: "POST",
+            url: $('#SearchActLeadForm')[0].action,
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "html",
+            success: function (data, textStatus, jqXHR) {
+                $('#ActivitiesLeadTbl').html(data)
+                $("#btnCloseSearch").trigger("click")
+            },
+            error: function (data, textStatus, jqXHR) {
+                toastr.warning('Xảy ra lỗi!')
+            },
+            complete: function () {
+                HideLoading();
+            }
+        })
+    }
+    function getCookieLeadIndex(name) {
+        /*debugger*/
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        else {
+            return 15;
+        }
+    }
+    function DetailLead(Id, ldcusview) {
+        $('body').addClass('loading')
+        $.ajax({
+            url: "/AdviseCard/DetailLeadModal?Id=" + Id + "&isPartial=" + ldcusview,
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                $("#addNewContent").html(data)
+                $('#IdLead').val(Id)
+                $('.bs-example-modal-sm').modal()
+            },
+            complete: function () {
+                $('body').removeClass('loading')
+
+            }
+        })
+    }
+</script>
+

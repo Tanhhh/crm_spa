@@ -1,0 +1,756 @@
+﻿
+
+@using PagedList;
+@using PagedList.Mvc;
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@model Erp.BackOffice.Crm.Models.LeadMeetingViewModel
+
+@*@{
+        ViewBag.Title = "Tạo cuộc họp";
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "LeadMeeting",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+
+    }
+
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>*@
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" />
+@*<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>*@
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+@*<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>*@
+
+
+<style>
+    .modal-body {
+        padding: 0;
+    }
+
+    #meetingModal > div {
+        position: relative !important;
+        top: calc(50% - 286px) !important;
+    }
+    /* Thêm CSS dưới đây */
+    /* Reset CSS */
+    /* Apply margin to the whole form */
+    /* Style for form-row */
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 1rem; /* Adjust as needed */
+    }
+
+    /* Style for form-group */
+
+
+    /* Style for col-form-label */
+    .col-form-label {
+        padding-top: 0.5rem; /* Adjust as needed */
+        margin-bottom: 0;
+        font-size: 12px;
+        font-weight: bolder;
+    }
+
+
+    /* Style for form-control */
+    .form-control {
+        width: calc(100%);
+        padding: 0 10px 0 10px !important;
+        font-size: 13px !important;
+    }
+
+    /* Adjust width for specific form elements if needed */
+    .form-group.col-4.col-sm-2 .form-control[type="date"],
+    .form-group.col-4.col-sm-2 .form-control[type="time"] {
+        width: 100%;
+    }
+
+    .input-with-unit {
+        display: flex;
+    }
+
+    .unit-label {
+        margin-left: 10px; /* Cách lề giữa input và chữ "phút" */
+        align-self: center; /* Hiển thị chữ "phút" theo chiều dọc giữa ô input */
+    }
+
+    .col-4 {
+        margin-right: 10px;
+    }
+    /* Additional styling if needed */
+    .timeAction {
+        width: 75px !important;
+        margin-left: 0px;
+    }
+
+    .timeExcute {
+        width: 70px !important;
+    }
+
+    .timeExcuteAll {
+        margin-left: 25px;
+    }
+
+    .input-group {
+        display: flex;
+    }
+
+        .input-group .minute {
+            margin-left: 5px;
+            text-align: center;
+        }
+
+    #PhutInput {
+        width: 40px;
+        border: none;
+    }
+
+    textarea.form-control {
+        padding: 10px !important;
+    }
+
+    .timeStart[readonly] {
+        color: #939192;
+        background: white !important;
+        cursor: default;
+    }
+
+
+    .headFlex-child {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .form-checkbox-confirm {
+        align-items: center;
+        display: flex;
+        gap: 1rem;
+    }
+
+        .form-checkbox-confirm label {
+            margin-bottom: 0px !important;
+        }
+
+        .form-checkbox-confirm label {
+            margin-bottom: 0px !important;
+        }
+
+    #Numberofminutes_Warning {
+        background: transparent; /* Đặt nền là trong suốt */
+        border: none; /* Loại bỏ đường viền */
+        border-bottom: 1px solid #000; /* Thêm gạch dưới với màu đen */
+        padding: 0; /* Loại bỏ padding để nút trở nên nhỏ gọn */
+        width: 35px;
+        outline: none; /* Loại bỏ viền xung quanh khi được focus */
+    }
+
+    .select2-container .select2-selection--single {
+        height: 44px !important;
+        padding: 6px 12px;
+    }
+
+        .select2-container .select2-selection--single .select2-selection__arrow {
+            height: auto;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        display: flex;
+        align-items: center;
+    }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered img.round-icon {
+            width: 32px; /* Điều chỉnh kích thước của hình ảnh */
+            height: 32px;
+            border-radius: 50%; /* Làm cho hình ảnh trở thành hình vuông */
+            margin-right: 8px; /* Khoảng cách giữa hình ảnh và văn bản */
+        }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 26px !important;
+        position: absolute !important;
+        top: 20px !important;
+        right: 1px !important;
+        width: 20px !important;
+    }
+
+    .select2-container {
+        display: block !important;
+        width: auto !important;
+    }
+
+    .tabs {
+        display: flex;
+    }
+
+    .tab-link {
+        cursor: pointer;
+        padding: 10px;
+        margin-right: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .active-tab-change-day {
+        background-color: #356fa2 !important;
+        color: #fff !important;
+        border-color: #428bca !important;
+    }
+
+        .nav-tabs .nav-item .nav-link {
+            color: #333 !important;
+        }
+
+    .alert_message {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 10px;
+    }
+
+
+    /* Styles for error messages */
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 10px;
+    }
+
+    .leadmeetingimage {
+        height: 70px;
+    }
+
+    .form-group {
+        margin-bottom: 0px;
+    }
+
+    .flatpickr-calendar {
+        width: 100px !important;
+    }
+
+    .tab-content img {
+        width: 30px !important;
+        height: 30px !important;
+    }
+
+
+
+/*    .modal-body .form-check-input-confirm {
+        width: 5% !important;
+        vertical-align: top;
+        margin-left: 0px !important;
+    }
+*/
+/*    img.leadMeetingImage {
+        width: 60px !important;
+        height: 60px !important;
+    }*/
+
+
+
+
+    .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        gap: 1rem;
+    }
+
+    label.col-form-label.mt-2 {
+        margin-bottom: .5rem !important;
+    }
+
+    .nav-tabs {
+        margin-bottom: 25px !important;
+    }
+    
+</style>
+@{
+    var leadLogId = ViewBag.LeadLogId != null ? ViewBag.LeadLogId : 1;
+    var jobId = ViewBag.JobId != null ? ViewBag.JobId : 1;
+    var isEdits = ViewBag.IsEdit != null ? ViewBag.IsEdit : false;
+}
+@Html.AntiForgeryToken()
+
+<div class="mt-4" id="LeadMeetingContent">
+    
+    <div class="headFlex">
+        <div class="headFlex-child">
+            <img class="leadMeetingImage" style="width: 50px !important; height: 50px !important;" src="~/assets/img/call.png" />
+            <h1 class="tille">Cuộc gọi đi @(ViewBag.NameLead!=null?"với":"") @ViewBag.NameLead</h1>
+            <div class="form-checkbox-confirm">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 24rem">
+
+                    <span style="display: flex; align-items: center">
+                        @Html.CheckBoxFor(model => model.Status, new { @class = "form-check-input-confirm", id = "statusCheckboxStatus", style = "width: 11px !important;margin: 0 5px 0 0;" })
+                        @Html.LabelFor(model => model.Status, "Hoàn thành", new { @class = "form-check-label", @for = "statusCheckboxStatus", style = "margin-right: 13px;margin: 0;" })
+                    </span>
+
+                        <span style="display: flex; align-items: center">
+                            <input type="checkbox" class="form-check-input-confirm" id="statusCheckboxImportant" name="Important" style="width: 11px !important; margin: 0 5px 0 0;">
+                            <label class="form-check-label" for="statusCheckboxImportant" style=" margin: 0;">Quan trọng</label>
+                        </span>
+
+                        <span>
+                            <img src="https://img.icons8.com/?size=256&id=116892&format=png" style="width: 25px; height: 25px" />
+                        </span>
+                </div>
+
+            </div>
+
+        <div class="form-check" style="text-align: right; margin-bottom: -8rem; margin-left: -2rem;">
+            <span>Nhắc trong</span>
+            @Html.TextBoxFor(model => model.Numberofminutes_Warning, new
+            {
+                @class = "form-check-input",
+                @type = "number",
+                @id = "Numberofminutes_Warning",
+                @step = "any",
+                @min = 0,
+            })
+            <span>phút</span>
+        </div>
+
+    </div>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active-tab-change-day" data-tab="today" href="#" onclick="updateStartDate('today', this)">Hôm nay</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-tab="tomorrow" href="#" onclick="updateStartDate('tomorrow', this)">Ngày mai</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-tab="in2days" href="#" onclick="updateStartDate('in2days', this)">Trong 2 ngày</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-tab="in3days" href="#" onclick="updateStartDate('in3days', this)">Trong 3 ngày</a>
+        </li>
+    </ul>
+
+    <div class="form-row">
+        <!-- Nội dung form -->
+        <div class="form-group col-4 " style=" border-bottom: none !important; border-left: none !important; border-right: none !important; padding: 0px; border-top: none !important; ">
+            @Html.LabelFor(model => model.DateAction, "Ngày giờ sự kiện ", new { @class = "col-form-label mt-2" })
+            @*@Html.TextBoxFor(model => model.DateAction, new { @class = "form-control DateAction", type = "date", @required = "required" })*@
+            @Html.TextBoxFor(model => model.DateAction, "{0:dd-MM-yyyy}", new { @class = "form-control DateAction", @id = "idDateAction", type = "date", @required = "required" })
+
+        </div>
+
+        <div class="form-group col-4" style=" border-bottom: none !important; border-left: none !important; border-right: none !important; padding: 0px; border-top: none !important; ">
+            @Html.LabelFor(model => model.TimeAction, "Giờ bắt đầu ", new { @class = "col-form-label mt-2" })
+            @Html.TextBoxFor(model => model.TimeAction, new { @class = "form-control timeAction timeStart", @id = "timePicker", @name = "timePicker" })
+        </div>
+
+        <div class="form-group col-4 timeExcuteAll" style=" border-bottom: none !important; border-left: none !important; border-right: none !important; padding: 0px; border-top: none !important; ">
+            @Html.LabelFor(model => model.TimeExcute, "Thời lượng", new { @class = "col-form-label mt-2" })
+            <div class="input-group">
+                @Html.TextBoxFor(model => model.TimeExcute, new { @class = "form-control timeExcute", @id = "idTimeExcute", type = "number", @min = 0, @required = "required" })
+                <div class="input-group minute">
+                    @Html.TextBox("PhutInput", "Phút", new { @class = "", @readonly = "readonly" })
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-4" style=" border-bottom: none !important; border-left: none !important; border-right: none !important; padding: 0px; border-top: none !important; ">
+            @Html.Label("Ngày giờ sự kiện ", new { @class = "col-form-label mt-2" })
+            <input type="date" id="DateActionEnd" name="DateActionEnd" class="form-control dateEnd" readonly>
+        </div>
+
+        <div class="form-group col-4" style=" border-bottom: none !important; border-left: none !important; border-right: none !important; padding: 0px; border-top: none !important; ">
+            @Html.Label("Giờ kết thúc", new { @class = "col-form-label mt-2" })
+            <input type="text" id="TimeActionEnd" name="TimeActionEnd" class="form-control timeAction timeEnd" placeholder="00:00" readonly>
+        </div>
+    </div>
+
+
+    <div class="form-group" style=" border-bottom: none !important; border-left: none !important; border-right: none !important; padding: 0px; border-top: none !important; ">
+        <!-- Nội dung form tiếp theo -->
+        @Html.LabelFor(model => model.Title, "Chủ đề", new { @class = "col-form-label mt-2" })
+        @Html.TextBoxFor(model => model.Title, new { @class = "form-control Title", @id = "idTitle", @required = "required" })
+    </div>
+
+
+
+    <div class="form-group" style=" border-bottom: none !important; border-left: none !important; border-right: none !important; padding: 0px; border-top: none !important; ">
+        <!-- Nội dung form tiếp theo -->
+        @Html.LabelFor(model => model.Note, "Mô tả", new { @class = "col-form-label mt-2" })
+        @Html.TextAreaFor(model => model.Note, new { @class = "form-control Note", @id = "idNote", rows = "4", @required = "required" })
+    </div>
+
+    <div class="form-group" style=" border-bottom: none !important; border-left: none !important; border-right: none !important; padding: 0px; border-top: none !important; ">
+        @Html.LabelFor(model => model.UserId, "Người chịu trách nhiệm", new { @class = "col-form-label mt-2" })
+        <select id="UserId" name="UserId" class="form-control select2_image_user" required>
+            <option value="">Chọn người dùng</option>
+            @foreach (var user in ViewBag.UsersList)
+            {
+                <option value="@user.Id" data-profile-image="@user.ProfileImage">
+                    @user.UserName
+                </option>
+            }
+        </select>
+    </div>
+
+    <input type="button" class="btn btn-primary mt-2" id="saveButton" value="Tạo cuộc gọi đi" onclick="validateForm()" style="margin-top: 1rem; max-width: 100%; width: 100%; height: 39px !important;" />
+    <input type="hidden" id="leadId" value="@ViewBag.LeadId" />
+    <input type="hidden" id="valueOfNumberofminutes_Warning" value="@ViewBag.Numberofminutes_Warning" />
+    <input type="hidden" id="currentUserId" value="@ViewBag.CurrentUserId" />
+    <input type="hidden" id="nameLead" value="@ViewBag.NameLead" />
+    <div class="alert-meeting"></div>
+</div>
+
+    <script id="additionalScript">
+
+    $(document).ready(function () {
+        setCurrentTime();
+
+        flatpickr("#timePicker", {
+            enableTime: true,
+            noCalendar: true,
+            dateFormat: "H:i",
+            time_24hr: true,
+            minuteIncrement: 1,
+
+        });
+    })
+
+
+    // hàm tính ngày giờ kết thúc
+    function calculateEndTime() {
+        var startDate = new Date(document.querySelector('.DateAction').value + 'T' + document.querySelector('.timeAction').value);
+        var duration = parseInt(document.querySelector('.timeExcute').value);
+        console.log(duration);
+        startDate.setMinutes(startDate.getMinutes() + duration);
+
+        var endDate = new Date(startDate);
+        var year = endDate.getFullYear();
+        var month = (endDate.getMonth() + 1).toString().padStart(2, '0');
+        var day = endDate.getDate().toString().padStart(2, '0');
+
+        // Tạo chuỗi theo định dạng "yyyy-MM-dd"
+        var formattedDate = year + '-' + month + '-' + day;
+        var endDateObject = new Date(formattedDate);
+
+        document.querySelector('.dateEnd').valueAsDate = endDateObject;
+        document.querySelector('.timeEnd').value = endDate.toTimeString().slice(0, 5);
+
+        //Thanh - thay đổi hiển thị tab theo ngày thay đổi ở DataAction. nếu vượt quá thì không chọn
+        var tabs = document.querySelectorAll('.nav-link');
+        tabs.forEach(function (tab) {
+            tab.classList.remove('active-tab-change-day');
+        });
+        var currentDate = new Date(); // Ngày hiện tại
+        //today
+        if (endDate.toDateString() === currentDate.toDateString()) {
+            var todayTab = document.querySelector('a[data-tab="today"]');
+            if (todayTab) {
+                todayTab.classList.add('active-tab-change-day');
+            }
+        } else if (endDate.toDateString() === new Date(currentDate.getTime() + (24 * 60 * 60 * 1000)).toDateString()) {
+            var tomorrowTab = document.querySelector('a[data-tab="tomorrow"]');
+            if (tomorrowTab) {
+                tomorrowTab.classList.add('active-tab-change-day');
+            }
+        } else if (endDate.toDateString() === new Date(currentDate.getTime() + (2 * 24 * 60 * 60 * 1000)).toDateString()) {
+            var in2daysTab = document.querySelector('a[data-tab="in2days"]');
+            if (in2daysTab) {
+                in2daysTab.classList.add('active-tab-change-day');
+            }
+        } else if (endDate.toDateString() === new Date(currentDate.getTime() + (3 * 24 * 60 * 60 * 1000)).toDateString()) {
+            var in3daysTab = document.querySelector('a[data-tab="in3days"]');
+            if (in3daysTab) {
+                in3daysTab.classList.add('active-tab-change-day');
+            }
+        }
+    }
+
+
+    document.querySelector('.DateAction').addEventListener('input', calculateEndTime);
+    document.querySelector('.timeAction').addEventListener('input', calculateEndTime);
+    document.querySelector('.timeExcute').addEventListener('input', calculateEndTime);
+
+    $('#TimeExcute').on('blur', function () {
+        // Lấy giá trị hiện tại của ô timeExcute
+        var currentValue = $(this).val();
+
+        // Kiểm tra xem giá trị có phải là rỗng không
+        if (currentValue === '') {
+            // Nếu là rỗng, thiết lập lại giá trị của ô timeExcute thành 0
+            $(this).val('0');
+            calculateEndTime();
+        }
+    });
+
+    // hiển thị ảnh người dùng
+    $(document).ready(function () {
+
+        // set sẵn value cho Numberofminutes_Warning
+        document.getElementById("Numberofminutes_Warning").value = $('#valueOfNumberofminutes_Warning').val();
+
+        $('.select2_image_user').select2({
+            templateResult: formatUser,
+            templateSelection: formatUser,
+            dropdownParent: $("#LeadMeetingContent")
+        });
+        if ($("#idDateAction").val() == "") {
+            currentDate = new Date();
+            var formattedDate = currentDate.toISOString().slice(0, 10);
+            $("#idDateAction").val(formattedDate);
+            var todayTab = document.querySelector('a[data-tab="today"]');
+            if (todayTab) {
+                todayTab.classList.add('active-tab-change-day');
+            }
+        }
+        if ($("#idTimeExcute").val() == "") {
+            $("#idTimeExcute").val(0);
+        }
+
+        setCurrentTime();
+
+        var currentUserId = $('#currentUserId').val();
+        $('#UserId').val(currentUserId).trigger('change');
+        if ($('#idTimeExcute').val() === 0) {
+            // Nếu không có giá trị, set DateActionEnd thành DateAction và TimeActionEnd thành TimeAction
+            $('#DateActionEnd').val($('#idDateAction').val());
+            $('#TimeActionEnd').val($('#timePicker').val());
+        }
+        var location = $("#location").val();
+        $(".locationEvent").val(location);
+        calculateEndTime();
+    });
+    // hiển thị ảnh người dùng
+    function formatUser(user) {
+        if (!user.id) {
+            return user.text;
+        }
+
+        var validprofileImage = $(user.element).data('profile-image');
+        var profileImage = "/Uploads/User/" + $(user.element).data('profile-image');
+
+        //var imageHtml = profileImage
+        //    ? '<img src="' + profileImage + '" alt="Profile Image" class="round-icon" />'
+        //    : '<img src="https://img.icons8.com/bubbles/50/000000/user.png" alt="Default Image" class="round-icon default-icon" />';
+        var imageHtml = validprofileImage
+            ? '<img src="' + profileImage + '" alt="Profile Image" class="round-icon" style="width: 30px; height: 30px; border-radius: 40px;" />'
+            : '<img src="https://img.icons8.com/bubbles/50/000000/user.png" alt="Default Image" class="round-icon default-icon" style="width: 30px; height: 30px;" />';
+
+        var userName = user.text;
+
+        return $(`<div>${imageHtml} ${userName}</div>`);
+    }
+    //set giờ hiện tại
+    function setCurrentTime() {
+        // Lấy thời gian hiện tại
+        var currentDate = new Date();
+
+        // Lấy giờ và phút hiện tại
+        var currentHour = currentDate.getHours().toString().padStart(2, '0'); // Chuyển thành chuỗi và bổ sung 0 ở đầu nếu cần
+        var currentMinute = currentDate.getMinutes().toString().padStart(2, '0'); // Chuyển thành chuỗi và bổ sung 0 ở đầu nếu cần
+
+        // Định dạng thời gian hiện tại theo định dạng hh:mm
+        var currentTime = currentHour + ':' + currentMinute;
+
+        // Đặt giá trị của trường timePicker thành thời gian hiện tại
+        $('#timePicker').val(currentTime);
+    }
+    // Hàm chuyển ngày
+    function updateStartDate(tab, element) {
+        var tabs = document.querySelectorAll('.nav-link');
+        tabs.forEach(function (tab) {
+            tab.classList.remove('active-tab-change-day');
+        });
+
+        // Đặt lớp 'active' cho tab được click
+        element.classList.add('active-tab-change-day');
+
+        var currentDate = new Date();
+
+        // Cập nhật ngày tháng năm bắt đầu dựa trên tab được chọn
+        if (tab === "tomorrow") {
+            currentDate.setDate(currentDate.getDate() + 1);
+        } else if (tab === "in2days") {
+            currentDate.setDate(currentDate.getDate() + 2);
+        } else if (tab === "in3days") {
+            currentDate.setDate(currentDate.getDate() + 3);
+        }
+
+        // Định dạng lại ngày tháng năm và cập nhật vào trường input
+        var formattedDate = currentDate.toISOString().slice(0, 10);
+        $("#idDateAction").val(formattedDate);
+        calculateEndTime();
+        if ($('#idTimeExcute').val() === '') {
+            // Nếu không có giá trị, set DateActionEnd thành DateAction và TimeActionEnd thành TimeAction
+            $('#DateActionEnd').val($('#idDateAction').val());
+            $('#TimeActionEnd').val($('#timePicker').val());
+        }
+    }
+
+
+    // Gọi toggleNumberInput khi trang được load
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleNumberInput();
+    });
+
+    // Kiểm tra nhập liệu và fetch controller
+    function validateForm() {
+        debugger;
+        // Kiểm tra các trường
+        var dateAction = $('#idDateAction').val();
+        var timeAction = $('#timePicker').val();
+        var timeExcute = $('#idTimeExcute').val();
+        var title = $('#idTitle').val();
+        var note = $('#idNote').val();
+        var userId = $('#UserId').val();
+        var numberofminutes_Warning = $('#Numberofminutes_Warning').val();
+        var leadId = $('#leadId').val();
+        var status = $('#statusCheckboxStatus').is(':checked');
+        var important = $('#statusCheckboxImportant').is(':checked');
+        var leadLogIdview = @leadLogId;
+        var jobIdview = @jobId;
+
+        // Kiểm tra xem các trường có giá trị hay không
+        if (!dateAction || !timeAction || !title || !userId || !leadId) {
+            // Hiển thị thông báo nếu một trong các trường chưa được nhập
+
+            $('.alert-meeting')
+                .addClass('alert-danger')
+                .html('Vui lòng nhập đầy đủ thông tin!')
+                .show()
+                .focus();
+            $('html, body').animate({ scrollTop: 0 }, 'slow');
+            return false;
+        }
+        showLoading()
+        var formData = {
+            DateAction: dateAction,
+            TimeAction: timeAction,
+            TimeExcute: timeExcute,
+            Title: title,
+            Note: note,
+            UserId: userId,
+            Numberofminutes_Warning: numberofminutes_Warning,
+            LeadId: $('#isPartial').val() == '1' ? $('#Id').val() : leadId,
+            Status: status,
+            Important: important,
+            isPartial: $('#isPartial').val(),
+            selectedId: typeof (selectedId) == 'object' ? selectedId.join(';') : '',
+            IsEdit: '@isEdits'
+
+        };
+        // Gửi Ajax request
+        $.ajax({
+            type: 'POST',
+            url: '/LeadMeeting/LeadCall', // Đường dẫn của controller action
+            data: formData,
+            success: function (result) {
+                // Xử lý kết quả từ controller nếu cần
+                console.log(result);
+
+                if (!result.error) {
+                    if (leadLogIdview != 1) {
+                        deleteMeeting(leadLogIdview, jobIdview);
+
+                    }
+                    // Thay đổi kiểu thông báo và hiển thị nó
+                    $('.alert-meeting').removeClass('alert-danger').addClass('alert-success').html(result.message).show();
+                    scrollToAlert();
+                    $('#meetingModal').removeClass("show");
+                    // Đặt lại kiểu dáng của modal-dialog
+                    $('.modal-dialog').css({
+                        'position': 'relative'
+                    });
+                    typeof (selectedId) == 'object' && selectedId.length > 0 ? $('#saveButton').attr('disabled', 'disabled') : ''
+
+                } else {
+                    // Hiển thị thông báo lỗi (nếu có)
+                    $('.alert-meeting').removeClass('alert-success').addClass('alert-danger').html(result.message).show();
+                    scrollToAlert();
+
+                }
+            },
+            error: function (error) {
+                $('.alert-meeting').removeClass('alert-success').addClass('alert-danger').html("Cuộc gọi đi đã tồn tại").show();
+            },
+            complete: function () {
+                hideLoading()
+            }
+        });
+
+        return true;
+    }
+
+    function scrollToAlert() {
+        document.querySelector('.alert-meeting').scrollIntoView({
+            behavior: 'smooth' // Tùy chọn, làm cho cuộn mượt hơn
+        });
+    }
+    function deleteMeeting(leadLogId, idJob) {
+        debugger;
+        $.ajax({
+            url: '/LeadMeeting/DeleteJobHF',
+            type: 'GET',
+            data: { LeadLogId: leadLogId, JobId: idJob },
+            success: function (response) {
+                if (response.success) {
+                    // Delete thành công
+                    console.log("Delete thành công");
+                } else {
+                    // Delete thất bại
+                    console.log("Delete thất bại");
+                }
+            },
+            error: function (xhr, status, error) {
+                // Xử lý khi có lỗi
+                console.log("Lỗi khi gửi yêu cầu:", error);
+            }
+        });
+
+    }
+
+    </script>
+
+

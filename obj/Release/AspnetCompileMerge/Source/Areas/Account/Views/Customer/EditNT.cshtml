@@ -1,0 +1,610 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Staff.Models
+@using Erp.BackOffice.Account.Models
+@using System.Collections.Generic
+@using Erp.BackOffice.Administration.Models
+@using GridMvc.Html
+@model  CustomerViewModel
+
+@{
+    ViewBag.Title = Wording.PageEdit_Customer;
+    //  Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    //Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Customer",
+        ActionName = "EditNT",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = Request["IsPopup"] == null ? true : false,
+        //DisplayBackButton = true
+
+    };
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    int rowNumber = 0;
+    int numberOfItem = 10;
+    IEnumerable<SelectListItem> CustomerGroupList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("CustomerGroup", null, "value");
+    IEnumerable<SelectListItem> CustomerTypeList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("CustomerType", null, "value");
+    IEnumerable<SelectListItem> EconomicStatusList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("EconomicStatus", null, "value");
+    IEnumerable<SelectListItem> SkinLevel = Erp.BackOffice.Helpers.Common.GetSelectList_Category("skinLevel", null, "value");
+    IEnumerable<SelectListItem> HairlLevel = Erp.BackOffice.Helpers.Common.GetSelectList_Category("hairLevel", null, "value");
+    IEnumerable<SelectListItem> GladLevel = Erp.BackOffice.Helpers.Common.GetSelectList_Category("gladLevel", null, "value");
+    IEnumerable<SelectListItem> AssignedUserId = SelectListHelper.GetSelectList_User(Model.FullName, Wording.Empty);
+    IEnumerable<CustomerViewModel> customerList = (IEnumerable<CustomerViewModel>)ViewBag.CustomerList;
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <style type="text/css">
+        .choisen-container .choisen-container-single .choisen-container-active .choisen-with-drop {
+            width: 180px !important;
+        }
+    </style>
+}
+
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@helper GridColumnCommand(int? id)
+{
+    <p>
+        <button name="Delete" value="@id" type="submit" class="Delete btn btn-mini btn-danger">
+            <i class="ace-icon fa fa-trash bigger-120"></i>
+        </button>
+
+    </p>
+
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "EditNT", "Customer", null, FormMethod.Post, new { id = "Edit", @class = "form-horizontal", enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.HiddenFor(model => model.Image)
+    @Html.HiddenFor(model => model.Code)
+    @*@Html.HiddenFor(model => model.CustomerType)*@
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+    <div class="tabbable">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tabCustomer">
+            <li>
+                <a data-toggle="tab" href="#tab1">@Wording.PersonalInfo</a>
+            </li>
+
+            <li>
+                <a data-toggle="tab" href="#tab2">@Wording.ResidenceInfo</a>
+            </li>
+            <li id="li-tab3" class="active">
+                <a data-toggle="tab" href="#tab3">Đánh giá khách hàng</a>
+            </li>
+            <li id="li-tab4">
+                <a data-toggle="tab" href="#tab4">Nhân viên quản lý</a>
+            </li>
+            <li id="li-tab5">
+                <a data-toggle="tab" href="#tab5">Khách hàng giới thiệu</a>
+            </li>
+
+        </ul>
+
+        <div class="tab-content clear-fix">
+            <div id="tab1" class="tab-pane">
+                <div class="row">
+                    <div class="col-sm-7">
+                        @{
+                            var htmlAttributes = new Dictionary<string, object>
+                                          {
+                                            { "class" , "form-control"},
+                                            { "placeholder", "ID CRM" }
+                                          };
+                            htmlAttributes.Add("disabled", "disabled");
+
+                        }
+
+                        @Html.CustomDropDownListFor(model => model.BranchId, SelectListHelper.GetSelectList_Branch(Model.BranchId, Wording.Empty), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                        @Html.CustomTextboxFor(model => model.FirstName, null, null, WidthType.span12, true)
+                        @Html.CustomTextboxFor(model => model.LastName, null, null, WidthType.span12, true)
+                        @*                        @Html.CustomDropDownListFor(model => model.ManagerStaffId, SelectListHelper.GetSelectList_User(Model.FullName, Wording.Empty), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)*@
+                        @Html.DateInput(model => model.Birthday, "dd/MM/yyyy", "99/99/9999", true, WidthType.span12)
+                        @Html.CustomDropDownListFor(model => model.Gender, SelectListHelper.GetSelectList_Gender(Model.Gender), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                        @Html.CustomTextboxFor(model => model.Note, null, null, WidthType.span12, true)
+
+                        @Html.CustomTextboxFor(model => model.cus_crm, null, null, WidthType.span12, true, htmlAttributes)
+
+                    </div>
+                    <div class="col-sm-5">
+                        <div class="wrap-btn-upload">
+                            <a class="btn btn-primary btn-sm btn-white"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                            <input type="file" id="file-image" name="file-image" class="file-image" onchange="previewFileImage(event, '#display-image img')" />
+                        </div>
+                        <div class="text-center" id="display-image">
+                            <img src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.Image, "Customer", "user"))" width="250" height="300" title="@Model.CompanyName" id="" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab2" class="tab-pane">
+                <div class="">
+                    @Html.CustomDropDownListFor(model => model.CityId, SelectListHelper.GetSelectList_Location("0", Model.CityId, Wording.Empty), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                    @Html.CustomDropDownListFor(model => model.DistrictId, SelectListHelper.GetSelectList_Location(Model.CityId, Model.DistrictId, Wording.Empty), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                    @Html.CustomDropDownListFor(model => model.WardId, SelectListHelper.GetSelectList_Location(Model.DistrictId, Model.WardId, Wording.Empty), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                    @Html.CustomTextboxFor(model => model.Address, null, null, WidthType.span12, true)
+                    @Html.CustomTextboxFor(model => model.Phone, null, null, WidthType.span12, true)
+                    @Html.CustomTextboxFor(model => model.Mobile, null, null, WidthType.span12, true)
+
+                    @Html.CustomTextboxFor(model => model.Email, null, null, WidthType.span12, true)
+                </div>
+            </div>
+            <div id="tab3" class="tab-pane in active">
+                @Html.CustomDropDownListFor(model => model.CustomerGroup, CustomerGroupList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                @Html.CustomDropDownListFor(model => model.CustomerType, CustomerTypeList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+
+                @Html.CustomDropDownListFor(model => model.EconomicStatus, EconomicStatusList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                @*@Html.CustomDropDownListFor(model => model.EconomicStatus, SelectListHelper.GetSelectList_Category(Model.EconomicStatus, null, "value"), null, null)*@
+
+
+
+
+                @Html.CustomDropDownListFor(model => model.SkinSkinLevel, SkinLevel, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                @Html.CustomDropDownListFor(model => model.HairlLevel, HairlLevel, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                @Html.CustomDropDownListFor(model => model.GladLevel, GladLevel, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+
+                @Html.CustomSwitchesFor(model => model.KhCuMuonBo, SwitchesStyle.CheckboxStyle, true)
+                @Html.CustomSwitchesFor(model => model.KhCuThanPhien, SwitchesStyle.CheckboxStyle, true)
+                @Html.CustomSwitchesFor(model => model.KhLauNgayKhongTuongTac, SwitchesStyle.CheckboxStyle, true)
+                @Html.CustomSwitchesFor(model => model.KhMoiDenVaHuaQuaiLai, SwitchesStyle.CheckboxStyle, true)
+                @Html.CustomSwitchesFor(model => model.KhMoiDenVaKinhTeYeu, SwitchesStyle.CheckboxStyle, true)
+                @Html.CustomSwitchesFor(model => model.IsBonusSales, SwitchesStyle.CheckboxStyle, true)
+                @Html.CustomSwitchesFor(model => model.isLock, SwitchesStyle.CheckboxStyle, true)
+
+            </div>
+            <div id="tab4" class="tab-pane clearfix">
+                <div class="table-responsive">
+                    @Html.CustomDropDownListFor(model => model.ManagerStaffId, SelectListHelper.GetSelectList_User(Model.FullName, Wording.Empty), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+
+
+                    <div id="datetimeinput" class="form-group ">
+                        <label class="control-label col-md-2  " for="StartDate">Ngày bắt đầu</label>
+                        <div class="control-value col-md-4">
+                            <div class="clearfix" style="display:inline-block;">
+                                <input type="date" name="StartDate" id="StartDate" value="@string.Format("{0:yyyy-MM-dd}", Model.StartDate)" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <button id="CreateCusUser" name="Create" value="CreateCusUser" type="submit" class="CreateCusUser btn btn-mini btn-primary">
+                        <i class="ace-icon fa fa-plus"></i>
+                        @Wording.CreateNew
+                    </button>
+
+                    @Html.Grid(Model.CustomerUserList).Columns(columns =>
+               {
+               columns.Add().Titled("#").SetWidth(20).RenderValueAs(o =>
+               {
+               rowNumber++;
+
+               return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+               });
+                   columns.Add(u => u.FullName).Titled(Wording.FullName).Sortable(false).Sanitized(false).Encoded(false).SetWidth(130);
+                   columns.Add(u => u.StartDate).Format("{0:dd/MM/yyyy}").Titled(Wording.StartDate).SetWidth(100);
+                   columns.Add(u => u.EndDate).Format("{0:dd/MM/yyyy}").Titled(Wording.EndDate).SetWidth(100);
+                   columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+               }).WithPaging(10)
+
+                </div>
+            </div>
+
+
+
+            <div id="tab5" class="tab-pane clearfix">
+                <div class="">
+                    @*@Html.CustomDropDownListFor(model => model.IdCustomer_Gioithieu, SelectListHelper.GetSelectList_Customer(Model.FullName, Wording.Empty), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)*@
+                    <label>Khách hàng<label style="color:red;">*</label></label>
+                    @*@Html.TextBox("KH_TUONGTAC_ID", Request["KH_TUONGTAC_ID"], new { @class = "hide", autocomplete = "off", placeholder = "Khách hàng", style = "width:150px" })*@
+                    @Html.TextBox("IdCustomer_Gioithieu", Request["IdCustomer_Gioithieu"], new { @class = "hide", autocomplete = "off", placeholder = "Khách hàng", style = "width:150px" })
+
+                    <input id="product_barcode" type="text" placeholder="Tên khách hàng" autocomplete="off" style="width:150px;" />
+                    <select id="productSelectList" name="productSelectList" style="width:302px">
+                        <option value="">- Tìm khách hàng -</option>
+                        @if (customerList != null)
+                        {
+                            foreach (var item in customerList)
+                            {
+                                <option value="@item.Id" data-selected="0" data-value="@item.Id | @(Common.KiemTraTonTaiHinhAnh(item.Image, "product-image-folder", "product"))  | @(item.Code + " - " + item.CompanyName )">@item.Code - @item.CompanyName</option>
+                            }
+                        }
+                    </select>
+
+                    <div id="datetimeinput" class="form-group ">
+                        <label class="control-label col-md-2  " for="_StartDate">Ngày bắt đầu</label>
+                        <div class="control-value col-md-4">
+                            <div class="clearfix" style="display:inline-block;">
+                                <input type="date" name="_StartDate" id="_StartDate" value="@string.Format("{0:dd/MM/yyyy}", Model._StartDate)" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <button id="CreateCustomerRecommend" name="Create" value="CreateCustomerRecommend" type="submit" class="CreateCustomerRecommend btn btn-mini btn-primary">
+                        <i class="ace-icon fa fa-plus"></i>
+                        @Wording.CreateNew
+                    </button>
+
+                    @Html.Grid(Model.CustomerRecommendList).Columns(columns =>
+               {
+               columns.Add().Titled("#").SetWidth(20).RenderValueAs(o =>
+               {
+               rowNumber++;
+
+               return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+               });
+                   columns.Add(u => u.FullName).Titled(Wording.FullName).Sortable(false).Sanitized(false).Encoded(false).SetWidth(130);
+                   columns.Add(u => u.Code).Titled("Mã KH").Sortable(false).Sanitized(false).Encoded(false).SetWidth(130);
+
+                   columns.Add(u => u.StartDate).Format("{0:dd/MM/yyyy}").Titled(Wording.StartDate).SetWidth(100);
+                   //columns.Add(u => u.EndDate).Format("{0:dd/MM/yyyy}").Titled(Wording.EndDate).SetWidth(100);
+                   //columns.Add(u => u.CustomerId).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+               }).WithPaging(10)
+
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+
+                            using (Html.BeginButtonContainer(pageSetting))
+                            {
+                                <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+                                    <i class="ace-icon fa fa-save"></i>
+                                    @Wording.Save
+                                </button>
+
+                                }
+                            }
+
+@section Scripts {
+
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+    <script src="/Scripts/combojax.js?=vs1.01"></script>
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+
+
+    <script type="text/javascript">
+
+        $(function () {
+            $('#PHANLOAI_TUONGTAC').attr("disabled", "disabled");
+            $('#TINHTRANG_TUONGTAC').attr("disabled", "disabled");
+
+            $('#LOAI_TUONGTAC').change(function () {
+                var selectedEventType = this.options[this.selectedIndex].value;
+                if (selectedEventType != "TOC") {
+                    $('.TINHTRANG').hide().filter('#' + selectedEventType).show();
+                    $('#PHANLOAI_TUONGTAC').attr("disabled", "disabled");
+                    $('#TINHTRANG_TUONGTAC').removeAttr('disabled');
+                    $('#PHANLOAI_TUONGTAC').val("");
+                    $('#TINHTRANG_TUONGTAC').val("");
+                }
+                else {
+                    $('.TINHTRANG').hide().filter('#' + selectedEventType).show();
+                    $('#PHANLOAI_TUONGTAC').removeAttr('disabled');
+                }
+            });
+            $('#PHANLOAI_TUONGTAC').change(function () {
+                var selectedEventType = this.options[this.selectedIndex].value;
+                if (selectedEventType != null) {
+                    $('.TINHTRANG').hide().filter('#' + selectedEventType).show();
+                    $('#TINHTRANG_TUONGTAC').removeAttr("disabled");
+                } else {
+                    $('#TINHTRANG_TUONGTAC').attr("disabled", "disabled");
+                }
+            });
+
+            //$('#NGAYTUONGTAC_TIEP').datetimepicker({
+            //    format: 'DD/MM/YYYY HH:mm'
+            //});
+
+            $('#NGAYLAP').datetimepicker({
+                format: 'dd/MM/yyyy'
+            });
+            $('#GIO_TUONGTAC').datetimepicker({
+                format: 'HH:mm'
+            });
+        });
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+        function initCkeditor() {
+            $('.ckeditor').ckeditor({
+                "extraPlugins": 'imagebrowser',
+                "imageBrowser_listUrl": "@Url.Action("ListJson","Images")",
+                // Define the toolbar groups as it is a more accessible solution.
+                toolbarGroups: [
+                    { "name": "document", "groups": ["mode", "document", "doctools"] },
+                    { "name": "editing", "groups": ["find", "selection", "spellchecker"] },
+                    { "name": "forms" },
+                    { "name": "tools" },
+                    { "name": "basicstyles", "groups": ["basicstyles", "cleanup"] },
+                    { "name": "clipboard", "groups": ["clipboar", "undo"] },
+                    { "name": "links", "groups": ["links"] },
+                    { "name": "paragraph", "groups": ["list", "blocks"] },
+                    { "name": "insert", "groups": ["insert"] },
+                    { "name": "styles", "groups": ["styles"] },
+                    //{ "name": "about", "groups": ["about"] },
+                    { "name": "styles" },
+                    { "name": "colors" },
+                    { "name": "align", "groups": ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+
+                ],
+                // Remove the redundant buttons from toolbar groups defined above.
+                removeButtons: 'Underline,Strike,Subscript,Superscript,Anchor,Styles,Specialchar'
+            });
+        }
+
+        $(document).ready(function () {
+            //init rcb chọn sản phẩm
+            $('#productSelectList').radComboBox({
+                colTitle: 'ID, Hình, Tên khách hàng',
+                colValue: 1,
+                colImage: 2,
+                colHide: '1',
+                colSize: '0px,50px,',
+                colClass: ',,',
+                //width: 600,
+                height: 300,
+                boxSearch: true,
+                colSearch: 2
+            });
+            //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+            $('#productSelectList').on('change', function () {
+                var $this = $(this);
+                var selected = $this.find("option:selected");
+
+                if (selected.val() == '' || $('#product_item_' + selected.val()).length > 0)
+                    return;
+                $('#IdCustomer_Gioithieu').val(selected.val());
+                //$('#CustomerName').val(selected.text());
+                $('#product_barcode').val(selected.text());
+
+            });
+            $('#product_barcode').keypress(function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $('#product_barcode').trigger('change');
+                }
+            });
+
+            //khi nhập barcode
+            $('#product_barcode').change(function () {
+                var $this = $(this);
+                if ($this.val() != '') {
+
+                    var barcode = $this.val();
+                    //đặt lại giá trị rỗng
+                    $this.val('').focus();
+
+                    var valueSearch = searchProductByBarCodeContain(barcode);
+                    if (valueSearch == undefined) {
+                        alert('Không tìm thấy khách hàng với mã code trên!');
+                        return;
+                    }
+
+                    $('#productSelectList').val(valueSearch).trigger("change");
+                }
+            });
+        });
+        function searchProductByBarCodeContain(barcode) {
+            barcode = barcode.toLowerCase();
+            //var $productSelect = $('.detail_item_id').first();
+
+            var $optionList = $("#productSelectList").find('option');
+
+            var arrResulft = [];
+            for (var i = 0; i < $optionList.length; i++) {
+                var data_code = $($optionList[i]).data('code') != undefined ? $($optionList[i]).data('code').toString().toLowerCase() : undefined;
+                if (barcode.indexOf(data_code) != -1)
+                    arrResulft.push($($optionList[i]).attr('value'));
+
+                if (arrResulft.length == 1) {
+                    return arrResulft[0];
+                }
+            }
+
+            return arrResulft[0];
+        };
+
+
+        $('#NGAYTUONGTAC_TIEP').datetimepicker({
+            format: 'dd/MM/yyyy HH:mm'
+
+        });
+        $("#Save").click(function () {
+            var endDate = new Date();
+            endDate = document.getElementById("NGAYTUONGTAC_TIEP").value;
+
+            //var today = new Date();
+            //var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+            //var time = today.getHours() + ":" + today.getMinutes();
+            //var dateTime = date + ' ' + time;
+
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+            if (mm < 10) {
+                mm = '0' + mm
+            }
+            var hh = today.getHours();
+            var MM = today.getMinutes();
+            today = dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + MM;
+
+
+            if (endDate == "") {
+                return true;
+            }
+            else {
+                if ((endDate < today)) {
+                    alert("Ngày tương tác tiếp phải lớn hơn ngày hiện tại");
+                    document.getElementById("NGAYTUONGTAC_TIEP").value = "";
+                    return false;
+                }
+            }
+            var startDate = document.getElementById("NGAYLAP").value;
+
+
+            if (endDate < startDate) {
+                alert("End date should be greater than Start date");
+                document.getElementById("NGAYTUONGTAC_TIEP").value = "";
+                return false;
+            }
+            return true;
+        });
+
+        var url = '/api/BackOfficeServiceAPI/FetchLocation';
+        var districts = $('#DistrictId'); // cache it
+        var ward = $('#WardId');
+
+        $("#CityId").change(function () {
+            ShowLoading();
+            var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+            if (id != '') {
+                $.getJSON(url, { parentId: id }, function (response) {
+                    districts.empty(); // remove any existing options
+                    ward.empty();
+                    $(document.createElement('option'))
+                            .attr('value', '')
+                            .text('- Rỗng -')
+                            .appendTo(ward).trigger('chosen:updated');
+                    $(response).each(function () {
+                        $(document.createElement('option'))
+                            .attr('value', this.Id)
+                            .text(capitalizeFirstAllWords(this.Name.toLowerCase().replace('huyện', '').replace('quận', '')))
+                            .appendTo(districts).trigger('chosen:updated');
+                        HideLoading();
+                    });
+                });
+            }
+            else {
+                districts.empty(); // remove any existing options
+                ward.empty();
+                $(document.createElement('option'))
+                           .attr('value', '')
+                           .text('- Rỗng -')
+                           .appendTo($(districts)).trigger('chosen:updated');
+                $(document.createElement('option'))
+                           .attr('value', '')
+                           .text('- Rỗng -')
+                           .appendTo($(ward)).trigger('chosen:updated');
+                HideLoading();
+            }
+        });
+
+        $("#DistrictId").change(function () {
+            ShowLoading();
+            var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+            $.getJSON(url, { parentId: id }, function (response) {
+                ward.empty(); // remove any existing options
+                $(document.createElement('option'))
+                       .attr('value', '')
+                       .text('- Rỗng -')
+                       .appendTo(ward).trigger('chosen:updated');
+                $(response).each(function () {
+                    $(document.createElement('option'))
+                        .attr('value', this.Id)
+                        .text(capitalizeFirstAllWords(this.Name.toLowerCase()))
+                        .appendTo(ward).trigger('chosen:updated');
+                });
+                HideLoading();
+            });
+        });
+
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.Id" >@Model.CompanyName</option>';
+                window.parent.ClosePopupAndReloadPageStaffDetail();
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+
+        });
+
+        //$("#tabCustomer").tabs({ active: 2 });
+
+        @Model.JavaScriptToRun
+        function CloseCurrentPopup(id) {
+            //chuyen huong trang theo id lay tu controller
+            window.parent.location.href = '/Customer/Detail/' + id;
+        }
+
+        $('#CreateCusUser').click(function () {
+            if ($('#StartDate').val() == "") {
+                alert("chưa nhập ngày bắt đầu");
+                return false;
+            }
+        })
+
+        $('#CreateCustomerRecommend').click(function () {
+            if ($('#_StartDate').val() == "") {
+                alert("chưa nhập ngày bắt đầu");
+                return false;
+            }
+        })
+        $(function () {
+            $(".datetype").datepicker({ dateFormat: 'dd/MM/yyyy' });
+        });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+}

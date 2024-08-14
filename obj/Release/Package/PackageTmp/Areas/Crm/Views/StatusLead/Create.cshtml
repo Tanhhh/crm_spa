@@ -1,0 +1,191 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Areas.Cms.Models
+@{
+    ViewBag.Title = "Thêm mới trạng thái";
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "StatusLead",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+<script src="~/assets/js/jquery.2.1.1.min.js"></script>
+<link href="~/assets/toastr/toastr.min.css" rel="stylesheet" />
+<script src="~/assets/toastr/toastr.min.js"></script>
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+<form class="form-horizontal">
+
+    <div class="edit-view clearfix">
+        <div id="" class="control-group form-group ">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="Name">Tên trạng thái</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                <div class="clearfix">
+                    <input autocomplete="off" class="col-xs-4" data-val="true" data-val-length="Tiêu đề không được vượt quá 250 ký tự." data-val-length-max="250" data-val-required="Bắt buộc nhập" id="cName" maskformat="" name="Name" placeholder="" type="text" value="">
+                </div>
+            </div>
+        </div>
+
+        <div id="" class="control-group form-group ">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="SuccessRate">Tỷ lệ thành công</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                <div class="clearfix">
+                    <input autocomplete="off" class="col-xs-4" id="cSuccessRate" maskformat="" name="SuccessRate" placeholder="" type="text" value="">
+                </div>
+            </div>
+        </div>
+        <div id="" class="control-group form-group ">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="ColorStatus">Màu sắc</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                <input type="color" id="cColorStatus" style=" padding: 2px;">
+            </div>
+        </div>
+        <div id="" class="control-group form-group ">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="EndStatus">Trạng thái cuối</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                <select data-val="true" data-val-required="Bắt buộc nhập" id="cEndStatus" name="EndStatus" style="width:207px" value="">
+                    <option value="">-Rỗng-</option>
+                    <option value="true">Mua</option>
+                    <option value="false">Không mua</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="" class="control-group form-group ">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="TypeForecast">Dự báo</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                <select data-val="true" data-val-required="Bắt buộc nhập" id="cTypeForecast" name="TypeForecast" style="width:207px" value="">
+                    <option value="">-Rỗng-</option>
+                    <option value="1">Đang thực hiện</option>
+                    <option value="2">Cơ hội cao</option>
+                    <option value="3">Cam kết</option>
+                    <option value="4">Kết thúc thắng</option>
+                    <option value="5">Mất khách hàng</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="" class="control-group form-group ">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4" for="Type">Loại trạng thái</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                <select data-val="true" data-val-required="Bắt buộc nhập" id="cType" name="Type" style="width:207px">
+                    <option value="1" @(ViewBag.DataType == 1 ? "selected" : "")>Lead</option>
+                    <option value="2" @(ViewBag.DataType == 2 ? "selected" : "")>Contact</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="control-group form-group">
+            <label class="control-label no-padding-right control-label col-lg-5 col-md-4 col-sm-4" for="OrderStatus">STT</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                <div class="clearfix">
+                    <div class="ace-spinner middle" style="width: 125px;">
+                        <div class="input-group">
+                            <input data-val-range-max="2147483647" data-val-range-min="0" id="cOrderStatus" name="OrderStatus" type="text" value="" class="spinbox-input form-control text-center">
+
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        $(function () {
+                            $("[name='OrderStatus']").ace_spinner({ value: (@(ViewBag.lastOrderStatus + 1) * 1), min: '0', max: '100', step: '1', btn_up_class: 'btn-info', btn_down_class: 'btn-info' });
+                        });</script>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="IsPopup" value="True">
+        <style type="text/css">
+            #page_toolbar {
+                position: fixed;
+                bottom: 21px;
+                margin-left: /*-13px;*/ 0px;
+                width: 100%;
+                padding-top: 15px;
+                padding-bottom: 20px;
+                padding-left: 12px;
+                z-index: 999;
+                border-top: 3px double #E5E5E5;
+                background: #F5F5F5;
+            }
+
+                #page_toolbar .btn-white {
+                    margin-top: 1px;
+                    line-height: 1.3;
+                    margin-right: 3px;
+                }
+        </style>
+        <div id="page_toolbar">
+            <div>
+                <button class="btn btn-mini btn-primary" id="cSave" value="Save">
+                    <i class="ace-icon fa fa-save"></i>
+                    Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+@section Scripts {
+    <script src="~/assets/toastr/toastr.min.js"></script>
+    <script>
+        $(function () {
+            $(window).resize(function () {
+                $("#page_toolbar").width($(".main-content").width() + 24);
+                $("#page_toolbar").width($(".main-content").width() + 24);
+            });
+            $('#cSave').click(function (e) {
+                e.preventDefault();
+                debugger;
+                // Lấy dữ liệu từ các trường trong form
+                var name = $('#cName').val();
+                var successRate = $('#cSuccessRate').val();
+                var colorStatus = $('#cColorStatus').val();
+                var endStatus = $('#cEndStatus').val();
+                var orderStatus = $('#cOrderStatus').val();
+                var type = $('#cType').val();
+                var typeForcast = $('#cTypeForecast').val();
+                if (name === '' || orderStatus === '0') {
+                    toastr.warning('Vui lòng nhập đầy đủ thông tin!', 'Thông báo', { timeOut: 1500 });
+                    return;
+                }
+                // Gửi dữ liệu bằng Ajax
+                $.ajax({
+                    url: '/StatusLead/Create',
+                    type: 'POST',
+                    data: {
+                        name: name,
+                        successRate: successRate,
+                        colorStatus: colorStatus,
+                        endStatus: endStatus,
+                        orderStatus: orderStatus,
+                        type: type,
+                        typeForcast: typeForcast
+                    },
+                    success: function (rs) {
+                        if (rs.Success) {
+                            window.parent.postMessage('reloadIndex', '*'); // Gửi tin nhắn yêu cầu tải lại trang Index
+                            window.parent.ClosePopup();
+                        }
+                        else {
+                            toastr.error("Thêm mới trang thái đã thất bại!", 'Thông báo');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        toastr.error("Thêm mới trang thái đã thất bại!", 'Thông báo');
+                    }
+                });
+            });
+        });
+    </script>
+}

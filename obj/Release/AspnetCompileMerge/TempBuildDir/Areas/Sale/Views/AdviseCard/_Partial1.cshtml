@@ -1,0 +1,34 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@model CategoryViewModel
+
+@{
+    Layout = null;
+}
+
+<table class="table table-responsive table-bordered">
+    <thead>
+        <tr>
+            <td>Nội dung</td>
+            <td>Chi tiết</td>
+            <td>Ghi chú</td>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.ListQuestion.Count(); i++)
+        {
+            <tr>
+                <td>@(Model.ListQuestion[i].Name)</td>
+                <td>
+                    <textarea class="" id="Content_@(Model.ListQuestion[i].Id)_0" data-question-id="@Model.ListQuestion[i].Id" data-target-id="0" data-target-module="Answer"></textarea>
+                </td>
+                <td>
+                    <textarea class="" id="Note_@(Model.ListQuestion[i].Id)_0" data-question-id="@Model.ListQuestion[i].Id" data-target-id="0" data-target-module="Answer"></textarea>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>

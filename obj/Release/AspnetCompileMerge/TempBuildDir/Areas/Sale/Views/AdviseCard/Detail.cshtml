@@ -1,0 +1,254 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Crm.Models
+@model AdviseCardViewModel
+
+@{
+    ViewBag.Title = Wording.PageDetail_AdviseCard + (Model.Type == "SkinScan" ? " chăm sóc da" : " chăm sóc tóc");
+
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "AdviseCard",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+<style>
+    textarea {
+        background: #fee18826 !important;
+        width: 100% !important;
+    }
+</style>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+<div class="row">
+    <div class="col-sm-7">
+        <div id="accordion" class="accordion-style1 panel-group">
+            @foreach (var item in Model.ListAdviseType.Where(x => x.Level == 1))
+            {
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a class="accordion-toggle collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse_@item.Id" aria-expanded="false">
+                                <i class="bigger-110 ace-icon fa fa-angle-right" data-icon-hide="ace-icon fa fa-angle-down" data-icon-show="ace-icon fa fa-angle-right"></i>
+                                @item.Name
+                            </a>
+                        </h4>
+                    </div>
+
+                    <div class="panel-collapse collapse" id="collapse_@item.Id" aria-expanded="false" style="height: 0px;">
+                        <div class="panel-body">
+                            @if (item.Value == "SkinScan1")
+                            {
+                                @Html.Partial("_Partial1", item)
+                            }
+                            @if (item.Value == "SkinScan2" || item.Value == "SkinScan6" || item.Value == "CheckingHair1" || item.Value == "CheckingHair2" || item.Value == "CheckingHair3" || item.Value == "CheckingHair5")
+                            {
+                                @Html.Partial("_Partial2", item)
+                            }
+                            @if (item.Value == "SkinScan3")
+                            {
+                                @Html.Partial("_Partial3", item)
+                            }
+                            @if (item.Value == "SkinScan4")
+                            {
+                                @Html.Partial("_Partial4", item)
+                            }
+                            @if (item.Value == "SkinScan5")
+                            {
+                                @Html.Partial("_Partial6", item)
+                            }
+                            
+                            @if (item.Value == "CheckingHair4")
+                            {
+                                var list = Model.ListAdviseType.Where(x => x.Level == 2 && x.Code == item.Value).ToList();
+                                @Html.Partial("_Partial5", list)
+                            }
+                            else
+                            {
+                                if (Model.ListAdviseType.Any(x => x.Level == 2 && x.Code == item.Value))
+                                {
+                                    foreach (var ii in Model.ListAdviseType.Where(x => x.Level == 2 && x.Code == item.Value))
+                                    {
+                                        <p> <label class="control-label bolder blue">@ii.Name</label></p>
+                                        <div style="padding-left:20px">
+                                            @Html.Partial("_Partial2", ii)
+                                        </div>
+                                    }
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+        </div>
+    </div>
+    <div class="col-sm-5">
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title"><i class="ace-icon fa fa-info-circle"></i> Thông tin tư vấn</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="detail-view">
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Code, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CustomerCode, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CustomerName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CounselorName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CreatedUserName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Note, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p></p>
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title"><i class="ace-icon fa fa-image"></i> Ảnh</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <p>
+                        <a class="btn btn-primary btn-mini" onclick="OpenPopup('@Url.Action("Create", "Image", new { area = "Crm",TargetId=Model.Id,TargetModule="AdviseCard" })', 'Thêm hình ảnh', 0, 500)">
+                            <i class="ace-icon fa fa-image"></i>
+                            Thêm ảnh
+                        </a>
+                    </p>
+                    @Html.Action("Detail", "Image", new { area = "Crm", TargetId = Model.Id, TargetModule = "AdviseCard" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Print", "AdviseCard", "Sale"))
+    {
+        <a class="btn btn-white btn-success btn-sm" target="_blank" href="@Url.Action("Print", pageSetting.ModuleName, new { Id = Model.Id })">
+            <i class="ace-icon fa fa-print"></i>
+            @Wording.Print
+        </a>
+    }
+    if (Model.IsActived != true)
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "InquiryCard", "Sale"))
+        {
+            <a class="btn btn-primary btn-mini" target="_blank" href="@Url.Action("Create", "InquiryCard", new { TargetId = Model.Id, TargetModule="AdviseCard" })">
+                <i class="ace-icon fa fa-plus"></i>
+                Lập phiếu yêu cầu
+            </a>
+        }
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            LoadData();
+        });
+        $("input").change(function () {
+
+            var $_this = $(this);
+            var IsChecked = $_this.prop('checked');
+            if ($_this.hasClass('check_all')) {//input là check all
+
+                var question = $(this).val();
+                $('input[data-question-id="' + question + '"]').prop('checked', $_this.prop('checked'));
+                $('input[data-question-id="' + question + '"]').each(function (index, elem) {
+                    var TargetId = $(elem).data("target-id");
+                    var TargetModule = $(elem).data("target-module");
+                    SaveItem(question, TargetId, IsChecked, TargetModule);
+                });
+            }
+            else {    //input thường
+                var QuestionId = $(this).data("question-id");
+                var TargetId = $(this).data("target-id");
+                var TargetModule = $(this).data("target-module");
+                var $_checkedall = true;
+                $('input[data-question-id="' + QuestionId + '"]').each(function () {
+                    if (!$(this).is(':checked')) {
+                        $_checkedall = false;
+                    }
+                    $('input[name="QuestionId_' + QuestionId + '"]').prop('checked', $_checkedall);
+                });
+                SaveItem(QuestionId, TargetId, IsChecked, TargetModule);
+            }
+
+        });
+
+        $("textarea").change(function () {
+            var QuestionId = $(this).data("question-id");
+            var TargetId = $(this).data("target-id");
+            var TargetModule = $(this).data("target-module");
+            var IsChecked = true;
+            SaveItem(QuestionId, TargetId, IsChecked, TargetModule);
+        });
+
+
+        function SaveItem(QuestionId, TargetId, IsChecked, TargetModule) {
+            debugger;
+            ShowLoading();
+            var url = "/AdviseCard/SaveItem";
+            var AdviseCardId = '@Model.Id';
+            var content = $("#Content_" + QuestionId + "_" + TargetId).val();
+            var Note = $("#Note_" + QuestionId + "_" + TargetId).val();
+            var _note = $("#Note_" + QuestionId + "_0").val();
+            var _content = $("#Content_" + QuestionId + "_0").val();
+            if (_note != undefined && Note == undefined) {
+                Note = _note;
+            }
+            if (_note == undefined && Note == undefined) {
+                Note = "";
+            }
+            if (_content != undefined && content == undefined) {
+                content = _content;
+            }
+            $.post(url, { AdviseCardId: AdviseCardId, QuestionId: QuestionId, TargetId: TargetId, TargetModule: TargetModule, content: content, Note: Note, IsChecked: IsChecked }, function (res) {
+                if (res != 'success') {
+                    alertPopup('Lỗi!', 'Lưu thất bại!', 'error');
+                }
+                HideLoading();
+            });
+        };
+        function LoadData() {
+            ShowLoading();
+            var url = "/AdviseCard/LoadAdviseCardDetailById";
+            var AdviseCardId = '@Model.Id';
+            $.post(url, { AdviseCardId: AdviseCardId }, function (res) {
+                for (var i = 0; i < res.length; i++) {
+                    $('input[name="TargetId_' + res[i].QuestionId + '_' + res[i].TargetId + '"]').prop('checked', true);
+                    $('#Content_' + res[i].QuestionId + '_' + res[i].TargetId).val(res[i].Content);
+                    $('#Note_' + res[i].QuestionId + '_' + res[i].TargetId).val(res[i].Note);
+                    $('#Content_' + res[i].QuestionId + '_0').val(res[i].Content);
+                    $('#Note_' + res[i].QuestionId + '_0').val(res[i].Note);
+                }
+
+                HideLoading();
+            });
+        };
+    </script>
+}

@@ -1,0 +1,92 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@{
+    ViewBag.Title = "Đăng nhập Facebook";
+
+}
+
+
+<style>
+    #wrapper {
+        width: 500px;
+        height: 200px;
+        margin: 15% 42%;
+    }
+
+    .center {
+        width: 60%;
+        height: 50%;
+        text-align: center;
+    }
+
+
+
+    #allpage {
+        float: left;
+    }
+
+    #alltick {
+        padding-right:20px;
+        float: right;
+    }
+
+    #page {
+        color: white;
+        font-size: 17px;
+        font-weight: bold;
+        margin-left: 2%;
+        margin-top: 11px;
+    }
+
+    .noti {
+        position: absolute;
+        top: 1px;
+        right: -10px;
+        width: 17px;
+        height: 15px;
+        background: #f33636;
+        color: #fff;
+        border-radius: 100%;
+        font-size: 12px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    a.facebook-logout {
+        display: flex;
+        margin-left: 75.5%;
+        color: white !important;
+        margin-top: 10px;
+    }
+
+    i.fas.fa-sign-out-alt {
+        margin-top: 5px;
+        margin-right: 5px;
+    }
+</style>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Đăng nhập Facebook</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+
+</head>
+<body>
+    <div class="nav-header" style="width: 100%;background: #008ed7;height: 40px;position: absolute;display:flex;top:0;left:0;right:0;">
+        <div class="nav-header-left" style="position:relative;margin-top: 10px;">
+        </div>
+        <p id="page">Datviet Software</p>
+    </div>
+
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous" src="https://connect.facebook.net/vi_VN/sdk.js#xfbml=1&version=v7.0&appId=247660513180458&autoLogAppEvents=1" nonce="tul6Aui2"></script>
+        <div id="wrapper">
+            <div class="center">
+                <i class="material-icons" style="font-size:150px">account_circle</i>
+                <h3>Đăng nhập Facebook để tiếp tục</h3>
+                <div class="fb-login-button" data-size="large" data-button-type="login_with" data-layout="rounded" data-auto-logout-link="false" data-use-continue-as="false" data-width="" data-scope="public_profile,email,pages_show_list,pages_read_engagement,pages_manage_engagement,pages_read_user_content,pages_manage_posts,pages_messaging" data-onlogin="LoginFB();"></div>
+            </div>
+            
+        </div>
+</body>
+<script src="~/Scripts/LoginFB/LoginFB.js"></script>

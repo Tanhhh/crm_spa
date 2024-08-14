@@ -1,0 +1,165 @@
+﻿@model List<CustomerViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Areas.Administration.Models
+@using Erp.BackOffice.Staff.Models
+@using Erp.BackOffice.Account.Models
+@using GridMvc.Html
+
+
+@{
+    ViewBag.Title = "Quản lý khách hàng";
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Customer",
+        ActionName = "GetCusOfManager",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = true,
+        DisplayBackButton = false
+    };
+
+
+
+}
+<h3>Khách hàng được quản lỷ bởi: @ViewBag.UserName</h3>
+
+<p>Tổng số: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Model.Count())</b></p>
+<p>Đang theo dõi: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Model.Where(x => x.isLock !=true).Count())</b> </p>
+
+@if (Model.Count() > 0)
+            {
+    @Html.Grid(Model).Columns(columns =>
+        {
+            //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(Id));
+            columns.Add(model => model.BranchName).Titled(Wording.BranchName).Sortable(true).Sanitized(false).Encoded(false);
+
+            columns.Add(u => u.CompanyName).Titled(Wording.CustomerName).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.CompanyName, u.Code, u.Id, u.Note, u.Image, u.PlusPoint, u.Phone));
+
+            columns.Add(u => u.Phoneghep).Titled(Wording.ContactId).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnContact(u.Phoneghep, u.Email));
+            columns.Add(u => u.Address).Titled(Wording.Address).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnNameAddress(u.DistrictName, u.WardName, u.ProvinceName, u.Address));
+            columns.Add(u => u.Note).Titled(Wording.Note).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnNote(u.Note));
+
+            columns.Add(model => model.CustomerType).Titled(Wording.CustomerType).Sortable(true).Sanitized(false).Encoded(false);
+
+            columns.Add(u => u.CreatedDate).Titled("Thời gian").Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnDateName(u.CreatedDate, u.ModifiedDate));
+            columns.Add(u => u.isLock).Titled("Theo dõi").Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => Ngungtheodoi(u.isLock));
+
+        }).WithPaging(10);
+            }
+            else
+            {
+    <div>Chưa có khách hàng để quản lý.</div>
+}
+
+
+
+@helper Ngungtheodoi(bool? isngung)
+{
+if (isngung == true)
+{
+        <a>Đã ngừng theo dõi</a>
+}
+else
+{
+        <a>Đang theo dõi</a>
+}
+
+}
+
+
+@helper GridColumnAction(int? Id, string TargetModule, string TargetCode, string TargetName, bool isPopup)
+{
+if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("LiabilitiesDetail", "TransactionLiabilities", "Account"))
+{
+        <a class="btn btn-white btn-danger btn-minier" onclick="OpenPopup('@Url.Action("LiabilitiesDetail", "TransactionLiabilities", new { TargetModule = TargetModule, TargetCode = TargetCode, TargetName = TargetName, popup = true })', 'Chi tiết công nợ', 0, 500)">
+            <i class="ace-icon fa fa-money"></i> Công nợ
+        </a>
+}
+    @*if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "CommisionCustomer", "Sale"))
+        {
+            <a class="btn btn-white btn-success btn-minier" onclick="OpenPopup('@Url.Action("Create", "CommisionCustomer", new { area = "Sale", CustomerId = Id, popup = true })', 'Cài đặt chiết khấu', 500, 700)">
+                <i class="ace-icon fa fa-cog"></i>
+                Chiết khấu
+            </a>
+        }*@
+}
+
+
+@helper GridColumnName(string name, string code, int id, string note, string Image, int? pluspoint, string phone, bool isPopup = false, string jsCallback = null)
+{
+
+name = string.IsNullOrEmpty(name) == false ? name : "No Title";
+    <div class="itemdiv commentdiv">
+        <div class="user">
+
+            <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image,"Customer","user"))" title="@name" data-rel="colorbox" class="cboxElement">
+                <img id="myImg" alt="@name" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))">
+            </a>
+
+        </div>
+        <div class="body">
+            <div class="name" data-toggle="tooltip" title="Tên khách hàng">
+                @if (!isPopup)
+                {
+                <a href="@Url.Action("Detail", "Customer", new { Id = id })">@name</a>
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(jsCallback))
+                    {
+                <a onclick="parent.selectItem_Customer(@id,'@code','@name','@pluspoint')">@name</a>
+                    }
+                    else
+                    {
+                <a onclick="parent.@(jsCallback)(@id, '@name','@pluspoint','@code','@phone')">@name</a>
+                    }
+                }
+                @if (!string.IsNullOrEmpty(note))
+                {
+                <span class="help-button" data-rel="tooltip" data-placement="bottom" data-original-title="@note">?</span>
+                }
+            </div>
+            <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+                @code
+            </div>
+        </div>
+    </div>
+}
+@helper GridColumnNote(string note)
+{
+    <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+        @note
+    </div>
+}
+@helper GridColumnNameAddress(string DistrictName, string WardName, string ProvinceName, string Address)
+{
+    <p data-toggle="tooltip" title="Địa chỉ - Phường/Xã">
+        <i class="fa fa-map-marker"></i> @(Address == null ? "chưa có" : Address) - @(WardName == null ? "chưa có" : WardName)
+    </p>
+    <span data-toggle="tooltip" title="Quận/huyện - Thành phố/Tỉnh">
+        <i class="fa fa-globe"></i> @(DistrictName == null ? "chưa có" : DistrictName) - @(ProvinceName == null ? "chưa có" : ProvinceName)
+    </span>
+
+}
+
+@helper GridColumnContact(string Phoneghep, string Email)
+{
+    <p data-toggle="tooltip" title="Số điện thoại">
+        <i class="fa fa-mobile-phone"></i> @(Phoneghep == null ? "chưa có" : Phoneghep.EndsWith("-") ? Phoneghep.Remove(Phoneghep.Length - 1) : Phoneghep)
+
+    </p>
+    <span data-toggle="tooltip" title="Email">
+        <i class="fa fa-envelope"></i> @(Email == null ? "chưa có" : Email)
+    </span>
+
+}
+@helper GridColumnDateName(DateTime? CreateDate, DateTime? DateOfIssue)
+{
+    <p data-toggle="tooltip" title="Ngày tạo">
+        <i class="fa fa-calendar-plus-o"></i> @CreateDate.Value.ToString("dd/MM/yyyy HH:mm")
+    </p>
+    <span data-toggle="tooltip" title="Ngày cập nhật"><i class="fa fa-calendar-check-o"></i> @(DateOfIssue.HasValue ? DateOfIssue.Value.ToString("dd/MM/yyyy HH:mm") : "chưa có")</span>
+}

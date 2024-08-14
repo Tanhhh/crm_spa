@@ -1,0 +1,187 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using PagedList.Mvc;
+
+
+@model PagedList.IPagedList<ProductViewModel>
+@{
+    Layout = null;
+    List<ProductViewModel> invoice = (List<ProductViewModel>)ViewBag.model;
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+
+
+    var st = ViewBag.start;///? Request["start"] : aDateTime.ToString("dd/MM/yyyy");
+    var en = ViewBag.end ;//= Request["end"] != null ? Request["end"] : retDateTime.ToString("dd/MM/yyyy");
+}
+
+
+<div class="width-100 margin-bottom-10" id="header">
+    <div class="infobox infobox-blue" style="width:fit-content">
+        <div class="infobox-icon">
+            <i class="ace-icon fa fa-dollar"></i>
+        </div>
+        <div class="infobox-data">
+            <span class="infobox-data-number ng-binding">@CommonSatic.ToCurrencyStr(invoice.Sum(x => x.Amount), null)</span>
+            <div class="infobox-content ng-binding">
+                Tiền bán hàng
+
+            </div>
+        </div>
+    </div>
+    <!-- ngIf: reportTypeModel.type != 4 --><div class="infobox infobox-blue ng-scope" data-ng-if="reportTypeModel.type != 4">
+        <div class="infobox-icon">
+            <i class="ace-icon fa fa-shopping-cart"></i>
+        </div>
+        <div class="infobox-data">
+            <span class="infobox-data-number ng-binding">@CommonSatic.ToCurrencyStr(invoice.Sum(x => x.Quantity), null)</span>
+            <div class="infobox-content ng-binding">Hàng hóa bán </div>
+        </div>
+    </div><!-- end ngIf: reportTypeModel.type != 4 -->
+    <!-- ngIf: reportTypeModel.type == 4 -->
+    <div class="infobox infobox-orange">
+        <div class="infobox-icon">
+            <i class="ace-icon fa fa-dollar"></i>
+        </div>
+        <div class="infobox-data">
+            <span class="infobox-data-number ng-binding">@CommonSatic.ToCurrencyStr(ViewBag.tienhangtra, null)</span>
+            <div class="infobox-content ng-binding">Tiền trả hàng</div>
+        </div>
+
+
+    </div>
+    <!-- ngIf: reportTypeModel.type != 4 --><div class="infobox infobox-orange ng-scope" data-ng-if="reportTypeModel.type != 4">
+        <div class="infobox-icon">
+            <i class="ace-icon fa fa-shopping-cart"></i>
+        </div>
+        <div class="infobox-data">
+            <span class="infobox-data-number ng-binding">@CommonSatic.ToCurrencyStr(ViewBag.sodonhangtra, null)</span>
+            <div class="infobox-content ng-binding">Hàng hóa trả </div>
+        </div>
+    </div><!-- end ngIf: reportTypeModel.type != 4 -->
+    <!-- ngIf: reportTypeModel.type == 4 -->
+    <!-- ngIf: reportTypeModel.type == 5 && monthlyReport.totalDebt > 0 -->
+    <div style="float:right">
+        <input type="text" id="searchproduct" style="width: 300px;" placeholder="Nhập tên hoặc mã sản phẩm và Enter" value="@Request["searchproduct"]" />
+
+    </div>
+</div>
+
+<table id="dTable" class="table table-bordered">
+    <thead>
+
+        <tr>
+
+            <th style="width:1%;text-align:center">Mã sản phẩm</th>
+            <th style="width:15%;text-align:center">Tên sản phẩm</th>
+
+            <th style="width:3%;text-align:center">SL bán</th>
+            <th style="width:10%;text-align:center">Tiền bán hàng</th>
+            <th style="width:10%;text-align:center">SL trả</th>
+            <th style="width:10%;text-align:center">Tiền trả hàng</th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+            {
+            <tr>
+                <td style="text-align:center">@item.Code</td>
+                <td>@item.Name</td>
+                <td style="text-align:right">@item.Quantity</td>
+                <td style="text-align:right">@CommonSatic.ToCurrencyStr(item.Amount, null)</td>
+                <td style="text-align:right">@(item.QuantityTotalInventory)</td>
+                <td style="text-align:right">@CommonSatic.ToCurrencyStr(item.PriceOutbound * item.QuantityTotalInventory, null)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- Thêm mã phân trang -->
+<br />
+@*<div class="row" style="width:100% ;background :#eff3f8;">
+        <div class="col-md-6 col-lg-6 col-xs-6 col-sm-6">
+
+            </div>
+        <div class="col-md-6 col-lg-6 col-xs-6 col-sm-6 text-right">
+            Trang: @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount
+            <div class="sotrang" style="width: 19%;display: inline-block;">Trang:<input style="width:60px;height:29px;" id="page1" name="page1" type="text" placeholder="@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount" /></div>
+            <div class="sodong" style="width: 19%;display: inline-block;">
+                @using (Html.BeginForm("Revenue", "SaleReport", FormMethod.Get))
+                {
+                    <div> Số dòng: @Html.DropDownList("size", (List<SelectListItem>)ViewBag.size, new { @onchange = "this.form.submit();" })</div>
+                }
+            </div>
+
+            <div class="chonsodong" style="width: 45%; display: inline-block; float: right; margin: 0px 0px 0px -54px; ">@Html.PagedListPager(Model, page => Url.Action("Revenue", new { page, size = ViewBag.currentSize, start = Request["start"], end = Request["end"], UserId = Request["UserId"] }))</div>
+        </div>
+    </div>*@
+
+<div class="row" style="width:100%; margin: 0; display: list-item; background :#eff3f8;">
+    <div class="col-md-4 col-lg-4 col-xs-4 col-sm-4">
+
+    </div>
+    <div class="col-md-8 col-lg-8 col-xs-8 col-sm-8 text-right">
+        @*Trang: @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount*@
+        <div class="sotrang" style="float: left;display: inline-block;">Trang:<input style="width:70px;height:32px;" id="page2" name="page2" type="text" placeholder="@(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) / @Model.PageCount" /></div>
+        <div class="sodong" style="float: left; margin-left: 15px; display: inline-block;">
+            
+                <div> Số dòng: @Html.DropDownList("size1", (List<SelectListItem>)ViewBag.size)</div>
+            
+        </div>
+
+        <div class="chonsodong" style="display: inline-block; float: right; margin: 0px 0px 0px -54px; ">
+            @Html.PagedListPager(Model, page => Url.Action("_RevenueProduct", new { page, size = ViewBag.currentSize, start = st, end = en }),
+    PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "productrevenue" }))
+    </div>
+</div>
+</div>
+
+@*@Html.PagedListPager(Model, page => Url.Action("_RevenueProduct", new { page, size = ViewBag.currentSize }),
+    PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing(new AjaxOptions() { HttpMethod = "GET", UpdateTargetId = "productrevenue" }))*@
+<!-- Kết thúc -->
+
+<script>
+
+    $("#size1").change(function () {
+        debugger
+        var size = $("#size1").val();
+        var product = $("#searchproduct").val();
+        var start = $('#start').val();
+        var end = $('#end').val();
+        //$.get('/SaleReport/_RevenueProduct/?size=' + size, function (html) {
+        //    $("#productrevenue").html(html);
+        //})
+        $.get('/SaleReport/_RevenueProduct/?searchproduct=' + product + '&start=' + start + '&end=' + end + '&size=' + size, function (html) {
+            $("#productrevenue").html(html);
+        })
+    });
+
+    $("#searchproduct").keypress(function () {
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if (keycode == '13') {
+            var product = $("#searchproduct").val();
+            var start = $('#start').val();
+            var end = $('#end').val();
+            
+            $.get('/SaleReport/_RevenueProduct/?searchproduct=' + product + '&start=' + start + '&end=' + end, function (html) {
+                $("#productrevenue").html(html);
+            })
+        }
+
+    })
+
+    $("#page2").keyup(function () {
+        var product = $("#searchproduct").val();
+        var start = $('#start').val();
+        var end = $('#end').val();
+        var size = $('#size1').val();
+        var page = $('#page2').val();
+        $.get('/SaleReport/_RevenueProduct/?searchproduct=' + product + '&start=' + start + '&end=' + end + '&size=' + size + '&page=' + page, function (html) {
+            $("#productrevenue").html(html);
+        })
+
+    });
+</script>

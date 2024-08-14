@@ -1,0 +1,323 @@
+﻿@using Erp.BackOffice.Sale.Controllers
+@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@model Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>
+
+
+@{
+    var TyleRule = ViewBag.TyleRule as IEnumerable<TyleRuleModel>;
+    var lsstatus = ViewBag.lsstatus as IEnumerable<StatusLeadModel>;
+    var tuple = ViewBag.section as Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>;
+    Layout = null;
+}
+    <style>
+            select {
+                height: 28px;
+            }
+            #searchPanelContent label {
+                color: #3f51b5;
+                font-weight:bold;
+            }
+            #searchPanelContent p {
+                color: #3f51b5;
+                font-size: 15px;
+            }
+            .select2-container {
+                width: 200px !important;
+            }
+
+    </style>
+
+
+    <div class="content" style="padding:18px;width:100%; position: relative;">
+        <button id="btnCloseAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true" style="position: absolute; top: 0 !important; right: 17px !important; font-size: 24px !important; padding: 0 11px !important; background: #e1e1e1 !important; border: none !important; color: #999 !important; ">&times;</button>
+
+        <div>
+            <P>Trạng thái hiện tại: <span id="StatusFromCurr" style="font-weight:bold"></span></P>
+            <div style="align-items: center;">
+                @Html.Label("Loại Rule", new { style = "margin-right:10px" })
+                <select style="height: 28px; width: 20rem;" name="TypeRuleId">
+                    @foreach (var item in TyleRule)
+                    {
+                        <option data-code="@item.TypeRule" value="@item.Id" @(item.TypeRule == "CHANGESTATUS" ? "selected" : "")>
+                            @item.Note
+                        </option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 5px 0;">
+            <div style="display: flex;">
+                @Html.Label("Điều kiện", new { style = "margin-right:10px" })
+                <select style="margin-left:10px" class="js-example-basic-single" name="ruleDetails.FieldName">
+                    <option value="" selected>--Chọn--</option>
+                    @{ var properties = typeof(LeadModel).GetProperties();
+                        int outchk;
+                        string[] dont = new string[] { "IsDeleted", "CreatedDate", "CreatedUserId", "ModifiedDate", "ModifiedUserId", "AssignedUserId", "StatusId" };
+                        var prop = properties.Where(x => !x.Name.StartsWith("F") && !int.TryParse(x.Name.Remove(0, 1).ToString(), out outchk) && x.Name != "Id" && !dont.Contains(x.Name));
+
+                        foreach (var item1 in prop)
+                        {
+                            var display = item1.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;
+                            string displayname = display != null ? display.DisplayName : "";
+                            <option value="@item1.Name">@displayname</option>
+                        }
+                    }
+                    @foreach (var item in tuple.Item2)
+                    {
+                        <option data-type="@item.TypeField" data-code="@item.CodeList" value="@item.FieldName">@item.NameLabel</option>
+                    }
+                </select>
+
+            </div>
+            <select name="ruleDetails.Logic" style="width:50px;height:28px">
+                <option selected value="=">=</option>
+                <option value="!=">!=</option>
+                <option value="=">>=</option>
+                <option value="="><=</option>
+                <option value=">">></option>
+                <option value="<"><</option>
+                <option value="like">like</option>
+            </select>
+            <input name="ruleDetails.ContentRule" style="width:200px;height:28px" />
+            <select hidden id="CodeList">
+            </select>
+            <select hidden id="Chkbox">
+            </select>
+            <div style="display:flex">
+                <label style="margin-right:10px" for="AndOr"> And/Or </label>
+                <select id="AndOr" name="ruleDetails.AndOr" disabled>
+
+                    <option value>
+                        --Chọn--
+                    </option>
+                    <option value="1">
+                        And
+                    </option>
+                    <option value="0">
+                        Or
+                    </option>
+
+                </select>
+            </div>
+        </div>
+        <div style="display: flex;">
+            @Html.Label("Trạng thái", new { style = "margin-right:5px" })
+            <select class="js-example-basic-single" name="StatusTo">
+                <option value="">
+                    --Chọn--
+                </option>
+                @foreach (var item in lsstatus)
+                {
+                    <option value="@item.Id">
+                        @item.Name
+                    </option>
+                }
+            </select>
+        </div>
+        <table style="margin: 10px 0; " id="tblRuleDetail" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        STT
+                    </th>
+                    <th>
+                        Điều kiện
+                    </th>
+
+                    <th>
+                        Trạng thái mới
+                    </th>
+                    <th>
+                        And/Or
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <section hidden id="smsbody">
+            <select id="cttemplate" class='js-example-basic-single'>
+            </select>
+            <textarea style="height:200px;width:100%" name="ContentRule"></textarea>
+        </section>
+        <section hidden id="mailbody">
+            <p>Từ: <span><strong>@ViewBag.FromMail</strong></span></p>
+            <select name="TileEmail" class="js-example-basic-single">
+            </select>
+            <textarea style="height:180px;width:100%" class="ckeditor" name="ContentEmail"></textarea>
+        </section>
+    </div>
+
+
+            <script>
+            CKEDITOR.replace('ContentEmail')
+            </script>
+            <script>
+            $(document).ready(function () {
+            $('.js-example-basic-single').select2({ dropdownParent: $("#searchPanelContent") });
+            $('select[name="ruleDetails.FieldName"]').change(function () {
+            debugger
+            if ($('select[name="ruleDetails.FieldName"] option:selected').data('type') == 'List') {
+            $.ajax({
+            url: '/AdviseCard/GetListByCode?code=' + $('select[name="ruleDetails.FieldName"] option:selected').data('code'),
+            method: 'get',
+            async: false,
+            dataType: "json",
+            success: function (data) {
+            $('#CodeList').empty()
+            $('#CodeList').append(`<option value=''>--Rỗng--</option>`)
+            $(data).each(function () {
+            $('#CodeList').append(`<option value='${this.Value}'>${this.Name}</option>`)
+            })
+            $('#CodeList').show()
+            $('#CodeList').select2({ dropdownParent: $("#searchPanelContent") });
+            $('input[name="ruleDetails.ContentRule"]').hide()
+            $('#Chkbox').empty()
+            $('#Chkbox').hide()
+            }
+            })
+            }
+            else if ($('select[name="ruleDetails.FieldName"] option:selected').val() == 'ReceptionStaffId') {
+            $.ajax({
+            url: '/AdviseCard/GetReceptionStaffId',
+            method: 'get',
+            async: false,
+            dataType: "json",
+            success: function (data) {
+            $('#CodeList').empty()
+            $('#CodeList').append(`<option value=''>--Rỗng--</option>`)
+            $(data).each(function () {
+            $('#CodeList').append(`<option value='${this.Id}'>${this.FullName}</option>`)
+            })
+            $('#CodeList').show()
+            $('#CodeList').select2({ dropdownParent: $("#searchPanelContent") });
+            $('input[name="ruleDetails.ContentRule"]').hide()
+            $('#Chkbox').empty()
+            $('#Chkbox').hide()
+            }
+
+
+            })
+            }
+            else if ($('select[name="ruleDetails.FieldName"] option:selected').data('type') == 'Bool' || (['IsCancel'].includes($('select[name="ruleDetails.FieldName"] option:selected').val()))) {
+            $('#Chkbox').empty()
+            $('#Chkbox').append(`<option selected value=''>--Chọn--</option>`)
+            $('#Chkbox').append(`<option value='1'>Yes</option>`)
+            $('#Chkbox').append(`<option value='0'>No</option>`)
+            $('#Chkbox').show()
+            $('input[name="ruleDetails.ContentRule"]').hide()
+            $('#CodeList').hasClass("select2-hidden-accessible") ? $('#CodeList').select2('destroy') : ''
+            $('#CodeList').hide()
+            }
+            else {
+            $('#CodeList').hasClass("select2-hidden-accessible") ? $('#CodeList').select2('destroy') : ''
+            $('#CodeList').empty()
+            $('#CodeList').hide()
+            $('#Chkbox').empty()
+            $('#Chkbox').hide()
+            $('input[name="ruleDetails.ContentRule"]').val('')
+            $('input[name="ruleDetails.ContentRule"]').show()
+            }
+
+
+            })
+            $('#CodeList,#Chkbox').change(function () {
+            $('input[name="ruleDetails.ContentRule"').val($(this).val())
+            })
+            $('select[name=TileEmail],#cttemplate').change(function () {
+            debugger
+            if ($(this).is('#cttemplate')) {
+            $('textarea[name=ContentRule]').val($(this).val())
+            } else {
+            $('textarea[name=ContentEmail]').val($(this).val())
+            CKEDITOR.instances['ContentEmail'].setData($(this).val())
+            }
+            })
+            $('select[name=TypeRuleId]').change(function () {
+            debugger
+            if ($('select[name=TypeRuleId] option:selected').data('code') == 'SENDSMS') {
+            smsshow()
+            $.ajax({
+            url: '/AdviseCard/GetTempeleByType?type=1',
+            method: 'get',
+            async: false,
+            dataType: "json",
+            success: function (data) {
+            debugger
+            let ct = $('#cttemplate')
+            ct.empty()
+            ct.append($("<option>").attr('value', '').text('--Chọn--'));
+            $(data).each(function () {
+            ct.append($("<option>").attr('value', this.ContentRule).text(this.ContentRule));
+            })
+            }
+            })
+
+            } else if ($('select[name=TypeRuleId] option:selected').data('code') == 'SENDZALO') {
+            smsshow()
+            $.ajax({
+            url: '/AdviseCard/GetTempeleByType?type=2',
+            method: 'get',
+            async: false,
+            dataType: "json",
+            success: function (data) {
+            debugger
+            let ct = $('#cttemplate')
+            ct.empty()
+            ct.append($("<option>").attr('value', '').text('--Chọn--'));
+            $(data).each(function () {
+            ct.append($("<option>").attr('value', this.ContentRule).text(this.ContentRule));
+            })
+            }
+            })
+
+
+
+            }
+            else if ($('select[name=TypeRuleId] option:selected').data('code') == 'SENDEMAIL') {
+            mailshow()
+            $.ajax({
+            url: '/AdviseCard/GetTempeleByType?type=3',
+            method: 'get',
+            async: false,
+            dataType: "json",
+            success: function (data) {
+            debugger
+            let ti = $('select[name=TileEmail]')
+            ti.empty()
+            ti.append($("<option>").attr('value', '').text('--Chọn--'));
+            $(data).each(function () {
+            ti.append($("<option>").attr('value', this.ContentEmail).text(this.TileEmail));
+            })
+
+
+            }
+            })
+
+
+
+            } else {
+            statusshow()
+            }
+            })
+
+            })
+
+            function smsshow() {
+            $('#smsbody').show()
+            $('#mailbody').hide()
+            }
+            function mailshow() {
+            $('#smsbody').hide()
+            $('#mailbody').show()
+            }
+            function statusshow() {
+            $('#smsbody').hide()
+            $('#mailbody').hide()
+            }
+            </script>
+

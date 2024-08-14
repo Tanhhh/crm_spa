@@ -1,0 +1,409 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model SalesReturnsViewModel
+
+@{
+    if (Model.Id > 0)
+    {
+        ViewBag.Title = "Cập nhật hóa đơn hàng bán trả lại";
+    }
+    else
+    {
+        ViewBag.Title = Wording.PageCreate_SalesReturns;
+    }
+
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SalesReturns",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+<link href="/assets/css/combojax.css" rel="stylesheet" />
+}
+
+<style type="text/css">
+        .has_error {
+            border: 1px #f2a696 solid !important;
+            color: #D68273;
+        }
+
+              .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+</style>
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.ValidationSummary(true)
+    <div class="row">
+        <div class="col-sm-7 ">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#return" aria-expanded="true"><i class="fa fa-spinner"></i>Trả sản phẩm</a>
+                                </li>
+                                
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="return" class="tab-pane active">
+                                  <div id="search_content_invoice"></div>
+                                    <div id="listReturnDetail" class="table-responsive top-10 ">
+                                        <table class="table table-bordered grid-table bottom-5">
+                                            <thead>
+                                                <tr>
+                                                    <th class="grid-header" width="50">STT</th>
+                                                    <th class="grid-header">Tên SP/DV</th>
+                                                    <th class="grid-header">Lô/Hạn SD</th>
+                                                    <th class="grid-header" width="60">SL</th>
+                                                    <th class="grid-header" width="100">Đơn giá</th>
+                                                    <th class="grid-header" width="90">Thành tiền</th>
+                                                    <th class="grid-header" width="20"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="detailList">
+                                                <tr role="0" hidden>
+                                                    <td class="text-center">
+                                                        1
+                                                    </td>
+                                                    <td>
+                                                        <input class="item_id" type="hidden" id="DetailList_0__Id" name="DetailList[0].Id" value="0" />
+                                                        <input class="item_product_id" type="hidden" id="DetailList_0__ProductId" name="DetailList[0].ProductId" value="0" />
+                                                        <span class="item_product_name"></span>
+                                                    </td>
+                                                    <td class="detail_locode">
+                                                        <input class="item_locode" type="text" id="DetailList_0__LoCode" name="DetailList[0].LoCode" value="" style="width:80px" />
+                                                        <input class="input-mask-date item_expiry_date" type="text" id="DetailList_0__ExpiryDate" name="DetailList[0].ExpiryDate" value="" style="width:80px;">
+                                                    </td>
+                                                    <td>
+                                                        <input type="hidden" name="DetailList[0].Unit" id="DetailList_0__Unit" value="" class="item_unit" />
+                                                        <input class="item_quantity numberinput2 text-right" type="text" id="DetailList_0__Quantity" name="DetailList[0].Quantity" value="0" style="width:100%" />
+                                                    </td>
+                                                    <td>
+                                                        <input class="item_price numberinput2 text-right" type="text" id="DetailList_0__Price" name="DetailList[0].Price" value="" style="width:100%" />
+                                                    </td>
+                                                    <td align="right"><span class="item_total" align="right"></span></td>
+                                                    <td class="text-center">
+                                                        <a class="btn-delete-item">
+                                                            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                @for (int i = 0; i < Model.DetailList.Count(); i++)
+                                                {
+                                                    var thanh_tien = Model.DetailList[i].Price * Model.DetailList[i].Quantity;
+                                                    <tr role="@(i+1)">
+                                                        <td class="text-center">
+                                                            @(i + 1)
+                                                        </td>
+                                                        <td>
+                                                            <input class="item_id" type="hidden" id="DetailList_@(i+1)__Id" name="DetailList[@(i+1)].Id" value="@Model.DetailList[i].Id" />
+                                                            <input class="item_product_id" type="hidden" id="DetailList_@(i+1)__ProductId" name="DetailList[@(i+1)].ProductId" value="@Model.DetailList[i].ProductId" />
+                                                            <span class="item_product_name">@Model.InvoiceList[i].ProductName</span>
+                                                        </td>
+                                                        <td class="detail_locode">
+                                                            <input class="item_locode" type="text" id="DetailList_@(i+1)__LoCode" name="DetailList[@(i+1)].LoCode" value="@Model.DetailList[i].LoCode" style="width:80px" />
+                                                            <input class="input-mask-date item_expiry_date" type="text" id="DetailList_@(i+1)__ExpiryDate" name="DetailList[@(i+1)].ExpiryDate" value="@(Model.DetailList[i].ExpiryDate.HasValue ? Model.DetailList[i].ExpiryDate.Value.ToString("dd/MM/yyyy") : "")" style="width:80px;">
+                                                        </td>
+                                                        <td>
+                                                            <input type="hidden" name="DetailList[@(i+1)].Unit" id="DetailList_@(i+1)__Unit" value="@Model.DetailList[i].Unit" class="item_unit" />
+                                                            <input class="item_quantity numberinput2 text-right" type="text" id="DetailList_@(i+1)__Quantity" name="DetailList[@(i+1)].Quantity" value="@Model.DetailList[i].Quantity" style="width:100%" />
+                                                        </td>
+                                                        <td>
+                                                            <input class="item_price numberinput2 text-right" type="text" id="DetailList_@(i+1)__Price" name="DetailList[@(i+1)].Price" value="@Model.DetailList[i].Price" style="width:100%" />
+                                                        </td>
+                                                        <td align="right"><span class="item_total" align="right">@(thanh_tien.ToCurrencyStr(null))</span></td>
+                                                        <td class="text-center">
+                                                            <a class="btn-delete-item">
+                                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+
+                                                    <td colspan="3" class="red"><span id="status"></span></td>
+                                                    <td class="detailList_SL" align="right" style="font-weight:bold"></td>
+                                                    <td></td>
+                                                    <td class="detailList_Amount" align="right" style="font-weight:bold"></td>
+                                                    <td></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+
+                                    </div>
+
+                                </div>
+                                <div id="invoice" class="tab-pane">
+                                    <div class="product-search-box clearfix " style="margin-bottom:10px">
+                                        <span class="label label-warning" style="padding: 6px; float: left; height: 26px; margin-left: 0px;">[F4]</span>
+                                        <div id="product_search_control">
+                                            <span class="ctl">
+                                                @Html.TextBox("Product", "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "off", style = "width:400px;" })
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div id="listOrderDetail" class="table-responsive top-10 ">
+                                        <table class="table table-bordered grid-table bottom-5">
+                                            <thead>
+                                                <tr>
+                                                    <th class="grid-header" width="50">STT</th>
+                                                    <th class="grid-header">Tên SP/DV</th>
+                                                    <th class="grid-header">Lô/Hạn SD</th>
+                                                    <th class="grid-header" width="60">SL</th>
+                                                    <th class="grid-header" width="100">Đơn giá</th>
+
+                                                    <th class="grid-header" width="90">Thành tiền</th>
+
+                                                    <th class="grid-header" width="20"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="productInvoiceList">
+                                                <tr role="0" hidden>
+                                                    <td class="text-center">
+                                                        1
+                                                    </td>
+                                                    <td>
+                                                        <input class="item_id" type="hidden" id="InvoiceList_0__Id" name="InvoiceList[0].Id" value="0" />
+                                                        <input class="item_product_id" type="hidden" id="InvoiceList_0__ProductId" name="InvoiceList[0].ProductId" value="0" />
+                                                        <span class="item_product_name"></span>
+                                                    </td>
+                                                    <td class="detail_locode">
+                                                        <input class="item_locode" type="text" id="InvoiceList_0__LoCode" name="InvoiceList[0].LoCode" value="" style="width:80px" />
+                                                        <input class="input-mask-date item_expiry_date" type="text" id="InvoiceList_0__ExpiryDate" name="InvoiceList[0].ExpiryDate" value="" style="width:80px;">
+                                                    </td>
+                                                    <td>
+                                                        <input type="hidden" name="InvoiceList[0].Unit" id="InvoiceList_0__Unit" value="" class="item_unit" />
+                                                        <input class="item_quantity numberinput2 text-right" type="text" id="InvoiceList_0__Quantity" name="InvoiceList[0].Quantity" value="0" style="width:100%" />
+                                                    </td>
+                                                    <td>
+                                                        <input class="item_price numberinput2 text-right" type="text" id="InvoiceList_0__Price" name="InvoiceList[0].Price" value="" style="width:100%" />
+                                                    </td>
+                                                    <td align="right"><span class="item_total" align="right"></span></td>
+                                                    <td class="text-center">
+                                                        <a class="btn-delete-item">
+                                                            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                @for (int i = 0; i < Model.InvoiceList.Count(); i++)
+                                                {
+                                                    var thanh_tien = Model.InvoiceList[i].Price * Model.InvoiceList[i].Quantity;
+                                                    <tr role="@(i+1)">
+                                                        <td class="text-center">
+                                                            @(i + 1)
+                                                        </td>
+                                                        <td>
+                                                            <input class="item_id" type="hidden" id="InvoiceList_@(i+1)__Id" name="InvoiceList[@(i+1)].Id" value="@Model.InvoiceList[i].Id" />
+                                                            <input class="item_product_id" type="hidden" id="InvoiceList_@(i+1)__ProductId" name="InvoiceList[@(i+1)].ProductId" value="@Model.InvoiceList[i].ProductId" />
+                                                            <span class="item_product_name">@Model.InvoiceList[i].ProductName</span>
+                                                        </td>
+                                                        <td class="detail_locode">
+                                                            <input class="item_locode" type="text" id="InvoiceList_@(i+1)__LoCode" name="InvoiceList[@(i+1)].LoCode" value="@Model.InvoiceList[i].LoCode" style="width:80px" />
+                                                            <input class="input-mask-date item_expiry_date" type="text" id="InvoiceList_@(i+1)__ExpiryDate" name="InvoiceList[@(i+1)].ExpiryDate" value="@(Model.InvoiceList[i].ExpiryDate.HasValue ? Model.InvoiceList[i].ExpiryDate.Value.ToString("dd/MM/yyyy") : "")" style="width:80px;">
+                                                        </td>
+                                                        <td>
+                                                            <input type="hidden" name="InvoiceList[@(i+1)].Unit" id="InvoiceList_@(i+1)__Unit" value="@Model.InvoiceList[i].Unit" class="item_unit" />
+                                                            <input class="item_quantity numberinput2 text-right" type="text" id="InvoiceList_@(i+1)__Quantity" name="InvoiceList[@(i+1)].Quantity" value="@Model.InvoiceList[i].Quantity" style="width:100%" />
+                                                        </td>
+                                                        <td>
+                                                            <input class="item_price numberinput2 text-right" type="text" id="InvoiceList_@(i+1)__Price" name="InvoiceList[@(i+1)].Price" value="@Model.InvoiceList[i].Price" style="width:100%" />
+                                                        </td>
+                                                        <td align="right"><span class="item_total" align="right">@(thanh_tien.ToCurrencyStr(null))</span></td>
+                                                        <td class="text-center">
+                                                            <a class="btn-delete-item">
+                                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+
+                                                    <td colspan="3" class="red"><span id="status"></span></td>
+                                                    <td class="productInvoiceList_SL" align="right" style="font-weight:bold"></td>
+                                                    <td></td>
+                                                    <td class="productInvoiceList_Amount" align="right" style="font-weight:bold"></td>
+                                                    <td></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-spinner"></i> Tổng quan</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane active">
+                                    @Html.ModulePopupFor(m => m.ProductInvoiceOldId, "ProductInvoice", Model.ProductInvoiceOldCode, false, true)
+                                    @Html.HiddenFor(m => m.CustomerId)
+                                    @Html.CustomTextboxFor(model => model.CustomerName, null, null, WidthType.span12, true, new Dictionary<string, object> {{ "readonly", "readonly" }, { "id", "CustomerId_DisplayText" } })
+                                    @Html.CustomDropDownListFor(model => model.WarehouseDestinationId,SelectListHelper.GetSelectList_Warehouse(Model.WarehouseDestinationId,null), WidthType.span12, true, "- Chọn -")
+                                    @Html.CustomTextAreaFor(model => model.Note, Wording.Note, WidthType.span12, true, null, "hide", "full-w")
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p></p>
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title"><i class="fa fa-cc-paypal"></i> Thông tin thanh toán</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @Html.CustomTextboxFor(model => model.TotalAmount, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.InvoiceNew.TotalAmount, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.InvoiceNew.TaxFee, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.InvoiceNew.TongTienSauVAT, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.AmountPayment, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.AmountReceipt, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "text-right numberinput" }, { "readonly", "readonly" } })
+                      
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+@section Scripts {
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+
+<script src="/Scripts/combojax.js?=vs1.01211"></script>
+<script src="~/Scripts/area_sale/SaleReturn.js?=vs1.001"></script>
+
+    <script type="text/javascript">
+        function SetTextForId(ele, strName) {
+            var a = $(ele).closest('div .control-group');
+            a.find('label').html(strName);
+        }
+        $(document).ready(function () {
+            SetTextForId($('#TotalAmount'), "Tổng tiền đơn trả");
+            SetTextForId($('#InvoiceNew_TotalAmount'), "Tổng tiền mua hàng");
+        });
+        $(document).ready(function () {
+            LoadNumberInput();
+            $('#listOrderDetail').on('change', 'input', function () {
+                var value = $(this).val();
+                if (value == "") {
+                    $(this).addClass("valid_null");
+                }
+                else {
+                    $(this).removeClass("valid_null");
+                    $(this).removeClass("has_error");
+
+                }
+            });
+            $('#listOrderDetail').on('change', 'input', function () {
+                var value = $(this).val();
+                if (value == "") {
+                    $(this).addClass("valid_null");
+                }
+                else {
+                    $(this).removeClass("valid_null");
+                    $(this).removeClass("has_error");
+
+                }
+            });
+            $('#Save').click(function () {
+                ShowLoading();
+                var WarehouseDestinationId = $("#WarehouseDestinationId").val();
+                var messagge = "";
+                var count_locode = $('.item_locode.valid_null').length;
+                var expiry_date_null = $('.item_expiry_date.valid_null').length;
+                $('.valid_null').addClass("has_error");
+                if (count_locode > 1) {
+                    messagge += "Cần nhập đầy đủ số lô <br>";
+                }
+                if (expiry_date_null > 1) {
+                    messagge += "Cần nhập đầy đủ hạn sử dụng <br>";
+                }
+                if (WarehouseDestinationId == '') {
+                    messagge += "Kho nhận chưa có <br>";
+                }
+                if (messagge != '') {
+                    alertPopup('Lỗi!', messagge, 'error');
+                    HideLoading();
+                }
+                else {
+                    ClearFormatBeforeSubmit($("#SaleOrder"));
+                    $("#SaleOrder").submit();
+                    // HideLoading();
+                }
+
+                //return false;
+            });
+
+
+        });
+
+    </script>
+
+}

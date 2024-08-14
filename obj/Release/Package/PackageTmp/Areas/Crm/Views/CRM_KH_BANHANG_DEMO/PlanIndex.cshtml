@@ -1,0 +1,219 @@
+﻿@model List<Crm_SendPlanViewModel>
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using Erp.BackOffice.Administration.Models
+@{
+    ViewBag.Title = "Kế hoạch bán hàng cần duyệt";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CRM_KH_BANHANG_DEMO",
+        ActionName = "PlanIndex",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    var stt = 1;
+
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+
+    List<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (List<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+@*@if (ViewBag.TuChoiPlan != null || ViewBag.TuChoiPlan != "")
+    {
+        <div class="alert alert-success" role="alert">
+            @ViewBag.TuChoiPlan
+        </div>
+    }*@
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@helper GridColumnName(string name, int id, int month, int year)
+{
+/**/
+
+
+
+//CRM_KH_BANHANG_DEMO/Create/14791?month=10&year=2020
+name = string.IsNullOrEmpty(name) ? "No Title" : name;
+    <a target="_blank" href="@Url.Action("Create", "CRM_KH_BANHANG_DEMO" , new { Id= id,month = month, year = year })">@name</a>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <input name="Name" id="Name" value="@Request["Name"]" type="text" placeholder="Quản lý.." />
+        <label>Tháng</label>
+        <select id="Month" name="Month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(Month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Năm</label>
+        <select id="Year" name="Year">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1) + 1; i++)
+            {
+                <option @(Year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        @*<input class="ace" checked="@Request["check"]" id="check" name="check" type="checkbox" value="@Request["check"]">*@
+        @*<label for="check" class="margin-left-5">   </label>*@
+        @*<span class="lbl">Đã duyệt</span>*@
+        <label>
+            <input type="radio" class="hidden-320 ace ng-valid ng-dirty" id="single1" @(ViewBag.Approve == 0 ? "checked" : "") name="Approve" value="0">
+            <span class="lbl ng-binding">Chưa duyệt </span>
+        </label>
+        <label>
+            <input type="radio" class="hidden-320 ace ng-pristine ng-valid" id="single2" @(ViewBag.Approve == 1 ? "checked" : "") name="Approve" value="1">
+            <span class="lbl ng-binding">Quản lý duyệt</span>
+        </label>
+        <label>
+            <input type="radio" class="hidden-320 ace ng-pristine ng-valid" id="single2" @(ViewBag.Approve == 2 ? "checked" : "") name="Approve" value="2">
+            <span class="lbl ng-binding">Giám đốc duyệt</span>
+        </label>
+        <br />
+
+}
+
+@*<form action="PlanSearch" method="post">
+        <input name="ten" type="text" placeholder="Nhập tên.." />
+        <select name="thang">
+            <option value="-1">Chọn tháng..</option>
+            @for (var m = 1; m <= 12; m++)
+            {
+                <option value="@m">@m</option>
+            }
+        </select>
+        <select>
+            <option value="-1">Chọn năm..</option>
+            @for (var y = 2016; y <= DateTime.Now.Year; y++)
+            {
+                {
+                    <option value="@y">@y</option>
+                }
+            }
+        </select>
+        <br />
+        <label for="check">Đã duyệt:</label>
+        <input name="check" id="check" type="checkbox" value="1" />
+        <br />
+        <input type="submit" value="Tìm Kiếm" />
+    </form>*@
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Người lập</th>
+            <th scope="col">Tháng</th>
+            <th scope="col">Năm</th>
+            
+            <th>Người duyệt</th>
+            
+            <th scope="col">Hoạt động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+            {
+            <tr>
+                <th scope="row">@(stt++)</th>
+                <td>@GridColumnName(item.Name, item.NGUOILAP_ID, item.Month, item.Year)</td>
+                <td>@item.Month</td>
+                <td>@item.Year</td>
+                @if (item.IsApprove == 1)
+                {
+                    <td><span>@item.NguoiDuyet  Đã duyệt</span></td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td>
+                    @if (item.IsApprove == 1)
+                    {
+
+                        <a type="button" style="padding: 0 !important;" class="btn btn-success" href="@Url.Action("Approve", "CRM_KH_BANHANG_DEMO" , new { Id= item.Id})">Giám đốc duyệt</a>
+                        <button type="button" style="padding: 0 !important;" class="btn btn-danger" data-toggle="modal" data-target="#exampleModalCenter">
+                            Từ chối
+                        </button>
+                    }
+                    else if (item.IsApprove == 0)
+                    {
+                        <a type="button" style="padding: 0 !important;" class="btn btn-success" href="@Url.Action("ManagerApprove", "CRM_KH_BANHANG_DEMO" , new { Id= item.Id})">Quản lý duyệt</a>
+                        <button type="button" style="padding: 0 !important;" class="btn btn-danger" data-toggle="modal" data-target="#exampleModalCenter">
+                            Từ chối
+                        </button>
+                    }
+                    else
+                    {
+                        <span>Kế hoạch đã được lập</span>
+                    }
+                    <!-- nhập lý do t chối -->
+                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <form action="TuChoiPlan" method="post">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLongTitle">Nhập lý do từ chối</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <input name="Id" value="@item.Id" style="display:none;" />
+                                        <input type="text" style="width: 100%;" name="Note" id="input" required pattern="\S+.*" />
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                                        <button type="submit" class="btn btn-primary">Từ chối</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!--emd nhập lý do từ chối-->
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>

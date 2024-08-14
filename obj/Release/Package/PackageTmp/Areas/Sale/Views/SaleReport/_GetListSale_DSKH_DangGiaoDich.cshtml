@@ -1,0 +1,81 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Areas.Sale.Models
+@model List<KH_DangCoGDViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            <tr class="" style="display:none">
+                <th class="" colspan="10" style="text-align:center"><h4>Thống kê danh sách khách hàng đang giao dịch</h4></th>
+            </tr>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th style="width:100px;text-align:center">NV quản lý</th>
+                <th style="width:200px;text-align:center">Nhóm quản lý</th>
+                <th style="width:200px;text-align:center">Mã số</th>
+                <th style="width:100px;text-align:center">Họ tên khách hàng</th>
+                <th style="width:150px;text-align:center">SĐT</th>
+                <th style="width:100px;text-align:center">Địa chỉ </th>
+                <th style="width:100px;text-align:center">GĐNDT</th>
+                <th style="width:100px;text-align:center">Loại KH</th>
+                <th style="width:100px;text-align:center">Tình trạng kinh tế</th>
+                <th style="width:100px;text-align:center">Ngày GD gần nhất</th>
+                <th style="width:100px;text-align:center">Tổng số GD</th>
+                <th style="width:100px;text-align:center">Tổng tiền GD ảo</th>
+                <th style="width:100px;text-align:center">Tổng tiền thanh toán</th>
+                <th style="width:100px;text-align:center">Xếp hạng vip</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr class="@(index%2==0?"alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+
+                <td>@item.ManagerStaffName</td>
+                <td>@item.TenNhomHuong</td>
+                <td>@item.Code</td>
+                <td>@item.CompanyName</td>
+                <td>@item.Phone</td>
+                <td>@item.Address</td>
+                @if (item.SoNgayGD > 1)
+                {
+                    <td>N </td>
+                }
+                else
+                {
+                    <td>Y </td>
+                }
+                <td>@item.CustomerType</td>
+                <td>@item.EconomicStatus</td>
+                <td>@(item.NgayGDGN.Value.ToShortDateString())</td>
+                <td>@item.SoLanGD</td>
+                <td>@item.TotalAmount</td>
+                <td>@item.tongtiendatra</td>
+                <td>@item.LoyaltyPointName</td>
+
+            </tr>
+            }
+        </tbody>
+        @*<thead>
+                <tr>
+                    <td colspan="9" style="text-align:right"><b>Tổng</b></td>
+                    <td style="text-align:right">@(Common.PhanCachHangNgan2(Model.Sum(x => x.Quantity)))</td>
+                </tr>
+            </thead>*@
+    </table>
+    <script src="~/Scripts/jquery.floatThead.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+            $("#CTable").floatThead({ top: 30 });
+        });
+    </script>

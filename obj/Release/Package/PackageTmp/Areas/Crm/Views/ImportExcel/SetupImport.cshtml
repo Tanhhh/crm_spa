@@ -1,0 +1,1028 @@
+﻿@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Sale.Models
+@using System.ComponentModel
+
+@{
+    ViewBag.Title = "ImportExcel";
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+    var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+    var dataNameLabel = ViewBag.dataNameLabel as IEnumerable<ImportExcelNameLabelViewModel>;
+    var dataDisplayName = ViewBag.datadDsplayName as List<string>;
+    int number;
+    var listTemplateName = ViewBag.listTemplateName;
+    var properties = typeof(LeadModel).GetProperties();
+    string[] dont = new string[] { "IsDeleted", "CreatedDate", "CreatedUserId", "ModifiedDate", "ModifiedUserId", "AssignedUserId" };
+    var prop = properties.Where(x => x.Name != "Id" && !dont.Contains(x.Name));
+    var stt = 0;
+}
+
+<style>
+    .mb-body {
+        margin-left: 10px;
+        margin-right: 30px;
+        min-height: 300px;
+    }
+
+    .mb-file,
+    .mb-details {
+        margin-top: 10px;
+    }
+
+    .button-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+        float: inline-end;
+    }
+
+    .start-button,
+    .back-button,
+    .next-button {
+        padding: 5px 10px;
+        background-color: #f9f9f9;
+        border: 1px solid #DDD;
+        color: black;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+        .start-button:hover,
+        .back-button:hover,
+        .next-button:hover {
+            background-color: #428BCA !important;
+        }
+
+    .start-button {
+        margin-right: auto;
+    }
+
+    .back-next-buttons {
+        display: flex;
+    }
+
+    .back-button {
+        margin-right: 10px;
+    }
+
+    .next-button {
+        margin-left: 10px;
+    }
+
+    .row-container {
+        margin-left: 20px;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+        .row-container label,
+        .row-container input {
+            margin-right: 10px;
+        }
+
+    .mb-grid {
+        display: grid;
+        margin-top: 10px;
+    }
+
+    #page4 .back-next-buttons,
+    #page3 .back-next-buttons,
+    #page2 .back-next-buttons {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+    }
+
+    table {
+        overflow-x: auto;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        margin-bottom: 30px;
+    }
+
+    table tr td:first-child {
+        background-color: #f9f9f9;
+        font-weight: bold;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    th:not(:first-child), td:not(:first-child) {
+        min-width: 80px;
+    }
+
+    tr:nth-child(1) {
+        font-weight: bold;
+    }
+
+    .table-maped tr td {
+        min-width: 280px;
+    }
+
+        .table-maped tr td:not(:first-child):hover {
+            cursor: pointer;
+            background-color: #f9f9f9;
+        }
+
+    .table > thead > tr {
+        color: #707070;
+        font-weight: 400;
+        background: #e2e2e2de;
+    }
+</style>
+<!-- Page 1 -->
+<div class="mb-body" id="page1">
+    <div class="mb-file">
+        <label style="font-weight:bold">Dạng file</label>
+        <div style="margin-left:20px">
+            <input type="checkbox" id="excelFileCheckbox" checked disabled style=" outline: none; border-radius: .3rem;">
+            <label for="excelFileCheckbox">Excel file (*.xls, *.xlsx)</label>
+        </div>
+    </div>
+    <div class="mb-file">
+        <label for="formFileSm" class="form-label" style="font-weight:bold">Chọn file</label>
+        <input class="form-control form-control-sm" id="formFileSm" type="file" style="margin-left:20px;width:50%">
+    </div>
+    <div class="mb-details" id="idSpecifydt" style="display:none;">
+        <label class="form-label" style="font-weight:bold">Thiết lập dữ liệu</label>
+        <div class="row-container">
+            <label for="inFirstRow">Tên Sheet</label>
+            <input class="form-control" id="inSheetName" style="width: 240px; height: 3rem; border-radius: 3px !important; " readonly="disabled">
+            <button id="btnCheck" style=" padding: .55rem 1rem; border: none; border-radius: .5rem; background: #61deb1; color: #fff;">Kiểm tra dữ liệu</button>
+        </div>
+        <div class="row-container">
+            <label for="inFirstRow">First Row:</label>
+            <input class="form-control" id="inFirstRow" style="width: 80px; height: 3rem; border-radius: 3px !important;" type="number" min="1" readonly="disabled">
+            <label for="inLastRow">Last Row:</label>
+            <input class="form-control" id="inLastRow" style="width: 80px; height: 3rem; border-radius: 3px !important;" type="number" min="2" readonly="disabled">
+            <span id="idMaxRow" style="color:#428BCA"></span>
+        </div>
+    </div>
+    <div class="button-row">
+        <div class="back-next-buttons">
+            <button class="next-button" id="idNextPreview" style="background: #428BCA !important; color: #fff; ">Tiếp tục ></button>
+        </div>
+    </div>
+</div>
+
+<!-- Page 2 -->
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+<div id="page2" class="mb-body" style="display: none; padding: 0rem 0px 2rem 0px;">
+    <div class="mb-grid">
+        <label style="font-weight: bold; font-size: 15px !important; text-transform: capitalize;">Duyệt trước dữ liệu</label>
+        <div class="table-container">
+            <div id="gridPreview" style="float:left"></div>
+        </div>
+
+    </div>
+    <div class="back-next-buttons">
+        <button class="back-button" onclick="goToPage(1)">< Trở lại</button>
+        <button class="next-button" id="idNextMapping" onclick="goToPage(3)" style=" background: #428BCA !important; color: #fff;">Tiếp tục ></button>
+    </div>
+</div>
+<!-- page 3 -->
+<div id="page3" class="mb-body" style="display: none; padding: 0rem 0px 2rem 0px;">
+    <div class="mb-grid">
+        <div style=" margin-bottom: 1.5rem;">
+            <label style="font-weight:bold; margin-bottom: 10px; margin-right:10px;">Chọn mẫu Mapping</label>
+            <select class="form-select form-select-sm" aria-label="Small select example" id="selectTempalte" style=" height: 30px !important; border-radius: .5rem;">
+                <option value="" selected>Danh sách mẫu Mapping</option>
+                @if (listTemplateName != null)
+                {
+                    foreach (var temNa in listTemplateName)
+                    {
+                        <option value="@temNa">@temNa</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="table-container">
+            <div id="gridMapping" style="float:left">
+                <table class="table table-bordered table-maped">
+                    <thead>
+                        <tr>
+                            <th>Trường dữ liệu</th>
+                            <th>Cột trong file Excel</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-maped">
+                        @foreach (var item in prop)
+                        {
+                            if (item.Name.StartsWith("F") && int.TryParse(item.Name.Substring(1), out number))
+                            {
+                                if (dataNameLabel != null)
+                                {
+                                    var name = dataNameLabel.FirstOrDefault(x => x.FieldName == item.Name);
+                                    if (name != null)
+                                    {
+                                        <tr id="@stt">
+                                            <td style="text-align: left">
+                                                <span id="column-in-table-@stt" data-field="@stt" data-value="@item.Name">@name.NameLabel</span>
+                                            </td>
+                                            <td style="font-weight:bold" class="openModalCell">
+                                                <span id="column-in-file-@stt"></span>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                            else
+                            {
+                                var display = item.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;
+                                string displayname = display != null ? display.DisplayName : "";
+                                <tr id="@stt">
+                                    <td style="text-align: left">
+                                        <span id="column-in-table-@stt" data-field="@stt" data-value="@item.Name"> @displayname </span>
+                                    </td>
+                                    <td style="font-weight:bold" class="openModalCell">
+                                        <span id="column-in-file-@stt"></span>
+                                    </td>
+                                </tr>
+                            }
+                            stt = stt + 1;
+                        }
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            border: 1px solid #ccc;
+            height: auto;
+            width: auto;
+            overflow: hidden;
+            float: right;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 2px;
+            height: auto;
+            max-height: 420px;
+            border: 1px solid #888;
+            width: 800px;
+        }
+
+        #close {
+            position: absolute;
+            top: 0;
+            right: 0;
+            color: #aaa;
+            font-size: 25px;
+            font-weight: bold;
+            line-height: 15px;
+            margin: 5px;
+            border: 1px solid #aaa;
+        }
+
+            #close:hover,
+            #close:focus {
+                color: black;
+                border: 1px solid black;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+        .modalmap-container {
+            overflow-y: auto;
+            max-height: 389px;
+        }
+
+        #topmodal {
+            padding-bottom: 5px;
+        }
+
+        .table-modal tr:hover {
+            background-color: #428BCA;
+            color: white;
+        }
+
+        .highlight {
+        }
+
+        .loading-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.1); 
+            z-index: 9999; 
+            display: none; 
+        }
+    </style>
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div id="topmodal">
+                <span style="font-weight:bold">Trường dữ liệu: <span id="idNameCiTable" data-id="" style="font-weight:normal; color: #428BCA"> </span></span>
+                <span id="close">&times;</span>
+            </div>
+            <div class="modalmap-container" id="table-modal-mapped">
+                <table class="table table-bordered table-modal" style="margin-bottom: 0px">
+                    <thead>
+                        <tr>
+                            <th style="width:50px;">Mapped</th>
+                            <th>Cột trong file Excel</th>
+                            <th>Giá trị của hàng đầu tiên(1st)</th>
+                            <th>Giá trị của hàng thứ 2(2st)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+    <div class="back-next-buttons">
+        <button class="back-button" onclick="goToPage(2)">< Trở lại</button>
+        <button class="next-button" id="idNextPreResult" style=" background: #428BCA !important; color: #fff;">Tiếp tục </button>
+    </div>
+</div>
+<!-- Page 4-->
+
+<div id="page4" class="mb-body" style="display: none; padding: 0rem 0px 2rem 0px;">
+    <div id="overlay" class="overlay"></div>
+
+    <div class="mb-grid">
+        <label style="font-weight:bold">Duyệt trước kết quả</label>
+        <div class="table-container">
+            <div id="gridPreviewResult" style="float:left"></div>
+        </div>
+        <!-- Đặt biểu tượng loading ở giữa trang -->
+        <div id="loading" class="loading-container" style="display: none;">
+            <img src="~/assets/images/loadingicon.gif" alt="Loading..." width="100" height="100">
+        </div>
+
+    </div>
+    <div class="back-next-buttons">
+        <button class="back-button" onclick="goToPage(3)">< Trở lại</button>
+        <!-- Button để gọi hàm khi nhấn -->
+        <button class="next-button" id="idnextOk">
+            Import
+        </button>
+    </div>
+</div>
+
+<!-- Page 5-->
+<div id="page5" class="mb-body" style="display: none; padding: 0rem 0px 2rem 0px;">
+    <div class="mb-grid">
+        <label style="font-weight:bold">Bạn có cần lưu mẫu Import không?</label>
+        <div class="input-group mb-3" style="width: 50%;display: inline-flex;">
+            <input type="text" class="form-control" id="idTemplateMapName" placeholder="Nhập tên mẫu" aria-label="Tên mẫu Mapping">
+            <button class="btn btn-outline-secondary" type="button" id="idSaveTempalteMap">Lưu</button>
+        </div>
+    </div>
+</div>
+<script src="~/assets/js/jquery.2.1.1.min.js"></script>
+<link href="~/assets/toastr/toastr.min.css" rel="stylesheet" />
+<script src="~/assets/toastr/toastr.min.js"></script>
+<script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+<script>
+ 
+    $(document).ready(function () {
+        // biến Local
+        var LcolumnData;
+        var LcolumnHeaders;
+        //
+        var fileInput = $("#formFileSm");
+        var excelFileCheckbox = $("#excelFileCheckbox");
+        var firstRowInput = $("#inFirstRow");
+        var lastRowInput = $("#inLastRow");
+        var inSheetName = $("#inSheetName");
+        var btnCheck = $("#btnCheck");
+        var idMaxRow = $("#idMaxRow");
+        var idNextPreview = $("#idNextPreview");
+        var idNextMapping = $("#idNextMapping");
+        var idSpecifydt = $("#idSpecifydt");
+        var modal = $('#myModal');
+        var closeButton = $('#close');
+
+        //page 1
+        // xử lý input file
+        fileInput.on("change", function () {
+            if (excelFileCheckbox.prop("checked")) {
+                var allowedExtensions = [".xls", ".xlsx"];
+                var filePath = fileInput.val();
+                if (filePath) {
+                    var fileExtension = filePath.substr(filePath.lastIndexOf(".")).toLowerCase();
+                    if (!allowedExtensions.includes(fileExtension)) {
+                        toastr.warning("Vui lòng chọn tệp có phần mở rộng .xls hoặc .xlsx!", "Thông báo");
+                        fileInput.val("");
+                    } else {
+                        idSpecifydt.css("display", "block");
+                        inSheetName.removeAttr("readonly");
+                        inSheetName.val("Sheet1");
+                    }
+                } else {
+                    inSheetName.attr("readonly", "disabled");
+                    firstRowInput.attr("readonly", "disabled");
+                    lastRowInput.attr("readonly", "disabled");
+                }
+            } else {
+                idSpecifydt.css("display", "none");
+            }
+        });
+        // kiểm tra row
+        btnCheck.on("click", function () {
+            var sheetName = inSheetName.val();
+            if (sheetName) {
+                var file = fileInput[0].files[0];
+                if (!file) {
+                    return;
+                }
+                //console.log(file);
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var data = new Uint8Array(e.target.result);
+                    var workbook = XLSX.read(data, { type: "array" });
+
+                    var sheet = workbook.Sheets[sheetName];
+                    if (!sheet) {
+                        toastr.warning("Không tìm thấy Sheet có tên '" + sheetName + "' trong file!", "Thông báo");
+                        inSheetName.val("");
+                        firstRowInput.val("");
+                        lastRowInput.val("");
+                        return;
+                    }
+                    var cellRange = XLSX.utils.decode_range(sheet["!ref"]);
+                    var maxRow = cellRange.e.r + 1;
+
+                    firstRowInput.removeAttr("readonly");
+                    lastRowInput.removeAttr("readonly");
+
+                    firstRowInput.attr("max", maxRow - 1);
+                    lastRowInput.attr("max", maxRow);
+
+                    firstRowInput.val(1);
+                    lastRowInput.val(maxRow);
+
+                    idMaxRow.text("Max Row = " + maxRow.toString());
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+
+        firstRowInput.on("input", function () {
+            validateInputs(firstRowInput.val(), lastRowInput.val());
+        });
+
+        lastRowInput.on("input", function () {
+            validateInputs(firstRowInput.val(), lastRowInput.val());
+        });
+        // giới hạn row
+        function validateInputs(firstRowValue, lastRowValue) {
+
+            if (isNaN(firstRowValue) || isNaN(lastRowValue)) {
+                return;
+            }
+
+            if (firstRowValue < 1) {
+                firstRowInput.val("1");
+            }
+
+            if (lastRowValue < firstRowValue) {
+                lastRowInput.val((firstRowValue + 1).toString());
+            }
+        }
+        // xử lý chuyển sang page 2
+        idNextPreview.on("click", function () {
+            debugger;
+            var allowedExtensions = [".xls", ".xlsx"];
+            var filePath = fileInput.val();
+            if (filePath) {
+                var fileExtension = filePath.substr(filePath.lastIndexOf(".")).toLowerCase();
+                if (!allowedExtensions.includes(fileExtension)) {
+                    toastr.warning("Chưa hỗ trợ chức năng Import dạng file này!", "Thông báo");
+                    fileInput.val() = "";
+                } else {
+                    var formData = new FormData();
+                    var file = fileInput[0].files[0];
+
+                    if (file == null) {
+                        toastr.warning('Chưa chọn file, vui lòng chọn file!', 'Thông báo');
+                    } else if (isNaN(parseInt(firstRowInput.val())) || isNaN(parseInt(lastRowInput.val()))) {
+                        toastr.warning('Chưa có thông tin về Row, vui lòng bổ sung thông tin!', 'Thông báo');
+                    } else {
+                        var sheetname = inSheetName.val();
+                        var firstRow = parseInt(firstRowInput.val());
+                        var lastRow = parseInt(lastRowInput.val());
+                        formData.append('pexcelFile', file);
+                        formData.append('psheetname', sheetname);
+                        formData.append('pfirstRow', firstRow);
+                        formData.append('plastRow', lastRow);
+
+                        callAjaxGetDataFile(formData);
+                    }
+                }
+            } else {
+                toastr.warning("Không có file nào được chọn!", "Thông báo");
+            }
+        });
+        //page 3
+        $("#selectTempalte").change(function () {
+            debugger;
+            var selecttr = $('#tbody-maped td:nth-child(2) span'); //
+            selecttr.empty();
+            var nameTem = $(this).val();
+            if (nameTem != "") {
+                $.ajax({
+                    url: '/ImportExcel/GetTemplateMap',
+                    type: 'POST',
+                    data: { nameTem: nameTem },
+                    dataType: 'json',
+                    success: function (dataResult) {
+                        if (dataResult && dataResult.length > 0) {
+                            // Lặp qua từng đối tượng trong danh sách
+                            for (var i = 0; i < dataResult.length; i++) {
+                                var importExcelTemplate = dataResult[i];
+                                var fieldID = importExcelTemplate.fieldID;
+                                var fieldExcel = importExcelTemplate.FieldExcel;
+                                $("#column-in-file-" + fieldID).text(fieldExcel);
+                            }
+                        } else {
+                            toastr.warning('Import thất bại!', 'Thông báo');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Xử lý lỗi
+                        console.log('Thất bại: ' + error);
+                    }
+                });
+            }
+        });
+        // mở Modal khi click trên tr
+        $("#tbody-maped").on("click", ".openModalCell", function (event) {
+            debugger;
+            event.preventDefault();
+            var cell = $(this);
+            var rowId = cell.closest("tr").attr("id");
+            var columnInTable = $("#column-in-table-" + rowId).text();
+
+            modal.css("display", "block");
+            $("#idNameCiTable").text(columnInTable);
+            $("#idNameCiTable").data("id", rowId);
+        });
+        //close Modal
+        closeButton.on('click', function () {
+            modal.css('display', 'none');
+        });
+        //closer Modal khi click ngoài vùng modal
+        $(window).on('click', function (event) {
+            if (event.target === modal[0]) {
+                modal.css('display', 'none');
+            }
+        });
+        //click vào tr
+        $("#table-modal-mapped tbody").on("click", "tr", function () {
+            debugger;
+            // Tắt modal
+            modal.css('display', 'none');
+
+            var rowId = this.id;
+            var parts = rowId.split("_");
+            var extractedValue = parts[1];
+            var dataId = $("#idNameCiTable").data("id");
+            $("#column-in-file-" + dataId).text(extractedValue);
+
+            //checked trên checkbox của tr
+            $(this).find("input[type='checkbox']").prop("checked", true);
+
+        });
+        // chuyển sang page 3
+        idNextMapping.on("click", function () {
+            loadDataModal();
+        });
+        var valueMap = [];
+        //chuyển sang page 4
+        $("#idNextPreResult").on("click", function () {
+            debugger;
+            var NameHeadInPreResult = [];
+            valueMap = [];
+            $("#tbody-maped tr").each(function () {
+                var columnInTable = $(this).find("td:first-child span").data("value");
+                var columnInTablePre = $(this).find("td:first-child span").text();
+                var columnInFile = $(this).find("td:nth-child(2) span").text();
+                var fieldID = $(this).find("td:first-child span").data("field");
+                if (columnInFile) {
+                    valueMap.push({
+                        columnInTable: columnInTable,
+                        columnInFile: columnInFile,
+                        fieldID: fieldID
+                    });
+                    NameHeadInPreResult.push({
+                        columnInTable: columnInTable,
+                        columnInTablePre: columnInTablePre
+                    })
+                }
+            });
+            if (valueMap.length != 0) {
+                if (valueMap.find(x => x.columnInTable === "LeadName")) {
+                    goToPage(4);
+                    var gridPreviewRs = $('#gridPreviewResult'); //
+
+                    // Xóa dữ liệu cũ trong lưới (nếu có)
+                    gridPreviewRs.empty();
+
+                    // Tạo lưới và hiển thị dữ liệu
+                    var table = $('<table class="table table-bordered"></table>');
+                    var thead = $('<thead></thead>');
+                    var tbody = $('<tbody></tbody>');
+
+                    // Tạo hàng tiêu đề
+                    var headerRow = $('<tr></tr>');
+                    headerRow.append('<th>' + "" + '</th>');
+                    for (var column in LcolumnData) {
+                        if (valueMap.find(x => x.columnInFile === column)) {
+                            var colInTa = valueMap.find(x => x.columnInFile === column)?.columnInTable || "";
+                            var contentcol = NameHeadInPreResult.find(x => x.columnInTable === colInTa)?.columnInTablePre || "";
+                            headerRow.append('<th>' + contentcol + '</th>');
+                        }
+                    }
+                    thead.append(headerRow);
+                    var firstColumnValues = Object.values(LcolumnData)[0];
+                    var leng = firstColumnValues.length;
+                    // tạo dữ liệu cho hàng headername
+                    var dataRow = $('<tr></tr>');
+                    var rowNumberColumn = $('<td></td>');
+                    rowNumberColumn.text(("1"));
+                    dataRow.append(rowNumberColumn);
+
+                    for (var column in LcolumnHeaders) {
+                        if (valueMap.find(x => x.columnInFile === column)) {
+                            var columnValue = LcolumnHeaders[column];
+                            dataRow.append('<td>' + columnValue + '</td>');
+                        }
+                    }
+
+                    tbody.append(dataRow);
+                    var stt = 2;
+                    // Tạo các hàng dữ liệu
+                    for (var i = 0; i < leng; i++) {
+                        var dataRow = $('<tr></tr>');
+
+                        // Thêm cột mới với giá trị là số thứ tự của hàng tương ứng
+                        var rowNumberColumn = $('<td></td>');
+                        rowNumberColumn.text(stt);
+                        dataRow.append(rowNumberColumn);
+
+                        for (var column in LcolumnData) {
+                            if (valueMap.find(x => x.columnInFile === column)) {
+                                var columndt = LcolumnData[column];
+                                var cellValue = columndt[i];
+
+                                // Kiểm tra kiểu dữ liệu của cellValue và chuyển đổi phù hợp
+                                if (typeof cellValue === 'boolean') {
+                                    dataRow.append('<td>' + (cellValue ? 'True' : 'False') + '</td>');
+                                } else if (typeof cellValue === 'string') {
+                                    // Kiểm tra nếu giá trị có định dạng ngày tháng mới
+                                    if (/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(cellValue)) {
+                                        var date = new Date(cellValue);
+                                        var formattedDate = formatDate(date);
+                                        dataRow.append('<td>' + formattedDate + '</td>');
+                                    } else if (cellValue.startsWith('/Date(') && cellValue.endsWith(')/')) {
+                                        // Giữ lại xử lý cho trường hợp cũ ('/Date(ticks)/')
+                                        var ticks = parseInt(cellValue.substr(6));
+                                        var date = new Date(ticks);
+                                        var formattedDate = formatDate(date);
+                                        dataRow.append('<td>' + formattedDate + '</td>');
+                                    } else {
+                                        dataRow.append('<td>' + cellValue + '</td>');
+                                    }
+                                } else if (typeof cellValue === 'object' && cellValue instanceof Date) {
+                                    var formattedDate = formatDate(cellValue);
+                                    dataRow.append('<td>' + formattedDate + '</td>');
+                                } else {
+                                    dataRow.append('<td></td>');
+                                }
+                            }
+
+                        }
+                        tbody.append(dataRow);
+                        stt = stt + 1;
+                    }
+                    // Gắn các phần tử vào lưới
+                    table.append(thead);
+                    table.append(tbody);
+                    gridPreviewRs.append(table);
+                } else {
+                    toastr.warning('Trường dữ liệu "Tên Lead" bắt buộc Mapping! Vui lòng Mapping!', 'Thông báo');
+                }
+            } else {
+                toastr.warning('Chưa Mapping cho các trường dữ liệu! Vui lòng Mapping!', 'Thông báo');
+            }
+        })
+        //Page 4
+        $(document).ready(function () {
+            // Gắn sự kiện click cho nút button
+            $("#idnextOk").on('click', function () {
+
+                handleImport();
+            });
+        });
+
+        function handleImport() {
+            showOverlay();
+
+            showLoading();
+
+            setTimeout(function () {
+                // Gửi yêu cầu AJAX
+                var formData = new FormData();
+                var jsonData = JSON.stringify(valueMap);
+                formData.append('data', jsonData);
+                $.ajax({
+                    url: '/ImportExcel/ExcuteData',
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    contentType: false,
+                    processData: false,
+                    success: function (rs) {
+                        hideLoading();
+
+                        hideOverlay();
+
+                        if (rs.Success) {
+                            toastr.success('Import thành công!', 'Thông báo');
+                            goToPage(5);
+                        } else {
+                            toastr.warning('Import thất bại!', 'Thông báo');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Xử lý lỗi
+                        console.log('Thất bại: ' + error);
+
+                        hideLoading();
+
+                        hideOverlay();
+                    }
+                });
+            }, 3000); 
+        }
+
+        function showOverlay() {
+            $('#overlay').show();
+        }
+
+        function hideOverlay() {
+            $('#overlay').hide();
+        }
+
+        function showLoading() {
+            $('#loading').show();
+        }
+
+        function hideLoading() {
+            $('#loading').hide();
+        }
+
+        $("#idSaveTempalteMap").on('click', function () {
+            debugger;
+            var nameTem = $("#idTemplateMapName").val();
+            if (nameTem != null) {
+                $.ajax({
+                    url: '/ImportExcel/SaveTemplateMap',
+                    type: 'POST',
+                    data: {
+                        nameTem: nameTem
+                    },
+                    success: function (rs) {
+                        if (rs.Success) {
+                            toastr.success('Lưu Tempalte thành công!', 'Thông báo');
+                        } else {
+                            toastr.warning('Lưu Tempalte thất bại!', 'Thông báo');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // Xử lý lỗi
+                        console.log('Lưu Tempalte thất bại: ' + error);
+                    }
+                });
+            }
+        });
+        function callAjaxGetDataFile(formData) {
+            debugger
+            $.ajax({
+                url: '/ImportExcel/ImportData',
+                type: 'POST',
+                data: formData,
+                enctype: 'multipart/form-data',
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (data) {
+                    // Xử lý dữ liệu trả về và hiển thị lên lưới
+                    if (data != null) {
+                        LcolumnData = data.ColumnData;
+                        LcolumnHeaders = data.ColumnHeaders;
+
+                        var gridPreview = $('#gridPreview'); //
+
+                        // Xóa dữ liệu cũ trong lưới (nếu có)
+                        gridPreview.empty();
+
+                        // Tạo lưới và hiển thị dữ liệu
+                        var table = $('<table class="table table-bordered"></table>');
+                        var thead = $('<thead></thead>');
+                        var tbody = $('<tbody></tbody>');
+
+                        // Tạo hàng tiêu đề
+                        var headerRow = $('<tr></tr>');
+                        headerRow.append('<th>' + "" + '</th>');
+                        for (var column in LcolumnData) {
+                            headerRow.append('<th>' + column + '</th>');
+                        }
+                        thead.append(headerRow);
+                        var firstColumnValues = Object.values(LcolumnData)[0];
+                        var leng = firstColumnValues.length;
+                        // tạo dữ liệu cho hàng headername
+                        var dataRow = $('<tr></tr>');
+                        var rowNumberColumn = $('<td></td>');
+                        rowNumberColumn.text(("1"));
+                        dataRow.append(rowNumberColumn);
+
+                        for (var column in LcolumnHeaders) {
+                            var columnValue = LcolumnHeaders[column];
+                            dataRow.append('<td>' + columnValue + '</td>');
+                        }
+
+                        tbody.append(dataRow);
+                        var stt = 2;
+                        // Tạo các hàng dữ liệu
+                        for (var i = 0; i < leng; i++) {
+                            var dataRow = $('<tr></tr>');
+
+                            // Thêm cột mới với giá trị là số thứ tự của hàng tương ứng
+                            var rowNumberColumn = $('<td></td>');
+                            rowNumberColumn.text(stt);
+                            dataRow.append(rowNumberColumn);
+
+                            for (var column in LcolumnData) {
+                                var columndt = LcolumnData[column];
+                                var cellValue = columndt[i];
+
+                                // Kiểm tra kiểu dữ liệu của cellValue và chuyển đổi phù hợp
+                                if (typeof cellValue === 'boolean') {
+                                    dataRow.append('<td>' + (cellValue ? 'True' : 'False') + '</td>');
+                                } else if (typeof cellValue === 'string') {
+                                    // Kiểm tra nếu giá trị có định dạng ngày tháng mới
+                                    if (/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(cellValue)) {
+                                        var date = new Date(cellValue);
+                                        var formattedDate = formatDate(date);
+                                        dataRow.append('<td>' + formattedDate + '</td>');
+                                    } else if (cellValue.startsWith('/Date(') && cellValue.endsWith(')/')) {
+                                        // Giữ lại xử lý cho trường hợp cũ ('/Date(ticks)/')
+                                        var ticks = parseInt(cellValue.substr(6));
+                                        var date = new Date(ticks);
+                                        var formattedDate = formatDate(date);
+                                        dataRow.append('<td>' + formattedDate + '</td>');
+                                    } else {
+                                        dataRow.append('<td>' + cellValue + '</td>');
+                                    }
+                                } else if (typeof cellValue === 'object' && cellValue instanceof Date) {
+                                    var formattedDate = formatDate(cellValue);
+                                    dataRow.append('<td>' + formattedDate + '</td>');
+                                } else {
+                                    dataRow.append('<td></td>');
+                                }
+                            }
+                            tbody.append(dataRow);
+                            stt = stt + 1;
+                        }
+                        // Gắn các phần tử vào lưới
+                        table.append(thead);
+                        table.append(tbody);
+                        gridPreview.append(table);
+                    }
+                    goToPage(2);
+                    console.log('Import thành công');
+                },
+                error: function (xhr, status, error) {
+                    // Xử lý lỗi
+                    console.log('Import thất bại: ' + error);
+                }
+            });
+        }
+        // đổ dữ liệu lên Modal
+        function loadDataModal() {
+            debugger;
+            var tableBody = $("#table-modal-mapped tbody");
+            var dataRow = $('<tr id="idtr_"></tr>');
+            dataRow.append('<td>' + '<input type="checkbox" id="check_">' + '</td>');
+            dataRow.append('<td>' + '' + '</td>');
+            dataRow.append('<td>' + '' + '</td>');
+            dataRow.append('<td>' + '' + '</td>');
+            tableBody.append(dataRow);
+            for (var column in LcolumnData) {
+                var dataRow = $('<tr id="idtr_' + column + '"></tr>');
+                dataRow.append('<td>' + '<input type="checkbox" id="check_' + column + '">' + '</td>');
+                dataRow.append('<td>' + column + '</td>');
+                dataRow.append('<td>' + LcolumnHeaders[column] + '</td>');
+                var columndt = LcolumnData[column];
+                if (typeof columndt[0] === 'boolean') {
+                    dataRow.append('<td>' + (columndt[0] ? 'True' : 'False') + '</td>');
+                } else if (typeof columndt[0] === 'string') {
+                    if (columndt[0].startsWith('/Date(') && columndt[0].endsWith(')/')) {
+                        var formattedDate = formatJsonDate(columndt[0]);
+                        dataRow.append('<td>' + formattedDate + '</td>');
+                    } else {
+                        dataRow.append('<td>' + columndt[0] + '</td>');
+                    }
+                } else {
+                    dataRow.append('<td></td>');
+                }
+                tableBody.append(dataRow);
+            }
+        }
+
+        function formatJsonDate(jsonDate) {
+            var regex = /\/Date\((\d+)\)\//;
+            var match = regex.exec(jsonDate);
+            if (match) {
+                var timestamp = parseInt(match[1]);
+                var date = new Date(timestamp);
+                var formattedDate = formatDate(date);
+                return formattedDate;
+            }
+            return "";
+        }
+
+        function formatDate(date) {
+            var options = {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: 'numeric',
+                minute: 'numeric',
+                second: 'numeric',
+                hour12: true
+            };
+            return date.toLocaleString('en-US', options);
+        }
+
+
+    });
+    var currentPage = 1;
+    var inputValues = {};
+
+    //next page
+    function goToPage(pageNumber) {
+        var currentPageDiv = $("#page" + currentPage);
+        var nextPageDiv = $("#page" + pageNumber);
+        saveInputValues();
+        currentPageDiv.css('display', 'none');
+        nextPageDiv.css('display', 'block');
+        currentPage = pageNumber;
+        restoreInputValues();
+        window.scrollTo(0, 0);
+    }
+
+    function saveInputValues() {
+        var inputs = $("#page" + currentPage + " input");
+        inputs.each(function () {
+            var input = $(this);
+            inputValues[input.attr("id")] = input.val();
+        });
+    }
+
+    function restoreInputValues() {
+        var inputs = $("#page" + currentPage + " input");
+        inputs.each(function () {
+            var input = $(this);
+            if (input.attr("id") in inputValues) {
+                input.val(inputValues[input.attr("id")]);
+            }
+        });
+    }
+
+</script>

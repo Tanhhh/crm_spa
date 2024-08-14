@@ -1,0 +1,231 @@
+﻿@model IEnumerable<DM_CAMNHAN_KHANGViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = "Danh mục Cảm Nhận Khách Hàng";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "DM_CAMNHAN_KHANG",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        AdvancedSearch = false,
+        SearchOjectAttr = ViewBag.ListOjectAttrSearch
+    };
+}
+
+@helper GridColumnCommand(int id)
+{
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "DM_CAMNHAN_KHANG", "Sale"))
+    {
+        <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+            <button name="Delete" value="Delete" type="submit" class="btn btn-minier btn-danger">
+                <i class="ace-icon fa fa-trash"></i>
+            </button>
+        </div>
+    }
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@if (ViewBag.errors != null && ViewBag.errors != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.errors
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@helper GridColumnName(int id, string TIEUDE)
+{
+    TIEUDE = string.IsNullOrEmpty(TIEUDE) ? "No Title" : TIEUDE;
+    <a href="@Url.Action("Edit", "DM_CAMNHAN_KHANG", new { Id = id })"><b>@TIEUDE</b>   </a>
+    <br />
+
+}
+
+
+
+@helper ShowLink(int id, string link)
+{
+if(link == null)
+{
+    string newstring = link.Substring(link.Length - 11, 11);
+    string LINK = "https://www.youtube.com/embed/" + newstring;
+}
+    <div class="bs-example">
+        <!-- Button HTML (to Trigger Modal) -->
+        <a href="#@id" class="btn btn-lg btn-primary" data-toggle="modal">Xem</a>
+
+        <!-- Modal HTML -->
+        <div id=@id class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">YouTube Video</h4>
+                    </div>
+                    <div class="modal-body">
+                        <iframe id="ShowVideo" width="480" height="300" src=@link frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@helper isshow(int id, int? is_show)
+{
+    <label>
+        <input id="is_show_table" class="ace class-is-show text-center" type="checkbox" name="is-show-table" value="@is_show" checked="@(is_show == 1? "checked":null)">
+        <span class="lbl"></span>
+    </label>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+
+        @Html.TextBox("txtSearch", Request["txtSearch"], new { @class = "", autocomplete = "off", placeholder = "Tiêu Đề" })
+
+    </p>
+}
+
+
+<p>Tổng số: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Model.Count())</b></p>
+
+@using (Html.BeginForm("Delete", "DM_CAMNHAN_KHANG", FormMethod.Post))
+{
+
+    <div class="table-responsive">
+        <div id="test">
+            @Html.Grid(Model).Columns(columns =>
+            {
+                columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(40).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.CAMNHAN_KHANG_ID));
+                columns.Add(u => u.STT).Titled("STT").Sanitized(false).Encoded(false).RenderValueAs(u => u.STT.ToString()).SetWidth(85);
+                columns.Add().Titled("Video").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => ShowLink(u.CAMNHAN_KHANG_ID, u.LINK_VIDEO));
+                columns.Add().Titled("Tiêu Đề").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.CAMNHAN_KHANG_ID, u.TIEUDE));
+                columns.Add().Titled("Hiện").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => isshow(u.CAMNHAN_KHANG_ID, u.IS_SHOW));
+                columns.Add(u => u.CreatedDate).Titled(Wording.CreatedDate).SetWidth(130).Format("{0:dd/MM/yyyy HH:mm}");
+                columns.Add(u => u.ModifiedDate).Titled(Wording.ModifiedDate).SetWidth(130).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+                columns.Add(u => u.CAMNHAN_KHANG_ID).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.CAMNHAN_KHANG_ID)).SetWidth(85);
+            }).WithPaging(10)
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "DM_CAMNHAN_KHANG", "Sale"))
+        {
+            <a class="btn btn-mini btn-primary" href="@Url.Action("Create", pageSetting.ModuleName)">
+                <i class="ace-icon fa fa-plus"></i>
+                @Wording.CreateNew
+            </a>
+        }
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "DM_CAMNHAN_KHANG", "Sale"))
+        {
+            <button class="btn btn-white btn-sm btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                <i class="ace-icon fa fa-trash"></i>
+                @Wording.Delete
+            </button>
+        }
+    }
+
+}
+<script>
+
+    $('#test').find('table.table.table-striped.grid-table').first().attr('id', 'CTable');
+
+
+</script>
+
+<script src="~/Scripts/jquery.floatThead.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#CTable").floatThead({ top: 30 });
+    });
+</script>
+@section Scripts {
+
+
+
+
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+        /// Show Video
+
+
+
+        function ShowVideo() {
+            var url = $("#ShowVideo").attr('src');
+            $("#myModal").on('hide.bs.modal', function () {
+                $("#ShowVideo").attr('src', '');
+            })
+
+            $("#myModal").on('show.bs.modal', function () {
+                $("#cartoonVideo").attr('src', url);
+            })
+        }
+
+
+    </script>
+}

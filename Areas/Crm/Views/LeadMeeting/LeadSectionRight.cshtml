@@ -1,0 +1,411 @@
+﻿
+@model IEnumerable<Erp.BackOffice.Sale.Models.LeadSection_FieldModel>
+
+    @{
+        Layout = "";
+        var stt = 1;
+        var orderedModel = Model.OrderBy(m => m.OrderField);
+        int totalItems = orderedModel.Count();
+    }
+
+    @foreach (var item in orderedModel)
+    {
+        <tr data-id="@item.Id" data-ordersection="@item.OrderField">
+            <td class="stt">@(stt++)</td>
+            <td class="showLeadSectionField-right" id="NameLabel">
+                <span class="name-field">@item.NameLabel</span>
+                <input type="text" class="edit-name-field" value="@item.NameLabel" style="display:none" />
+            </td>
+            <td class="showLeadSectionField-right" id="FieldName">
+                <span class="name-field">@item.FieldName</span>
+                @*<input type="text" class="edit-name-field" value="@item.FieldName" style="display:none" />*@
+                <select class="edit-name-field" style="display:none;"></select>
+            </td>
+            <td class="showLeadSectionField-right" id="TypeField">
+                <span class="name-field">@item.TypeField</span>
+                <select class="edit-name-field" style="display:none">
+                    <option value="Bool" @(item.TypeField == "Bool" ? "selected" : "")>Bool</option>
+                    <option value="Date" @(item.TypeField == "Date" ? "selected" : "")>Date</option>
+                    <option value="Datetime" @(item.TypeField == "Datetime" ? "selected" : "")>Datetime</option>
+                    <option value="List" @(item.TypeField == "List" ? "selected" : "")>List</option>
+                    <option value="Number" @(item.TypeField == "Number" ? "selected" : "")>Number</option>
+                    <option value="String" @(item.TypeField == "String" ? "selected" : "")>String</option>
+                </select>
+            </td>
+            <td class="showLeadSectionField-right" id="CodeList">
+                @if (string.IsNullOrEmpty(item.CodeList))
+                {
+                    <span class="name-field">...</span>
+                }
+                else
+                {
+                    <span class="name-field">@item.CodeList</span>
+                }
+                <input type="text" class="edit-name-field" value="@item.CodeList" style="display:none" />
+            </td>
+            <td class="leadSectionIsHidden" id="IsHiden">
+                <input type="checkbox" class="hidden-checkbox-field" style="display: none;" @(item.IsHiden == true ? "checked" : "")>
+                <span class="tick-field">@Html.Raw(item.IsHiden == true ? "<text style='color: green; font-size: 25px;'>✔</text>" : "<input type=\"checkbox\">")</span>
+            </td>
+
+            <td style="text-align:center !important">
+                <!-- Nút lên chỉ hiển thị khi không phải là phần tử đầu tiên -->
+                @if (stt > 2)
+                {
+                    <button class="move-up changeOrderSection-right">▲</button>
+                }
+                <!-- Nút xuống chỉ hiển thị khi không phải là phần tử cuối cùng -->
+                @if (stt < totalItems + 1)
+                {
+                    <button class="move-down changeOrderSection-right">▼</button>
+                }
+            </td>
+        </tr>
+    }
+
+<script>
+        $(document).ready(function () {
+            function attachEventLeadSectionRights() {
+                $('.changeOrderSection-right').click(function () {
+                    debugger
+                    var currentButton = $(this);
+                    var currentRow = currentButton.closest('tr');
+                    var currentOrderSection = currentRow.data('ordersection');
+                    var targetRow;
+
+                    // Kiểm tra class của nút
+                    if (currentButton.hasClass('move-up')) {
+                        // Lấy id của hàng đó
+                        var currentId = currentRow.data('id');
+                        // Lấy hàng liền kề trên
+                        targetRow = currentRow.prev('tr');
+                        if (targetRow.length !== 0) {
+                            // Lấy id của hàng liền kề trên
+                            var targetId = targetRow.data('id');
+                            // Lấy OrderSection của hàng liền kề trên
+                            var targetOrderSection = targetRow.data('ordersection');
+                            $.ajax({
+                                type: 'POST',
+                                url: '/LeadMeeting/UpdateOrderField',
+                                data: {
+                                    currentId: currentId,
+                                    targetId: targetId,
+                                    currentOrderSection: currentOrderSection,
+                                    targetOrderSection: targetOrderSection
+                                },
+                                beforeSend: function () {
+                                    // Trước khi gửi yêu cầu, hiển thị thông báo loading
+                                    ShowLoading();
+                                },
+                                success: function (response) {
+                                    f5LeadSectionRight(response.IdLeadSection);
+                                    HideLoading();
+                                },
+                                error: function (xhr, status, error) {
+                                    // Xử lý khi gặp lỗi trong quá trình gửi request
+                                    HideLoading();
+                                    console.error("Error: ", error);
+                                }
+                            });
+                        }
+                    } else if (currentButton.hasClass('move-down')) {
+                        // Tương tự cho trường hợp move-down
+                        var currentId = currentRow.data('id');
+                        targetRow = currentRow.next('tr');
+                        if (targetRow.length !== 0) {
+                            var targetId = targetRow.data('id');
+                            var targetOrderSection = targetRow.data('ordersection');
+                            $.ajax({
+                                type: 'POST',
+                                url: '/LeadMeeting/UpdateOrderField',
+                                data: {
+                                    currentId: currentId,
+                                    targetId: targetId,
+                                    currentOrderSection: currentOrderSection,
+                                    targetOrderSection: targetOrderSection
+                                },
+                                beforeSend: function () {
+                                    // Trước khi gửi yêu cầu, hiển thị thông báo loading
+                                    ShowLoading();
+                                },
+                                success: function (response) {
+                                    debugger
+                                    f5LeadSectionRight(response.IdLeadSection);
+                                    HideLoading();
+                                },
+                                error: function (xhr, status, error) {
+                                    // Xử lý khi gặp lỗi trong quá trình gửi request
+                                    HideLoading();
+                                    console.error("Error: ", error);
+                                }
+                            });
+                        }
+                    }
+                });
+                $('.name-field').dblclick(function () {
+                    debugger;
+
+                    var $this = $(this);
+                    var $td = $this.closest('td');
+                    var $tr = $td.closest('tr');
+                    //if ($tr === 'new-row')
+                    if ($td.attr('id') === 'FieldName' && $tr.attr('class') !== 'new-row') {
+                        $.ajax({
+                            url: '/LeadMeeting/ExistedFieldValueLeadCheck',
+                            type: 'POST',
+                            data: { fieldName: $this.text() },
+                            success: function (response) {
+                                var existedField = response.data.existedField;
+                                if (existedField > 0) {
+                                    toastr.error('Trường này đã có dữ liệu, không thể thay đổi!', 'Thông báo');
+                                    return;
+                                }
+                                else {
+                                    var $input = $this.siblings('.edit-name-field');
+                                    var typeLead = $('.form-select').val();
+                                    var fieldName = $this.closest('td').attr('id');
+                                    if (fieldName == 'FieldName') {
+                                        $.ajax({
+                                            url: '/LeadMeeting/GetFColumnNamesInLeadSecTionField',
+                                            type: 'GET',
+                                            data: { typeLead: typeLead },
+                                            success: function (data) {
+                                                var selectElement = $input;
+                                                selectElement.empty();
+                                                selectElement.prepend('<option>' + $this.text() + '</option>');
+                                                $.each(data, function (index, value) {
+                                                    selectElement.append('<option>' + value + '</option>');
+                                                });
+                                            },
+                                            error: function (xhr, status, error) {
+                                                console.error(error);
+                                            }
+                                        });
+                                    }
+                                    $input.show().focus();
+                                    $this.hide();
+                                }
+
+                            },
+                            error: function (xhr, status, error) {
+                                console.error(error);
+                            }
+                        });
+                    } else {
+                        var $input = $this.siblings('.edit-name-field');
+                        var typeLead = $('.form-select').val();
+                        var fieldName = $this.closest('td').attr('id');
+                        if (fieldName == 'FieldName') {
+                            $.ajax({
+                                url: '/LeadMeeting/GetFColumnNamesInLeadSecTionField',
+                                type: 'GET',
+                                data: { typeLead: typeLead },
+                                success: function (data) {
+                                    debugger
+                                    var selectElement = $input;
+                                    selectElement.empty();
+                                    //selectElement.prepend('<option>' + $this.text() + '</option>');
+                                    $.each(data, function (index, value) {
+                                        selectElement.append('<option>' + value + '</option>');
+                                    });
+                                },
+                                error: function (xhr, status, error) {
+                                    console.error(error);
+                                }
+                            });
+                        }
+                        $input.show().focus();
+                        $this.hide();
+                    }
+                });
+                $('.edit-name-field').focusout(function () {
+                    debugger
+                    var $this = $(this);
+                    var $span = $this.siblings('.name-field');
+                    var newValue = $this.val();
+                    var fieldName = $this.closest('td').attr('id');
+                    var currentRowId = $this.closest('tr').data('id');
+
+                    if (currentRowId !== undefined && (newValue !== '' || fieldName === 'CodeList')) {
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/LeadMeeting/UpdateNewValueLeadSectionField',
+                            data: {
+                                currentRowId: currentRowId,
+                                fieldName: fieldName,
+                                newValue: newValue
+                            },
+                            beforeSend: function () {
+                                ShowLoading();
+                            },
+                            success: function (response) {
+                                f5LeadSectionRight(response.IdLeadSection);
+                                HideLoading();
+                            },
+                            error: function (xhr, status, error) {
+                                HideLoading();
+                                console.error("Error: ", error);
+                            }
+                        });
+                    } else {
+                        var fieldValues = {};
+                        var leadSectionId = $("#leadFieldSection").data("leadsectionid");
+                        var rows = $('#leadFieldSection tbody tr');
+                        var penultimateRow = rows.eq(rows.length - 2);
+                        var previousOrderSection = penultimateRow.data('ordersection');
+                        var $parentRow = $this.closest('tr.new-row');
+                        var emptyFields = $parentRow.find('.edit-name-field').filter(function () {
+                            var fieldName = $(this).closest('td').attr('id');
+                            return $(this).val().trim() === '' && fieldName !== 'CodeList';
+                        });
+                        if (emptyFields.length > 0 && emptyFields.not('.hidden-checkbox-field').length > 0) {
+                            return;
+                        } else {
+                            $parentRow.find('td').each(function () {
+                                var $td = $(this);
+                                var $allFields = $td.find('.edit-name-field, .hidden-checkbox-field');
+                                var inputId = $td.attr('id');
+                                var inputValue = $allFields.val()
+                                // Kiểm tra nếu id không rỗng và giá trị không rỗng
+                                if (inputId !== undefined) {
+                                    fieldValues[inputId] = inputValue.trim();
+                                }
+                            })
+                            debugger
+                            $.ajax({
+                                type: 'POST',
+                                url: '/LeadMeeting/InsertLeadSectionField',
+                                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                                data: {
+                                    leadSectionId: leadSectionId,
+                                    previousOrderSection: previousOrderSection,
+                                    fieldValues: JSON.stringify(fieldValues)
+
+                                },
+                                beforeSend: function () {
+                                    ShowLoading();
+                                },
+                                success: function (response) {
+                                    f5LeadSectionRight(leadSectionId);
+                                    HideLoading();
+                                    $('.cancelNewRowsLeadFieldSection').hide();
+                                },
+                                error: function (xhr, status, error) {
+                                    HideLoading();
+                                    toastr.error('Lỗi, vui lòng thử lại', 'Thông báo');
+                                    console.error("Error: ", error);
+                                }
+                            });
+                        }
+                    }
+                });
+
+                $('.tick-field').click(function () {
+                    var $this = $(this);
+                    var $input = $this.siblings('.hidden-checkbox-field');
+
+                    $input.show().focus();
+                    $this.hide();
+                });
+
+                $('.hidden-checkbox-field').focusout(function () {
+                    var $this = $(this);
+                    var checked = $this.prop('checked') ? 1 : 0;
+                    var fieldName = $this.closest('td').attr('id');
+                    var currentRowId = $this.closest('tr').data('id');
+
+                    if (currentRowId !== undefined) {
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/LeadMeeting/UpdateNewValueLeadSectionField',
+                            data: {
+                                currentRowId: currentRowId,
+                                fieldName: fieldName,
+                                newValue: checked
+                            },
+                            beforeSend: function () {
+                                ShowLoading();
+                            },
+                            success: function (response) {
+                                f5LeadSectionRight(response.IdLeadSection);
+                                HideLoading();
+                            },
+                            error: function (xhr, status, error) {
+                                HideLoading();
+                                console.error("Error: ", error);
+                            }
+                        });
+                    }
+                });
+            }
+            var totalRows;
+            attachEventLeadSectionRights();
+            $('.addleadFieldSection').click(function () {
+
+                // Kiểm tra xem đã có hàng mới được thêm vào trước đó hay chưa
+                if ($('#leadFieldSection tbody').find('.new-row').length === 0) {
+                    var lastRow = $('#leadFieldSection tbody tr').last();
+                    lastRow.find('td:last-child').append('<button class="move-down changeOrderSection">▼</button>');
+                    // Lấy số lượng hàng hiện có
+                    totalRows = $('#leadFieldSection tbody tr').length + 1;
+                    //<td class="showLeadSectionField-right" id="TypeField">
+                    //    <span class="name-field">...</span>
+                    //    <input type="text" class="edit-name-field" style="display:none" />
+                    //</td>
+                    var newRowHtml = `<tr class="new-row">
+                            <td class="stt">${totalRows++}</td>
+                            <td class="showLeadSectionField-right" id="NameLabel">
+                                <span class="name-field">...</span>
+                                <input type="text" class="edit-name-field" style="display:none" />
+                            </td>
+                            <td class="showLeadSectionField-right" id="FieldName">
+                                <span class="name-field">...</span>
+                                <select class="edit-name-field" style="display:none;"></select>
+                            </td>
+                            <td class="showLeadSectionField-right" id="TypeField">
+                                <span class="name-field">...</span>
+                                <select class="edit-name-field" style="display:none">
+                                    <option value="Bool">Bool</option>
+                                    <option value="Date">Date</option>
+                                    <option value="Datetime">Datetime</option>
+                                    <option value="List">List</option>
+                                    <option value="Number">Number</option>
+                                    <option value="String">String</option>
+                                </select>
+                            </td>
+                            <td class="showLeadSectionField-right" id="CodeList">
+                                <span class="name-field">...</span>
+                                <input type="text" class="edit-name-field" style="display:none" />
+                            </td>
+                            <td class="leadSectionIsHidden" id="IsHiden">
+                                <input type="checkbox" class="hidden-checkbox-field" style="display: none;">
+                                <span class="tick-field"><input type=\"checkbox\"></span>
+                            </td>
+                            <td>
+                                <button class="move-up changeOrderSection-right">▲</button>
+                            </td>
+                        </tr>`;
+
+                    // Thêm hàng mới vào cuối bảng
+                    $('#leadFieldSection tbody').append(newRowHtml);
+                    $('#leadFieldSection tbody .new-row:last-child .edit-name-field').focus();
+                    $('.cancelNewRowsLeadFieldSection').show();
+                    attachEventLeadSectionRights();
+                }
+            });
+            $('.cancelNewRowsLeadFieldSection').click(function () {
+                // Xóa tất cả các hàng mới thêm
+                $('#leadFieldSection tbody').find('.new-row').remove();
+
+                var lastRow = $('#leadFieldSection tbody tr').last();
+                if (lastRow.find('.move-down.changeOrderSection').length > 0) {
+                    lastRow.find('.move-down.changeOrderSection').remove();
+                }
+                $(this).hide();
+            });
+        });
+
+</script>
+

@@ -1,0 +1,194 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.Helpers
+
+@{
+    ViewBag.Title = "Báo cáo tổng số khách hàng trong ngày";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "Sale_TotalTourOfStaff",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        SearchButtonText = "Xem báo cáo"
+    };
+    var BranchId = Erp.BackOffice.Helpers.Common.CurrentUser.BranchId;
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.category;
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+}
+
+@section HeadOfPage {
+    <style type="text/css">
+        .cell-center {
+            text-align: center;
+        }
+
+        .tr-bold {
+            font-weight: 700;
+        }
+
+        .ctl {
+            position: relative;
+            /*float: left;*/
+            margin-right: 3px;
+        }
+
+            .ctl .error {
+                position: absolute;
+                background: #de2a2a;
+                left: 0px;
+                top: 28px;
+                padding: 2px 5px;
+                color: #fff;
+                z-index: 999;
+            }
+
+                .ctl .error:before {
+                    border-bottom: 7px solid #de2a2a;
+                    border-left: 7px solid transparent;
+                    border-right: 7px solid transparent;
+                    left: 9px;
+                    top: -6px;
+                    content: "";
+                    display: inline-block;
+                    position: absolute;
+                }
+
+        .icon-add {
+            margin-top: 0px !important;
+        }
+
+        .combojax {
+            display: inline-block;
+            position: initial !important;
+            float: none !important;
+        }
+    </style>
+
+}
+
+<div id="page_header" class="widget-box">
+    <div class="widget-header">
+        <h5 class="widget-title">
+            <i class="ace-icon fa fa-star orange"></i>
+            @ViewBag.Title
+        </h5>
+        <div class="widget-toolbar">
+            <a class="btn-search" href="#" data-action="collapse">
+                <i class="ace-icon fa fa-search blue"></i>
+            </a>
+            <a class="btn-setting"></a>
+        </div>
+    </div>
+
+    <div class="widget-body" style="display: block;">
+        <div class="widget-main">
+            <div class="search-view form-inline" id="SaleReport">
+                <p>
+                    <span class="inline">
+                        <span class="input-group input-daterange">
+                            @Html.TextBox("Date", Request["Date"] != null ? Request["Date"] : aDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Chọn ngày" })
+                        </span>
+                    </span>
+                    <span class="ctl inline">
+                        @Html.DropDownList("BranchId", SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"))
+                    </span>
+                </p>
+                <form id="TypeReportForm">
+                        <label>
+                            <input id="SPDV" name="TypeReport" type="radio" class="ace" value="SPDV" checked="checked">
+                            <span class="lbl"> Khách hàng mua sản phẩm dịch vụ</span>
+                        </label>
+                        <label>
+                            <input id="CSD" name="TypeReport" type="radio" class="ace" value="CSD">
+                            <span class="lbl"> Khách hàng chăm sóc da</span>
+                        </label>
+                </form>
+                <p style="margin:0px;">
+                    <button class="btn btn-mini btn-primary" name="search" onclick="searchreact()" type="submit" value="Search">
+                        Xem báo cáo
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" style="padding-top: 5px;">
+    <div class="col-xs-12">
+        <div id="react_report" class="table-responsive">
+
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(true)">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(false)">
+        <i class="ace-icon fa fa-print"></i>
+        In báo cáo
+    </button>
+}
+
+@section Scripts {
+
+    <script>
+        $(function () {
+            searchreact();
+
+        });
+        function searchreact() {
+            GetDatatable('/SaleReport/_GetListSale_TotalCustomerOfDayReport');
+        };
+        function GetDatatable(url) {
+            var Date = $('#Date').val();
+            var BranchId = $('#BranchId').val();
+            var typeReport = $('input[name=TypeReport]:checked', '#TypeReportForm').val();
+
+            var formdata = {
+                Date: Date,
+                BranchId: BranchId,
+                typeReport: typeReport
+            };
+            ClickEventHandlerHTML(true, url, "#react_report", formdata, function () {
+            });
+        };
+        function GetDetailListOfCustomer(typeCustomer) {
+            var Date = $('#Date').val();
+            var BranchId = $('#BranchId').val();
+            var typeReport = $('input[name=TypeReport]:checked', '#TypeReportForm').val();
+            OpenPopup('/SaleReport/Sale_DetailCustomerOfDay?Date=' + Date + '&BranchId=' + BranchId + '&typeCustomer=' + typeCustomer + '&typeReport=' + typeReport, '', 0, 900);
+        };
+        
+        function GetPrint(type) {
+            var typeReport = $('input[name=TypeReport]:checked', '#TypeReportForm').val();
+            var isDetail = confirm('Bạn có muốn xuất thông tin khách hàng?');
+            if (isDetail==true) {
+                var Date = $('#Date').val();
+                var BranchId = $('#BranchId').val();
+                OpenPopup('/SaleReport/PrintSale_TotalCustomerOfDayReport?Date=' + Date + '&BranchId=' + BranchId + '&IsDetail=' + isDetail + '&typeReport=' + typeReport + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+                HideLoading();
+            } else {
+                var Date = $('#Date').val();
+                var BranchId = $('#BranchId').val();
+                OpenPopup('/SaleReport/PrintSale_TotalCustomerOfDayReport?Date=' + Date + '&BranchId=' + BranchId + '&IsDetail=' + isDetail + '&typeReport=' + typeReport + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+                HideLoading();
+            }
+        };
+        function Dropdowntable(id) {
+            $(id).closest('tr').next().toggleClass('open');
+            $(id).find(ace.vars['.icon']).toggleClass('fa-angle-double-down').toggleClass('fa-angle-double-up');
+            console.log('test')
+        };
+
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

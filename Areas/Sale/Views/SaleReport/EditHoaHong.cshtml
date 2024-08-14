@@ -1,0 +1,111 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model HOAHONG_NVKDViewModel
+
+@{
+    ViewBag.Title = "Cập nhật tỷ lệ hoa hồng";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "EditHoaHong",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.CustomTextboxFor(model => model.STT, null, null, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.TYLE_TARGET, null, null, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.MIN_TARGET, null, null, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.MAX_TARGET, null, null, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.TYLE_HOAHONG, null, null, WidthType.span12)
+
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+
+   
+    @Html.ScriptBottom_ChosenStyle()
+    <script>
+    
+        // alert();
+        //$('#TYLE_HOAHONG').val($('#TYLE_HOAHONG').val().replace(",", "."));
+
+        $(document).ready(function () {
+            //$('#TYLE_HOAHONG').change(function () {
+            //    $(this).val($(this).val().replace(/\-/g, ''));
+            //    $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+            //    $(this).val($(this).val().replace(",", "."));
+            //    var ralVal = numeral($(this).val());
+            //    if (ralVal <= 0) {
+            //        $(this).val(0);
+            //    }
+            //});
+
+
+            $('[name="TYLE_HOAHONG"]').change(function () {
+                debugger
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(0);
+                }
+            });
+
+            $('#MIN_TARGET').change(function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(0);
+                }
+            });
+
+            $('#MAX_TARGET').change(function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(0);
+                }
+            });
+
+            //$('[name="Submit"]').click(function () {
+            //    $('#TYLE_HOAHONG').val($('#TYLE_HOAHONG').val().replace(".", ","));
+            //});
+        });
+    </script>
+
+}

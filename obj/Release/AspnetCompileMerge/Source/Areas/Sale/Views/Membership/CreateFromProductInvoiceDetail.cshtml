@@ -1,0 +1,286 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model ProductInvoiceViewModel
+
+@{
+    ViewBag.Title = Wording.PageCreate_Membership;
+
+    //Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    //mặc định IsPopup luôn mở
+    Layout = "~/Views/Shared/" + "_PopupLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Membership",
+        ActionName = "CreateFromProductInvoiceDetail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+
+
+
+    //List<ProductInvoiceDetailViewModel> InvoiceList = (List<ProductInvoiceDetailViewModel>)ViewBag.InvoiceList;
+
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+
+    <style>
+        .input-mask-date {
+            width: 100% !important;
+        }
+
+        .item_note {
+            width: 100% !important;
+        }
+        .item_Code{
+            height:50px;
+        }
+    </style>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger" style="margin: 30px 0px -10px 0px;">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @Html.Raw(ViewBag.SuccessMessage)
+    </div>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+
+    <div class="">
+        <div class="listsearch">
+            <div id="listOrderDetail" class="table-responsive top-10 ">
+                <table class="table table-bordered grid-table bottom-5">
+                    <thead>
+                        <tr>
+                            <th class="grid-header" width="30">STT</th>
+                            <th class="grid-header" >Mã MBS</th>
+                            <th class="grid-header" >QR_Code</th>
+                            <th class="grid-header" width="30">Số Serial</th>
+                            <th class="grid-header" width="200">Tên SP/DV</th>
+                            <th class="grid-header" width="50">SL</th>
+                            <th class="grid-header" width="100">Ngày hết hạn</th>
+                            <th class="grid-header" width="150">Ghi chú</th>
+                            <th class="grid-header" width="90">Số lần in</th>
+                            <th class="grid-header" width="90">Đã gia hạn</th>
+                            <th class="grid-header" width="90">Đã chuyển</th>
+                            <th class="grid-header" width="20">
+                                <label>
+                                    <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+                                    <span class="lbl"></span>
+                                </label>
+                            </th>
+                            <th class="grid-header" width="20">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody class="Membership_parentList">
+                        <tr tr role="0" id="0" hidden>
+                            <td class="text-center">
+                                1
+                            </td>
+                            <td>
+                                <input class="item_Code" type="text" id="Membership_parentList_0__Code" name="Membership_parentList[0].Code" value="" style="width:80px" />
+                            </td>
+                            <td>
+                                <input class="item_QRCode" type="text" id="Membership_parentList_0__QRCode" name="Membership_parentList[0].QRCode" value="" style="width:80px" />
+                            </td>
+                            <td>
+                                <input class="item_SerialNumber" type="text" id="Membership_parentList_0__SerialNumber" name="Membership_parentList[0].SerialNumber" value="" style="width:80px" />
+                            </td>
+                            <td>
+                                <input class="item_Id" type="hidden" id="Membership_parentList_0__Id" name="Membership_parentList[0].Id" value="0" />
+                                <input class="item_ProductId" type="hidden" id="Membership_parentList_0__ProductId" name="Membership_parentList[0].ProductId" value="0" />
+                                <input class="item_ProductInvoiceDetaiId" type="hidden" id="Membership_parentList_0__ProductInvoiceDetaiId" name="Membership_parentList[0].ProductInvoiceDetaiId" value="0" />
+                                <p class="item_product_name" title="tên sản phẩm/dịch vụ"></p>
+                            </td>
+                            <td align="right">
+                                <input class="item_quantity" type="hidden" id="Membership_parentList_0__Quantity" name="Membership_parentList[0].Quantity" value="0" />
+                                <span class="item_quantity" align="right"></span>
+                            </td>
+                            <td>
+                                <input placeholder="MM/DD/YYYY HH:mm" class="input-mask-date item_expiry_date" type="text" id="Membership_parentList_0__ExpiryDate" name="Membership_parentList[0].ExpiryDate" value="" style="width:80px;">
+                            </td>
+                            <td>
+                                <input class="item_note" type="text" id="Membership_parentList_0__Note" name="Membership_parentList[0].Note" value="" style="width:80px" />
+                            </td>
+                            <td>
+                                <input class="item_NumberPrint" type="text" id="Membership_parentList_0__NumberPrint" name="Membership_parentList[0].NumberPrint" value="0" style="width:80px" />
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-center">
+
+                            </td>
+                            <td class="text-center">
+                                <p>
+                                    <a class="btn-delete-item" name="Delete_parent" value="0">
+                                        <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                    </a>
+                                </p>
+                            </td>
+                        </tr>
+                        @for (int i = 0; i < Model.Membership_parentList.Count(); i++)
+                        {
+                            <tr tr role="@(i+1)" id="@(i+1)">
+                                <td class="text-center">
+                                    @(i + 1)
+                                </td>
+                                <td>
+                                    <p class="item_Code" readonly type="text" id="Membership_parentList_@(i+1)__Code" name="Membership_parentList[@(i+1)].Code" style="width:150px">@Model.Membership_parentList[i].Code</p>
+                                    <input  type="hidden" id="Membership_parentList_@(i+1)__Code" name="Membership_parentList[@(i+1)].Code" value="@Model.Membership_parentList[i].Code" />
+                                </td>
+                                <td>
+                                    <p class="item_QRCode" readonly type="text" id="Membership_parentList_@(i+1)__QRCode" name="Membership_parentList[@(i+1)].QRCode" style="width:150px">@Model.Membership_parentList[i].QRCode</p>
+                                    <input type="hidden" id="Membership_parentList_@(i+1)__QRCode" name="Membership_parentList[@(i+1)].QRCode" value="@Model.Membership_parentList[i].QRCode" />
+
+                                </td>
+                                <td>
+                                    <input class="item_SerialNumber" type="text" id="Membership_parentList_@(i+1)__SerialNumber" name="Membership_parentList[@(i+1)].SerialNumber" value="@Model.Membership_parentList[i].SerialNumber" style="width:80px" />
+                                </td>
+                                <td>
+                                    <input class="item_Id" type="hidden" id="Membership_parentList_@(i+1)__Id" name="Membership_parentList[@(i+1)].Id" value="@Model.Membership_parentList[i].Id" />
+                                    <input class="item_ProductId" type="hidden" id="Membership_parentList_@(i+1)__ProductId" name="Membership_parentList[@(i+1)].ProductId" value="@Model.Membership_parentList[i].ProductId" />
+                                    <input class="item_ProductInvoiceDetaiId" type="hidden" id="Membership_parentList_@(i+1)__ProductInvoiceDetaiId" name="Membership_parentList[@(i+1)].ProductInvoiceDetaiId" value="@Model.Membership_parentList[i].ProductInvoiceDetaiId" />
+                                    <p class="item_product_name" title="tên sản phẩm/dịch vụ">@Model.Membership_parentList[i].ProductCode - @Model.Membership_parentList[i].ProductName</p>
+                                </td>
+                                <td align="right">
+                                    <input class="item_quantity" type="hidden" id="Membership_parentList_@(i+1)__Quantity" name="Membership_parentList[@(i+1)].Quantity" value="@Model.Membership_parentList[i].Quantity" />
+                                    <span class="item_quantity" align="right">@(Common.PhanCachHangNgan2(Model.Membership_parentList[i].Quantity))</span>
+                                </td>
+                                <td>
+                                    <input placeholder="dd/MM/yyyy" class="input-mask-date item_expiry_date" type="text" id="Membership_parentList_@(i+1)__ExpiryDate" name="Membership_parentList[@(i+1)].ExpiryDate" value="@(Model.Membership_parentList[i].ExpiryDate.HasValue ? Model.Membership_parentList[i].ExpiryDate.Value.ToString("dd/MM/yyyy") : "")" style="width:80px;">
+                                </td>
+                                <td>
+                                    <input class="item_note" type="text" id="Membership_parentList_@(i+1)__Note" name="Membership_parentList[@(i+1)].Note" value="@Model.Membership_parentList[i].Note" style="width:80px" />
+                                </td>
+                                <td>
+                                    <input class="item_NumberPrint" readonly type="text" id="Membership_parentList_@(i+1)__NumberPrint" name="Membership_parentList[@(i+1)].NumberPrint" value="@Model.Membership_parentList[i].NumberPrint" style="width:80px" />
+                                </td>
+                                <td value="@Model.Membership_parentList[i].is_extend.ToString()">
+                                    @(Model.Membership_parentList[i].is_extend.ToString() == "1" ? "Có" : Model.Membership_parentList[i].is_extend.ToString() == "0" ? "Không" : "Chưa tạo MBS")
+                                </td>
+                                <td></td>
+                                <td class="text-center">
+                                    <label>
+                                        <input id="PrintId-checkbox" class="ace class-print-all" type="checkbox" name="PrintId-checkbox" value="@Model.Membership_parentList[i].Id">
+                                        <span class="lbl"></span>
+                                    </label>
+                                </td>
+                                <td class="text-center">
+                                    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete_parent", "Membership", "Sale"))
+                                    {
+                                        <p>
+                                            <a id="Delete_parent" class="btn-delete-item" name="Delete_parent" value="@Model.Membership_parentList[i].Id" onclick="MembershipDelete('@Model.Membership_parentList[i].Id.ToString()')">
+                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                            </a>
+                                        </p>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+
+                </table>
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+
+
+
+
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("PrintAllMBS", "Membership", "Sale"))
+    {
+        <a id="PrintAll" name="PrintAll" value="PrintAll" href="" target="_blank" class="btn btn-white btn-success btn-sm" onclick="return CheckIsval();">
+            <i class="ace-icon fa fa-print"></i>
+            In phiếu MBS
+        </a>
+    }
+
+
+}
+
+@section Scripts {
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('.input-mask-date').datetimepicker({
+                format: 'DD/MM/YYYY',
+            });
+        });
+    </script>
+    <script >
+        function CheckIsval() {
+            if ($('.class-print-all').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn in các item đã chọn ?')) {
+                    var idPrintAll = '';
+                    $('input.class-print-all:checked').each(function () {
+                        idPrintAll = idPrintAll + "," + $(this).val();
+                    });
+                    idPrintAll = idPrintAll.substring(1,idPrintAll.length);
+                    var oldurl = "/Membership/PrintAllMBS?idPrintAll=";
+                    var newurl = oldurl + idPrintAll;
+                    $("#PrintAll").attr("href",newurl);
+                    //location.href = '/Membership/PrintAllMBS?id=' + id + '&idPrintAll=' + idPrintAll;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        function MembershipDelete(id) {
+            if (confirm('Bạn có chắc muốn xóa item đã chọn ?')) {
+
+                location.href = '/Membership/Delete_parent?id=' + id;
+            }
+            else {
+                return false;
+            }
+        };
+
+    </script>
+
+}

@@ -1,0 +1,161 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model MembershipViewModel
+
+@{
+    ViewBag.Title = Wording.PageEdit_Membership;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Membership",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = true,
+        DisplayBackButton = true
+    };
+    IEnumerable<SelectListItem> AdviseType = Erp.BackOffice.Helpers.Common.GetSelectList_Category("TemplateListVote", Model.Type, "value");
+}
+<style>
+    span.cus {
+        position: relative;
+        top: 20px;
+        left: 500px;
+        /* width: 20px; */
+    }
+
+    input[type="checkbox"] {
+        width: 20px;
+        margin: 0 5px;
+    }
+
+    span.tt {
+        position: relative;
+        top: -5px;
+    }
+</style>
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    @Html.HiddenFor(model => model.AssignedUserId)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.HiddenFor(model => model.Status)
+    @Html.HiddenFor(model => model.TargetModule)
+    @Html.HiddenFor(model => model.TargetCode)
+    <div style="display:none">
+        <input type="number" value="1" name="Is_extend" />
+        <input type="text" value="@Model.ExpiryDate" name="ExpiryDateOld" />
+
+    </div>
+    @Html.DateTimePicker(model => model.CreatedDate, "dd/MM/yyyy H:mm", "00/00/0000 00:00:00", true, true)
+
+
+    @Html.CustomDropDownListFor(model => model.BranchId, Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Model.BranchId, null), WidthType.span4, true, null, DropdownListStyle.DropdownListStyleChosen)
+    @Html.CustomTextboxFor(model => model.Code, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" } })
+    @Html.CustomDropDownListFor(model => model.Type, AdviseType, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+    @Html.ModulePopupFor(m => m.TargetId, "Target", Model.TargetCode, false,true)
+    @Html.ModulePopupFor(m => m.CustomerId, "Customer", Model.CustomerName, false, true)
+    @Html.CustomDropDownListFor(model => model.ProductId, SelectListHelper.GetSelectList_Service(Model.ProductId, Wording.Empty), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)
+    @Html.DateTimePicker(model => model.ExpiryDate, "dd/MM/yyyy H:mm", "00/00/0000 00:00:00", true, false)
+    
+        using (Html.BeginForm("Edit", "Membership", FormMethod.Post))
+        {
+
+        <span class="cus"><input type="checkbox" name="kiemtracheck" value="check" checked><span class="tt">Gia hạn các MBS còn lại trong cùng target @Model.TargetCode</span></span>
+        }
+    
+
+
+
+
+
+
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(".fa-search").remove();
+            $(".input-group-addon").remove();
+            document.getElementById("CreatedDate").readOnly = true;
+        });
+        $("button[name='Submit']").click(function (e) {
+            //kiem tra ngay thang
+            debugger
+            //ngay bat dau;
+            var startDate = $("#CreatedDate").val().split(" ");
+
+            //cat thoi gian
+            var catgio = startDate[1].split(":");
+            var gio = catgio[0];
+            var phut = catgio[1];
+            //cat ngay
+            var catthoigian = startDate[0].split("/");
+            var catngay = catthoigian[0];
+            var catthang = catthoigian[1];
+            var catnam = catthoigian[2];
+            //ngay ket thuc
+            var endDate = $("#ExpiryDate").val().split(" ");
+            //cat thoi gian
+            var catgio1 = endDate[1].split(":");
+            var gio1 = catgio1[0];
+            var phut1 = catgio1[1];
+            //cat ngay
+            var catthoigian1 = endDate[0].split("/");
+            var catngay1 = catthoigian1[0];
+            var catthang1 = catthoigian1[1];
+            var catnam1 = catthoigian1[2];
+            //so sanh
+            if (catnam < catnam1) {
+                alertPopupthongbao("thành công", "gia hạn thành công", "type")
+                return true;
+            }
+            else
+            {
+                if (catngay > catngay1 || catthang > catthang1 || catnam > catnam1) {
+                    alertPopup("Lỗi", "Thời Hạn phải lớn hơn ngày Bắt Đầu!!!", "warning");
+                    return false;
+                }
+                if (catngay == catngay1 && catthang == catthang1 && catnam == catnam1) {
+                    if (gio > gio1) {
+                        alertPopup("Lỗi", "Thời Hạn phải lớn hơn ngày Bắt Đầu!!!", "warning");
+                        return false;
+                    }
+                    if (gio == gio1) {
+                        if (phut > phut1) {
+                            alertPopup("Lỗi", "Thời Hạn phải lớn hơn ngày Bắt Đầu!!!", "warning");
+                            return false;
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

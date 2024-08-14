@@ -1,0 +1,3655 @@
+﻿@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+@model SectionCusModel
+
+
+@{
+                var tuple = Model.Tuple as Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>;
+                var category = ViewBag.category as Erp.Domain.Interfaces.ICategoryRepository;
+                var user = ViewBag.user as Erp.Domain.Repositories.UserRepository;
+                var lead = ViewBag.lead as LeadModel;
+                var isPartial = ViewBag.isPartial;
+                var cusId = ViewBag.CusId;
+                var CodeKH = ViewBag.CodeKH;
+                var errorMessageSendSMS = ViewBag.errorMessageSendSMS;
+                Layout = null;
+                var branch = Erp.Domain.Account.Helper.SqlHelper.QuerySP<Erp.Domain.Staff.Entities.Branch>("GetAllBranch");
+                string[] smschkbox =new string[] { "F17", "F30", "F13"};
+            }
+
+<style>
+    .form-label {
+        font-weight: bold;
+        font-size: 14px;
+        color: #3F51B5;
+    }
+
+    .cke_top .cke_contents, .cke_bottom {
+        display: block;
+        overflow: hidden;
+        height: auto !important;
+    }
+
+    [id^="cke_"][id$="_contents"] {
+    height: 22rem !important;
+    }
+
+    /* #cke_110_ {
+        height: 238px !important;
+    }*/
+
+
+    .wrapper {
+        display: flex;
+    align-items: center;
+margin: 1rem 0;
+    }
+
+        .wrapper .border-checked {
+    border: .1rem solid #dbdbdb;
+            border-radius: 5rem;
+        align-items: center;
+    padding: 2px 0 0 0;
+    }
+
+            .wrapper .border-checked input {
+    width: 1.2rem !important;
+        vertical-align: top;
+        margin-left: 10px !important;
+    }
+
+
+    .thao-tac {
+        background-color: aqua
+    }
+
+    .title-infoLead {
+    padding: 0 !important;
+    }
+
+#btnSendCmt {
+    margin-right: 30px !important;
+background: #eef3f7;
+    }
+
+        #btnSendCmt:hover {
+            background: #03a9f478;
+        }
+
+    #saveLeadForm::-webkit-scrollbar {
+        width: 7px;
+    }
+
+    #saveLeadForm::-webkit-scrollbar-thumb {
+        background-color: #0460b3; /* Màu nền của thanh trượt */
+        border-radius: 10px; /* Độ cong của góc */
+    }
+
+    #LeadLogsShow > div:first-child {
+        margin-top: 20px !important;
+    }
+
+    #LeadLogsMeetingShow > div:first-child {
+        margin-top: 15px !important;
+    }
+
+    #StatusHeader {
+        white-space: nowrap;
+padding: 0 16px;
+    }
+
+    .btn-edit {
+    background: unset !important;
+    border: unset;
+    color: #9E9E9E !important;
+        margin-top: 10px;
+        font-size: 20px;
+    }
+
+        .btn-edit:hover {
+            color: black !important;
+        }
+
+    .modal-body input {
+        width: 100%;
+    }
+
+        .modal-body input[type=checkbox], .modal-body input[type=radio] {
+    width: 4%;
+        vertical-align: top;
+        margin-left: 20px;
+    }
+
+    .modal-body .form-check-input-confirm {
+    width: 10% !important;
+        vertical-align: top;
+        margin-left: 0px !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+        height: 33px !important;
+    border-radius: unset !important;
+    }
+
+    .close-meetingModal {
+        font-weight: bolder;
+    border: 0px;
+        /* height: 39px; */
+        font-size: 30px;
+    color: #ac2626;
+    }
+
+    .customerid, input[name=CustomerId_DisplayText] {
+        display: none;
+    }
+
+    /*thanh*/
+
+    #TabLeadHeader ul li > a {
+        background: transparent;
+border: none;
+    font-size: 15px;
+padding: 8px 24px;
+    }
+
+        #TabLeadHeader ul li > a:hover {
+            color: #337ab7 !important;
+        }
+
+    .ui-tabs .ui-tabs-nav li.ui-tabs-active > a {
+    border: 1px solid !important;
+        border-color: #4C8FBD #C5D0DC transparent !important;
+        border-top-width: 2px !important;
+    color: #3F51B5;
+        border-radius: 7px 7px 0 0;
+    }
+
+    div#modalSendZNS {
+        background: rgba(0, 0, 0, 0.5);
+    }
+
+    .control-group.form-group {
+    display: flex;
+        align-items: center;
+    gap: 1.5rem;
+    }
+
+    label.control-label.customerid {
+        margin-left: 21px;
+    }
+
+    .control-value {
+        max-width: 65%;
+    }
+
+    div#swal2-html-container {
+        margin: 8px 0 !important;
+    font-size: 1.2rem;
+    }
+    /*    Khách mua */
+    .customerPurchaseModal {
+        background-color: transparent;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+height: auto;
+    margin-top: 20px;
+    }
+
+        .customerPurchaseModal .modal-content {
+    padding: 20px;
+    margin: 400px;
+        margin-top: 240px;
+    }
+
+            .customerPurchaseModal .modal-content div {
+                display: flex;
+    flex-direction: row; /* Các thành phần nằm thẳng dọc */
+    margin-bottom: 10px;
+            }
+
+            .customerPurchaseModal .modal-content label {
+                font-weight: bold;
+    margin-bottom: 5px; /* Khoảng cách giữa các label */
+width: 200px;
+    margin-right: 65px;
+            }
+
+            .customerPurchaseModal .modal-content input[type="text"],
+            .customerPurchaseModal .modal-content input[type="date"],
+            .customerPurchaseModal .modal-content input[type="number"],
+            .customerPurchaseModal .modal-content select,
+            .customerPurchaseModal .modal-content textarea {
+                padding: 8px;
+border: 1px solid #ccc;
+                border-radius: 5px;
+    margin-bottom: 10px; /* Khoảng cách giữa các input */
+width: 100%; /* Chiều rộng 100% */
+            }
+
+
+            .customerPurchaseModal .modal-content button {
+                padding: 8px 16px;
+border: none;
+    border-radius: 5px;
+cursor: pointer;
+    font-weight: bold;
+            }
+
+            .customerPurchaseModal .modal-content .saveCustomerPurchaseModal {
+        background-color: #4CAF50; /* Màu nền cho nút Lưu */
+                color: white;
+    }
+
+            .customerPurchaseModal .modal-content .cancelCustomerPurchaseModal {
+        background-color: transparent; /* Nền trong suốt cho nút Hủy bỏ */
+    color: black;
+    border: 1px solid #ccc;
+            }
+
+            .customerPurchaseModal .modal-content saveCustomerPurchaseModal:hover {
+    opacity: 0.8; /* Hiệu ứng khi di chuột qua */
+    }
+
+        .customerPurchaseModal .modal-overlay {
+    position: fixed;
+        top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Màu overlay */
+    }
+
+        .customerPurchaseModal .modal-content {
+    left: 25%;
+    transform: translate(-50%, -50%);
+        background-color: white; /* Màu nền của modal */
+    padding: 20px;
+        border-radius: 5px;
+        z-index: 1114; /* Z-index cao hơn overlay */
+    width: auto;
+    }
+
+    .ui-tabs .ui-tabs-nav li.ui-tabs-active > a {
+    border: 0 solid !important;
+        /* border-color: #4C8FBD #C5D0DC transparent !important; */
+        border-bottom-width: 3px !important;
+    color: #3F51B5;
+        box-shadow: none;
+    }
+
+#TabLeadHeader ul li > a:hover {
+color: #fff !important;
+        background: #60c9f8 !important;
+        text-decoration: none !important;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    }
+
+    .close:hover {
+    transition: .3s linear;
+    transform: scale(0.9)
+    }
+
+    .modal-body {
+    position: relative;
+    padding: 15px 18px 30px 15px;
+    }
+
+    .file-item {
+    display: flex;
+        align-items: center;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        max-width: 300px;
+    overflow: hidden;
+    }
+
+        .file-item a {
+            text-decoration: none;
+        }
+
+
+        .file-item a {
+            flex-grow: 1;
+overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+color: #007bff;
+            cursor: pointer;
+        }
+
+        .file-item .file-size {
+        margin-left: 10px;
+        font-size: 12px;
+    color: #000;
+        }
+
+        .file-item button {
+            margin-left: 5px;
+    background-color: #dc3545;
+            color: #fff;
+            border: none;
+    border-radius: 50%;
+width: 20px;
+height: 20px;
+    font-size: 12px;
+cursor: pointer;
+        }
+
+            .file-item button:hover {
+    cursor: pointer;
+    }
+
+    br {
+        display: none;
+    }
+
+    input#UserIdZalo,
+    input#CountForBrand {
+        display: none;
+    }
+
+    label {
+        color: #333 !important;
+        margin: .5rem 0;
+    }
+
+    .border-checked label {
+    margin: 0;
+    }
+
+    input[type="checkbox"] {
+    margin: 14px 6px 0 0;
+    }
+
+    .modal-footer {
+        padding-top: 16px !important;
+        padding-bottom: 16px !important;
+    }
+
+    .modal-body section:last-child {
+        margin-bottom: 0;
+    }
+
+    .container-SendZNS,
+    .container-SendSMS {
+    width: 60rem !important;
+    background: #fff !important;
+        border-radius: 3px !important;
+    }
+
+    .container-SendSMS {
+    height: 39rem;
+    }
+
+/*Toast*/
+#toast-container {
+top: 5.3%;
+right: 7%;
+    }
+</style>
+
+<div class="modal-dialog modal-sm" style="@(lead != null ? "width:100%" : " width: 40%; box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);")" role="document">
+    <div style="height: 100%;@(isPartial==1?"":" box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);")" class="modal-content">
+
+
+        <!-- Modal header -->
+        <div @(isPartial == 1 ? "hidden" : "") style="height:8%" class="modal-header">
+            <button id="btnCloseAdd" type="button" class="close" data-dismiss="modal" aria-hidden="true" style="position: absolute; top: 9px !important; right: 17px !important; font-size: 24px !important; padding: 0 11px !important; background: #e1e1e1 !important; border: none !important; color: #999 !important; ">&times;</button>
+            <h3 style="color: #3F51B5; text-transform: uppercase; margin-left: 10px;" class="modal-title">@(lead != null ? @ViewBag.lead.LeadName : "Thêm mới")</h3>
+        </div>
+        <div @(isPartial == 1 ? "hidden" : "") style="height:8%" id="StatusHeader">
+
+        </div>
+        <div style="height: 8%;" id="TabLeadHeader">
+            <ul style="padding: 20px 40px 10px 20px; display: flex; align-items: center;">
+                <li class="li-active">
+                    <a data-id="1" href="#select2parent">Chung</a>
+                </li>
+                @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("TabLeadProduct", "AdviseCard", "Sale"))
+                {
+                    <li>
+                        <a data-id="2" href="#tableadproduct" id="idtableadproduct">Các sản phẩm</a>
+                    </li>
+
+                }
+                @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("TabLeadQuotation", "AdviseCard", "Sale"))
+                {
+                    <li>
+                        <a data-id="3" href="#tableadquotation" id="idtableadquotation">Báo giá</a>
+                    </li>
+
+                }
+
+                <li>
+                    <a data-id="4" href="#tableadhistory" id="idtableadhistory">Lịch sử</a>
+                </li>
+            </ul>
+            @* tab chung *@
+            <div class="overflow-wrapper" style="display: flex; height: 84%; overflow: hidden; " id="select2parent">
+                <form @(isPartial == 1 ? "hidden" : "") id="saveLeadForm" action="/AdviseCard/SaveNewLead" style=" width: 35.5%; position: relative;" method="post" @(lead != null ? "style=width:50%" : "style=width:100%")>
+                    <input hidden id="IdLead" name="Id" value="@lead.Id" />
+                    <input hidden id="isPartial" value="@isPartial" />
+                    <input hidden name="CusId" value="@cusId" />
+                    <input hidden id="VStatusId" value="0" />
+                    <input hidden id="Vendstatus" value="0" />
+                    <!-- Modal body -->
+                    <div class="modal-body">
+
+                        @foreach (var item in tuple.Item1)
+                        {
+                            <section style="padding:15px;border-radius:3px; margin-top: 5px">
+                                @if (lead != null)
+                                {
+                                    <button @(isPartial == 2 ? "hidden" : "") class="btn-edit float-right" type="button" name="editsection">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <div id="personInCharge" style="display:flex;align-items:center;">
+
+                                    </div>
+                                }
+                                <h4 class="title-infoLead" style="color: #337ab7; margin: 5px 0 !important; font-weight: bold;">
+                                    @item.Name @(item.isDefault==1?Html.Raw("<span style=color:#43c466;font-weight:bold;margin-left:15px>" + @CodeKH+"</span>"):"")
+                                </h4>
+                                @if (item.isDefault == 1)
+                                {
+                                    var properties = typeof(LeadModel).GetProperties();
+                                    int outchk;
+                                    string[] dont = new string[] { "IsDeleted", "CreatedDate", "CreatedUserId", "ModifiedDate", "ModifiedUserId", "AssignedUserId", "StatusId" };
+                                    var prop = properties.Where(x => !x.Name.StartsWith("F") && !int.TryParse(x.Name.Remove(0, 1).ToString(), out outchk) && x.Name != "Id" && !dont.Contains(x.Name));
+                                    foreach (var item1 in prop)
+                                    {
+                                        var display = item1.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;
+                                        string displayname = (isPartial == -1 && item1.Name == "LeadName") ? "Tên cơ hội" : display != null ? display.DisplayName : "";
+                                        string[] categorydefault = new string[] { "Source", "TypeData", "Topic" };
+                                        string[] listdefault = new string[] { "ReceptionStaffId" };
+                                        string[] checkdefault = new string[] { "IsCancel" };
+                                        string[] required = new string[] { "LeadName" };
+                                        if (categorydefault.Contains(item1.Name))
+                                        {
+                                            var content = category.GetCategoryByCode(item1.Name).FirstOrDefault();
+                                            <br>
+                                            @Html.Label(displayname, new { style = "margin-right:10px" })
+                                            @Html.TextBox(item1.Name, lead != null && item1.GetValue(lead) != null ? item1.GetValue(lead).ToString() : content != null ? content.Value : "", lead != null ? new { @class = "abc", @readonly = "disabled" } : (object)"")
+                                        }
+                                        else if (checkdefault.Contains(item1.Name))
+                                        {
+                                            <br />
+                                            <div class="wrapper">
+                                                <div class="title">
+                                                    @Html.Label(displayname, new { style = "margin-right:10px" })
+                                                    <input name='@item1.Name' hidden value="@(lead != null && item1.GetValue(lead) != null ? item1.GetValue(lead).ToString():"")" />
+                                                    @Html.RadioButton(item1.Name, "", lead == null || (lead != null && item1.GetValue(lead) == null) ? true : false, new { style = "display:none" })
+                                                </div>
+
+                                                <div class="border-checked">
+                                                    @Html.RadioButton(item1.Name, "0", lead != null && item1.GetValue(lead) != null && (item1.GetValue(lead).ToString() == "0") ? true : false, lead != null ? new { disabled = "disabled" } : (object)"")
+                                                    @Html.Label("Không hủy", new { style = "margin-right:10px" })
+                                                    @Html.RadioButton(item1.Name, "1", lead != null && item1.GetValue(lead) != null && item1.GetValue(lead).ToString() == "1" ? true : false, lead != null ? new { disabled = "disabled" } : (object)"")
+                                                    @Html.Label("Hủy", new { style = "margin-right:10px" })
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (listdefault.Contains(item1.Name))
+                                        {
+
+
+
+                                            IEnumerable<Erp.Domain.Entities.User>
+                                                users = user.GetAllUsers();
+                                            List<SelectListItem>
+                                                lstcus = new List<SelectListItem>
+                                                    ();
+                                            foreach (var item2 in users)
+                                            {
+                                                string displayText = item2.FullName;
+                                                if (!string.IsNullOrEmpty(item2.Mobile))
+                                                {
+                                                    displayText += " - " + item2.Mobile;
+                                                }
+                                                SelectListItem selectListItem = new SelectListItem() { Text = displayText, Value = item2.Id.ToString() };
+                                                lstcus.Add(selectListItem);
+                                            }
+                                            <br>
+                                            @Html.Label(displayname, new { style = "margin-right:10px" })
+                                            <input name='@item1.Name' hidden value="@(lead != null && item1.GetValue(lead) != null?item1.GetValue(lead).ToString():"")" />
+                                            <select @(lead != null ? "disabled" : "") class="js-example-basic-single" name='@item1.Name'>
+                                                <option @( lead != null && item1.GetValue(lead) != null ? "" : "selected") value=''>---Chọn---</option>
+                                                @foreach (var item2 in lstcus)
+                                                {
+                                                    if (lead != null && item1.GetValue(lead) != null && item2.Value == item1.GetValue(lead).ToString())
+                                                    {
+                                                        <option selected value="@item2.Value">@item2.Text</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@item2.Value">@item2.Text</option>
+                                                    }
+                                                }
+                                            </select>
+                                        }
+                                        else if (item1.PropertyType == typeof(String))
+                                        {
+                                            <br>
+                                            @Html.Label(displayname, new { style = "margin-right:10px" })
+                                            if (required.Contains(item1.Name))
+                                            {<input value='@( lead != null && item1.GetValue(lead) != null ? item1.GetValue(lead).ToString() : "")' name="@item1.Name" required @(lead != null ? "readonly" : "") style="width: 100%; border: 0.5px solid #0000002b; height: 33px;" /> }
+                                            else
+                                            {
+                                                @Html.TextBox(item1.Name, lead != null && item1.GetValue(lead) != null ? item1.GetValue(lead).ToString() : "", lead != null ? new { @readonly = "readonly" } : (object)"");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <br>
+                                            <label style="margin-right:10px">@displayname</label>
+                                            <input type="number" value='@( lead != null && item1.GetValue(lead) != null ? item1.GetValue(lead).ToString() : "")' name="@item1.Name" @(lead != null ? "readonly" : "") style="width:100%;" />
+                                        }
+                                    }
+
+                                }
+                                @{ var itemField = tuple.Item2.Where(x => x.LeadSectionId == item.Id && x.IsHidenList != true);
+                                    string inputele = "";
+                                }
+                                @foreach (var item1 in itemField)
+                                {
+                                    inputele += "</br><label style='margin-right:10px'>" + item1.NameLabel + "</label>";
+                                    switch (item1.TypeField)
+                                    {
+                                        case "Number":
+                                            inputele += Html.Raw("<input oninput='javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);' maxlength='15' value='" + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") + "' type='number' " + (lead != null ? "readonly" : "") + " name='" + item1.FieldName + "'/>");
+                                            break;
+                                        case "Date":
+                                            inputele += Html.Raw("<input value='" + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") + "' type='date' " + (lead != null ? "readonly" : "") + " name='" + item1.FieldName + "'/>");
+                                            break;
+                                        case "Datetime":
+                                            inputele += Html.Raw("<input value='" + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") + "' type='datetime-local' " + (lead != null ? "readonly" : "") + " name='" + item1.FieldName + "'/>");
+                                            break;
+                                        case "String":
+                                            inputele += Html.Raw("<input value='" + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") + "' type='text' " + (lead != null ? "readonly" : "") + " name='" + item1.FieldName + "'/>");
+                                            break;
+                                        case "Bool":
+                                            if (smschkbox.Contains(item1.FieldName))
+                                            {
+                                                inputele += Html.Raw("<input value='" + /*(lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") +*/ "' type='hidden' name='" + item1.FieldName + "' value='' /><input type='checkbox' " + (lead != null ? "disabled" : "") + " onclick=\"this.previousSibling.value = this.checked ? '1' : '0';this.checked?SaveLeadLogSMS(this.previousSibling.value,this.previousSibling.getAttribute('name')):''\"/>");
+
+                                            }
+                                            else
+                                            {
+                                                inputele += Html.Raw("<input value='" + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() : "") + "' type='hidden' name='" + item1.FieldName + "' value='' /><input type='checkbox' " + (lead != null ? "disabled" : "") + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString() == "1" ? " Checked" : "" : "") + " onclick=\"this.previousSibling.value = this.checked ? '1' : '0';\"/>");
+
+                                            }
+                                            break;
+
+                                    }
+                                    if (item1.TypeField == "List")
+                                    {
+                                        var itemList = category.GetListCategoryByCode(item1.CodeList);
+                                        string optionele = "";
+                                        string valuee = "";
+                                        if (item1.FieldName == "F12")
+                                        {
+
+                                            foreach (var item2 in branch)
+                                            {
+                                                if (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null && item2.Id.ToString() == typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString())
+                                                {
+                                                    optionele += "<option selected value='" + item2.Id.ToString() + "'>" + item2.Name + "</option>";
+                                                    valuee = item2.Id.ToString();
+                                                }
+                                                else
+                                                {
+                                                    optionele += "<option value='" + item2.Id.ToString() + "'>" + item2.Name + "</option>";
+
+                                                }
+                                            }
+                                            inputele += "<input value='" + valuee + "' hidden name='" + item1.FieldName + "'/><select class='js-example-basic-single' " + (lead != null ? "disabled" : "") + " name='" + item1.FieldName + "'> <option " + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? "" : "selected") + " value =''>---Chọn---</option>" + optionele + "</select>";
+
+                                        }
+                                        else
+                                        {
+
+                                            foreach (var item2 in itemList)
+                                            {
+                                                if (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null && item2.Value == typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead).ToString())
+                                                {
+                                                    optionele += "<option selected value='" + item2.Value + "'>" + item2.Name + "</option>";
+                                                    valuee = item2.Value;
+                                                }
+                                                else
+                                                {
+                                                    optionele += "<option value='" + item2.Value + "'>" + item2.Name + "</option>";
+
+                                                }
+                                            }
+                                            inputele += "<input value='" + valuee + "' hidden name='" + item1.FieldName + "'/><select class='js-example-basic-single' " + (lead != null ? "disabled" : "") + " name='" + item1.FieldName + "'> <option " + (lead != null && typeof(LeadModel).GetProperty(item1.FieldName).GetValue(lead) != null ? "" : "selected") + " value =''>---Chọn---</option>" + optionele + "</select>";
+
+                                        }
+                                    }
+                                }
+                                @Html.Raw(inputele)
+                            </section>
+                        }
+
+
+                        <!-- Your content goes here -->
+                    </div>
+                    <!-- Modal footerrrr -->
+                    
+                </form>
+                @if (lead != null)
+                {
+                    <div style="@(isPartial==1?"width:100%;":"width: 65%;")padding-top: 14px;">
+                        <div id="myDiv" style="margin: 5px; width: 100%; margin-left: 10px;">
+                            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("SendCmtLead", "AdviseCard", "Sale"))
+                            {
+                                <button type="button" class="btn btn-header-cmt active">Comment</button>
+
+                            }
+                            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("SendApiPhoneCall", "AdviseCard", "Sale"))
+                            {
+                                <button type="button" class="btn btn-header-cmt" id="btnShowPhoneCallModal">Call</button>
+
+                            }
+                            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("ShowEmailModal", "AdviseCard", "Sale"))
+                            {
+                                <button type="button" class="btn btn-header-cmt" id="btnShowEmailModal">E-mail</button>
+
+                            }
+                            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("GetSMSList", "AdviseCard", "Sale"))
+                            {
+                                <button type="button" class="btn btn-header-cmt" onclick="openModalSendSMS()">SMS</button>
+
+                            }
+                            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Index", "LeadMeeting", "Crm"))
+                            {
+                                <button type="button" class="btn btn-header-cmt" id="createMeetingButton">Meeting</button>
+
+                            }
+                            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("TaskView", "LeadMeeting", "Crm"))
+                            {
+                                <button type="button" class="btn btn-header-cmt" id="createTaskButton">Task</button>
+
+                            }
+                            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CallToView", "LeadMeeting", "Crm"))
+                            {
+                                <button type="button" class="btn btn-header-cmt" id="createCallToButton">Gọi đi</button>
+
+                            }
+                            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("HistoryCallView", "LeadMeeting", "Crm"))
+                            {
+                                <button type="button" class="btn btn-header-cmt" id="createHistoryCallToButton">Call logs</button>
+
+                            }
+                            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("GetZNSList", "AdviseCard", "Sale"))
+                            {
+                                <button type="button" id="btnShowZNSModal" class="btn btn-header-cmt">Zalo ZNS</button>
+
+                            }
+                        </div>
+                        <div id="submyDiv" style="width:98.8%;"></div>
+                        @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("SendCmtLead", "AdviseCard", "Sale"))
+                        {
+
+                            <div style="position: relative; display: inline-block; margin: 5px; width: 100%; margin-top: -11px;">
+                                <textarea style="display: block; width: 100%; margin: 5px;height: 40px;padding-top: 10px;" id="LeadCmt" placeholder="Leave a comment" onkeypress="handleKeyPress(event)"></textarea>
+                                <label id="filename" style="width: 70px; height: 30px; float: right; margin: 5px; border: #03a9f4a3; border-radius: 3px; position: absolute; right: 250px; top: 4px"></label>
+                                <label for="cmtfile" style="width: 70px; height: 30px; float: right; margin: .5rem 1rem !important; border: #03a9f4a3; border-radius: 3px; position: absolute; right: 145px; top: 4px; background-color: rgb(238, 243, 247);text-align:center ">
+                                    <img src="~/assets/img/attach-file.png" alt="attach-file" / style="width: 20px !important; height: 20px !important; margin-top: 5px;">
+                                </label>
+                                <input onchange="debugger; $('#filename').text($(this)[0].files.length>0?$(this)[0].files[0].name:'')" style="display:none" id="cmtfile" type="file" />
+                                <button type="button" id="btnSendCmt" onclick="SendCmt()" title="Gửi" style=" width: 70px; height: 30px; float: right; margin: 5px; border: #03a9f4a3; border-radius: 3px; position: absolute; right: 45px; top: 4px;"><i class="fa fa-send-o" style=" color: blue;"></i></button>
+                            </div>
+                        }
+                        <div style=" height: auto; overflow-x: hidden; ">
+                            <div id="PinCmtShow" style="margin-top:10px !important">
+
+
+                            </div>
+
+                        </div>
+                        <div id="LeadLogsMeetingShow" style=" height: auto; overflow-x: hidden; ">
+                            <div id="SubLeadLogsShow" style="margin-top:10px !important">
+
+
+                            </div>
+
+                        </div>
+                        <div id="LeadLogsShow" style=" padding-top: 7px; padding-bottom: 1.5rem;">
+                            <div style="margin: 0 0 6rem 0">
+
+                                @*@Html.Action("LeadLogsView", new { Id = lead.Id, isPartial=isPartial })*@
+                            </div>
+
+                        </div>
+                    </div>
+
+                }
+            </div>
+            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("TabLeadProduct", "AdviseCard", "Sale"))
+            {
+                <div id="tableadproduct" style="height: 84%; background: #7ea3c321">
+                    <div style="overflow-y:scroll;height:550px;overflow-x:hidden; padding-top: 7px; width:100%;">
+                        <div style="margin-top:0px !important " id="tableadproductDelail">
+
+                        </div>
+                    </div>
+
+                </div>
+
+            }
+            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("TabLeadQuotation", "AdviseCard", "Sale"))
+            {
+                <div id="tableadquotation" style="height: 84%; background: #7ea3c321">
+                    <div style="overflow-y:scroll;height:550px;overflow-x:hidden; padding-top: 7px; width:100%;">
+                        <div style="margin-top:0px !important " id="tableadquotationDelail">
+
+                        </div>
+                    </div>
+                </div>
+
+            }
+            @* tab lịch sử *@
+            <div id="tableadhistory" style="display: flex; height: 84%;  background: #7ea3c321">
+                <div style="overflow-y: scroll; height: 550px; overflow-x: hidden; padding: 20px 0px 50px 30px; width: 100%;">
+                    <div style="margin-top:0px !important" id="tableadhistoryDelail">
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+        </div>
+    </div>
+@*tạo lịch họp*@
+<div id="meetingModal" class="modal fade" role="dialog">
+    <div style="box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);" class="modal-dialog modal-lg">
+        @*Modal content*@
+        <div class="modal-content">
+            <div class="modal-header modal-meeting" style="float:right">
+
+                <button type="button" class="close close-meetingModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                @*Div to hold meeting content loaded via AJAX*@
+                <div id="meetingContent">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="abso" style="position: fixed; bottom: 2rem; left: 0; max-width: 100%; width: 98.8%; right: 0; overflow: hidden; z-index: 9991; display: flex; ">
+    <div id="btnAdd" class="modal-footer" style=" position: sticky; bottom: 0; background: #eaf6ff; max-width: 100%; width: 100%; text-align: center; ">
+        <button type="button" id="btnCloseAdd" class="btn btn-default2" data-dismiss="modal">Đóng</button>
+        @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("SaveNewLead", "AdviseCard", "Sale"))
+        {
+            <button type="button" id="saveLeadModal" class="btn btn-primary2">Lưu</button>
+        }
+
+    </div>
+</div>
+<script>
+    debugger
+    // Lấy tất cả các nút trong phần tử có id "myDiv"
+    var buttons = document.getElementById("myDiv").getElementsByClassName("btn-header-cmt");
+    // Lặp qua từng nút và thêm sự kiện click
+    for (var i = 0; i < buttons.length; i++) {
+        buttons[i].addEventListener("click", function () {
+            // Loại bỏ lớp "active" từ tất cả các nút
+            for (var j = 0; j < buttons.length; j++) {
+                buttons[j].classList.remove("active");
+            }
+            // Thêm lớp "active" cho nút được click
+            this.classList.add("active");
+        });
+    }
+
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+<style>
+
+    .modal-body input, .select2-container {
+        margin-bottom: 0px !important;
+    }
+
+    .close {
+        margin-left: auto;
+    }
+
+    /*.select2-dropdown .select2-search {
+
+        }*/
+
+    #body-sms-select {
+        margin-bottom: 10px;
+    }
+
+        #body-sms-select label {
+            font-weight: bold;
+        }
+
+        #body-sms-select select {
+            min-width: 350px;
+            width: 380px;
+            max-width: 500px;
+        }
+
+    .modal-body-sms {
+        padding-bottom: 45px !important;
+        padding: 15px;
+    }
+
+        .modal-body-sms textarea {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            min-height: 160px;
+            height: auto;
+            /*   margin: 5px;*/
+            color: black;
+        }
+    /*
+                .modal-body-sms button {
+                    width: 50px;
+                    height: 30px;
+                    margin: 5px;
+                    float: right;
+                }*/
+
+    #information-send {
+        align-self: flex-start;
+        font-size: 14px;
+    }
+
+    .title-button {
+        font-weight: 550;
+        margin: 1.2rem 0 2rem 0 !important;
+    }
+
+    .setWidth {
+        max-width: 60rem;
+        width: 95%;
+    }
+
+    .btn-createClient {
+        padding: 7px 40px;
+        border: none;
+        border-radius: 3px;
+        margin-right: 3px;
+        color: #fff !important;
+        background: #bada05 !important;
+        position: relative;
+        cursor: pointer !important;
+    }
+
+        .btn-createClient .icon-arrowFaticon {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 1px 5px;
+            margin: 0;
+            border-left: .1rem solid #999;
+        }
+
+            .btn-createClient .icon-arrowFaticon img {
+                width: 15px;
+            }
+
+        .btn-createClient:hover {
+            transform: scale(.99);
+            transition: .3s ease;
+            box-shadow: 0 5px 10px rgba(0,0,0, .3)
+        }
+
+
+    .btn-haveNotBoughtYet {
+        padding: 7px 25px;
+        border: none;
+        outline: none;
+        border-radius: 3px;
+        margin-left: 3px;
+        background: #e64b4b !important;
+        color: #fff !important;
+        cursor: pointer !important;
+    }
+
+        .btn-haveNotBoughtYet:hover {
+            transform: scale(.99);
+            transition: .3s ease;
+            box-shadow: 0 5px 10px rgba(0,0,0, .3)
+        }
+
+    .setWidth-modal-changeto {
+    }
+
+
+
+    .btn-accept:hover {
+        transform: scale(.98);
+        transition: 3s linear;
+        box-shadow: 0 .5rem 1rem rgba(0,0,0, .3)
+    }
+
+    .btn-cancel:hover {
+        transform: scale(.98);
+        transition: .3s linear;
+        box-shadow: 0 .5rem 1rem rgba(0,0,0, .3)
+    }
+
+    .btn-primary, .btn-primary.focus, .btn-primary:focus {
+        background-color: #428BCA !important;
+        margin-right: 0;
+        border-color: #428BCA;
+    }
+</style>
+<div class="fade modal" id="modalSendSMS" tabindex="-1" role="dialog" aria-labelledby="modalConLabel" aria-hidden="true" style="z-index: 9999">
+    <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 0; top: 0; left: 0; right: 0; bottom: 0;" onclick="closeModalSendSMS()"></div>
+    <div style="top: calc(50% - 180px);" class="modal-dialog" role="document">
+        <div class="container-SendSMS">
+            <div class="">
+                <div style="padding: 15px; background: #7ea3c321">
+                    <h5 id="modalConLabel">Gửi SMS</h5>
+                    <button type="button" class="close" onclick="closeModalSendSMS()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div style="padding: 15px;">
+                <div style="margin: 0; ">
+                    <span id="information-send" value-name="@ViewBag.lead.Name" value-phone="@ViewBag.lead.Mobile" value-id="@ViewBag.lead.Id">Tên: @ViewBag.lead.Name <br> Điện thoại: @ViewBag.lead.Mobile</span>
+                </div>
+                <div class="modal-body modal-body-sms" style="padding: 0 !important">
+
+                    <div id="body-sms-select">
+                        <label style=" color: #2038bd;">Chọn mẫu SMS :</label>
+                        <select id="listSMS" name="listSMS">
+                            <option value="0">All</option>
+                        </select>
+                    </div>
+                    <textarea id="idContentSMS"></textarea>
+                </div>
+                <div>
+                    <button id="sendSMSButton" onclick="SendSMSModal()"><i class="fa fa-send-o" id="icon-sendsms"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade emailModal" id="EmailModalAddNewModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 9999;">
+    <div style="position: absolute; height: 100%; width: 100%; z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseEmailModal"></div>
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div style="font-weight: bold; text-align: center;" class="modal-header">
+                <button type="button" class="close btnCloseEmailModal" aria-hidden="true">×</button>
+                <h5 style="font-weight:bold" bold class="modal-title">Soạn Email</h5>
+            </div>
+            <div style="max-height:1200px" class="modal-body">
+                <form style="height:100%">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <div class="mb-3">
+                                    <label for="emailSender" class="form-label">Người gửi</label>
+                                    <input type="email" class="form-control" id="emailSender">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="emailReceiver" class="form-label">Người nhận</label>
+                                    <input type="email" class="form-control" id="emailReceiver">
+                                    <div class="form-label" style="font-size: 13px; font-weight: normal; color: #b4b4b4; font-style: italic ">
+                                        * Lưu ý: <span style="font-size:13px; font-style: italic; color: #b4b4b4">Dùng dấu ; để gửi từ 2 người trở lên (abc@gmail.com; dcf@gmail.com)</span>
+                                    </div>
+
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="emailTitle" class="form-label">Tiêu đề</label>
+                                    <input type="text" class="form-control" id="emailTitle">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    <label for="emailTemplate" class="form-label">Chọn Template</label>
+                                    <select class="form-select" id="emailTemplate" style="height:34px;"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 10px; height: 32rem">
+                            <div class="col-lg-12">
+                                <label for="emailContent" class="form-label">Nội dung</label>
+
+                                <textarea id="emailInput" class="editor" style="height: 500px;"></textarea>
+
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="tCurrentID" value="0" />
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="mb-file">
+                                <label for="formFileSm" class="form-label" style="font-weight:bold;margin-left:15px">Chọn file</label>
+                                <input class="form-control form-control-sm" id="formFileSm" type="file" style="margin-left:20px;width:50%; height: 34px !important" multiple>
+                            </div>
+
+                        </div>
+
+                        <div id="fileList" class="row" style="margin-top: 10px; display: none;">
+                            <div class="col-lg-12" style="display: flex; flex-wrap: wrap;" id="fileContainer"></div>
+                        </div>
+
+
+
+
+                        <div id="validateDiv" class="row text-danger" style="display:none;"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer text-center">
+                <button class="btn btn-primary2" style="margin-right:0%;" type="button" id="btnSendEmailAddNewModal">Gửi</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="fade modal" id="modalPhoneCall" tabindex="-1" role="dialog" aria-labelledby="modalConLabel" aria-hidden="true" style="z-index: 99999 !important">
+    <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnHidePhoneCallModal"></div>
+    <div style="top: calc(50% - 180px);" class="modal-dialog thao-tac" role="document">
+        <div class="modal-content thao-tac-content">
+            <div class="modal-header thao-tac-header">
+                <div>
+                    <h5 class="modal-title" id="modalConLabel">Gọi điện thoại</h5>
+                    <button type="button" class="close btnHidePhoneCallModal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+            <div style="display:flex">
+                <div style="width: 60%; padding: 20px; border-right: 1px solid; margin: 10px;" class="caller-info">
+                    <div class="caller-info-header">
+                        <div id="information-send-phonecall" value-name="@ViewBag.lead.Name" value-id="@ViewBag.lead.Id">Tên: @ViewBag.lead.Name</div>
+                        @*                            @if (ViewBag.lead != null)
+                            {
+                                <div>Lead Email: @ViewBag.lead.Email</div>
+                            }*@
+                        <div id="dausocloudfoneValue" value-DauSoCloudFone="@ViewBag.DauSoCloudFone"> Số nhánh: @(ViewBag.DauSoCloudFone != null ? ViewBag.DauSoCloudFone : "Không có")</div>
+                    </div>
+                    <div class="caller-info-body">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+
+                            <span id="phoneValue" value-phone="@ViewBag.lead.Mobile">Sđt: @ViewBag.lead.Mobile</span>
+
+                            <button type="button" id="btnPhoneCall"><i class="fa fa-phone" id="icon-phonecall"></i>Gọi điện</button>
+                        </div>
+                        <input type="hidden" id="txterrorMessageSendSMS" name="txterrorMessageSendSMS" value="@errorMessageSendSMS">
+                    </div>
+                </div>
+                <div style="width:40%" class="modal-body">
+                    <div style="text-align: center;margin-bottom:5px;">Quét QR Code để gọi</div>
+                    <div id="qrcode" style="margin: auto; width: 210px; border: 20px solid #00000024; padding: 20px; border-radius: 5px; "></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade znszaloModal" id="modalSendZNS" tabindex="-1" role="dialog" aria-labelledby="modalConLabel" aria-hidden="true" style="z-index: 9999;">
+    <div class="modal-dialog" role="document" style="margin: 15rem auto;">
+        <div class="container-SendZNS">
+            <div class="">
+                <h3 class="modal-title" id="modalConLabel" style="padding: 15px; background: #7ea3c321">Gửi ZNS</h3>
+                <button type="button" class="close closeZNSModal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="padding-box" style="padding: 15px">
+                <div style="margin: 0">
+                    <span id="information-send-zns" style="color:red;" value-name="@ViewBag.lead.Name" value-phone="@ViewBag.lead.Mobile" value-id="@ViewBag.lead.Id">Tên: @ViewBag.lead.Name <br> Điện thoại: @ViewBag.lead.Mobile</span>
+                </div>
+                <div class="hei-set">
+                    <div id="body-zns-select">
+                        <label for="listZNSZalo" style=" color: #2038bd;">Chọn mẫu ZNS :</label>
+                        <select id="listZNSZalo" name="listZNS" class="form-control" style=" height: 25px !important; border-radius: 3px">
+                            <option value="0">All</option>
+                            <!-- Populate options dynamically from database or other source -->
+                        </select>
+                    </div>
+                    <textarea id="idContentZNS" class="form-control" placeholder="Nội dung ZNS" readonly style="margin: 0 0 1rem 0; width: 100%; height: 15rem"></textarea>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <button style="visibility: hidden"></button>
+                        <button type="button" id="sendZNSButton" class="btn btn-primary mt-3" style=" width: 85px !important; border-radius: 3px !important; float: right; line-height: 1; margin: 0 !important;"><i class="fa fa-send-o" id="icon-sendzns"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div style="top: 83px; z-index: 9999" class="modal fade bs-determine-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div id="modal-determine" class="modal-dialog modal-sm" style="left: 55%; transform: translate(-50%, -50%);  position: absolute; width: 50%; top: 40%; margin: auto;" role="document">
+        <div class="modal-content setWidth">
+            <!-- Modal header -->
+            <div class="modal-header">
+                <button onclick="closeNewModal('.bs-determine-modal-sm')" type="button" class="close" aria-hidden="true">×</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body" style="text-align: center; text-transform: capitalize;">
+                <h3 class="title-button">Vui lòng chọn kết quả </h3>
+                <button class="bg-primary btn-createClient" onclick="KmChangeTo()">
+                    Tạo khách hàng
+                    <span class="icon-arrowFaticon"><img src="~/assets/img/downward-arrow.png" alt="Alternate Text" /></span>
+                </button>
+                <button class="bg-warning btn-haveNotBoughtYet" onclick="f5StatusLead(-2)">Chưa mua</button>
+
+            </div>
+            <!-- Modal footer -->
+        </div>
+    </div>
+</div>
+<div style="top: 83px; z-index: 9999" class="modal fade bs-changeto-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div id="modal-changeto" class="modal-dialog modal-sm" style="left: 50%; position: absolute; top: 40%; transform: translate(-50%, -50%); width: 45rem; border-radius: 3px;" role="document">
+        <div class="modal-content setWidth-modal-changeto">
+            <!-- Modal header -->
+            <div style="display:none" class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body" style="display:flex; flex-direction:column">
+                <div style="margin-bottom: 2rem;">
+                    <div class="client-new" style=" font-size: 1.5rem">
+                        <input type="radio" value="new" class="radio radio-inline" checked name="khoption" /> Khách hàng mới
+                    </div>
+                    <div class="client-old" style="margin-top: 1rem; font-size: 1.5rem">
+                        <input type="radio" value="old" class="radio radio-inline" style="margin: 4px 0 0 20px !important;" name="khoption" /> Khách hàng cũ
+                    </div>
+                </div>
+                @Html.ModulePopupFor(m => m.CustomerId, "Customer", Model.CustomerName, false, true, addClassForLabelField: "customerid")
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer" style="display: flex;">
+                <button type="button" class="btn btn-primary btn-accept" style="width: 100%; border-radius: 5px;" onclick="redirectCSKH()">Chọn</button>
+                <button type="button" class="btn btn-default btn-cancel" style="width: 100%; border-radius: 5px;" onclick="closeNewModal('.bs-changeto-modal-sm')">Hủy</button>
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<div style="top: 83px; z-index: 9999" class="modal fade bs-CheckExistLeadId-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+    <div id="modal-CheckExistLeadId" class="modal-dialog modal-sm" style="left: 50px; right: 0%; position: absolute; top: -31px; " role="document">
+        <div class="modal-content">
+            <!-- Modal header -->
+            <div style="display:none" class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body" style="display:flex; flex-direction:column">
+                <div>
+                    Khách hàng đã được tạo không thể tiếp tục tạo được nữa! Bạn có muốn truy xuất vào khách hàng đó không?
+                </div>
+            </div>
+            <!-- Modal footer -->
+            <div class="modal-footer">
+
+                <button type="button" class="btn btn-primary" onclick="redirectCSKHDetail()">Đồng ý</button>
+                <button type="button" class="btn btn-default" onclick="closeNewModal('.bs-CheckExistLeadId-modal-sm')">Hủy</button>
+
+            </div>
+
+
+        </div>
+    </div>
+</div>
+@*Của khách mua*@
+
+<div class="modal customerPurchaseModal" style="display: none; z-index: 1113; overflow-y: hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content" id="customerPurchaseModalContent">
+        <h2 id="tillePurchaseModal" style="margin: 10px 0 50px 0; font-weight:bolder">Chi tiết kết quả</h2>
+        <div>
+            <label for="amountcustomerPurchaseModal">Doanh số ảo</label>
+            <input type="text" id="amountcustomerPurchaseModal" oninput="formatCurrencyCustomerPurchaseModal(this)" maxlength="15">
+        </div>
+        <div>
+            <label for="endDatecustomerPurchaseModal">Ngày kết thúc</label>
+            <input type="date" id="endDatecustomerPurchaseModal" placeholder="Chọn ngày tháng năm">
+        </div>
+        <div>
+            <label for="reasoncustomerPurchaseModal">Lý do mua</label>
+            <select id="reasoncustomerPurchaseModal">
+                <option value="option1">Lựa chọn 1</option>
+                <option value="option2">Lựa chọn 2</option>
+                <option value="option3">Lựa chọn 3</option>
+                <!-- Thêm các option khác nếu cần -->
+            </select>
+        </div>
+        <div>
+            <label for="brandcustomerPurchaseModal">Nhãn hàng</label>
+            <select id="brandcustomerPurchaseModal">
+                <option value="option1">Lựa chọn 1</option>
+                <option value="option2">Lựa chọn 2</option>
+                <option value="option3">Lựa chọn 3</option>
+                <!-- Thêm các option khác nếu cần -->
+            </select>
+        </div>
+        <div style="justify-content: flex-end">
+            <button class="cancelCustomerPurchaseModal" style="margin-right: 5px">Hủy bỏ</button>
+            <button class="saveCustomerPurchaseModal">Lưu</button>
+        </div>
+    </div>
+</div>
+
+<style>
+
+    /* css để đảm bảo các option trong dropdown menu xuống dòng khi cần thiết */
+    #listznszalo option {
+        white-space: normal;
+    }
+
+    /* các style khác bạn đã định nghĩa */
+    #body-zns-select {
+        margin-bottom: 10px;
+    }
+
+        #body-zns-select label {
+            font-weight: bold;
+        }
+
+        #body-zns-select select {
+            min-width: 350px;
+            width: 380px;
+            max-width: 500px;
+        }
+
+    .modal-body-zns {
+        padding-bottom: 45px;
+    }
+
+        .modal-body-zns textarea {
+            display: block;
+            width: 560px;
+            min-height: 160px;
+            height: auto;
+            margin: 5px;
+            color: black;
+        }
+
+        .modal-body-zns button#sendZNSButton {
+            width: 80px;
+            float: right;
+            line-height: 1;
+            margin-right: 30px;
+        }
+
+    #information-send {
+        align-self: flex-start;
+        color: red;
+    }
+
+    #modalSendSMS {
+        top: -13% !important;
+    }
+</style>
+<script>
+    function pinCmt(leadid, id, type) {
+        showLoading()
+        $.ajax({
+            url: '/AdviseCard/UpdatePin',
+            data: { id, leadid, type },
+            method: 'post',
+            success: function (data) {
+                data > 0 ? toastr.success('Pin thành công') : toastr.warning('Pin thất bại')
+            },
+            complete: function () {
+                hideLoading()
+            }
+        })
+    }
+</script>
+<script>
+    function LoadLeadLogs() {
+        debugger
+        $.ajax({
+            url: '/AdviseCard/LeadLogsView?id=' + ('@isPartial' == 1 ? $('#Id').val() : $('#IdLead').val()) + '&isPartial=' + '@isPartial',
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                $('#LeadLogsShow').html(data)
+            }
+        })
+    }
+    function LoadPinCmt() {
+        debugger
+        $.ajax({
+            url: '/AdviseCard/PinCmtView?id=' + ('@isPartial' == 1 ? $('#Id').val() : $('#IdLead').val()) + '&isPartial=' + '@isPartial',
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                $('#PinCmtShow').html(data)
+            }
+        })
+    }
+    function LoadLeadMeetingLogs() {
+        debugger
+        $.ajax({
+            url: '/AdviseCard/LeadLogsMeetingView?LeadId=' + ('@isPartial' == 1 ? $('#Id').val() : $('#IdLead').val()) + '&isPartial=' + '@isPartial',
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                $('#LeadLogsMeetingShow').html(data)
+            }
+        })
+    }
+    function CheckBeforeOpen() {
+        $.ajax({
+            url: '/AdviseCard/CheckExistLeadId?LeadId=' + $('#saveLeadForm input[name=Id]').val(),
+            method: "get",
+            async: false,
+            dataType: "json",
+            success: function (data) {
+                if (data > 0) {
+                    debugger
+                    $('input[name=CustomerId]').val(data)
+                    $('.bs-CheckExistLeadId-modal-sm').modal()
+                } else {
+                    $('.bs-determine-modal-sm').modal()
+                }
+            }
+        })
+    }
+    function redirectCSKHDetail() {
+        let e = event.target.parentElement.parentElement.parentElement.parentElement
+        window.open("/Customer/Detail?Id=" + $('input[name=CustomerId]').val() + "&LeadId=" + $('#saveLeadForm input[name=Id]').val(), '_blank');
+        closeNewModal(e)
+    }
+                    function redirectCSKH() {
+
+                    let choose = $('input[name=khoption]:checked').val()
+                        let CustomerId = $('input[name=CustomerId]').val()
+                        let e = event.target.parentElement.parentElement.parentElement.parentElement
+                        if (choose == "new") {
+                        window.open("/Customer/CreateNT?LeadId=" + $('#saveLeadForm input[name=Id]').val(), '_blank');
+
+                    }else{
+                        window.open("/Customer/Detail?Id=" + CustomerId + "&LeadId=" + $('#saveLeadForm input[name=Id]').val(), '_blank');
+                        }
+                        closeNewModal(e)
+                    }
+
+                    function closeNewModal(a) {
+                    $(a).modal('hide')
+                    }
+                    function KmChangeTo() {
+                    debugger
+                    f5StatusLead(-3)
+                    $('.bs-determine-modal-sm').modal('hide')
+                    $('.bs-changeto-modal-sm').modal()
+                    }
+                    function SaveLeadLogSMS(valuee, name){
+                    $.ajax({
+                    url:'/AdviseCard/SaveLeadLogSMS',
+                    method:"post",
+                    data:{id:'@(lead != null ? lead.Id.ToString() : "")', val:valuee,name:name},
+                    dataType:"json",
+                    success: function(data){
+                    if(data==1){
+                    }else{
+                    toastr.warning('Xảy ra lỗi: '+data)
+                    }
+                    }
+                    })
+                    }
+                    // In your Javascript (external .js resource or <script> tag)
+                    $(document).ready(function () {
+                    debugger
+                        $('.js-example-basic-single').select2({ dropdownParent: $("#select2parent") });
+                    @(lead != null ? "f5StatusLead(" + (lead.StatusId.ToString() != "" ? lead.StatusId.ToString() : "-1") + ")" : "")
+                        LoadLeadLogs()
+                        LoadPinCmt()
+                        LoadLeadMeetingLogs()
+                        $('input[name=khoption]').change(function () {
+                        debugger
+                            if ($('input[name=khoption]:checked').val() == "old") {
+                            $('.customerid, input[name=CustomerId_DisplayText]').css('display', 'table-cell')
+                        } else {
+                            $('.customerid, input[name=CustomerId_DisplayText]').css('display', 'none')
+                        }
+})
+                    $('#saveLeadModal').click(function () {
+                    debugger
+                    var formData = new FormData($('#saveLeadForm')[0]);
+                        ShowLoading();
+                        $.ajax({
+                    type: "POST",
+                    url: $('#saveLeadForm')[0].action,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: "html",
+                            success: function (data, textStatus, jqXHR) {
+                                let isJson=false
+                                try {
+                                    JSON.parse(data)
+                                    isJson=true
+                                } catch {
+                                    isJson=false
+                                }
+                    if (data == 0) {
+                        toastr.error('Lưu không thành công! Vui lòng chọn Đề nghị hủy.');
+                    }
+                    else if (data == -1){
+                        toastr.error('Lưu không thành công! Vui lòng chọn lý do hủy.');
+
+                    }
+                    else if (isJson&&JSON.parse(data).hasOwnProperty("chkendstatus") && JSON.parse(data).chkendstatus > 0) {
+                        let jsonv = JSON.parse(data)
+                        $('#VStatusId').val(jsonv.chkendstatus)
+                        $('#Vendstatus').val(jsonv.endstatus)
+                        jsonv.endstatus == true ? $('#KM').click() : $('#KCM').click()
+                    } else {
+                    toastr.success('Lưu thành công!')
+                        $('#saveLeadForm').find('input[type=checkbox]').each((index, item) => {
+                            debugger
+                            item.click()
+                            item.checked = false
+                        })
+                    let cookiepg = getCookieLeadIndex('ListOrKanbanId');
+                    if (cookiepg == 0) {
+                        let cookie = getCookieLeadIndex('pageSize');
+                        let pageNumber = getCookieLeadIndex('pageNumber') == 0 ? 1 : getCookieLeadIndex('pageNumber');
+                        if (typeof SearchLeadFunc === 'function') {
+                            SearchLeadFunc(pageNumber, cookie);
+                        } else {
+                        }
+
+                    f5StatusLead(-1)
+                    } else {
+                    $("#btnCloseAdd").click();
+                    callKanban();
+                    }
+                    }
+
+
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                    toastr.warning('Xảy ra lỗi!')
+                            },
+                            complete: function () {
+                                debugger
+                                HideLoading();
+                            }
+                        })
+                        //HideLoading();
+                    })
+                    /*             $('button[name=editsection]').click(function () {
+                    debugger
+                    let ele=  $(this).parent().find('input,select')
+                    $.each(ele,function(idx,item){
+                    $(item).attr('disabled',false)
+                    $(item).attr('readonly',false)
+
+                    })
+                    })*/
+
+
+
+                    $('button[name=editsection]').click(function () {
+                    let ele = $(this).parent().find('input:not([type="hidden"]), select');
+
+                    // Lặp qua từng phần tử và chuyển đổi giữa thuộc tính disabled và readonly
+                    ele.each(function (idx, item) {
+                    if ($(item).is(':disabled') || $(item).is('[readonly]')) {
+                    $(item).removeAttr('disabled');
+                    $(item).removeAttr('readonly');
+                    } else {
+                    $(item).attr('disabled', true);
+                    $(item).attr('readonly', true);
+                    }
+                    });
+                    });
+
+
+
+                    let radisel=$('#saveLeadForm').find('input[type=radio],select')
+                    $.each(radisel,function(index,item){
+                    $(this).on('change',function(){
+                    $(`input[name=${$(this).attr('name')}][type=text]`).val(`${$(this).val()}`)
+
+                    })
+                    })
+                    })
+    function f5StatusLead(StatusId) {
+        if (StatusId === -2) {
+            swal.fire({
+                title: "CHƯA MƯA ",
+                text: "Bạn có chắc muốn về trạng thái: 'CHƯA MUA' không?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Đồng ý",
+                cancelButtonText: "Hủy",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    //  người dùng Đồng ý, AJAX để cập nhật trạng thái
+                    sendUpdateRequest(StatusId);
+                    closeNewModal('.bs-determine-modal-sm')
+                }
+            });
+        } else {
+            // Nếu StatusId không phải là -2, thực hiện AJAX để cập nhật trạng thái mà không cần xác nhận
+            sendUpdateRequest(StatusId);
+        }
+    }
+    var customerIdbyLead = 0;
+    function sendUpdateRequest(StatusId) {
+        debugger
+        $.ajax({
+            url: '/LeadMeeting/GetCustomerByLeadId', // Thay ControllerName bằng tên controller của bạn
+            type: 'GET',
+            data: { leadId: @(lead != null ? lead.Id.ToString() : "") },
+            success: function(data) {
+                // Xử lý dữ liệu trả về ở đây
+                debugger
+                if (data.CustomerId > 0) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/AdviseCard/UpdateStatusLead?Id=" +  @(lead != null ? lead.Id.ToString() : "") + "&Status=" + StatusId + "&isPartial=" + '1',
+                        dataType: "html",
+                        success: function (data, textStatus, jqXHR) {
+                            debugger
+                            $('#StatusHeader').html(data);
+                            var endLead = '@Erp.BackOffice.Filters.SecurityFilter.AccessRight("CheckExistLeadId", "AdviseCard", "Sale")';
+                            if (endLead === 'True') {
+                                $('.endLead').show();
+                            } else {
+
+                                $('.endLead').hide();
+                            }
+                            if ('@isPartial' == '1') {
+                                f5DsLeadCustomer();
+                            }
+                        },
+                        error: function (data, textStatus, jqXHR) {
+                        },
+                    })
+                } else {
+                     $.ajax({
+                        type: "POST",
+                        url: "/AdviseCard/UpdateStatusLead?Id=" +  @(lead != null ? lead.Id.ToString() : "") + "&Status=" + StatusId +"&isPartial="+'@isPartial',
+                        dataType: "html",
+                            success: function (data, textStatus, jqXHR) {
+                            debugger
+                                $('#StatusHeader').html(data);
+                                var endLead =  '@Erp.BackOffice.Filters.SecurityFilter.AccessRight("CheckExistLeadId", "AdviseCard", "Sale")';
+                                if (endLead === 'True') {
+                                    $('.endLead').show();
+                                } else {
+
+                                    $('.endLead').hide();
+                                }
+                                if ('@isPartial' == '1') {
+                                    f5DsLeadCustomer();
+                                }
+                        },
+                        error: function (data, textStatus, jqXHR) {
+                        },
+                    })
+                }
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                console.log('Error:', errorThrown);
+            }
+        });
+         @*$.ajax({
+                    type: "POST",
+             url: "/AdviseCard/UpdateStatusLead?Id=" +  @(lead != null ? lead.Id.ToString() : "") + "&Status=" + StatusId +"&isPartial="+'@isPartial',
+                    dataType: "html",
+                        success: function (data, textStatus, jqXHR) {
+                        debugger
+                            $('#StatusHeader').html(data);
+                            var endLead =  '@Erp.BackOffice.Filters.SecurityFilter.AccessRight("CheckExistLeadId", "AdviseCard", "Sale")';
+                            if (endLead === 'True') {
+                                $('.endLead').show();
+                            } else {
+
+                                $('.endLead').hide();
+                            }
+                            if ('@isPartial' == '1') {
+                                f5DsLeadCustomer();
+                            }
+                    },
+                    error: function (data, textStatus, jqXHR) {
+                    },
+                    })*@
+    }
+    function SendCmt() {
+        debugger
+        var formcmt = new FormData();
+        formcmt.append('file', $('#cmtfile')[0].files.length>0? $('#cmtfile')[0].files[0]:null)
+        formcmt.append('message', $('#LeadCmt').val())
+        formcmt.append('id', '@isPartial' == '1' ? $('#Id').val() : $('#IdLead').val())
+        formcmt.append('isPartial',  '@isPartial')
+                    $.ajax({
+                    url:"/AdviseCard/SendCmtLead",
+                    method:"post",
+                        data: formcmt,
+                        contentType: false,
+                        processData: false,
+                    dataType:"json",
+                    success: function(data){
+                    if(data==1){
+                    //toastr.success('Gửi bình luận thành công!')
+                    // Đặt lại giá trị của input về rỗng
+                        $('#LeadCmt').val('');
+                        $('#cmtfile').val(null)
+                        $('#cmtfile').trigger('change')
+                    }else{
+                    //toastr.warning('Gửi bình luận thất bại!')
+                    }
+                    }
+                    })
+                    }
+
+                    function openModalSendSMS() {
+                        debugger;
+
+                        var Phone = '@isPartial' == '1' ? $('#tab2 input[name=Phone]').val():$('#saveLeadForm input[name=Mobile]').val();
+                        console.log(Phone);
+                        if (!Phone) {
+                            toastr.warning('Số điện thoại không hợp lệ! Xin vui lòng kiểm tra');
+                            return false;
+                        }
+                    var showSMSErrorMessage = $('#txterrorMessageSendSMS').val();
+                    if(showSMSErrorMessage != ""){
+                    toastr.warning('Chưa cài đặt thông số gửi tin nhắn, Vui lòng cài đặt!', 'Thông báo');
+                    } else{
+                    $.ajax({
+                    url: "/AdviseCard/GetSMSList?typeLead="+'@(isPartial == 1 ? "false" : "true")',
+                    type: "GET",
+                    data: { id: '@(isPartial == 1 ? (cusId != null ? cusId.ToString() : "") : (lead != null ? lead.Id.ToString() : ""))'},
+                    dataType: 'json',
+                    success: function (data) {
+                    if (data != null) {
+                    //show modal
+                    $('#modalSendSMS').modal('show');
+                    // Xử lý dữ liệu trả về từ Controller
+                    populateDropdown(data);
+
+                    //check sdt
+
+                    if (!isValidPhoneNumber(Phone)) {
+                    document.getElementById('icon-sendsms').style.color = 'black';
+                    sendSMSButton.disabled = true;
+                        toastr.warning('Số điện thoại không hợp lệ! Xin vui lòng thay đổi', 'Thông báo');
+                    } else {
+                    //@*toastr.success('Số điện thoại hợp lệ!');*@
+                    }
+                    // hiển thị nội dung trên textarea
+                    showContent();
+                    } else {
+                    toastr.warning('Chưa cài đặt thông số gửi tin nhắn, Vui lòng cài đặt!', 'Thông báo');
+                    }
+                    },
+                    error: function (xhr, status, error) {
+                    toastr.warning('Mở modal Send SMS thất bại!', 'Thông báo');
+                    @* alert("Lỗi: " + error);*@
+                    }
+                    });
+                    document.getElementById('icon-sendsms').style.color = 'blue';
+                    sendSMSButton.disabled = false;
+                    }
+                    }
+                    //đóng modal
+                    function closeModalSendSMS() {
+                        $('#modalSendSMS').modal('hide');
+                    }
+                    function showContent() {
+                    // Lấy nội dung (text) của tùy chọn đầu tiên từ dropdown
+                    var firstOptionText = $('#listSMS option:first').text();
+                    // Gán nội dung đầu tiên vào textarea
+                    $('#idContentSMS').val(firstOptionText);
+                    }
+                    function populateDropdown(data) {
+                        var dropdown = $('#listSMS');
+                        var leadName = '@isPartial' == '1' ? $('#tab0 input[name=LastName]').val():$('#saveLeadForm input[name=LeadName]').val();
+                        var mobile = '@isPartial' == '1' ? $('#tab2 input[name=Phone]').val():$('#saveLeadForm input[name=Mobile]').val();
+                        $('#information-send').attr('value-name', leadName);
+                        $('#information-send').attr('value-phone', mobile);
+                        $('#information-send').text ('Tên: ' + leadName + ' Điện thoại: ' +mobile);
+                    dropdown.empty(); // Xóa tất cả các option cũ
+                        // Thêm option mới từ dữ liệu lấy được từ Controller
+                    $.each(data, function (index, item) {
+                    dropdown.append($('<option></option>').val(item.Id).text(item.ContentRule));
+                    });
+                    }
+                    $(document).ready(function () {
+                    // sử dụng select2
+                        $('#listSMS').select2({
+                            dropdownParent: $('#body-sms-select')
+                        });
+                    // gán content select vào textarea
+                    $('#listSMS').on('select2:select', function (e) {
+                    var selectedOption = e.params.data;
+                    var contentSMS = selectedOption.text;
+                    if (contentSMS) {
+                    document.getElementById('idContentSMS').value = contentSMS;
+                    sendSMSButton.disabled = false;
+                    document.getElementById('icon-sendsms').style.color = 'blue';
+                    }
+                    });
+
+                    var sendSMSButton = document.getElementById('sendSMSButton');
+                    var idContentSMS = document.getElementById('idContentSMS');
+
+                    // Lắng nghe sự kiện input trong trường idContentSMS
+                    idContentSMS.addEventListener('input', function () {
+                    var contenSMS = idContentSMS.value;
+
+                    // Kiểm tra xem có nội dung hay không
+                    if (contenSMS) {
+                    // Nếu không có nội dung, kích hoạt lại nút và khôi phục màu sắc ban đầu
+                    sendSMSButton.disabled = false;
+                    document.getElementById('icon-sendsms').style.color = 'blue';
+                    } else {
+                    // Nếu có nội dung, vô hiệu hóa nút và thay đổi màu sắc
+                    sendSMSButton.disabled = true;
+                    document.getElementById('icon-sendsms').style.color = 'black';
+                    }
+                    });
+                    });
+                    function SendSMSModal() {
+                    var sendSMSButton = document.getElementById('sendSMSButton');
+                    var contenSMS = document.getElementById('idContentSMS').value;
+                    // Kiểm tra xem nút đã được bấm trước đó hay chưa
+                    if (!sendSMSButton.disabled) {
+                    debugger;
+                    // Vô hiệu hóa nút sau khi đã nhấp vào
+                    sendSMSButton.disabled = true;
+                    document.getElementById('icon-sendsms').style.color = 'black';
+                    // Kiểm tra xem có nội dung hay không
+                    if (contenSMS) {
+                    var spanElement = document.getElementById('information-send');
+                    var Id = spanElement.getAttribute('value-id');
+                    var Name = spanElement.getAttribute('value-name');
+                    var Phone ='@isPartial' == '1' ? $('#tab2 input[name=Phone]').val(): spanElement.getAttribute('value-phone');
+                    //check sdt 0, 84, +84 đều hợp lệ
+                    if (isValidPhoneNumber(Phone)) {
+                    //Gọi Api SendSMS
+                    var Status = 0; // kết quả sendMSM : 1 - thành công , 0 - thất bại
+                    $.ajax({
+                    url: "/AdviseCard/SendApiSMS",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                    contentSMS: contenSMS,
+                    phone: Phone
+                    },
+                    success: function (rs) {
+                    if (rs.Success) {
+                    var codeResult = rs.CodeResult;
+                    if (codeResult === "100") {
+                    // Request thành công
+                    Status = 1;
+                    //Create LeadLogs
+                        CreateLeadLogs(Id, contenSMS, Status, Phone, codeResult);
+                    toastr.success('Gửi SMS thành công!', 'Thông báo');
+                    } else {
+                    // Request thất bại
+                    Status = 0;
+                    //Create LeadLogs
+                        CreateLeadLogs(Id, contenSMS, Status, Phone, codeResult);
+                    if (codeResult === "99") {
+                    // Lỗi không xác định, thử lại sau
+                    toastr.warning('Lỗi không xác định, thử lại sau!', 'Gửi SMS thất bại!');
+                    } else if (codeResult === "101") {
+                    // Đăng nhập thất bại
+                    toastr.warning('Đăng nhập thất bại!', 'Gửi SMS thất bại!');
+                    } else if (codeResult === "102") {
+                    // Tài khoản đã bị khóa
+                    toastr.warning('Tài khoản đã bị khóa!', 'Gửi SMS thất bại!');
+                    } else if (codeResult === "103") {
+                    // Số dư tài khoản không đủ để gửi tin
+                    toastr.warning('Số dư tài khoản không đủ để gửi tin!', 'Gửi SMS thất bại!');
+                    } else if (codeResult === "104") {
+                    // Mã Brandname không đúng
+                    toastr.warning('Mã Brandname không đúng!', 'Gửi SMS thất bại!');
+                    } else if (codeResult === "118") {
+                    // Loại tin nhắn không hợp lệ
+                    toastr.warning('Loại tin nhắn không hợp lệ!', 'Gửi SMS thất bại!');
+                    } else {
+                    // Trường hợp khác
+                    toastr.warning('Gửi SMS thất bại!', 'Thông báo');
+                    }
+                    }
+                    } else {
+                    toastr.warning('Lỗi không xác định, thử lại sau!', 'Gửi SMS thất bại!');
+                    }
+                    },
+                    error: function (xhr, status, error) {
+                    // Xử lý lỗi và hiển thị thông báo lỗi
+                    toastr.warning('Gửi SMS thất bại!', 'Thông báo');
+                    }
+                    });
+
+                    } else {
+                    toastr.warning('Số điện thoại không hợp lệ! Xin vui lòng thay đổi', 'Thông báo');
+                    }
+                    } else {
+                    toastr.warning('Không có nội dung!', 'Thông báo');
+                    }
+                    }
+                    }
+    function CreateLeadLogs(Id, contenSMS, Status, Phone, codeResult){
+                    $.ajax({
+                    url: "/AdviseCard/CreateSMSLeadLogs",
+                    type: "POST",
+                    dataType: 'json',
+                    data: {
+                    Id: '@isPartial' == '1' ? $('#Id').val() : $('#IdLead').val(), isPartial:'@isPartial',
+                    Content: contenSMS,
+                    Status: Status,
+                        Mobile: Phone,
+                        codeResult: codeResult
+                    },
+                    success: function (rs) {
+                    if(Status == 1){
+                    closeModalSendSMS();
+                    }
+                    },
+                    error: function (xhr, status, error) {
+
+                    }
+                    });
+                    }
+                    function isValidPhoneNumber(phoneNumber) {
+                    const patternVN = /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/;
+                    const pattern = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+                    if (!phoneNumber) {
+                    return false;
+                    } else if (patternVN.test(phoneNumber)) {
+                    return true;
+                    } else if (pattern.test(phoneNumber)) {
+                    return true;
+                    } else {
+                    return false;
+                    }
+                    }
+</script>
+
+
+<script>
+
+    var selectedFiles = [];
+
+    document.getElementById('formFileSm').addEventListener('change', function (event) {
+        var files = event.target.files;
+        var fileContainer = document.getElementById('fileContainer');
+
+        // Bắt đầu tải file đầu tiên
+        uploadFile(0, files, fileContainer);
+    });
+
+    function uploadFile(index, files, fileContainer) {
+        if (index >= files.length) {
+            // Khi đã tải xong tất cả các file
+            document.getElementById('fileList').style.display = 'block';
+            return;
+        }
+
+        var file = files[index];
+        var fileName = file.name.toLowerCase();
+        var fullPath = file.webkitRelativePath || file.name;
+        var fullPath1 = URL.createObjectURL(file);
+        console.log("File path:", fullPath);
+        console.log("File path 1:", fullPath1);
+
+
+        if (!fileName.endsWith('.exe')) {
+            selectedFiles.push(file);
+
+            var fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.style.marginRight = '10px';
+            fileItem.style.marginBottom = '10px';
+            fileItem.style.padding = '5px';
+            fileItem.style.border = '1px solid #ccc';
+            fileItem.style.display = 'flex';
+            fileItem.style.alignItems = 'center';
+
+            var fileNameElement = document.createElement('a');
+            fileNameElement.textContent = shortenFileName(file.name);
+            fileNameElement.href = URL.createObjectURL(file); // Sử dụng URL.createObjectURL để tạo đường dẫn tạm thời cho file
+            fileNameElement.setAttribute('download', file.name); // Thiết lập thuộc tính download để tải file
+            fileNameElement.style.flexGrow = '1';
+            fileNameElement.style.overflow = 'hidden';
+            fileNameElement.style.textOverflow = 'ellipsis';
+            fileNameElement.style.whiteSpace = 'nowrap';
+            fileNameElement.style.color = '#007bff';
+            fileNameElement.title = file.name;
+
+            var fileSizeElement = document.createElement('span');
+            fileSizeElement.textContent = '(' + formatBytes(file.size) + ')';
+            fileSizeElement.className = 'file-size';
+            fileSizeElement.style.marginLeft = '10px';
+            fileSizeElement.style.fontSize = '12px';
+            fileSizeElement.style.color = '#000';
+
+            var progressBar = document.createElement('progress');
+            progressBar.value = 0;
+            progressBar.max = 100;
+            progressBar.style.flexGrow = '1';
+            progressBar.style.marginLeft = '10px';
+            progressBar.style.height = '10px';
+            progressBar.style.display = 'block';
+
+            var removeButton = document.createElement('button');
+            removeButton.textContent = 'X';
+            removeButton.style.marginLeft = '5px';
+            removeButton.addEventListener('click', createRemoveHandler(fileItem, file));
+            removeButton.style.cursor = 'pointer'; // Thay đổi con trỏ chuột khi rê đến nút xóa
+
+            fileItem.appendChild(fileNameElement);
+            fileItem.appendChild(fileSizeElement);
+            fileItem.appendChild(progressBar);
+            fileItem.appendChild(removeButton);
+            fileContainer.appendChild(fileItem);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', URL.createObjectURL(file), true);
+            xhr.responseType = 'blob';
+
+            xhr.onload = function () {
+                if (this.status === 200) {
+                    progressBar.style.display = 'none';
+                    // Sau khi tải xong file hiện tại, tiến hành tải file tiếp theo
+                    uploadFile(index + 1, files, fileContainer);
+                }
+            };
+
+            xhr.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    var percent = (e.loaded / e.total) * 100;
+                    progressBar.value = percent;
+                }
+            };
+
+            xhr.send();
+        } else {
+            toastr.warning('Vui lòng không chọn các file cài đặt (ví dụ: file exe).');
+            // Bỏ qua file này và tiến hành tải file tiếp theo
+            uploadFile(index + 1, files, fileContainer);
+        }
+    }
+
+    function createRemoveHandler(itemToRemove, fileToRemove) {
+        return function () {
+            itemToRemove.remove();
+            var index = selectedFiles.indexOf(fileToRemove);
+            if (index !== -1) {
+                selectedFiles.splice(index, 1);
+            }
+        };
+    }
+
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    function shortenFileName(fileName, maxLength = 25) {
+        if (fileName.length > maxLength) {
+            return fileName.substring(0, maxLength - 3) + '...';
+        }
+        return fileName;
+    }
+    // Hàm để xóa danh sách các tệp đã chọn
+    function resetSelectedFiles() {
+        selectedFiles = [];
+        // Xóa tất cả các phần tử con trong #fileContainer
+        var fileContainer = document.getElementById('fileContainer');
+        while (fileContainer.firstChild) {
+            fileContainer.removeChild(fileContainer.firstChild);
+        }
+    }
+    function resetInputFile() {
+        document.getElementById('formFileSm').value = '';
+    }
+
+    // Thêm sự kiện khi modal đóng
+    $('#EmailModalAddNewModal').on('hidden.bs.modal', function () {
+        resetSelectedFiles();
+        resetInputFile();
+    });
+
+                    var showEmailErrorMessage = @Html.Raw(Json.Encode(ViewBag.errorMessageEmail)); // Define leadData here
+                    var showPhoneCallErrorMessage = @Html.Raw(Json.Encode(ViewBag.errorMessagePhoneCall));
+                    var lead = @Html.Raw(Json.Encode(ViewBag.lead));
+                    $(document).ready(function () {
+                        debugger
+                        $('#btnShowEmailModal').click(ShowEmailModal);
+
+                    //
+                    });
+    let initialEmailFooterContent = '';
+
+    function ShowEmailModal() {
+        debugger
+        var emailCus = '@isPartial' == '1' ? $('#tab2 input[name=Email]').val() : $('#saveLeadForm input[name=Email]').val();
+
+        console.log(emailCus);
+        if (emailCus === '' || !emailCus) {
+            toastr.warning('Email không hợp lệ! Vui lòng kiểm tra');
+            return false;
+        }
+
+                    if (showEmailErrorMessage !== null) {
+                    toastr.warning(showEmailErrorMessage);
+                    }
+
+                    if (showEmailErrorMessage === null) {
+                    $.ajax({
+                        url: "/AdviseCard/ShowEmailModal?typeLead="+'@(isPartial == 1 ? "false" : "true")',
+                    type: "GET",
+                        data: { id: '@(isPartial == 1 ? (cusId != null ? cusId.ToString() : "") : (lead != null ? lead.Id.ToString() : ""))'},
+                    dataType: 'json',
+                    success: function (data) {
+                    if (data != null) {
+                    // Xử lý dữ liệu trả về từ Controller
+                    populateDropdownEmail(data);
+                    $('#emailTitle').val("");
+                        if (data.EmailFooter && data.EmailFooter.length > 0) {
+                            initialEmailFooterContent = data.EmailFooter[0].Logs || '';
+
+                            CKEDITOR.instances['emailInput'].setData(data.EmailFooter[0].Logs || '');
+                        }
+
+
+                    $('#emailTemplate').val(JSON.stringify({ 'TileEmail': '', 'ContentEmail': '' }));
+                        $("#EmailModalAddNewModal").modal("show");
+                    }
+                    }
+                    });
+                    }
+                    }
+                    //
+                    function populateDropdownEmail(data) {
+
+                    $('#emailSender').val(data.EmailSender);
+                        $('#emailReceiver').val('@isPartial' == '1' ? $('#tab2 input[name=Email]').val() :    $('#saveLeadForm input[name=Email]').val());
+                    $('#emailTemplate').empty();
+                    $('#emailTemplate').append($('<option>').val(JSON.stringify({ 'TileEmail': '', 'ContentEmail': '' })).text('Chọn tiêu đề')).attr('selected');
+                    data.EmailTemplate.forEach(x => {
+                    $('#emailTemplate').append($('<option>').val(JSON.stringify(x)).text(x.TileEmail)); // Đổ Email Template Data vào option của select
+                    });
+
+    }
+    $(document).ready(function () {
+
+        $('.btnCloseEmailModal').click(CloseEmailModal);
+
+        $('body').on('hidden.bs.modal', function () {
+            // This function is for handling the problem of disabling the scrolling bar when any modal is closed.
+            // It checks if there is any modal still open, and if so, adds back the 'modal-open' class to the body of the document.
+            if ($('.modal.in').length > 0) {
+                $('body').addClass('modal-open');
+            }
+        });
+
+        $('#emailTemplate').on('change', function () {
+            var selectedValue = JSON.parse($('#emailTemplate').val());
+            var newFooterContent = selectedValue.ContentEmail;
+            var footer = CKEDITOR.instances['emailInput'].getData();
+
+            // Nếu footer chưa từng được thay đổi, gán giá trị mới
+            if (!footer.includes(selectedValue)) {
+                footer = newFooterContent + '\n' + initialEmailFooterContent;
+            } else {
+                // Nếu footer đã được thay đổi, thay thế selectedValue cũ bằng selectedValue mới
+                footer = footer.replace(selectedValue, newFooterContent);
+            }
+
+            // Set dữ liệu cho CKEditor
+            CKEDITOR.instances['emailInput'].setData(footer);
+
+            // Gán tiêu đề vào input #emailTitle
+            $('#emailTitle').val(selectedValue.TileEmail);
+        });
+
+
+
+
+    });
+
+    function CloseEmailModal() {
+        $("#EmailModalAddNewModal").modal("hide");
+    }
+                    //
+</script>
+<link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+<script src="/Scripts/ckeditor/ckeditor.js"></script>
+<script src="~/Scripts/textarea-caret-position/index.js"></script> >
+<script>
+    $(document).ready(function () {
+        // Configure CKEditor with custom toolbar for email composition
+        var editor = CKEDITOR.instances.emailInput;
+        if (editor) {
+            editor.destroy(true);
+        }
+        CKEDITOR.replace('emailInput', {
+            toolbar: [
+                { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                { name: 'styles', items: ['Format', 'FontSize'] },
+                { name: 'colors', items: ['TextColor', 'BGColor'] },
+                { name: 'paragraph', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                { name: 'links', items: ['Link', 'Unlink'] },
+                { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] }
+            ],
+            // Remove unwanted plugins
+            removePlugins: 'elementspath',
+            // Set default CKEditor height
+            height: 500,
+        });
+    });
+</script>
+<script src="~/Scripts/script.js"></script>s
+<script src="~/Scripts/emailValidation.js"></script>
+<script type="text/javascript">
+            //Handle Sending Email
+                    $(document).ready(function () {
+                        $('#btnSendEmailAddNewModal').click(() => {
+                    SendEmailRequestAddNewModal();
+                    })
+                    });
+
+    function SendEmailRequestAddNewModal() {
+    var emailFrom = $('#emailSender').val();
+    var emailSentTo = $('#emailReceiver').val();
+
+    var subject = $('#emailTitle').val();
+                       var currentContent = CKEDITOR.instances['emailInput'].getData();
+
+                       var selectedFileNames = [];
+                       console.log('emailReceiver', emailReceiver);
+                       console.log('currentContent', currentContent);
+                       console.log('subject', subject);
+
+                       for (var i = 0; i < selectedFiles.length; i++) {
+                           selectedFileNames.push(selectedFiles[i].name);
+                       }
+
+                       console.log(selectedFiles);
+                       if (selectedFileNames.length > 0) {
+
+                           sendFilesAndEmailData(emailFrom, emailSentTo, subject, currentContent, selectedFiles);
+
+                       } else {
+
+                           SendEmail(emailFrom, emailSentTo, subject, currentContent);
+
+                       }
+}
+
+    function validateAndFormatEmails(emails) {
+        var emailArray = emails.split(';');
+        var formattedEmails = [];
+        var uniqueEmails = new Set();
+        var errorMessage = '';
+
+        for (var i = 0; i < emailArray.length; i++) {
+            var email = emailArray[i].trim();
+
+            if (!emailPattern.test(email)) {
+                errorMessage += "Định dạng email không hợp lệ: " + email + "<br>";
+            }
+
+            if (uniqueEmails.has(email)) {
+                errorMessage += "Địa chỉ email trùng lặp: " + email + "<br>";
+            }
+
+            uniqueEmails.add(email);
+            formattedEmails.push(email);
+        }
+
+        if (errorMessage !== '') {
+            return { errorMessage: errorMessage }; // Trả về một đối tượng chứa thông tin lỗi
+        }
+
+        if (formattedEmails.length === 1) {
+            return { formattedEmails: formattedEmails[0] };
+        }
+
+        return { formattedEmails: formattedEmails.join(';') };
+    }
+
+    function SendEmail(emailFrom, emailSentTo, subject, message)
+ {
+    // Kiểm tra và định dạng email trước khi gửi
+    var validationResult = validateAndFormatEmails(emailSentTo);
+
+    // Kiểm tra nếu có thông báo lỗi
+    if (validationResult.errorMessage != null) {
+        toastr.error(validationResult.errorMessage);
+        return;
+    }
+
+    // Kiểm tra xem formattedEmails có tồn tại hay không
+    if (validationResult.formattedEmails) {
+        var emailsArray = validationResult.formattedEmails.split(';');
+        var successCount = 0;
+        ShowLoading();
+        for (var i = 0; i < emailsArray.length; i++) {
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SendEmail", "AdviseCard")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    model: {
+                        Sender: emailFrom,
+                        Receiver: emailsArray[i],
+                        Title: subject,
+                        Body: message,
+                    },
+                    Id: '@isPartial' == '1' ? $('#Id').val() : $('#IdLead').val(),
+                    isPartial: '@isPartial'
+                }),
+                dataType: "json",
+                success: function (response) {
+                    handleResponsemuti(response);
+
+                    successCount++; // Tăng biến đếm nếu email được gửi thành công
+                    setTimeout(function () {
+                        HideLoading();
+                    }, 1500);
+                    if (successCount === emailsArray.length && emailFrom != '' && subject != '' && message != '') {
+                        toastr.success("Gửi thành công");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                    toastr.error("Error sending email: " + error); // Thay đổi ở đây
+                }
+            });
+        }
+
+    } else {
+        console.error("Formatted emails not found in validationResult");
+        }
+
+}
+    async function sendFilesAndEmailData(emailFrom, emailSentTo, subject, message, files) {
+        var formData = new FormData();
+
+        //if (!emailFrom || !emailSentTo || !subject || !message) {
+        //    toastr.warning("Vui lòng điền đầy đủ thông tin");
+        //    return;
+        //}
+
+        formData.append('model.Sender', emailFrom);
+        formData.append('model.Title', subject);
+        var encodedMessage = encodeURIComponent(message);
+        formData.append('model.Body', encodedMessage);
+        formData.append('Id', $('#isPartial').val() === '1' ? $('#Id').val() : $('#IdLead').val());
+        formData.append('isPartial', $('#isPartial').val());
+
+        var totalFileSizeMB = 0; // Biến để lưu tổng dung lượng các tệp
+
+        // Tính tổng dung lượng của tất cả các tệp
+        for (var i = 0; i < files.length; i++) {
+            totalFileSizeMB += files[i].size / (1024 * 1024); // Chuyển đổi dung lượng sang MB
+        }
+
+        // Kiểm tra xem tổng dung lượng có vượt quá 50MB không
+        if (totalFileSizeMB > 50) {
+            toastr.error("Tổng dung lượng tệp vượt quá dung lượng tối đa cho phép (50MB)");
+            return;
+        }
+
+        // Thêm tất cả các tệp vào FormData
+        for (var i = 0; i < files.length; i++) {
+            formData.append("files" + i, files[i]);
+        }
+
+        var validationResult = validateAndFormatEmails(emailSentTo);
+
+        if (validationResult.errorMessage != null) {
+            toastr.error(validationResult.errorMessage);
+            return;
+        }
+
+        if (validationResult.formattedEmails) {
+            var emailsArray = validationResult.formattedEmails.split(';');
+            var emailCount = emailsArray.length;
+            var successCount = 0;
+
+            // Hiển thị biểu tượng loading trước khi bắt đầu gửi email
+            ShowLoading();
+
+            // Chuyển đổi để sử dụng async/await trong vòng lặp
+            for (var j = 0; j < emailCount; j++) {
+                var formDataClone = new FormData();
+                formDataClone.append('model.Sender', emailFrom);
+                formDataClone.append('model.Title', subject);
+                formDataClone.append('model.Body', encodedMessage);
+                formDataClone.append('Id', $('#isPartial').val() === '1' ? $('#Id').val() : $('#IdLead').val());
+                formDataClone.append('isPartial', $('#isPartial').val());
+                formDataClone.append('model.Receiver', emailsArray[j]);
+
+                // Thêm tất cả các tệp vào FormData
+                for (var k = 0; k < files.length; k++) {
+                    formDataClone.append("files" + k, files[k]);
+                }
+
+                // Bao bọc xhr gọi trong một Promise để có thể sử dụng await
+                await new Promise((resolve, reject) => {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/AdviseCard/SendEmailWithFiles', true);
+                    xhr.onload = function () {
+                        if (xhr.status === 200) {
+                            console.log('Email and files sent successfully');
+                            successCount++;
+                            if (successCount === emailCount) {
+                                toastr.success("Gửi Email thành công");
+                                $("#EmailModalAddNewModal").modal("hide");
+                            }
+                            resolve();
+                        } else {
+                            console.error('An error occurred:', xhr.responseText);
+                            toastr.error('An error occurred while sending email and files');
+                            reject();
+                        }
+                    };
+                    xhr.onerror = function () {
+                        console.error('Network error');
+                        reject();
+                    };
+                    xhr.send(formDataClone);
+                });
+            }
+
+            // Sau khi gửi email xong, ẩn biểu tượng loading
+            HideLoading();
+        }
+    }
+
+    function ShowLoadings() {
+        $('#modalLoadingWait').modal('show');
+    }
+
+    function HideLoadings() {
+        $('#modalLoadingWait').modal('hide');
+    }
+
+
+
+
+    function handleResponsemuti(response) {
+        if (response.success) {
+            $('#validateDiv').empty();
+            $('#validateDiv').hide();
+            $("#EmailModalAddNewModal").modal("hide");
+        } else {
+            $('#validateDiv').show();
+            $('#validateDiv').empty();
+            if (response.errors && response.errors.length > 0) {
+                response.errors.forEach(element => {
+                    $('#validateDiv').append(`<h6>${element}</h6>`);
+                });
+            } else {
+                console.error("Errors not found in response");
+            }
+        }
+    }
+    function handleResponse(response) {
+        if (response.success) {
+            $('#validateDiv').empty();
+            $('#validateDiv').hide();
+            $("#EmailModalAddNewModal").modal("hide");
+            toastr.success('Gửi Email thành công!');
+        } else {
+            $('#validateDiv').show();
+            $('#validateDiv').empty();
+            if (response.errors && response.errors.length > 0) {
+                response.errors.forEach(element => {
+                    $('#validateDiv').append(`<h6>${element}</h6>`);
+                });
+            } else {
+                console.error("Errors not found in response");
+            }
+        }
+    }
+
+</script>
+<script>
+    //
+    //show phone call modal
+    //show modal
+    var $btnShowPhoneCallModal = $('#btnShowPhoneCallModal');
+    $btnShowPhoneCallModal.click(() => {
+        if (showPhoneCallErrorMessage === null) {
+            openModalPhoneCall();
+        }
+        if (showPhoneCallErrorMessage !== null) {
+            toastr.warning(showPhoneCallErrorMessage);
+        }
+    });
+
+
+
+
+    var $btnHidePhoneCallModal = $('.btnHidePhoneCallModal');
+    $btnHidePhoneCallModal.click(closeModalPhoneCall);
+
+    function openModalPhoneCall() {
+        var Phone = '@isPartial' == '1' ? $('#tab2 input[name=Phone]').val() : $('#saveLeadForm input[name=Mobile]').val(); // Truy cập giá trị số điện thoại từ phần tử có id là 'phoneValue'
+        var Name = '@isPartial' == '1' ? $('#tab0 input[name=LastName]').val() : $('#saveLeadForm input[name=Name]').val(); // Truy cập giá trị số điện thoại từ phần tử có id là 'phoneValue'
+        var DauSoCloudFone = $('#dausocloudfoneValue').attr('value-DauSoCloudFone');
+        $('#phoneValue').attr('value-phone', Phone);
+        $('#information-send-phonecall').attr('value-phone', Phone);
+        $('#information-send-phonecall').attr('value-name', Name);
+        $('#phoneValue').text(`Sđt: ${Phone}`);
+        $('#information-send-phonecall').text('Tên: ' + Name);
+        $('#qrcode').empty();
+        var qrCode = new QRCode(document.getElementById("qrcode"), { text: '@isPartial' == '1' ? $('#tab2 input[name=Phone]').val() : $('#saveLeadForm input[name=Mobile]').val(), width: 128, height: 128, });
+        if (!isValidPhoneNumber(Phone)) {
+            $('#icon-phonecall').css('color', 'black');
+            $('#btnPhoneCall').prop('disabled', true);
+            toastr.warning('Số điện thoại không hợp lệ vui lòng kiểm tra!');
+        } else if (!isValidDauSoCloudFone(DauSoCloudFone)) {
+            $('#icon-phonecall').css('color', 'black');
+            $('#btnPhoneCall').prop('disabled', true);
+            toastr.warning('Chưa có số nhánh, vui lòng kiểm tra!');
+        } else {
+            $('#icon-phonecall').css('color', 'blue');
+            $('#btnPhoneCall').prop('disabled', false);
+            $('#modalPhoneCall').modal('show');
+        }
+    }
+
+    //đóng modal
+    function closeModalPhoneCall() {
+        $('#modalPhoneCall').modal('hide');
+    }
+    function isValidDauSoCloudFone(DauSoCloudFone) {
+        if (!DauSoCloudFone) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+</script>
+<script src="~/Scripts/qrcode.min.js"></script>
+<script>
+                    //Phone Call Request
+                    $(document).ready(function () {
+
+                    var $btnPhoneCall = $('#btnPhoneCall');
+                    $btnPhoneCall.click(PhoneCallRequest);
+                    });
+
+    function PhoneCallRequest() {
+                        debugger
+                        var spanElement = document.getElementById('information-send-phonecall');
+        var Id = '@isPartial' == '1' ? document.getElementById('Id').value : document.getElementById('IdLead').value;
+                    var Name = spanElement.getAttribute('value-name');
+                    var Phone = spanElement.getAttribute('value-phone');
+        var DauSoCloudFone = document.getElementById('dausocloudfoneValue').getAttribute('value-DauSoCloudFone');
+        //alert(document.getElementById('dausocloudfoneValue').getAttribute('value-DauSoCloudFone'));
+                    $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SendApiPhoneCall", "AdviseCard")',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                    Ext: DauSoCloudFone,
+                    PhoneName: Name,
+                    PhoneNumber: Phone,
+                        Id: Id,
+                    isPartial:'@isPartial'
+                    }),
+                    dataType: "json",
+                    success: function (response) {
+                    if (response.Success) {
+                    $("#modalPhoneCall").modal("hide");
+                   toastr.success('Hệ thống đang tiến hành gọi điện thoại, vui lòng đợi trong giây lát!');
+                    } else {
+                  $("#modalPhoneCall").modal("hide");
+                    toastr.warning(response.ErrorMessage);
+                    }
+                    },
+                    });
+                    }
+</script>
+
+@*Của LeadMeeting*@
+<script>
+
+                    $(document).ready(function() {
+                    var timePicker = $("#timePicker");
+
+                    // Kiểm tra nếu giá trị của trường giờ không được thiết lập (null hoặc rỗng)
+                    if (!timePicker.val()) {
+                    // Thiết lập giá trị mặc định là 08:00
+                    timePicker.val("08:00");
+                    }
+
+                    // Thêm sự kiện click cho nút tạo LeadMeeting
+                    $('#createMeetingButton').click(function() {
+                    // Gửi yêu cầu AJAX để tải view Index từ controller LeadMeeting
+                    var leadId = @(lead != null && lead.Id != null ? lead.Id.ToString() : "null");
+                    $.ajax({
+                    url: '/LeadMeeting/Index',
+                    type: 'GET',
+                    data: {
+                    leadId: leadId,
+                    },
+                    success: function(data) {
+                    // Thay thế nội dung của modal-content bằng nội dung mới
+                    $('#meetingContent').html(data);
+                    $('#meetingModal').removeClass("fade");
+                    $('#meetingModal').addClass("show");
+                    $('.modal-dialog').css({
+                    'position': 'static'
+                    });
+                    },
+                    error: function(error) {
+                    console.log(error);
+                    // Xử lý lỗi nếu có
+                    }
+                    });
+                    });
+
+                    // Thêm sự kiện click cho nút đóng modal
+                    $('.close-meetingModal').click(function() {
+                    // Ẩn modal
+                    $('#meetingModal').removeClass("show");
+                    // Đặt lại kiểu dáng của modal-dialog
+                    $('.modal-dialog').css({
+                    'position': 'relative'
+                    });
+                    });
+
+                    $('#meetingModal').click(function (event) {
+                    if ($(event.target).is('#meetingModal')) {
+                    // Ẩn modal nếu người dùng nhấp ra bên ngoài nội dung modal
+                    $('#meetingModal').modal('hide');
+                    }
+                    });
+                    });
+
+
+
+
+                    function handleKeyPress(event) {
+                    if (event.keyCode === 13) {
+                    // Kiểm tra xem phím nhấn là phím Enter (keyCode = 13)
+                    SendCmt(); // Gọi hàm SendCmt() để gửi bình luận
+                    event.preventDefault(); // Ngăn chặn sự kiện mặc định của phím Enter
+                    }
+                    }
+</script>
+@*Của LeadMeetingCall*@
+<script>
+                    $(document).ready(function() {
+                    var timePicker = $("#timePicker");
+
+                    // Kiểm tra nếu giá trị của trường giờ không được thiết lập (null hoặc rỗng)
+                    if (!timePicker.val()) {
+                    // Thiết lập giá trị mặc định là 08:00
+                    timePicker.val("08:00");
+                    }
+
+                    // Thêm sự kiện click cho nút tạo LeadMeeting
+                    $('#createCallToButton').click(function() {
+                    // Gửi yêu cầu AJAX để tải view Index từ controller LeadMeeting
+                    var leadId = @(lead != null && lead.Id != null ? lead.Id.ToString() : "null");
+                    $.ajax({
+                    url: '/LeadMeeting/CallToView',
+                    type: 'GET',
+                    data: {
+                    leadId: leadId,
+                    },
+                    success: function(data) {
+                    // Thay thế nội dung của modal-content bằng nội dung mới
+                    $('#meetingContent').html(data);
+                    $('#meetingModal').removeClass("fade");
+                    $('#meetingModal').addClass("show");
+                    $('.modal-dialog').css({
+                    'position': 'static'
+                    });
+                    },
+                    error: function(error) {
+                    console.log(error);
+                    // Xử lý lỗi nếu có
+                    }
+                    });
+                    });
+
+                    // Thêm sự kiện click cho nút đóng modal
+                    $('.close-meetingModal').click(function() {
+                    // Ẩn modal
+                    $('#meetingModal').removeClass("show");
+                    // Đặt lại kiểu dáng của modal-dialog
+                    $('.modal-dialog').css({
+                    'position': 'relative'
+                    });
+                    });
+
+                    $('#meetingModal').click(function (event) {
+                    if ($(event.target).is('#meetingModal')) {
+                    // Ẩn modal nếu người dùng nhấp ra bên ngoài nội dung modal
+                    $('#meetingModal').modal('hide');
+                    }
+                    });
+                    });
+
+
+</script>
+
+@*Của LeadMeetingTask*@
+<script>
+                    $(document).ready(function() {
+                    var timePicker = $("#timePicker");
+
+                    // Kiểm tra nếu giá trị của trường giờ không được thiết lập (null hoặc rỗng)
+                    if (!timePicker.val()) {
+                    // Thiết lập giá trị mặc định là 08:00
+                    timePicker.val("08:00");
+                    }
+
+                    // Thêm sự kiện click cho nút tạo LeadMeeting
+                    $('#createTaskButton').click(function() {
+                    // Gửi yêu cầu AJAX để tải view Index từ controller LeadMeeting
+                    var leadId = @(lead != null && lead.Id != null ? lead.Id.ToString() : "null");
+                    $.ajax({
+                    url: '/LeadMeeting/TaskView',
+                    type: 'GET',
+                    data: {
+                    leadId: leadId,
+                    },
+                    success: function(data) {
+                    // Thay thế nội dung của modal-content bằng nội dung mới
+                    $('#meetingContent').html(data);
+                    $('#meetingModal').removeClass("fade");
+                    $('#meetingModal').addClass("show");
+                    $('.modal-dialog').css({
+                    'position': 'static'
+                    });
+                    },
+                    error: function(error) {
+                    console.log(error);
+                    // Xử lý lỗi nếu có
+                    }
+                    });
+                    });
+
+                    // Thêm sự kiện click cho nút đóng modal
+                    $('.close-meetingModal').click(function() {
+                    // Ẩn modal
+                    $('#meetingModal').removeClass("show");
+                    // Đặt lại kiểu dáng của modal-dialog
+                    $('.modal-dialog').css({
+                    'position': 'relative'
+                    });
+                    });
+
+                    $('#meetingModal').click(function (event) {
+                    if ($(event.target).is('#meetingModal')) {
+                    // Ẩn modal nếu người dùng nhấp ra bên ngoài nội dung modal
+                    $('#meetingModal').modal('hide');
+                    }
+                    });
+                    });
+
+
+</script>
+
+@*Của HisotyCall*@
+<script>
+                    $('#createHistoryCallToButton').click(function() {
+                    // Gửi yêu cầu AJAX để tải view Index từ controller LeadMeeting
+                    var leadId = @(lead != null && lead.Id != null ? lead.Id.ToString() : "null");
+                    $.ajax({
+                    url: '/LeadMeeting/HistoryCallView',
+                    type: 'GET',
+                    data: {
+                    leadId: leadId
+                    },
+                    success: function(data) {
+                    // Thay thế nội dung của modal-content bằng nội dung mới
+                    $('#meetingContent').html(data);
+                    $('#meetingModal').removeClass("fade");
+                    $('#meetingModal').addClass("show");
+                    $('.modal-dialog').css({
+                    'position': 'static'
+                    });
+                    },
+                    error: function(error) {
+                    console.log(error);
+                    // Xử lý lỗi nếu có
+                    }
+                    });
+                    });
+
+                    // Thêm sự kiện click cho nút đóng modal
+                    $('.close-meetingModal').click(function() {
+                    // Ẩn modal
+                    $('#meetingModal').removeClass("show");
+                    // Đặt lại kiểu dáng của modal-dialog
+                    $('.modal-dialog').css({
+                    'position': 'relative'
+                    });
+                    });
+
+                    $('#meetingModal').click(function (event) {
+                    if ($(event.target).is('#meetingModal')) {
+                    // Ẩn modal nếu người dùng nhấp ra bên ngoài nội dung modal
+                    $('#meetingModal').modal('hide');
+                    }
+                    });
+
+
+</script>
+<script>
+                    var personInCharge = @Html.Raw(Json.Encode(ViewBag.personInCharge));
+                    $(document).ready(function () {
+
+                    $('#personInCharge').append(formatPersonInCharge(personInCharge));
+                    });
+                    function formatPersonInCharge(user) {
+                    var imageHtml;
+                    var userName;
+                    if (!user) {
+                    imageHtml = '<img src="https://img.icons8.com/bubbles/50/000000/user.png" alt="Default Image" class="round-icon default-icon" style="width: 30px; height: 30px;" />';
+                    userName = '<h5>' + 'admin' + '</h5>';
+                    }
+                    if (user) {
+                    var validprofileImage = user.ProfileImage;
+                    var profileImage = "/Uploads/User/" + user.ProfileImage;
+
+                    imageHtml = (validprofileImage && personInCharge)
+                    ? '<img src="' + profileImage + '" alt="Profile Image" class="round-icon" style="width: 30px; height: 30px; border-radius: 40px;" />'
+                    : '<img src="https://img.icons8.com/bubbles/50/000000/user.png" alt="Default Image" class="round-icon default-icon" style="width: 30px; height: 30px;" />';
+                    userName = '<h5>' + user.UserName + '</h5>';
+
+                    }
+                    return $(`${imageHtml} ${userName}`);
+                    }
+</script>
+
+<script>
+                    var template_data = {};
+                    var toastrDisplayed = false;
+
+                    $(document).ready(function() {
+                    // Function to open modal
+                    function openModalSendZNS() {
+                    $('#modalSendZNS').modal({
+                    backdrop: 'static',
+                    keyboard: false
+                    });
+                    // Hiển thị modal
+                    $('#modalSendZNS').modal('show');
+
+                    resetErrorDisplay();
+
+
+                    // Gọi AJAX để lấy danh sách ZNS từ controller
+                    $.ajax({
+                    url: '/AdviseCard/GetZNSList?typeLead=+'+'@(isPartial == 1 ? "false" : "true")',
+                    type: 'GET',
+                    data: {
+                        id: '@(isPartial == 1 ? (cusId != null ? cusId.ToString() : "") : (lead != null ? lead.Id.ToString() : ""))',
+
+                    },
+                    dataType: 'json',
+                    success: function(response) {
+
+                    // Hiển thị dropdown dù có lỗi
+                    populateDropdown(response.data);
+                    // Sử dụng Select2 cho dropdown
+                        $('#listZNSZalo').val($('#listZNSZalo option:first').val()).trigger('change');
+
+                        $('#listZNSZalo').select2();
+                    //$('#listZNSZalo').on('change', function() {
+                    showContent();
+                    },
+
+                    error: function(xhr, status, error) {
+                    console.error('Error fetching ZNS list:', error);
+                    }
+                    });
+                    }
+
+                    // Function to close modal
+                    function closeModalSendZNS() {
+                    // Ẩn modal
+                    $('#modalSendZNS').modal('hide');
+                    clearToastr();
+
+                    }
+                    function clearToastr() {
+                    toastr.clear();
+                    }
+                    function showContent() {
+                    // Lấy nội dung (text) của tùy chọn đầu tiên từ dropdown
+                    var selectedOption = $('#listZNSZalo option:selected').text();
+
+                    // Gán nội dung đầu tiên vào textarea
+                        var formattedText = formatDateTimeInText(selectedOption);
+
+                        // Gán nội dung đầu tiên đã được chuyển đổi vào textarea
+                        $('#idContentZNS').val(formattedText);
+                    }
+                    function populateDropdown(data) {
+                        var dropdown = $('#listZNSZalo');
+                        var Name = $('#saveLeadForm input[name=Name]').val();
+                        var mobile = $('#saveLeadForm input[name=Mobile]').val();
+                        $('#information-send-zns').attr('value-name', Name);
+                        $('#information-send-zns').attr('value-phone', mobile);
+                        $('#information-send-zns').text('Tên: ' + Name + ' Điện thoại: ' + mobile);
+                    dropdown.empty();
+
+                    // Thêm option mới từ dữ liệu lấy được từ Controller
+                    $.each(data, function(index, item) {
+                    var option = $('<option></option>').val(item.ZNSId).text(item.ContentRule).attr('data-znsid', item.ZNSId).attr('data-id', item.Id);
+
+                    // Kiểm tra nếu có lỗi với option hiện tại thì hiển thị tooltip
+                    if (item.error) {
+                    option.prop('title', item.error);
+                    option.addClass('error-option');
+                    }
+                    option.data('realvalues', item.realValue);
+
+
+                    dropdown.append(option);
+                    });
+
+
+                    $('#listZNSZalo').off('change').on('change', function () {
+                    var selectedOption = $('#listZNSZalo option:selected');
+                    var contentRule = selectedOption.text();
+                    var znsId = selectedOption.data('znsid');
+                    var Id = selectedOption.data('id');
+                    var realValue = selectedOption.data('realvalue');
+                    console.log('Real Value:', realValue);
+
+                    updateZNSTemplate(Id);
+                    console.log(Id);
+
+                    // Xóa điều kiện hiển thị thông báo trước đó
+                    resetErrorDisplay();
+
+                    // Kiểm tra xem option có lỗi không
+                    if (selectedOption.hasClass('error-option')) {
+                    if (!toastrDisplayed) {
+                    toastrDisplayed = true;
+                    toastr.warning(selectedOption.prop('title'));
+                    }
+                    $('#idContentZNS').val(contentRule);
+                    } else {
+                    $('#idContentZNS').val(contentRule);
+                    }
+                    console.log(znsId);
+                    });
+                    }
+
+                    function resetErrorDisplay() {
+                    // Xóa điều kiện hiển thị thông báo trước đó
+                    $('#listZNSZalo option').each(function () {
+                    $(this).removeData('error-displayed');
+                    });
+                    toastrDisplayed = false;
+                    }
+                    function updateZNSTemplate(id) {
+                    $.ajax({
+                    url: '/AdviseCard/GetZNSTemplate',
+                    type: 'GET',
+                    data: {
+                    id: id
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                    var fieldZnsList = response.fieldZnsList;
+
+                    // Hiển thị danh sách trường fieldZns
+                    console.log('FieldZns List:', fieldZnsList);
+
+                    // Lấy realValues từ option đầu tiên được chọn
+                    var selectedOption = $('#listZNSZalo option:selected');
+                    var realValues = selectedOption.data('realvalues');
+
+                    // Extract data and format time
+                    extractDataAndFormatTime(fieldZnsList, realValues);
+                    },
+                    error: function(xhr, status, error) {
+                    console.error('Error fetching ZNS template:', error);
+                    }
+                    });
+                    }
+                    $('#sendZNSButton').click(function() {
+                    // Kiểm tra nội dung trong text area
+                    var contentZNS = $('#idContentZNS').val();
+                    if (contentZNS.trim() === '') {
+                    // Nếu không có thông tin nào trong text area
+                    toastr.error('Vui lòng chọn mẫu ZNS');
+                    } else if (isPlaceholderEmpty(contentZNS)) {
+                    // Nếu có {} trống thì hiển thị thông báo lỗi
+                    toastr.warning('Vui lòng nhập đầy đủ thông tin');
+                    } else {
+                    // Lấy giá trị ZNSZalo của option được chọn trong dropdown
+                    var selectedZNSId = $('#listZNSZalo option:selected').data('znsid');
+
+
+                    console.log(selectedZNSId);
+                        var idLead = $('#information-send-zns').attr('value-id');
+
+                    // Lấy số điện thoại từ span
+                        var Phone = '@isPartial' == '1' ? $('#tab2 input[name=Phone]').val(): $('#information-send-zns').attr('value-phone');
+                    var convertedPhone = convertPhoneNumber(Phone);
+                        var contentZNS = $('#idContentZNS').val();
+                        var formattedText = formatDateTimeInText(contentZNS);
+
+                    console.log(convertedPhone);
+                    console.log(template_data);
+
+                    $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("SendZNS", "AdviseCard")',
+                    data: JSON.stringify({
+                    phoneNumber: convertedPhone,
+                    templateId: selectedZNSId,
+                    templateData: template_data
+                    }),
+                    dataType: 'json',
+                    contentType: 'application/json',
+                        success: function (response) {
+                                debugger
+                            if (response.error === 0) {
+                                toastr.success("Gửi thành công");
+                                createZNSLeadLogs(idLead, formattedText, 1, Phone,'');
+
+                                closeModalSendZNS();
+                            } else {
+                                console.log(response.error)
+                                if (response.error === 1) {
+                                    toastr.error(response.message);
+                                }
+                                else {
+                                    handleErrorResponse(response.error);
+                                }
+                            }
+
+                    },
+                    error: function(xhr, status, error) {
+                    // Xử lý lỗi khi gửi request
+                    toastr.error("Mẫu ZNS không hợp lệ");
+                    }
+                    });
+                        }
+                    });
+                        function createZNSLeadLogs(Id, Content, Status, Mobile, ErrorCode) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '/AdviseCard/CreateZNSLeadLogs',
+                                data: JSON.stringify({
+                                    Id: '@isPartial'=='1'?$('#Id').val():Id,
+                                    Content: Content,
+                                    Status: Status,
+                                    Mobile: Mobile,
+                                    isPartial: 1,
+                                    CampaignId: 0,
+                                    ErrorCode: ErrorCode
+
+                                }),
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                success: function (response) {
+                                    if (response.success) {
+                                        // Xử lý thành công (nếu cần)
+                                        console.log('CreateZNSLeadLogs success');
+                                    } else {
+                                        // Xử lý khi có lỗi (nếu cần)
+                                        console.error('CreateZNSLeadLogs error');
+                                    }
+                                },
+                                error: function (xhr, status, error) {
+                                    // Xử lý khi gặp lỗi request
+                                    console.error('Error sending CreateZNSLeadLogs request:', error);
+
+                                }
+                            });
+                        }
+                        function handleErrorResponse(errorCode) {
+                            var idLead = $('#information-send-zns').attr('value-id');
+                            var Phone = $('#information-send-zns').attr('value-phone');
+                            var contentZNS = $('#idContentZNS').val();
+                            var formattedText = formatDateTimeInText(contentZNS);
+
+                            var errorMessage = '';
+                            var status = 0;
+
+                            switch (errorCode) {
+                                case -147:
+                                    errorMessage = 'Mẫu ZNS đã vượt giới hạn gửi trong ngày';
+                                    break;
+                                case -144:
+                                    errorMessage = 'OA đã vượt giới hạn gửi ZNS trong ngày';
+                                    break;
+                                case -138:
+                                    errorMessage = 'Ứng dụng gửi ZNS chưa có quyền sử dụng tính năng này, vui lòng kết nối để xin cấp quyền';
+                                    break;
+                                case -137:
+                                    errorMessage = 'Kiểm tra số dư tài khoản ZNS CLoud';
+                                    break;
+                                case -133:
+                                    errorMessage = 'Mẫu ZNS không thể gửi vào lúc (10PM-6AM)';
+                                    break;
+                                    break;
+                                case -131:
+                                    errorMessage = 'Mẫu ZNS chưa được phê duyệt';
+                                    break;
+                                case -124:
+                                    errorMessage = 'Hết hạn phiên kết nối Zalo OA, vui lòng kết nối lại';
+                                    break;
+                                case -119:
+                                    errorMessage = 'Tài khoản không thể nhận ZNS';
+                                    break;
+                                case -118:
+                                    errorMessage = 'Tài khoản Zalo không tồn tại hoặc đã bị vô hiệu hoá';
+                                    break;
+                                case -117:
+                                    errorMessage = 'ZNS ID không hợp lệ, vui lòng kiểm tra giá trị trong cơ sở dữ liệu';
+                                    break;
+                                case -115:
+                                    errorMessage = 'Tài khoản ZNS Cloud không đủ số dư để gửi mẫu';
+                                    break;
+                                case -114:
+                                    errorMessage = 'Người dùng không nhận được ZNS vì các lý do: Trạng thái tài khoản, Tùy chọn nhận ZNS, Sử dụng Zalo phiên bản cũ, hoặc các lỗi nội bộ khác';
+                                    break;
+                                case -112:
+                                    errorMessage = 'Nội dung mẫu ZNS không hợp lệ, không thể gửi (nội dung truyền vào chưa hợp lệ)';
+                                    break;
+                                case -110:
+                                    errorMessage = 'Phiên bản Zalo app không được hỗ trợ. Người dùng cần cập nhật phiên bản mới nhất';
+                                    break;
+                                case -108:
+                                    errorMessage = 'Số điện thoại của người dùng không hợp lệ';
+                                    break;
+                                default:
+                                    errorMessage = 'Mẫu ZNS không hợp lệ, mã lỗi ' + errorCode;
+                                    break;
+                            }
+
+                            toastr.error(errorMessage);
+                            createZNSLeadLogs(idLead, formattedText, status, Phone, errorCode);
+                        }
+
+
+                    function extractDataAndFormatTime(fieldZnsList, dataString) {
+                    // Tạo một mảng từ chuỗi dữ liệu
+                    var dataArray = dataString.split(',');
+
+                    // Tạo một đối tượng JSON trống
+                    var extractedData = {};
+
+                    // Lặp qua từng trường fieldZns và gán giá trị tương ứng từ mảng dữ liệu
+                    var fieldZns = fieldZnsList.split(',');
+                    for (var i = 0; i < fieldZns.length; i++) {
+                    extractedData[fieldZns[i]] = dataArray[i];
+                    }
+
+                    // Tìm trường có giá trị giống định dạng ngày tháng
+                    var timeFieldName = findDateTimeField(extractedData);
+
+                    // Chuyển đổi định dạng thời gian nếu trường thời gian được phát hiện
+                    if (timeFieldName) {
+                    var dateTime = extractedData[timeFieldName];
+                    var formattedDateTime = formatDateTime(dateTime);
+                    extractedData[timeFieldName] = formattedDateTime;
+                    }
+                    template_data = extractedData;
+
+                    // In ra đối tượng JSON đã trích xuất
+                    console.log(extractedData);
+                    }
+
+                    function formatDateTime(dateTime) {
+                    if (!(dateTime instanceof Date)) {
+                    dateTime = new Date(dateTime);
+                    }
+
+                    if (isNaN(dateTime.getTime())) {
+                    return null; // Trả về null nếu không thể chuyển đổi thành ngày tháng
+                    }
+
+                    var hours = dateTime.getHours();
+                    var minutes = dateTime.getMinutes();
+                    var day = dateTime.getDate();
+                    var month = dateTime.getMonth() + 1;
+                    var year = dateTime.getFullYear();
+
+                    // Chuyển đổi giờ và phút thành chuỗi có dạng hh:mm
+                    var timeString = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+
+                    // Chuyển đổi ngày và tháng thành chuỗi có dạng dd/MM/yyyy
+                    var dateString = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year;
+
+                    // Trả về chuỗi kết quả
+                    return timeString + ' ' + dateString;
+                    }
+
+
+                    // Hàm kiểm tra xem trường nào trong đối tượng chứa giá trị có dạng ngày tháng
+                    function findDateTimeField(dataObject) {
+                    for (var key in dataObject) {
+                    if (isDateTime(dataObject[key])) {
+                    return key;
+                    }
+                    }
+                    return null;
+                    }
+                        function convertISOToDateTime(isoString) {
+                            // Tạo một đối tượng Date từ chuỗi ISO 8601
+                            var date = new Date(isoString);
+
+                            // Lấy thông tin ngày, tháng, năm, giờ và phút
+                            var day = date.getDate();
+                            var month = date.getMonth() + 1; // Tháng bắt đầu từ 0 nên cần cộng thêm 1
+                            var year = date.getFullYear();
+                            var hours = date.getHours();
+                            var minutes = date.getMinutes();
+
+                            // Định dạng lại các giá trị thành chuỗi
+                            var formattedDateTime = hours + ':' + minutes + ' ' + day + '/' + month + '/' + year;
+
+                            // Trả về chuỗi đã được định dạng
+                            return formattedDateTime;
+                        }
+
+                        function formatDateTimeInText(text) {
+                            // Biểu thức chính quy để tìm kiếm các chuỗi thời gian có định dạng ISO 8601 trong văn bản
+                            var isoRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/g;
+
+                            // Tìm tất cả các chuỗi thời gian trong văn bản
+                            var isoMatches = text.match(isoRegex);
+
+                            // Nếu có các chuỗi thời gian được tìm thấy, chuyển đổi và thay thế chúng
+                            if (isoMatches) {
+                                isoMatches.forEach(function (match) {
+                                    var formattedDateTime = convertISOToDateTime(match);
+                                    text = text.replace(match, formattedDateTime);
+                                });
+                            }
+
+                            // Trả về văn bản đã được định dạng
+                            return text;
+                        }
+                    // Hàm kiểm tra xem một chuỗi có định dạng ngày tháng hợp lệ không
+                    function isDateTime(value) {
+                    var regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+                    return regex.test(value);
+                    }
+                    function convertPhoneNumber(phone) {
+                    // Kiểm tra xem số điện thoại đã có đầu số 84 (Việt Nam) chưa
+                    if (phone.startsWith("0")) {
+                    // Nếu chưa có, thêm đầu số 84 vào trước số điện thoại
+                    return "84" + phone.slice(1);
+                    } else {
+                    // Nếu đã có đầu số 84, không cần thay đổi
+                    return phone;
+                    }
+                    }
+
+                    // Bind click event to closeZNSModal
+                    $('.closeZNSModal').click(function() {
+                    closeModalSendZNS(); // Gọi hàm đóng modal
+                    });
+
+                    $('#btnShowZNSModal').click(function () {
+                    var spanElement = document.getElementById('information-send-zns');
+
+                    var Phone ='@isPartial' == '1' ? $('#tab2 input[name=Phone]').val(): spanElement.getAttribute('value-phone');
+                    if (Phone) {
+                    openModalSendZNS();
+                    } else {
+                    toastr.error('Không có số điện thoại.');
+                    }
+                    });
+
+                    // Function to check if there are any empty placeholders {}
+                    function isPlaceholderEmpty(content) {
+                    var regex = /{[^{}]*}/g;
+                    var placeholders = content.match(regex);
+                    if (placeholders) {
+                    for (var i = 0; i < placeholders.length; i++) {
+                    if (placeholders[i] === '{}') {
+                    return true; // Found an empty placeholder
+                    }
+                    }
+                    }
+                    return false; // No empty placeholders found
+                    }
+                    });
+
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script>
+    $(function () {
+        $("#TabLeadHeader").tabs();
+    });
+    //$('#listOrderDetail').on('change', '.item_price:not(.mask-format-currency)', function () {
+
+    //    });
+    $('#idtableadproduct').on('click', function(){
+        debugger;
+        DetailLeadProduct('@isPartial' == '1' ? $('#Id').val() : $('#IdLead').val());
+    });
+    function DetailLeadProduct(Id) {
+        $('body').addClass('loading');
+        $.ajax({
+            url: '@isPartial' == '1' ? "/AdviseCard/TabLeadProduct?id=" + Id + "&isPartial=" + '@isPartial' + "" : "/AdviseCard/TabLeadProduct?id=" + Id,
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                $('#tableadproductDelail').html(data)
+            },
+            complete: function () {
+                $('body').removeClass('loading')
+
+            }
+        });
+    }
+    $('#idtableadquotation').on('click', function(){
+    DetailLeadQuotation('@isPartial' == '1' ? $('#Id').val() : $('#IdLead').val());
+    });
+    function DetailLeadQuotation(Id) {
+        $('body').addClass('loading');
+        $.ajax({
+            url: '@isPartial' == '1' ? "/AdviseCard/TabLeadQuotation?id=" + Id + "&isPartial=" + '@isPartial' + "" : "/AdviseCard/TabLeadQuotation?id=" + Id,
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                $('#tableadquotationDelail').html(data)
+            },
+            complete: function () {
+                $('body').removeClass('loading')
+
+            }
+        });
+    }
+    $('#idtableadhistory').on('click', function(){
+        DetailLeadHistory('@isPartial' == '1' ? $('#Id').val() : $('#IdLead').val());
+    });
+    function DetailLeadHistory(Id) {
+        $('body').addClass('loading');
+        $.ajax({
+            url: '@isPartial' == '1' ? "/AdviseCard/TabLeadHistory?Id=" + Id + "&isPartial=" + '@isPartial' + "" : "/AdviseCard/TabLeadHistory?Id=" + Id,
+            method: "get",
+            dataType: "html",
+            success: function (data) {
+                $('#tableadhistoryDelail').html(data)
+            },
+            complete: function () {
+                $('body').removeClass('loading')
+
+            }
+        });
+    }
+    window.addEventListener('message', eventListenerAddNewModal);
+    function eventListenerAddNewModal(event) {
+        if (event.data.type === 'reloadTabLeadQuotationAndOpenPoupDetail') {
+            toastr.success('Thêm mới báo giá thành công!', 'Thông báo');
+            DetailLeadQuotation('@isPartial' == '1' ? $('#Id').val() : $('#IdLead').val());
+
+            var urldetailbg = "";
+            if ('@isPartial' == '1') {
+                urldetailbg = "/AdviseCard/TabLeadQuotationDetail?id=" + event.data.id + "&isPartial=" + '@isPartial';
+            } else {
+                urldetailbg = "/AdviseCard/TabLeadQuotationDetail?id=" + event.data.id;
+            }
+            OpenPopup(urldetailbg, 'Chi tiết báo giá', 0, 420);
+        } else
+        if (event.data === 'reloadTabLeadQuotation') {
+            toastr.success('Thêm mới báo giá thành công!', 'Thông báo');
+            DetailLeadQuotation('@isPartial' == '1' ? $('#Id').val() : $('#IdLead').val());
+        } else
+        if (event.data.type === 'downloadFileIn') {
+            var url = event.data.data;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.responseType = 'blob';
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    var fileData = xhr.response; // Dữ liệu tệp tin
+                    var fileName = event.data.fileName; // Tên file
+
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(fileData);
+                    link.download = fileName;
+                    link.click();
+
+                    $.ajax({
+                        url: '/CrmTemplateFile/RemoveFile',
+                        type: "POST",
+                        data: { fileName: event.data.fileName },
+                        dataType: 'json',
+                        success: function (rs) {
+                        }
+                    });
+                } else {
+                    // Xử lý khi có lỗi xảy ra trong quá trình tải xuống
+                }
+            };
+            xhr.send();
+        } else
+        if (event.data === 'showloadding') {
+            ShowLoading();
+        } else
+        if (event.data === 'hiddenloadding') {
+            HideLoading();
+        }
+    };
+    $("#myModal .close").click(function () {
+         $("#myModal").modal("hide");
+     });
+
+</script>
+<script>
+    $('.saveCustomerPurchaseModal').click(function () {
+        debugger
+        let chkEndStatus = $('#VStatusId').val()
+        // Lấy giá trị của các trường input và select
+        var amount = convertToNumberWithDot($('#amountcustomerPurchaseModal').val());
+        var endDate = $('#endDatecustomerPurchaseModal').val();
+        var dateParts = endDate.split("-");
+        var formattedDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+
+        var reason = $('#reasoncustomerPurchaseModal').val();
+        var leadId = @(lead != null && lead.Id > 0 ? lead.Id.ToString() : "null");
+        var statusId = $('.customerPurchaseModal').data('statusid');
+        var label = $('.customerPurchaseModal').find('label[for="reasoncustomerPurchaseModal"]');
+        var brand = $('#brandcustomerPurchaseModal').val();
+        // Tạo một mảng chứa các lỗi
+        var errors = [];
+
+        // Kiểm tra từng trường dữ liệu
+        //if ((!amount || isNaN(amount)) && ((chkEndStatus > 0 && !($('#Vendstatus').val()=='false'))||chkEndStatus <1)) {
+
+        //    console.log(amount);
+        //    errors.push('Số tiền phải là một số.');
+        //}
+        if (label.text() === 'Lí do chưa mua' && !reason) {
+            errors.push('Lí do chưa mua không được để trống.');
+        }
+        if (!endDate) {
+            errors.push('Ngày kết thúc không được để trống.');
+        }
+
+        if (!statusId) {
+            errors.push('Trạng thái không được để trống.');
+        }
+        if (!brand && label.text() === 'Lí do mua') {
+            errors.push('Nhãn hàng không được để trống.');
+        }
+        // Nếu có lỗi, hiển thị thông báo lỗi
+        if (errors.length > 0 ) {
+            // Hiển thị thông báo lỗi với SweetAlert2
+            toastr.warning('Lỗi!')
+        }else {
+            // Nếu không có lỗi, tiếp tục xử lý dữ liệu
+            var formData = {
+                amount: amount,
+                endDate: formattedDate,
+                reason: reason,
+                leadId: leadId,
+                statusId: $('#VStatusId').val(),
+                brand: brand
+            };
+            if (chkEndStatus > 0) {
+                //Gửi dữ liệu đến máy chủ để lưu vào cơ sở dữ liệu
+                $.ajax({
+                    url: '/AdviseCard/SaveForEndStatus',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: formData,
+                    success: function (response) {
+                        // Xử lý phản hồi từ máy chủ sau khi lưu thành công (nếu cần)
+                        console.log(response);
+                        response.success == true ? toastr.success('Thành công!') : toastr.warning('Thất bại!')
+                        if (response.success == true) {
+                            if (statusId == 28)
+                                sendUpdateRequest(-2);
+                            else
+                                sendUpdateRequest(-3);
+                        }
+                        $('.customerPurchaseModal').hide();
+                        //$('input[name="F42"]').val(endDate);
+                        //$('input[name="F44"]').val(amount);
+                        DetailLead(leadId);
+                    },
+                    error: function (xhr, status, error) {
+                        // Xử lý lỗi nếu có
+                        console.error(error);
+                        // Hiển thị thông báo lỗi bằng SweetAlert2
+                        toastr.error('Đã xảy ra lỗi khi lưu dữ liệu.')
+
+                    }
+                });
+                $('#VStatusId').val(0)
+            } else {
+                //Gửi dữ liệu đến máy chủ để lưu vào cơ sở dữ liệu
+                $.ajax({
+                    url: '/AdviseCard/SaveDataCustomerPurchase',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: formData,
+                    success: function (response) {
+                        // Xử lý phản hồi từ máy chủ sau khi lưu thành công (nếu cần)
+                        console.log(response);
+                        // Hiển thị thông báo thành công bằng SweetAlert2
+
+                        response.success == true ? toastr.success('Thành công!') : toastr.warning('Thất bại!')
+                        if (response.success == true) {
+                            if (statusId == 28)
+                                sendUpdateRequest(-2);
+                            else
+                                sendUpdateRequest(-3);
+                        }
+                        $('.customerPurchaseModal').hide();
+                        //$('input[name="F42"]').val(endDate);
+                        //$('input[name="F44"]').val(amount);
+                        DetailLead(leadId);
+                    },
+                    error: function (xhr, status, error) {
+                        // Xử lý lỗi nếu có
+                        console.error(error);
+                        toastr.error('Đã xảy ra lỗi khi lưu dữ liệu.')
+
+                    }
+                });
+                console.log(formData);
+            }
+
+        }
+
+
+    });
+    function convertToNumberWithDot(amountString) {
+        // Loại bỏ các dấu chấm
+        var amountWithoutDot = amountString.replace(/\./g, '');
+
+        // Chuyển đổi chuỗi thành số
+        var amountNumber = parseFloat(amountWithoutDot);
+
+        return amountNumber;
+    }
+
+
+
+
+</script>
+<script>
+    $(document).ready(function () {
+        // Lấy tất cả các trường nhập liệu kiểu number trừ trường có name là "YearofBirth"
+        var numberInputs = $('#saveLeadForm').find('input[type="number"]').not('[name="YearofBirth"]');
+
+        // Duyệt qua từng trường nhập liệu
+        numberInputs.each(function () {
+            var input = $(this);
+
+            // Khi trường nhập liệu được tập trung vào
+            input.on('focus', function () {
+                // Chuyển kiểu dữ liệu thành text
+                input.prop('type', 'text');
+
+                // Định dạng giá trị nhập liệu
+                input.val(formatNumber(input.val()));
+            });
+
+            // Khi trường nhập liệu mất trọng tâm
+            input.on('blur', function () {
+                var value = input.val();
+                // Loại bỏ dấu chấm ngăn cách hàng nghìn
+                var integerValue = parseInt(value.replace(/\,/g, ''));
+                // Kiểm tra xem giá trị đã được chuyển đổi thành số nguyên hay không
+                if (!isNaN(integerValue)) {
+                    // Gán giá trị số nguyên cho trường nhập liệu
+                    input.val(integerValue);
+                }
+            });
+            input.on('input', function () {
+                input.val(formatNumber2(input.val()));
+
+
+            });
+
+        });
+
+        // Hàm định dạng số
+        function formatNumber(number) {
+            return number.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        function formatNumber2(number) {
+            // Loại bỏ tất cả các dấu chấm hiện có
+            var sanitizedNumber = number.replace(/\,/g, '');
+            // Thêm dấu chấm sau mỗi 3 chữ số
+            var formattedNumber = sanitizedNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return formattedNumber;
+        }
+    });
+
+    $(document).ready(function () {
+        // Lấy input có type là number
+        var numberInput = $('#saveLeadForm').find('input[type="number"]').not('[name="YearofBirth"]');
+
+        numberInput.each(function () {
+            var numberInput = $(this);
+
+            // Chuyển kiểu dữ liệu và định dạng giá trị
+            numberInput.prop('type', 'text');
+            numberInput.val(formatNumber(numberInput.val()));
+
+            // Hàm định dạng số
+            function formatNumber(number) {
+                // Định dạng số và chia nhỏ thành các nhóm cách nhau bởi dấu chấm
+                return Number(number).toLocaleString('en');
+            }
+        });
+        $('#CustomerCode').hide();
+        $('label[for="M__Kh_ch_h_ng"]').hide();
+    });
+</script>
+
+
+@if (isPartial != null)
+{
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js" type="text/javascript"></script>
+    <script src="~/signalr/hubs"></script>
+    <script type="text/javascript">
+    debugger
+    var hub = $.connection.erpHub;
+    hub.client.f5LeadLogs = function (id) {
+        debugger
+        if (id == @Html.Raw(isPartial==1? "$('#Id').val()" : "$('#IdLead').val()")) {
+            $.ajax({
+                url: '/AdviseCard/LeadLogsView?id=' + id+ '@Html.Raw(isPartial==1? "&isPartial=1" : "&isPartial=0")',
+                method: "get",
+                dataType: "html",
+                success: function (data) {
+                    $('#LeadLogsShow').html(data)
+                }
+            })
+
+        }
+        };
+        hub.client.f5PinCmt = function (id) {
+        debugger
+        if (id == @Html.Raw(isPartial==1? "$('#Id').val()" : "$('#IdLead').val()")) {
+            $.ajax({
+                url: '/AdviseCard/PinCmtView?id=' + id+ '@Html.Raw(isPartial==1? "&isPartial=1" : "&isPartial=0")',
+                method: "get",
+                dataType: "html",
+                success: function (data) {
+                    debugger
+                    $('#PinCmtShow').html(data)
+                }
+            })
+
+        }
+    };
+    hub.client.LeadLogsMeeting = function (LeadId) {
+        debugger
+        if (LeadId ==  @Html.Raw(isPartial==1? "$('#Id').val()" : "$('#IdLead').val()")) {
+            $.ajax({
+                url: '/AdviseCard/LeadLogsMeetingView?LeadId=' + LeadId+'@Html.Raw(isPartial==1? "&isPartial=1" : "&isPartial=0")',
+                method: "get",
+                dataType: "html",
+                success: function (data) {
+                    $('#LeadLogsMeetingShow').html(data);
+                }
+            })
+
+        }
+    };
+    $.connection.hub.start();
+    $.connection.hub.disconnected(function () {
+        debugger
+        console.log('Connection lost, attempting to reconnect.');
+        setTimeout(function () {
+            debugger
+            $.connection.hub.start();
+        }, 5000); // Retry connection after 5 seconds
+    });
+    </script>
+}

@@ -1,0 +1,355 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model SchedulingHistoryViewModel
+
+@{
+    ViewBag.Title = Wording.PageEdit_SchedulingHistory;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SchedulingHistory",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    var group = Model.UserList.GroupBy(x => x.UserTypeId).ToList();
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <style>
+        .btn.btn-white {
+            /*border-color: rgba(204, 204, 204, 0)!important;*/
+            border-width: 0px !important;
+        }
+
+            .btn.btn-white:hover, .btn.btn-white:focus, .btn.btn-white.active,
+            .btn.btn-white:active, .open > .btn.btn-white.dropdown-toggle,
+            .open > .btn.btn-white.active.dropdown-toggle {
+                background-color: rgba(59, 183, 51, 0.46) !important;
+                border-color: #629959;
+                color: #3a3434 !important;
+            }
+
+        .img_user {
+            width: 40px !important;
+            height: 40px !important;
+            margin: 0 auto;
+            /* display: block; */
+            border-radius: 100%;
+            border: 2px solid;
+        }
+
+        .user_check {
+            width: 30px !important;
+        }
+
+        .combojax {
+            display: inline-block;
+        }
+
+            .combojax ul {
+                padding: 0px !important;
+            }
+    </style>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+
+                                <li class="active">
+                                    <a data-toggle="tab" href="#discount" aria-expanded="true"><i class="fa fa-users"></i> Danh sách nhân viên thực hiện</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#donate" aria-expanded="false"><i class="fa fa-cubes"></i> Danh sách thiết bị thực hiện</a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="discount" class="tab-pane active table-responsive clearfix">
+                                    @if (Model.UserList.Any())
+                                    {
+                                        <div class="tabbable">
+                                            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tab">
+                                                @for (int ii = 0; ii < group.Count(); ii++)
+                                                {
+                                                    <li id="tab_li_@ii" class="">
+                                                        <a data-toggle="tab" href="#tab_@(ii)">@group[ii].FirstOrDefault().UserTypeName<span class="badge badge-danger pull-right" id="count_check_@ii">0</span></a>
+                                                    </li>
+                                                }
+                                            </ul>
+
+                                            <div class="tab-content" style="height:355px;">
+                                                @for (int ii = 0; ii < group.Count(); ii++)
+                                                {
+                                                    <div id="tab_@(ii)" class="tab-pane" style="height:100%;">
+                                                        <div class="bottom-10">
+                                                            <label>
+                                                                <input class="ace" type="checkbox" name="checkAll_@ii" id="checkAll_@ii" onclick="CheckAll(@ii)" />
+                                                                <span class="lbl" style="margin-left: 2px;">Tất cả</span>
+                                                            </label>
+                                                        </div>
+                                                        <div data-toggle="buttons" class="btn-group">
+
+                                                            @foreach (var i in Model.UserList.Where(x => x.UserTypeId == group[ii].Key).OrderBy(x => x.Count_Scheduling))
+                                                            {
+                                                                <label class="btn btn-sm btn-white" data-toggle="tooltip" onclick="clickActive(this, @ii)" title="@i.FullName" id="label_@i.Id" name="label_@ii" style="padding:2px!important;margin-left:2px!important;margin-bottom:2px!important;width:200px">
+                                                                    <input type="checkbox" value="@i.Id" id="check_@ii" name="user_check" class="user_check">
+                                                                    <img class="img_user pull-left" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(i.ProfileImage, "User", "user"))">
+                                                                    <strong> @i.FullName </strong> <br>
+                                                                    <i class="fa fa-calendar"></i>
+                                                                    <em> Số lần đã làm @(i.Count_Scheduling) </em>
+                                                                </label>
+                                                            }
+
+                                                        </div>
+
+                                                    </div>
+
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-danger">
+                                            <p><i class="ace-icon fa fa-warning red"></i> Hiện tại chưa có nhân viên ở ca hiện tại</p>
+                                        </div>
+                                    }
+                                </div>
+                                <div id="donate" class="tab-pane">
+                                    <div class="product-search-box clearfix " style="margin-bottom:10px">
+                                        <span class="label label-warning" style="padding: 6px; float: left; height: 26px;margin-left:0px">[F4]</span>
+                                        <div id="product_search_control">
+                                            <span class="ctl">
+                                                @Html.TextBox("Equipment", "", new { placeholder = "Trang thiết bị...", autocomplete = "off", style = "width:300px; margin-right:0px" })
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <table class="table table-bordered grid-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="grid-header" style="width:5%">STT</th>
+                                                <th class="grid-header">Mã trang thiết bị</th>
+                                                <th class="grid-header">Tên trang thiết bị</th>
+                                                <th class="grid-header" style="width:100px">Ngày đăng ký</th>
+                                                <th class="grid-header" style="width:50px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="EquipmentList">
+                                            <tr role="0" hidden>
+                                                <td>1</td>
+                                                <td>
+                                                    <span class="detail_staff_equipment_code"><span />
+                                                </td>
+                                                <td>
+                                                    <span class="detail_staff_equipment_name"><span />
+                                                </td>
+                                                <td>
+                                                    <input class="detail_equipment_id" type="hidden" id="EquipmentList_0__EquipmentId" name="EquipmentList[0].EquipmentId" value="0" />
+                                                    <input class="detail_id" type="hidden" id="EquipmentList_0__Id" name="EquipmentList[0].Id" value="0" />
+                                                    <span class="detail_inspection_date"><span />
+                                                </td>
+                                                <td class="text-center"><a class="btn btn-xs btn-danger detail_remove">X</a></td>
+                                            </tr>
+                                            @for (int i = 0; i < Model.EquipmentList.Count; i++)
+                                            {
+                                                <tr role="@(i+1)">
+                                                    <td>@(i + 1)</td>
+                                                    <td>
+                                                        <span class="detail_staff_equipment_code">@Model.EquipmentList[i].StaffEquipmentCode<span />
+                                                    </td>
+                                                    <td>
+                                                        <span class="detail_staff_equipment_name">@Model.EquipmentList[i].StaffEquipmentName<span />
+                                                    </td>
+                                                    <td>
+                                                        <input class="detail_equipment_id" type="hidden" id="EquipmentList_@(i+1)__EquipmentId" name="EquipmentList[@(i+1)].EquipmentId" value="@Model.EquipmentList[i].EquipmentId" />
+                                                        <input class="detail_id" type="hidden" id="EquipmentList_@(i+1)__Id" name="EquipmentList[@(i+1)].Id" value="@Model.EquipmentList[i].Id" />
+                                                        <span class="detail_inspection_date">@(Model.EquipmentList[i].InspectionDate.HasValue ? Model.EquipmentList[i].InspectionDate.Value.ToString("dd/MM/yyyy") : "")<span />
+                                                    </td>
+                                                    <td class="text-center"><a class="btn btn-xs btn-danger detail_remove">X</a></td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="col-sm-6">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title"><i class="ace-icon fa fa-info-circle"></i> Thông tin xếp lịch</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @Html.HiddenFor(model => model.InquiryCardId)
+                        @Html.HiddenFor(model => model.CustomerId)
+                        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+                        @Html.HiddenFor(model => model.Id)
+                        @Html.HiddenFor(model => model.CreatedUserId)
+                        @Html.HiddenFor(model => model.AssignedUserId)
+                        @Html.HiddenFor(model => model.CreatedDate)
+                        @Html.HiddenFor(model => model.IsDeleted)
+                        @Html.HiddenFor(model => model.Status)
+                        @Html.HiddenFor(model => model.WorkDay)
+                        @Html.HiddenFor(model => model.EndDate)
+                        @Html.HiddenFor(model => model.BranchId)
+                        @Html.CustomTextboxFor(model => model.Code, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.CustomerCode, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.CustomerName, null, null, WidthType.span12, true, new Dictionary<string, object> { { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.InquiryCardCode, null, null, WidthType.span12)
+                        @Html.CustomDropDownListFor(model => model.RoomId, Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Room(Model.RoomId, Wording.Empty), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                        @Html.DateTimePicker(model => model.ExpectedWorkDay, "dd/MM/yyyy H:mm", "00/00/0000 00:00:00", true, false)
+                        @Html.CustomTextboxFor(model => model.TotalMinute, null, null, WidthType.span12)
+                        @Html.DateTimePicker(model => model.ExpectedEndDate, "dd/MM/yyyy H:mm", "00/00/0000 00:00:00", true, false)
+
+                        @Html.CustomTextAreaFor(model => model.Note, null, WidthType.span12, true, null)
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    <script src="/Scripts/combojaxTLT.js?=vs1.01"></script>
+    <script>
+        var $tr_template = $('#EquipmentList tr:first-child');
+        $(document).ready(function () {
+            $('[data-rel="tooltip"]').tooltip({ container: 'body' });
+            var id=$("#InquiryCardId").val();
+            $("#Equipment").combojax({
+                url: "/SchedulingHistory/GetListStaffEquipment?id="+id,
+                onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+                    //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+                },
+                onSelected: function (obj) {
+                    console.log(obj);
+                    if (obj) {
+                        var len = $('#EquipmentList tr').length;
+                        var tr_new = $tr_template.clone()[0].outerHTML;
+                        tr_new = tr_new.replace(/\[0\]/g, "[" + len + "]");
+                        tr_new = tr_new.replace(/\_0\__/g, "_" + len + "__");
+                        var $tr_new = $(tr_new);
+                        $tr_new.attr('role', len);
+                        $tr_new.find('td:first-child').text(len);
+                        $tr_new.find('.detail_staff_equipment_code').text(obj.Code);
+                        $tr_new.find('.detail_id').val(0);
+                        $tr_new.find('.detail_equipment_id').val(obj.Id);
+                        $tr_new.find('.detail_staff_equipment_name').text(obj.Name);
+                        $tr_new.find('.detail_inspection_date').text(obj.Note);
+                        $('#EquipmentList').append($tr_new);
+                        var $tr_after_append = $('tr[role="' + len + '"]');
+                        $tr_after_append.removeAttr("hidden", "hidden");
+                    }
+                }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+                  , onShowImage: false                  //hiển thị hình ảnh
+                  , onSearchSaveSelectedItem: false    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+                  , onRemoveSelected: true  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+            });
+
+            // xóa sản phẩm
+            $('#EquipmentList').on('click', '.detail_remove', function () {
+                $(this).closest('tr').remove();
+                $('#EquipmentList tr').each(function (index, tr) {
+                    $(tr).attr('role', index);
+                    $(tr).find('td:first-child').text(index);
+                    $(tr).find('.detail_equipment_id').attr('name', 'EquipmentList[' + index + '].EquipmentId').attr('id', 'EquipmentList_' + index + '__EquipmentId');
+                    $(tr).find('.detail_id').attr('name', 'EquipmentList[' + index + '].Id').attr('id', 'EquipmentList_' + index + '__Id');
+
+                });
+            });
+
+        });
+        $(document).ready(function () {
+            $('#tab_0').addClass("active");
+            $('#tab_li_0').addClass("active");
+        });
+        $(window).keydown(function (e) {
+            if (e.which == 115) {   // khi nhấn F4 trên bàn phím hiển thị dữ liệu dropdownlist
+                e.preventDefault();
+                $("#Equipment").focus();
+            }
+        });
+        function clickActive(elem, id) {
+            //  console.log(1111);
+            var $this = $(elem);
+
+            var $chekbox = $this.find('input[type="checkbox"]');
+            var $label = $this.find('label[name="label_' + id + '"]');
+            if ($chekbox.is(':checked')) {
+                $chekbox.prop('checked', false);
+                $label.removeClass('active');
+                $('span[id="count_check_' + id + '"]').text(parseInt($('span[id="count_check_' + id + '"]').text()) - 1);
+
+            } else {
+                $chekbox.prop('checked', true);
+                $label.addClass('active');
+                $('span[id="count_check_' + id + '"]').text(parseInt($('span[id="count_check_' + id + '"]').text()) + 1);
+
+            }
+            //$('span[id="count_check_' + id + '"]').text($this.parent().find(' > label.active').length);
+        }
+
+        function CheckAll(id) {
+            if ($('input[name="checkAll_' + id + '"]').is(':checked')) {
+                $('input[id="check_' + id + '"]').prop('checked', true);
+                $('label[name="label_' + id + '"]').addClass("active");
+                var label_check = $('label[name="label_' + id + '"]').length;
+                $('span[id="count_check_' + id + '"]').text(label_check);
+                //console.log(id);
+            } else {
+                $('input[id="check_' + id + '"]:checked').prop('checked', false);
+                $('label[name="label_' + id + '"]').removeClass("active");
+                var label_check = $('label[name="label_' + id + '"]').length;
+                $('span[id="count_check_' + id + '"]').text(0);
+            }
+        }
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

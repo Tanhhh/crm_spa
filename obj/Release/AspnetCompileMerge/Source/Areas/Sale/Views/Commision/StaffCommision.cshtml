@@ -1,0 +1,367 @@
+﻿@model IEnumerable<HoaHongNVViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Staff.Models
+@using GridMvc.Html
+
+
+@{
+    ViewBag.Title = "Tỷ lệ đạt doanh thu Nhân viên";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Commision",
+        ActionName = "StaffCommision",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    string branchId = Request["branchId"] != null ? Request["branchId"] : Common.CurrentUser.BranchId.ToString();
+
+    //List<BranchViewModel> branchList = (List<BranchViewModel>)ViewBag.branchList;
+    //List<ProductInvoiceViewModel> total = (List<ProductInvoiceViewModel>)ViewBag.TotalList;
+    //List<ProductInvoiceViewModel> Orlane = (List<ProductInvoiceViewModel>)ViewBag.Orlane;
+    //List<ProductInvoiceViewModel> Annayake = (List<ProductInvoiceViewModel>)ViewBag.Annayake;
+    //List<ProductInvoiceViewModel> LennorGreyl = (List<ProductInvoiceViewModel>)ViewBag.LennorGreyl;
+    //List<ProductInvoiceViewModel> NewOrlane = (List<ProductInvoiceViewModel>)ViewBag.newOrlane;
+    //List<ProductInvoiceViewModel> OldOrlane = (List<ProductInvoiceViewModel>)ViewBag.oldOrlane;
+    //List<string> ListTargetName = (List<string>)ViewBag.ListTargetName;
+    int index = 0;
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"> </script>
+
+<style>
+    #cTable table tbody, #cTable table thead {
+        display: block !important;
+    }
+
+    #cTable table tbody {
+        overflow: auto;
+        height: calc(100vh - 360px) !important;
+    }
+
+    #cTable table {
+        width: 1520px !important; /* can be dynamic */
+    }
+
+    #cTable th {
+        width: 100px;
+    }
+
+    #cTable td {
+        width: 100px;
+    }
+
+    #cTable > thead > tr > th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+
+    #cTable > tbody > tr > td {
+        vertical-align: middle;
+        /*text-align: center;*/
+    }
+</style>
+
+@helper GridColumnCommand(int id)
+{
+    <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+        <p>
+            <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+            </button>
+        </p>
+    </div>
+}
+
+@helper GridColumnName(string name, int id)
+{
+if (string.IsNullOrEmpty(name))
+{
+        <a href="@Url.Action("Edit", "Commision", new { Id = id })">No Title</a>
+}
+else
+{
+        <a href="@Url.Action("Edit", "Commision", new { Id = id })">@name</a>
+}
+}
+
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+    <p style="height:50px">
+        <label>Chi nhánh</label>
+        @Html.DropDownList("branchId",SelectListHelper.GetSelectList_Branch(Request["branchId"], "Chi nhánh"))
+        <label>Tháng</label>
+        <select id="month" name="month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(Month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Năm</label>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= DateTime.Now.Year; i++)
+            {
+                <option @(Year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Nhân viên QL</label>
+        @Html.DropDownList("userTypeId", SelectListHelper.GetSelectList_User_kd(Request["userTypeId"], branchId))
+
+
+
+
+    </p>
+}
+
+
+
+
+<div class="table-responsive" id="table">
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:20px;text-align:center">STT</th>
+                <th style="text-align:center;width:150px">Tên Nhân Viên</th>
+                
+                <th  style="text-align:center">Chỉ tiêu</th>
+                <th style="text-align:center">Target (VND)</th>
+                <th style="width:100px;text-align:center">Thực Tế (VND)</th>
+                <th style="text-align:center">Đạt (%)</th>
+                <th style="text-align:center">Tỷ lệ hoa hồng (%)</th>
+                <th style="text-align:center">Lương (VND)</th>
+            </tr>
+            
+            @*<tr>
+                @foreach (var a in ListTargetName)
+                    {
+                        <th class="text-center" style="width:100px;">@a</th>
+                    }
+                @foreach (var a in ListTargetName)
+                {
+                    <th class="text-center" style="width:100px;">@a</th>
+                }
+                @foreach (var a in ListTargetName)
+                {
+                    <th class="text-center" style="width:100px;">@a</th>
+                }
+                @foreach (var a in ListTargetName)
+                {
+                    <th class="text-center" style="width:100px;">@a</th>
+                }
+                @foreach (var a in ListTargetName)
+                {
+                    <th class="text-center" style="width:100px;">@a</th>
+                }
+            </tr>*@
+     
+
+        </thead>
+        <tbody>
+      @foreach (var item in Model)
+            {
+
+                index++;
+
+        <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+            <td class="text-center"  rowspan="6">@(index)</td>
+
+            <td rowspan="6" class="text-center"><a style="color:cadetblue">@item.userName</a></td>
+            <td>TỔNG</td>
+            <td>@CommonSatic.ToCurrencyStr(item.TotalTarget, null)</td>
+            <td>@CommonSatic.ToCurrencyStr(item.Total, null)</td>
+            <td>@item.TyleTotal</td>
+            <td></td>
+            <td>@CommonSatic.ToCurrencyStr(item.TongLuong, null)</td>
+           
+           </tr>
+           
+            @*<td>@CommonSatic.ToCurrencyStr(item.TotalTarget, null) </td>
+                <td> @CommonSatic.ToCurrencyStr(item.orlaneTarget, null) </td>
+                <td> @CommonSatic.ToCurrencyStr(item.neworlaneTarget, null) </td>
+                <td> @CommonSatic.ToCurrencyStr(item.oldorlaneTarget, null) </td>
+                <td> @CommonSatic.ToCurrencyStr(item.annayakeTarget, null) </td>
+                <td> @CommonSatic.ToCurrencyStr(item.LennorGreylTarget, null) </td>*@
+
+          <tr  class="@(index % 2 == 0 ? "alert-warning" : "")">
+
+            
+            <td>TỔNG ORLANE</td>
+              <td>@CommonSatic.ToCurrencyStr(item.orlaneTarget, null)</td>
+            <td>@CommonSatic.ToCurrencyStr(item.orlane, null)</td>
+            <td>@item.TyleOrlane</td>
+            <td></td>
+            <td></td>
+           
+            @*Ð?t*@
+
+            </tr>
+            <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+            <td>DS MỚI ORLANE</td>
+                <td>@CommonSatic.ToCurrencyStr(item.neworlaneTarget, null)</td>
+            <td>@CommonSatic.ToCurrencyStr(item.neworlane, null)</td>
+            <td>@item.TylenewOrlane</td>
+            <td>@item.HoahongNewOrlane</td>
+            <td>@CommonSatic.ToCurrencyStr(item.moneyNewOrlane, null)</td>
+           
+            </tr>
+           
+            <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+            <td>DS CŨ ORLANE</td>
+                <td>@CommonSatic.ToCurrencyStr(item.oldorlaneTarget, null)</td>
+            <td>@CommonSatic.ToCurrencyStr(item.oldorlane, null)</td>
+            <td>@item.TyleoldOrlane</td>
+            <td>@item.HoahongOldOrlane</td>
+            <td>@CommonSatic.ToCurrencyStr(item.moneyOldOrlane, null)</td>
+                </tr>
+            @*Luong*@
+          <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+            <td>DS ANNAYAKE</td>
+              <td>@CommonSatic.ToCurrencyStr(item.annayakeTarget, null)</td>
+            <td>@CommonSatic.ToCurrencyStr(item.annayake, null)</td>
+            <td>@item.TyleAnna</td>
+              <td>@item.HoaHongAnna</td>
+
+            <td>@CommonSatic.ToCurrencyStr(item.moneyAnna, null)</td>
+          
+
+        </tr>
+        <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+            <td>DS LEONOR GREYL</td>
+            <td>@CommonSatic.ToCurrencyStr(item.LennorGreylTarget, null)</td>
+            <td>@CommonSatic.ToCurrencyStr(item.LennorGreyl, null)</td>
+            <td>@item.TyleLenor</td>
+            <td>@item.HoahongLenor</td>
+            <td>@CommonSatic.ToCurrencyStr(item.moneyLenor, null)</td>
+        </tr>
+
+
+      }
+
+    </tbody>
+        <thead>
+            <tr class="">
+                <td class="text-right" style="font-weight:bold"></td>
+                <td class="text-center" style="font-weight:bold" colspan="2">Tổng doanh thu:</td>
+
+
+                <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Total), null))</td>
+               
+                <td class="text-right" style="font-weight:bold" colspan="2">Tổng lương</td>
+                <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TongLuong), null))</td>
+                <td class="text-right" style="font-weight:bold"></td>
+                @*<td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Orlane), null))</td>
+
+                    <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.OldOrlane), null))</td>
+                    <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.NewOrlane), null))</td>
+                    <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Annayake), null))</td>
+                    <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.LennorGreyl), null))</td>
+                    <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(total.Sum(x => x.TotalAmount), null))</td>
+                    <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Orlane.Sum(x => x.TotalAmount), null))</td>
+                    <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(OldOrlane.Sum(x => x.TotalAmount), null))</td>
+                    <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Annayake.Sum(x => x.TotalAmount), null))</td>
+                    <td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(LennorGreyl.Sum(x => x.TotalAmount), null))</td>*@
+            </tr>
+        </thead>
+    </table>
+
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    @*<a>Target của NVKD</a>
+        <a>Tổng:</a> <input type="text" readonly align="right" size="8" id="tongtien" style="color:red" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.TotalTarget)" name="tongtien" />
+        <a>Tổng Orlane:</a> <input type="text" readonly align="right" size="8" id="tongthu" style="color:lightseagreen" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.OrlaneTarget)" name="tongthu" />
+        <a>DS cũ Orlane:</a> <input type="text" readonly align="right" size="8" id="thanhtoan" style="color:dodgerblue" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.oldOrlaneTarget)" name="thanhtoan" />
+
+        <a>DS mới Orlane:</a><input type="text" readonly align="right" size="8" id="tienconno" style="color:blue" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.newOrlaneTarget)" name="tienconno" />
+        <a>DS Annayake:</a><input type="text" readonly align="right" size="8" id="annayake" style="color:cornflowerblue" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.newOrlaneTarget)" name="annayake" />
+        <a>DS Lennor Greyl:</a><input type="text" readonly align="right" size="8" id="LennorGreyl" style="color:cadetblue" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.newOrlaneTarget)" name="LennorGreyl" />*@
+
+
+}
+
+
+
+
+@section Scripts {
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+    </script>
+}

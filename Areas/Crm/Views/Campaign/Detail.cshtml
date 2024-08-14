@@ -1,0 +1,183 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Crm.Models
+
+@model CampaignViewModel
+
+@{
+    ViewBag.Title = "Thông tin chiến dịch";
+    bool isPopup = Request["popup"] != null && Request["popup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Campaign",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true,
+        AdvancedSearch = false,
+    };
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <p>@Html.Button(Wording.Edit, ButtonType.aTag, ButtonColor.Info, ButtonSize.Mini, true, IconType.Edit, IconSize.Default, false, new { @href = Url.Action("Edit", "Campaign", new { Id = Model.Id }) })</p>
+}
+
+<h4 class="green"><span>@Model.Name</span></h4>
+<div class="tabbable">
+    <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tabCustomer">
+        <li >
+            <a data-toggle="tab" href="#tab1">@Wording.Campaign_Detail</a>
+        </li>
+
+        <li class="active">
+            <a data-toggle="tab" href="#tab2"> SMS</a>
+        </li>
+       
+        <li>
+            <a data-toggle="tab" href="#tab3">Email</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane clearfix " id="tab1">
+            <div class="col-sm-12">
+                <div class="detail-view">
+                    <div class="row control-group">
+                        @Html.DetailViewItemFor2(model => model.Name)
+                    </div>
+                    <div class="row control-group">
+                        @Html.DetailViewItemFor2(model => model.Type)
+                    </div>
+                    <div class="row control-group">
+                        @Html.DetailViewItemFor2(model => model.Status)
+                    </div>
+                    <div class="row control-group">
+                        @Html.DetailViewItemFor2(model => model.StartDate)
+                    </div>
+                    <div class="row control-group">
+                        @Html.DetailViewItemFor2(model => model.EndDate)
+                    </div>
+                    <div class="row control-group">
+                        @Html.DetailViewItemFor2(model => model.BudgetedCost)
+                    </div>
+                    <div class="row control-group">
+                        @Html.DetailViewItemFor2(model => model.ExpectedRevenue)
+                    </div>
+                    <div class="row control-group">
+                        @Html.DetailViewItemFor2(model => model.ActualCost)
+                    </div>
+                    <div class="row control-group">
+                        @Html.DetailViewItemFor2(model => model.ExpectedResponse)
+                    </div>
+                    <div class="row control-group">
+                        @Html.DetailViewItemFor2(model => model.Commision)
+                    </div>
+                </div>
+                <p></p>
+            </div>
+        </div>
+        <div class="tab-pane clearfix active" id="tab2">
+            <div class="col-sm-12">
+                <p>
+                    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("searchsms", "SMSLog", "Crm"))
+                            {
+                                string whoCall = "SMS";
+                        //onclick="OpenPopup('@Url.Action("searchsms", "SMSLog", new { IsPopup = true, TargetID = Model.Id, TargetModule = "Campaign" })', 'Thêm mới SMS', 0, 0)"
+                        <a class="btn btn-mini btn-primary" onclick="location.href='@Url.Action("searchsms", "SMSLog",new { IsPopup = true, TargetID = Model.Id, TargetModule = "Campaign", whoCall})'">
+                            <i class="ace-icon fa fa-plus"></i>
+                            Thêm Khách Hàng
+                        </a>
+
+                    }
+                </p>
+
+                @Html.Action("ListSMS", "SMSLog", new { area = "Crm", TargetID = Model.Id, TargetModule = "Campaign" })
+            </div>
+        </div>
+        
+        <div class="tab-pane clearfix" id="tab3">
+            <div class="col-sm-12">
+                <p>
+                    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("searchsms", "SMSLog", "Crm"))
+                    {
+                        string whoCall = "EMAIL";
+                        //onclick="OpenPopup('@Url.Action("searchsms", "SMSLog", new { IsPopup = true, TargetID = Model.Id, TargetModule = "Campaign" })', 'Thêm mới SMS', 0, 0)"
+                    <a class="btn btn-mini btn-primary" onclick="location.href='@Url.Action("searchsms", "SMSLog",new { IsPopup = true, TargetID = Model.Id, TargetModule = "Campaign",whoCall })'">
+                        <i class="ace-icon fa fa-plus"></i>
+                        Thêm Khách Hàng
+                    </a>
+
+                    }
+                </p>
+
+                @Html.Action("ListEmail", "EmailLog", new { area = "Crm", TargetID = Model.Id, TargetModule = "Campaign" })
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        
+        function ClosePopupAndDoSomething() {
+            ClosePopup(true);
+            ShowLoading();
+        }
+        function ClosePopupAndRedirectToURL(url) {
+            ClosePopup(true);
+            location.href = url;
+        }
+
+        $(document).ready(function () {
+            $("#checkAll-SMS").change(function () {
+                $("input:checkbox").prop('checked', $(this).prop("checked"));
+            })
+        })
+
+            $('.class-delete-all-SMS').on('click', function () {
+                if ($('.class-delete-all-SMS:checked').length == $('.class-delete-all-SMS').length) {
+                    $('#checkAll-SMS').prop('checked', true);
+                } else {
+                    $('#checkAll-SMS').prop('checked', false);
+                }
+            });
+
+        $('.grid-header').mouseover(function () {
+            $('.grid-header')[0].title = "Chọn tất cả";
+            $('.grid-header')[7].title = "Chọn tất cả";
+        });
+    </script>
+}

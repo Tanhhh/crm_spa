@@ -1,0 +1,578 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+@model IEnumerable<Membership_parentViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        //var get= ViewBag.Thugon as IEnumerable<MembershipThuGonViewModel>;
+        ViewBag.Title = Wording.PageIndex_Membership;
+
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Membership",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        string type = (Request["type"] == null || Request["type"] == "SkinScan") ? "SkinScan" : "CheckingHair";
+        int rowNumber = 0;
+        int numberOfItem = 30;
+        int tongPage = ViewBag.TongTrang;
+        int currentPage = Request["page"] != null ? Convert.ToInt32(Request["page"]) : 1;
+
+        var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+        string status = Request["Status"] == null ? "pending" : Request["Status"];
+        // string branch = Request["BranchId"] == null ? Erp.BackOffice.Helpers.Common.CurrentUser.BranchId.Value.ToString() : Request["BranchId"];
+        string manager = Request["ManagerId"] == null ? "" : Request["ManagerId"];
+        List<MembershipViewModel> membership = (List<MembershipViewModel>)ViewBag.Membership;
+
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, 1, 1);
+        // Cộng thêm 1 tháng và trừ đi một ngày.
+        DateTime retDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
+    }
+    <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+    </script>
+    @section HeadOfPage {
+        <style>
+            .ui-ribbon {
+                position: relative;
+                display: block;
+                text-align: center;
+                font-size: 15px;
+                font-weight: 600;
+                color: #fff;
+                transform: rotate(43deg);
+                padding: 7px 0;
+                left: -2px;
+                top: 19px;
+                width: 140px;
+                line-height: 20px;
+                /*background-color: rgba(183, 51, 51, 0.94);*/
+                box-shadow: 0 0 3px rgba(0,0,0,.3);
+            }
+
+            .ui-ribbon-wrapper {
+                position: absolute;
+                overflow: hidden;
+                width: 108px;
+                height: 103px;
+                top: 0px;
+                right: 12px;
+                z-index: 1;
+            }
+
+            #myImg {
+                height: 70px !important;
+                width: 70px !important;
+            }
+
+            .search-media .search-actions {
+                width: 30% !important;
+                max-width: 250px !important;
+                min-width: 150px !important;
+            }
+
+            .fa-150 {
+                font-size: 1.5em;
+            }
+        </style>
+    }
+    @helper GridColumnCommand(Int64 id)
+    {
+        <p>
+            @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("PrintAllMBS", "Membership", "Sale"))
+            {
+                <a class="btn btn-mini btn-success" onclick="OpenPopup('@Url.Action("PrintAllMBS", "Membership", new {idPrintAll = id.ToString(), IsPopup = true })', '@Wording.Print', 0, 0);HideLoading();"><i class="ace-icon fa fa-print"></i></a>
+
+            }
+        </p>
+    }
+
+    @helper GridColumnName(string name, Int64 id, int ProductInvoiceId, bool isPopup = false, string jsCallback = null)
+    {
+        if (isPopup)
+        {
+            @*<a onclick="parent.@(jsCallback)(@id, '@name')">@name</a>*@
+            //<a id="detail_mbs_inquirycard" onclick="OpenPopup('@Url.Action("MembershipIndex", "Membership", new { IdParent = id, IsPopup = false, jsCallback = jsCallback })', '@Wording.PageDetail_Membership', 0, 0)">@name</a>
+            <a onclick="OpenPopup('@Url.Action("MembershipIndex", "Membership", new { IdParent = id, ProductInvoiceId=ProductInvoiceId, IsPopup = true })', '@Wording.PageDetail_Membership', 0, 0)">@name</a>
+
+        }
+        else
+        {
+            name = string.IsNullOrEmpty(name) ? "No Title" : name;
+            @*<a href="@Url.Action("MembershipIndex", "Membership", new { IdParent = id })">@name</a>*@
+            <a onclick="OpenPopup('@Url.Action("MembershipIndex", "Membership", new { IdParent = id, ProductInvoiceId=ProductInvoiceId, IsPopup = true })', '@Wording.PageDetail_Membership', 0, 0)">@name</a>
+
+        }
+    }
+
+    @helper GridColumnCategoryValue(object value)
+    {
+        var attr = Common.GetCategoryByValueOrId("value", value);
+        <span>@(attr != null ? attr.Name : "")</span>
+    }
+
+    @helper CheckPrintColumns(Int64 Id)
+    {
+        <label>
+            <input id="PrintId-checkbox" class="ace class-print-all" type="checkbox" name="PrintId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+    }
+    @helper GridColumnProductName(string ProductCode, string ProductName)
+    {
+        <span>@ProductCode - @ProductName</span>
+
+    }
+    @helper GridColumnStatusName(string status)
+    {
+        switch (status)
+        {
+            case "pending":
+                <a class="btn-info search-btn-action btn btn-sm btn-block">@Wording.Membership_Pending</a>
+                break;
+            case "tranfer":
+                <a class="btn-danger search-btn-action btn btn-sm btn-block">@Wording.Membership_Tranfer</a>
+
+                break;
+            case "complete":
+                <a class="btn-success search-btn-action btn btn-sm btn-block">@Wording.Membership_Complete</a>
+                break;
+            case "expired":
+                <a class="btn-default search-btn-action btn btn-sm btn-block">@Wording.Membership_Expired</a>
+                break;
+            case "inprocess":
+                <a class="btn-warning search-btn-action btn btn-sm btn-block">@Wording.Membership_Inprocess</a>
+                break;
+            case "TraHang":
+                <a class="btn-warning search-btn-action btn btn-sm btn-block">@Wording.TraHang</a>
+                break;
+        }
+    }
+
+    @helper renderCusstomer(int? CustomerId, string CustomerName)
+    {
+        @CustomerName
+        @*<a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = CustomerId, IsPopup = true })', '', 0, 0)">
+                @CusromerName
+            </a>*@
+    }
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <p>
+            <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+            <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+            <span class="input-daterange input-group">
+                @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : aDateTime.ToString("dd/MM/yyyy"), new { @class = "", autocomplete = "off", placeholder = "Từ ngày..." })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : retDateTime.ToString("dd/MM/yyyy"), new { @class = "", autocomplete = "off", placeholder = "Đến ngày..." })
+            </span>
+            @Html.TextBox("txtCode", Request["txtCode"], new { @class = "", autocomplete = "off", placeholder = "Mã phiếu MBS..." })
+            @Html.TextBox("txtCusCode", Request["txtCusCode"], new { @class = "", autocomplete = "off", placeholder = "Mã Hoặc Tên KH..." })
+            @*  @Html.TextBox("txtCusName", Request["txtCusName"], new { @class = "", autocomplete = "off", placeholder = "Tên KH..." })*@
+            @Html.TextBox("TargetCode", Request["TargetCode"], new { @class = "", autocomplete = "off", placeholder = "Mã đơn hàng..." })
+            @Html.TextBox("productCode", Request["productCode"], new { @class = "", autocomplete = "off", placeholder = "Mã hàng hóa..." })
+        </p>
+
+        <p>
+            @*@Html.DropDownList("BranchId", SelectListHelper.GetSelectList_Branch(branch, "Chi nhánh"))*@
+            @Html.DropDownList("ManagerId", SelectListHelper.GetSelectList_User(manager, "Người quản lý"))
+            @*@Html.DropDownList("CreateUserId", SelectListHelper.GetSelectList_User(Request["CreateUserId"], "Người lập phiếu"))*@
+            <span class="lbl"></span>
+
+            <label style="padding-left:10px"> Số phiếu còn lại</label>
+            <span class="input-group">
+                @Html.TextBox("PhieuConTu", Request["PhieuConTu"] != null ? Request["PhieuConTu"] : "", new { @class = "", autocomplete = "off", placeholder = "Từ ...", style = "width:50px" })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("PhieuConDen", Request["PhieuConDen"] != null ? Request["PhieuConDen"] : "", new { @class = "", autocomplete = "off", placeholder = "Đến ...", style = "width:50px" })
+            </span>
+        </p>
+    }
+    <script>
+
+        $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+            var started = $('#startDate').datepicker('getDate');
+            var finished = $('#endDate').datepicker('getDate');
+            var date;
+            //if (started >= finished) {
+            //    if (e.target.id == 'startDate') {
+            //        date = new Date(started);
+            //        date.setDate(started.getDate() - 1);
+            //        $('#startDate').datepicker('setDate', date);
+            //    }
+            //    if (e.target.id == 'endDate') {
+            //        date = new Date(finished);
+            //        date.setDate(finished.getDate() + 1);
+            //        $('#endDate').datepicker('setDate', date);
+            //    }
+            //}
+        });
+    </script>
+
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+    @helper GridColumnImage(string customercode, string name, string Image)
+    {
+        <div class="itemdiv commentdiv" style="height:72px!important;width:100%!important">
+            <div class="user" style="height:72px;width:100%!important;">
+                <div class="ace-thumbnails">
+                    <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))" title="@name" data-rel="colorbox" class="cboxElement">
+                        <img id="myImg" alt="@name" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))">
+                    </a>
+                </div>
+            </div>
+            <div class="body">
+                <div class="name" data-toggle="tooltip" title="Tên khách hàng">
+                    @name
+                </div>
+                <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+                    @customercode
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!isPopup)
+    {
+        //using (Html.BeginForm("PrintAllMBS", pageSetting.ModuleName, FormMethod.Post))
+        //{
+        <div id="membership" class="table table-responsive">
+            @Html.Grid(Model).Columns(columns =>
+            {
+                columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+                {
+                    rowNumber++;
+
+                    return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+});
+columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckPrintColumns(n.Id));
+columns.Add().Titled("Mã phiếu MBS").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Id, u.ProductInvoiceId, false, jsCallback));
+columns.Add(u => u.CreatedDate).Titled("Ngày lập phiếu").SetWidth(130).Format("{0:dd/MM/yyyy HH:mm}");
+columns.Add().Titled("Tên khách hàng").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => renderCusstomer(u.CustomerId, u.CustomerName));
+columns.Add().Titled(Wording.CustomerCode).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(n => n.CustomerCode);
+columns.Add().Titled("Hàng").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnProductName(u.ProductCode, u.ProductName));
+columns.Add().Titled("Số lần CSD").SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => u.Total.ToString());
+columns.Add().Titled("Số lần đã dùng").SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => u.solandadung.ToString());
+columns.Add().Titled("Số lần còn lại").SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => u.solanconlai.ToString());
+columns.Add(u => u.ManagerName).Titled(Wording.ManagerStaff).RenderValueAs(u => u.ManagerName);
+columns.Add(u => u.UserTypeName_kd).Titled("Nhóm").SetWidth(200).RenderValueAs(u => u.UserTypeName_kd);
+columns.Add(u => u.TargetCode).Titled("Đơn hàng").RenderValueAs(u => u.TargetCode);
+columns.Add(u => u.Id).Titled(Wording.Print).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+
+//columns.Add(u => u.ExpiryDate).Titled(Wording.ExpiryDate).SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+}).WithPaging(30)
+        </div>
+        <div class="container" style="margin-top: 6px;width: auto;background-color: #eff3f8;height: 60px;/* background-color: aqua; */">
+
+
+            <div class="row">
+
+                <div style="float:right;margin-right:20px;margin-top:14px">
+                    <label>Trang</label>
+                    <input id="trang" name="trang" type="text" style="width :50px; height: 27px" placeholder="@currentPage/@tongPage" />
+                    <div style="float:left; margin-right:50px" id="paged"></div>
+                    @*<label>Số dòng</label>
+                        <input id='SoTrang1' style="width :30px; height: 27px; border: 1px solid #D5D5D5" placeholder=@numberOfItem />*@
+                </div>
+            </div>
+
+
+        </div>
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("PrintAllMBS", "Membership", "Sale"))
+            {
+                <a id="PrintAll" name="PrintAll" value="PrintAll" href="" target="_blank" class="btn btn-white btn-success btn-sm" onclick="return CheckIsval();">
+                    <i class="ace-icon fa fa-print"></i>
+                    In phiếu MBS
+                </a>
+            }
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("ChangeMBS", "Membership", "Sale"))
+            {
+                <a id="PrintAll" name="PrintAll" value="PrintAll" href="@Url.Action("ChangeMBS","Membership","Sale")" target="_blank" class="btn btn-white btn-danger btn-sm">
+                    <i class="ace-icon fa fa-recycle"></i>
+                    Chuyển đổi MBS
+                </a>
+            }
+
+            <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(true)">
+                <i class="ace-icon fa fa-file-excel-o"></i>
+                Xuất excel
+            </button>
+
+        }
+        //}
+    }
+    else
+    {
+        <div class="table table-responsive">
+            @Html.Grid(Model).Columns(columns =>
+            {
+                columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+                {
+                    rowNumber++;
+
+                    return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+});
+columns.Add().Titled("Mã phiếu MBS").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Id, u.ProductInvoiceId, true, jsCallback));
+columns.Add(u => u.CreatedDate).Titled("Ngày lập phiếu").SetWidth(130).Format("{0:dd/MM/yyyy HH:mm}");
+columns.Add().Titled("Tên khách hàng").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => renderCusstomer(u.CustomerId, u.CustomerName));
+columns.Add().Titled("Hàng").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnProductName(u.ProductCode, u.ProductName));
+columns.Add().Titled("Số lần CSD").SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => u.Total.ToString());
+columns.Add().Titled("Số lần đã dùng").SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => u.solandadung.ToString());
+columns.Add().Titled("Số lần còn lại").SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => u.solanconlai.ToString());
+columns.Add(u => u.ManagerName).Titled(Wording.ManagerStaff).RenderValueAs(u => u.ManagerName);
+columns.Add(u => u.UserTypeName_kd).Titled("Nhóm").RenderValueAs(u => u.UserTypeName_kd);
+columns.Add(u => u.ChiefUserFullName).Titled("Nhóm trưởng").RenderValueAs(u => u.ChiefUserFullName);
+
+//columns.Add(u => u.ExpiryDate).Titled(Wording.ExpiryDate).SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+}).WithPaging(30)
+        </div>
+    }
+
+
+
+    @section Scripts {
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+        <script type="text/javascript">
+
+            function PaggingTemplate(totalPage, currentPage) {
+                var template = "";
+                var TotalPages = totalPage;
+                var CurrentPage = currentPage;
+                var PageNumberArray = Array();
+
+
+                var countIncr = 1;
+                for (var i = currentPage; i <= totalPage; i++) {
+                    PageNumberArray[0] = currentPage;
+                    if (totalPage != currentPage && PageNumberArray[countIncr - 1] != totalPage) {
+                        PageNumberArray[countIncr] = i + 1;
+                    }
+                    countIncr++;
+                };
+                PageNumberArray = PageNumberArray.slice(0, 5);
+                var FirstPage = 1;
+                var LastPage = totalPage;
+                if (totalPage != currentPage) {
+                    var ForwardOne = currentPage + 1;
+                }
+                var BackwardOne = 1;
+                if (currentPage > 1) {
+                    BackwardOne = currentPage - 1;
+                }
+
+
+
+
+                template = template + '<ul class="pager" style="margin-top: 10px;overflow: hidden; float: left;" >' +
+                    '<li><a class="btnPaged" href="#" onclick="GetPageData(' + FirstPage + ')">' +
+                    //'<i class="fa fa-angle-double-left"></i>' +
+                    FirstPage +
+                    '</a ></li > ' +
+                      '<li><a class="btnPaged PageActive page-number" href="#" onclick="GetPageData(' + BackwardOne + ')"><i class="fa fa-angle-left"></i></a>';
+
+                var numberingLoop = "";
+                numberingLoop = numberingLoop + '<a class="page-number active PageActive btnPaged" href="#">' + CurrentPage + '</a>'
+
+                template = template + numberingLoop + '<a class="btnPaged" href="#" onclick="GetPageData(' + ForwardOne + ')" >' +
+                    '<i class="fa fa-angle-right"></i></a ></li > ' +
+                    '<li class="btnPaged"><a class="btnPaged" href="#" onclick="GetPageData(' + LastPage + ')">' +
+                    LastPage +
+                    //'<i class="fa fa-angle-double-right btnPaged"></i>' +
+                    '</a ></li ></ul > ';
+
+                $("#paged").append(template);
+                $('#custom-select').change(function () {
+                    GetPageData($(this).val());
+                    $("#custom-select").val($(this).val());
+                    HideLoading();
+                });
+
+                $('#NumberPage').keyup(function (event) {
+                    if (window.event.keyCode == 13 || window.event.which == 13) {
+                        event.preventDefault();
+                        GetPageData($('#NumberPage').val());
+                        HideLoading();
+                    }
+                });
+            };
+            function GetPageData(page){
+                var x = page;
+                var url = window.location.href;
+
+                if (url.includes("?page=" +@currentPage) || url.includes("&page=" +@currentPage)) {
+                    var url = url.replace("page=" +@currentPage, "page=" + x);
+                }
+                else {
+                    if (!url.includes("grid-page=") && url.includes("?")) {
+                        var url = url + "&page=" + x;
+                    }
+                    else {
+                        var url = url + "?page=" + x;
+                    }
+                }
+                window.location.href = url;
+            }
+            $('#trang').keypress(function(event){
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if(keycode == '13'){
+                    var x = document.getElementById('trang').value;
+                    var url = window.location.href;
+
+                    if (url.includes("?page=" +@currentPage) || url.includes("&page=" +@currentPage)) {
+                        var url = url.replace("page=" +@currentPage, "page=" + x);
+                    }
+                    else {
+                        if (!url.includes("grid-page=") && url.includes("?")) {
+                            var url = url + "&page=" + x;
+                        }
+                        else {
+                            var url = url + "?page=" + x;
+                        }
+                    }
+                    window.location.href = url;
+                }
+            });
+            $(document).ready(function () {
+               // $("#CTable").freezeHeader({ 'offset': '30px' });
+                PaggingTemplate(@tongPage,@currentPage);
+            })
+
+
+        function MembershipDelete(id) {
+            if (confirm('Bạn có chắc muốn xóa item đã chọn ?')) {
+                ShowLoading();
+                $.post("@Url.Action("Delete", "Membership", new { area = "Sale" })", { id: id })
+            .done(function (data) {
+                $("#delete_" + id).closest('div').remove();
+                HideLoading();
+            });
+            return false;
+        }
+        else {
+                return false;
+        }
+        };
+            $('.class-print-all').on('click', function () {
+                if ($('.class-print-all:checked').length == $('.class-print-all').length) {
+                    $('#checkAll').prop('checked', true);
+                } else {
+                    $('#checkAll').prop('checked', false);
+                }
+            });
+        $('.grid-header').mouseover(function () {
+            $('.grid-header')[1].title = "Chọn tất cả";
+        });
+        </script>
+
+        <script>
+            function selectItem_TargetId(id, name) {
+                parent.selectItem_TargetId(id, name);
+                ClosePopup();
+
+            }
+
+            function CheckIsval() {
+                if ($('.class-print-all').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn in các item đã chọn ?')) {
+                        var idPrintAll = '';
+                        $('input.class-print-all:checked').each(function () {
+                            idPrintAll = idPrintAll + "," + $(this).val();
+                        });
+                        idPrintAll = idPrintAll.substring(1, idPrintAll.length);
+                        var oldurl = "/Membership/PrintAllMBS?idPrintAll=";
+                        var newurl = oldurl + idPrintAll;
+                        $("#PrintAll").attr("href", newurl);
+                        //location.href = '/Membership/PrintAllMBS?id=' + id + '&idPrintAll=' + idPrintAll;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+
+
+
+
+            function GetPrint(type) {
+                debugger
+                var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+                var txtCusInfo = $('#txtCusInfo').val();
+                var txtCode = $('#txtCode').val();
+                var TargetCode = $('#TargetCode').val();
+                var productCode = $('#productCode').val();
+                var type = $('#type').val();
+                var ManagerId = $('#ManagerId').val();
+                var CreateUserId = $('#CreateUserId').val();
+                OpenPopup('/Membership/ExportExcel?&startDate=' + startDate + '&endDate=' + endDate +
+                    '&CusInfo=' + txtCusInfo + 'txtCode=' + txtCode + '&TargetCode=' + TargetCode + '&productCode=' + productCode + '&type=' + type + '&ManagerId=' + ManagerId + '&CreateUserdId' + CreateUserId + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 200000);
+                HideLoading();
+            };
+        </script>
+
+    }
+

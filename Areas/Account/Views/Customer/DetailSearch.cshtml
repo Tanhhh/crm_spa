@@ -1,0 +1,440 @@
+﻿@model Erp.BackOffice.Account.Models.CustomerViewModel
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using Erp.Domain.Account.Entities
+@using Erp.Domain.Sale.Entities
+@using GridMvc.Html
+
+@{
+    if (ViewBag.IsNullLayOut == true)
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    }
+    ViewBag.Title = "Thông tin chi tiết khách hàng";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Customer",
+        ActionName = "DetailSearch",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = Request["IsDetailChart"] != null ? false : true,
+    };
+    IEnumerable<ProductInvoiceViewModel> serviceInvoice = (IEnumerable<ProductInvoiceViewModel>)ViewBag.service;
+
+    IEnumerable<LogVipViewModel> serviceLogVip = (IEnumerable<LogVipViewModel>)ViewBag.serviceLogVip;
+    IEnumerable<LogVipViewModelCrm> ListLogVipViewModelCrm = (IEnumerable<LogVipViewModelCrm>)ViewBag.ListLogVipViewModelCrm;
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+<style>
+    .img_user {
+        width: 40px !important;
+        height: 40px !important;
+        margin: 0 auto;
+        /* display: block; */
+        border-radius: 100%;
+        border: 2px solid;
+    }
+
+    .user_check {
+        width: 30px !important;
+    }
+</style>
+
+@helper GridColumnName(string name, int id)
+{
+    name = string.IsNullOrEmpty(name) ? "No Title" : name;
+    <a href="@Url.Action("UsingServiceLog", "Service", new {area="Sale", Id = id })">@name</a>
+
+}
+
+@helper GridColumnStaffName(int? userId)
+{
+    var staff = Common.GetStaffByUserId(userId.Value);
+    <span>@(staff != null ? staff.Name : "-")</span>
+}
+
+@if (ViewBag.IsNullLayOut != true)
+{
+    using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+    }
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+<div class="row">
+    <div class="col-sm-7">
+        <h4 class="green">
+            Khách hàng: @Model.CompanyName
+            <a class="btn btn-sm btn-white btn-primary pull-right red" onclick="OpenPopup('@Url.Action("LiabilitiesDetail", "TransactionLiabilities", new { TargetModule = "Customer", TargetCode = Model.Code, TargetName = Model.CompanyName, popup = true })', 'Chi tiết công nợ', 0, 500)">
+                <b>Công nợ: @(Model.Liabilities >= 0 ? Common.PhanCachHangNgan2(Model.Liabilities) : "-" + Common.PhanCachHangNgan2(Math.Abs(Model.Liabilities)))</b>
+            </a>
+        </h4>
+        <div class="tabbable top-10">
+            @*<ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tabCustomer1">
+                    @*<li id="tab_li_1" class="active">
+                    <a data-toggle="tab" href="#tab_1">Số lần sử dụng dịch vụ</a>
+                </li>*@
+            @*<li id="tab_li_2" class="active">
+                        <a data-toggle="tab" href="#tab_2">Lịch sử hóa đơn</a>
+                    </li>
+                    <li id="tab_li_2" class="active">
+                        <a data-toggle="tab" href="#tab_2">Lịch sử hóa đơn</a>
+                    </li>
+                </ul>*@
+
+            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tabCustomer1">
+                <li id="tab_li_HD">
+                    <a data-toggle="tab" href="#tab_HD">Lịch sử hoá đơn</a>
+                </li>
+                <li id="tab_li_XH">
+                    <a data-toggle="tab" href="#tab_XH">Lịch sử xếp hạng</a>
+                </li>
+                <li id="tab_li_LH" class="active">
+                    <a data-toggle="tab" href="#tab_LH">Lịch hẹn</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                @*<div class="tab-pane active clearfix" id="tab_1">
+                        @{Html.RenderAction("UsingService", "Service", new { area = "Sale", CustomerId = Model.Id, popup = true, IsNullLayOut = true });}
+                    </div>*@
+                <div class="tab-pane  clearfix" id="tab_HD">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width:130px">Ngày chứng từ</th>
+                                    <th style="width:110px">Mã chứng từ</th>
+                                    <th style="width:180px">Nhân viên lập phiếu</th>
+                                    <th style="width:100px">Số tiền</th>
+                                    <th>Chi nhánh</th>
+                                </tr>
+                            </thead>
+                            <tbody class="detailList">
+                                @foreach (var i in serviceInvoice)
+                                {
+                                    <tr>
+                                        <td>@i.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td class="has-error">
+
+                                            @if (Request["IsDetailChart"] == null || Request["IsDetailChart"] != "true")
+                                            {
+                                                <a href="@Url.Action("Detail", "ProductInvoice", new { area = "Sale", Id = i.Id })">@i.Code</a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@Url.Action("Detail", "ProductInvoice", new { area = "Sale", Id = i.Id, IsPopUp= true, IsChart = true })">@i.Code</a>
+                                            }
+                                        </td>
+                                        <td>@i.StaffCreateName</td>
+                                        <td class="text-right">@Common.PhanCachHangNgan2(i.TotalAmount)</td>
+                                        <td>@i.BranchName</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <div class="tab-pane active clearfix" id="tab_XH">
+                    @*<div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th style="width:130px">Năm</th>
+                                        <th style="width:110px">Xếp hạng</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="detailList">
+                                    @foreach (var i in serviceLogVip)
+                                    {
+                                        <tr>
+                                            <td>@i.Year</td>
+                                            <td>@i.Ratings</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>*@
+                </div>
+
+
+
+
+                <div class="tab-pane active clearfix" id="tab_LH">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th style="width:130px">Hoạt động</th>
+                                    <th style="width:110px">Mô tả</th>
+                                    <th style="width:180px">Thời gian hẹn</th>
+                                    <th style="width:80px">Hoàn thành</th>
+                                </tr>
+                            </thead>
+                            <tbody class="detailList">
+
+                                @if (ViewBag.ListLogVipViewModelCrm != null)
+                                {
+                                    foreach (var i in ListLogVipViewModelCrm)
+                                    {
+                                        <tr>
+                                            <td>@i.Chude</td>
+                                            <td>@i.Mota</td>
+                                            <td>@i.Thoigianhen</td>
+                                            <td>@i.Hoanthanh</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-5">
+        <div class="tabbable">
+            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tabCustomer2">
+                <li id="tab_li_KH" class="active">
+                    <a data-toggle="tab" href="#tab_KH">Thông tin khách hàng</a>
+                </li>
+                <li id="tab_li_LH">
+                    <a data-toggle="tab" href="#tab_LH">Thông tin liên hệ</a>
+                </li>
+                <li id="tap_li_DG">
+                    <a data-toggle="tab" href="#tab_DG">Đánh giá khách hàng</a>
+                </li>
+
+                @*<li id="tab_li_CK">
+                        <a data-toggle="tab" href="#tab_CK">Bản cam kết</a>
+                    </li>*@
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active clearfix" id="tab_KH">
+                    @Html.Partial("DetailSidebar", Model)
+                </div>
+                <div class="tab-pane clearfix" id="tab_LH">
+                    @Html.Partial("DetailContact", Model)
+                </div>
+                <div class="tab-pane clearfix" id="tab_DG">
+                    @Html.Partial("DetailReview", Model)
+                </div>
+
+                @*<div class="tab-pane clearfix" id="tab_CK">
+                        @{Html.RenderAction("Index", "CustomerCommitment", new { area = "Account", CustomerId = Model.Id });}
+                    </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    if (Request["IsDetailChart"] == null || Request["IsDetailChart"] != "true")
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("EditNT", "Customer", "Account"))
+        {
+            <a class="btn btn-mini btn-primary" href="@Url.Action("EditNT", pageSetting.ModuleName, new { Id = Model.Id })">
+                <i class="ace-icon fa fa-edit"></i>
+                @Wording.Edit
+            </a>
+        }
+    }
+    //if (Model.IsActived != true)
+    // {
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "AdviseCard", "Sale"))
+    {
+        @*<a class="btn btn-primary btn-mini" target="_blank" href="@Url.Action("Create", "AdviseCard", new { TargetId = Model.Id, TargetModule="Customer" })">
+                <i class="ace-icon fa fa-plus"></i>
+                Lập phiếu yêu cầu
+            </a>*@
+        <a class="btn btn-primary btn-mini" href="@Url.Action("Create", "AdviseCard",new { area="Sale",Id=Model.Id, IsPopup =false})">
+            <i class="ace-icon fa fa-plus"></i>
+            Lập phiếu yêu cầu
+        </a>
+    }
+    //}
+
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $('[data-rel=tooltip]').tooltip({ container: 'body' });
+        });
+
+        $(function () {
+            $('#Amount').numberFormat();
+            var amountRemain = 0;
+            $('input[type=radio][name=TransactionId]').change(function () {
+                //console.log(this.value);
+                $('#OriginalTransactionId').val(this.value);
+                amountRemain = parseFloat($(this).data("remain"));
+                //console.log(amountRemain);
+                $('#mask-Amount').val(currencyFormat(amountRemain));
+                $('#Amount').val(amountRemain);
+                $("#Thanhtoan").show();
+                $(".alert-required-transactionId").hide();
+
+                if ($(this).data("hasprocesspayment")) {
+                    $('#ProcessPaymentId').val($('.ProcessPaymentId:checked').val());
+                    var amount = $('.ProcessPaymentId:checked').data("amount");
+                    $('#mask-Amount').val(currencyFormat(amount));
+                    $('#Amount').val(amount);
+
+                    $('#mask-Amount').attr('readonly', 'readonly');
+
+                    checkNextPaymentDate();
+                    $('#NextPaymentDate').val($(this).data("nextpaymentdate"));
+                    $('#NextPaymentDate').attr('readonly', 'readonly');
+                }
+                else {
+                    $('#ProcessPaymentId').val(0);
+                    $('#mask-Amount').removeAttr('readonly');
+                    $('#NextPaymentDate').removeAttr('readonly');
+                }
+            });
+
+            $('#usingservice').show();
+            $('#mask-Amount').blur(function () {
+                checkNextPaymentDate();
+            });
+
+            $('#mask-Amount').focus(function () {
+                $(this).select();
+            });
+
+            $('#mask-Amount').keypress(function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                }
+            });
+
+            function checkNextPaymentDate() {
+                if (parseFloat($('#Amount').val()) < amountRemain) {
+                    $('.NextPaymentDate-container').show();
+                    $('#AmountRemain').val(currencyFormat(amountRemain - parseFloat($('#Amount').val())));
+                }
+                else {
+                    $('.NextPaymentDate-container').hide();
+                }
+            }
+        });
+
+        function ResolveLiabilities_OnSuccess(rs) {
+            location.reload();
+        }
+
+        function checkOnSubmit() {
+            if ($('#OriginalTransactionId').val() == '') {
+                $(".alert-required-transactionId").show();
+                return false;
+            }
+            else {
+                $(".alert-required-transactionId").hide();
+                return true;
+            }
+        }
+        //đóng thẻ div tập tin
+        function AllowClose() {
+            $("#Thanhtoan").hide();
+        }
+
+        document.getElementById("showTakePhotoForm").onclick = function () {
+            var checkbox = document.getElementsByName("UserId");
+            for (var i = 0; i < checkbox.length; i++) {
+                if (checkbox[i].checked === true) {
+                    //alert(checkbox[i].value);
+                    $("#modalPayment").modal("hide");
+                    OpenPopup('@Url.Action("TakePhoto", "Customer", new {Id = Model.Id })?UserId=' + checkbox[i].value + '&IsPopup=true', 'Chụp hình khách hàng', 0, 420);
+                }
+            }
+        };
+        function clickActive(elem, id) {
+            //  console.log(1111);
+            var $this = $(elem);
+
+            var $chekbox = $this.find('input[type="checkbox"]');
+            var $label = $this.find('label[name="label_' + id + '"]');
+            if ($chekbox.is(':checked')) {
+                $chekbox.prop('checked', false);
+                $label.removeClass('active');
+            } else {
+                $chekbox.prop('checked', true);
+                $label.addClass('active');
+            }
+            //$('span[id="count_check_' + id + '"]').text($this.parent().find(' > label.active').length);
+        }
+
+    </script>
+
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js" type="text/javascript"></script>
+    <script src="~/signalr/hubs"></script>
+    <script type="text/javascript">
+        $(function () {
+            var erpHub = $.connection.erpHub;
+
+            // Start the connection.
+            $.connection.hub.start().done(function () {
+
+            });
+
+            $('#myModal').on('hidden.bs.modal', function () {
+                var checkbox = document.getElementsByName("UserId");
+                for (var i = 0; i < checkbox.length; i++) {
+                    if (checkbox[i].checked === true) {
+                        erpHub.server.loadUrl('/Customer/Client', checkbox[i].value);
+                    }
+                }
+            });
+        });
+
+
+    </script>
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}
+
+

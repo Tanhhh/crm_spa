@@ -1,0 +1,87 @@
+﻿@model  IEnumerable<UserHistoryViewModel>
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Areas.Administration.Models
+@using GridMvc.Html
+@using Erp.BackOffice.Administration.Controllers
+@{
+    ViewBag.Title = "Hoạt động người dùng";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "User",
+        ActionName = "UserHistory",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int rowNumber = 0;
+    int numberOfItem = 10;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);//new DateTime(DateTime.Now.Year, 1, 1);
+                                                                                               // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);//new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddDays(-1);
+
+}
+
+@helper GridColumnName(string userName, string action)
+{
+    <a href="~/@action" target="_blank">@userName</a>
+
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+        <select class="chzn-select" style="width:250px; float:left" id="userId" name="userId">
+            <option value="">- Người dùng -</option>
+            @foreach (var item in SelectListHelper.GetSelectList_User(null, null))
+            {
+                <option @(Request["userId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <span class="input-daterange input-group">
+            @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : aDateTime.ToString("dd/MM/yyyy"), new { @class = "", autocomplete = "off", placeholder = "Từ ngày..." })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : retDateTime.ToString("dd/MM/yyyy"), new { @class = "", autocomplete = "off", placeholder = "Đến ngày..." })
+        </span>
+        
+    </p>
+}
+
+
+@Html.Grid(Model).Columns(columns =>
+{
+
+columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+{
+rowNumber++;
+return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+});
+
+columns.Add(u => u.UserName).Titled("Người dùng").Sortable(true).SetWidth(150).Sanitized(false).Encoded(false);
+columns.Add(u => u.CreatedDate).Titled("Ngày").Sortable(true).SetWidth(120).Css("text-center");
+columns.Add(u => u.Content).Titled("Hoạt động").SetWidth(200).Sanitized(false).Encoded(false).RenderValueAs(x => GridColumnName(x.Content, x.Action));
+
+
+}).WithPaging(50).Selectable(false)
+
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+@*@Html.ScriptBottom_ChosenStyle()*@
+}

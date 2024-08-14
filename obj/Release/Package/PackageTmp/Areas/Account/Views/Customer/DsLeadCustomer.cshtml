@@ -1,0 +1,20 @@
+﻿@using Erp.BackOffice.Sale.Models;
+@model IEnumerable<LeadModel>
+    @{
+        Layout = "";
+        int stt = 1;
+        var user = ViewBag.user as Erp.Domain.Interfaces.IUserRepository;
+    }
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@(stt++)</td>
+            <td><a onclick="DetailLead(@item.Id,0)">@item.LeadName</a></td>
+            <td>@item.Name</td>
+            <td>@(user.GetUserById(item.ReceptionStaffId??0)!=null? user.GetUserById(item.ReceptionStaffId ?? 0).FullName:"")</td>
+            <td>@item.CreatedDate</td>
+            <td>@item.Email</td>
+            <td>@item.Address</td>
+            <td>@item.Mobile</td>
+        </tr>
+    }

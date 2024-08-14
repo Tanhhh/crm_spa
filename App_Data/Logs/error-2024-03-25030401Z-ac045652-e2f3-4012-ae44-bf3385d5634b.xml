@@ -1,0 +1,204 @@
+﻿<error errorId="ac045652-e2f3-4012-ae44-bf3385d5634b" application="/LM/W3SVC/2/ROOT" host="PCHOA" type="System.Web.HttpException" message="A public action method 'AdminView' was not found on controller 'Erp.BackOffice.Administration.Controllers.UserController'." source="System.Web.Mvc" detail="System.Web.HttpException (0x80004005): A public action method 'AdminView' was not found on controller 'Erp.BackOffice.Administration.Controllers.UserController'.&#xD;&#xA;   at System.Web.Mvc.Controller.HandleUnknownAction(String actionName)&#xD;&#xA;   at System.Web.Mvc.Controller.&lt;&gt;c__DisplayClass1d.&lt;BeginExecuteCore&gt;b__18(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.&lt;&gt;c__DisplayClass8.&lt;BeginProcessRequest&gt;b__3(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="025871002" time="2024-03-25T03:04:01.4348555Z" statusCode="404">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_ACCEPT:text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br, zstd&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:en-US,en;q=0.9&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=5x4bqlih4s5q1jimzqnojc4s; __RequestVerificationToken=Y6TYp97GsAgm1cKn2cSq9MEEVSY0J4itiIDmQNQtD9n4C_LQJPNJ2BxwTFFmXfyJSkdRVyucUmOYROQ3NbX5pQ7mADBFXm8xMt5CmBAWgcs1; BO=9C41A7B992A47D076AE86767E0598D9C88EB13F40386450F9F49C1C6D0599EF478006368F61E37B3C20D8269BD58651637719B257F544A44023ABFA2419349E4F673D5AD6377893E54529B84221ED0609DB0B9269E041982C73ADBF7626EED4C; BRANCH_ID_CookieName=2048; LOAICHUCVUCookie=5; PostionCookie=1&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36&#xD;&#xA;HTTP_UPGRADE_INSECURE_REQUESTS:1&#xD;&#xA;HTTP_SEC_PURPOSE:prefetch;prerender&#xD;&#xA;HTTP_PURPOSE:prefetch&#xD;&#xA;HTTP_SEC_FETCH_SITE:none&#xD;&#xA;HTTP_SEC_FETCH_MODE:navigate&#xD;&#xA;HTTP_SEC_FETCH_USER:?1&#xD;&#xA;HTTP_SEC_FETCH_DEST:document&#xD;&#xA;HTTP_SEC_CH_UA:&quot;Chromium&quot;;v=&quot;122&quot;, &quot;Not(A:Brand&quot;;v=&quot;24&quot;, &quot;Google Chrome&quot;;v=&quot;122&quot;&#xD;&#xA;HTTP_SEC_CH_UA_MOBILE:?0&#xD;&#xA;HTTP_SEC_CH_UA_PLATFORM:&quot;Windows&quot;&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Connection: keep-alive&#xD;&#xA;Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7&#xD;&#xA;Accept-Encoding: gzip, deflate, br, zstd&#xD;&#xA;Accept-Language: en-US,en;q=0.9&#xD;&#xA;Cookie: ASP.NET_SessionId=5x4bqlih4s5q1jimzqnojc4s; __RequestVerificationToken=Y6TYp97GsAgm1cKn2cSq9MEEVSY0J4itiIDmQNQtD9n4C_LQJPNJ2BxwTFFmXfyJSkdRVyucUmOYROQ3NbX5pQ7mADBFXm8xMt5CmBAWgcs1; BO=9C41A7B992A47D076AE86767E0598D9C88EB13F40386450F9F49C1C6D0599EF478006368F61E37B3C20D8269BD58651637719B257F544A44023ABFA2419349E4F673D5AD6377893E54529B84221ED0609DB0B9269E041982C73ADBF7626EED4C; BRANCH_ID_CookieName=2048; LOAICHUCVUCookie=5; PostionCookie=1&#xD;&#xA;Host: localhost:53200&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36&#xD;&#xA;Upgrade-Insecure-Requests: 1&#xD;&#xA;Sec-Purpose: prefetch;prerender&#xD;&#xA;Purpose: prefetch&#xD;&#xA;Sec-Fetch-Site: none&#xD;&#xA;Sec-Fetch-Mode: navigate&#xD;&#xA;Sec-Fetch-User: ?1&#xD;&#xA;Sec-Fetch-Dest: document&#xD;&#xA;sec-ch-ua: &quot;Chromium&quot;;v=&quot;122&quot;, &quot;Not(A:Brand&quot;;v=&quot;24&quot;, &quot;Google Chrome&quot;;v=&quot;122&quot;&#xD;&#xA;sec-ch-ua-mobile: ?0&#xD;&#xA;sec-ch-ua-platform: &quot;Windows&quot;&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="025871002" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="025871002" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="025871002" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="0" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/User/AdminView" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TranghaERP\4.Source\ERP_TRANGHA\src\Erp.BackOffice\User\AdminView" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="4866" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="GET" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/User/AdminView" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/User/AdminView" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br, zstd" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="en-US,en;q=0.9" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=5x4bqlih4s5q1jimzqnojc4s; __RequestVerificationToken=Y6TYp97GsAgm1cKn2cSq9MEEVSY0J4itiIDmQNQtD9n4C_LQJPNJ2BxwTFFmXfyJSkdRVyucUmOYROQ3NbX5pQ7mADBFXm8xMt5CmBAWgcs1; BO=9C41A7B992A47D076AE86767E0598D9C88EB13F40386450F9F49C1C6D0599EF478006368F61E37B3C20D8269BD58651637719B257F544A44023ABFA2419349E4F673D5AD6377893E54529B84221ED0609DB0B9269E041982C73ADBF7626EED4C; BRANCH_ID_CookieName=2048; LOAICHUCVUCookie=5; PostionCookie=1" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36" />
+    </item>
+    <item name="HTTP_UPGRADE_INSECURE_REQUESTS">
+      <value string="1" />
+    </item>
+    <item name="HTTP_SEC_PURPOSE">
+      <value string="prefetch;prerender" />
+    </item>
+    <item name="HTTP_PURPOSE">
+      <value string="prefetch" />
+    </item>
+    <item name="HTTP_SEC_FETCH_SITE">
+      <value string="none" />
+    </item>
+    <item name="HTTP_SEC_FETCH_MODE">
+      <value string="navigate" />
+    </item>
+    <item name="HTTP_SEC_FETCH_USER">
+      <value string="?1" />
+    </item>
+    <item name="HTTP_SEC_FETCH_DEST">
+      <value string="document" />
+    </item>
+    <item name="HTTP_SEC_CH_UA">
+      <value string="&quot;Chromium&quot;;v=&quot;122&quot;, &quot;Not(A:Brand&quot;;v=&quot;24&quot;, &quot;Google Chrome&quot;;v=&quot;122&quot;" />
+    </item>
+    <item name="HTTP_SEC_CH_UA_MOBILE">
+      <value string="?0" />
+    </item>
+    <item name="HTTP_SEC_CH_UA_PLATFORM">
+      <value string="&quot;Windows&quot;" />
+    </item>
+  </serverVariables>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="5x4bqlih4s5q1jimzqnojc4s" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="Y6TYp97GsAgm1cKn2cSq9MEEVSY0J4itiIDmQNQtD9n4C_LQJPNJ2BxwTFFmXfyJSkdRVyucUmOYROQ3NbX5pQ7mADBFXm8xMt5CmBAWgcs1" />
+    </item>
+    <item name="BO">
+      <value string="9C41A7B992A47D076AE86767E0598D9C88EB13F40386450F9F49C1C6D0599EF478006368F61E37B3C20D8269BD58651637719B257F544A44023ABFA2419349E4F673D5AD6377893E54529B84221ED0609DB0B9269E041982C73ADBF7626EED4C" />
+    </item>
+    <item name="BRANCH_ID_CookieName">
+      <value string="2048" />
+    </item>
+    <item name="LOAICHUCVUCookie">
+      <value string="5" />
+    </item>
+    <item name="PostionCookie">
+      <value string="1" />
+    </item>
+  </cookies>
+</error>

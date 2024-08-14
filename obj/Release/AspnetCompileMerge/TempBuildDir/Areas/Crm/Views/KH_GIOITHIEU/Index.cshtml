@@ -1,0 +1,415 @@
+﻿@model IEnumerable<CRM_KH_GIOITHIEUViewModel>
+
+    @using Erp.BackOffice.Account.Models
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Areas.Cms.Models
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = "Khách hàng giới thiệu";
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "KH_GIOITHIEU",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int rowNumber = 0;
+        int numberOfItem = 30;
+        int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+        var path = Erp.BackOffice.Helpers.Common.GetSetting("KH_GIOITHIEU");
+        IEnumerable<CategoryViewModel> TRANGTHAIGIOITHIEU = (IEnumerable<CategoryViewModel>)ViewBag.TRANGTHAIGIOITHIEU;
+        IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.User;
+    }
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    <style>
+        .popover {
+            width: 100% !important;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 10px;
+        }
+    </style>
+    @helper CheckDeleteColumns(int? KH_GIOITHIEU_ID)
+        {
+            <label>
+                <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_GIOITHIEU_ID">
+                <span class="lbl"></span>
+            </label>
+}
+    @helper BuildCheckAll()
+        {
+            <label>
+                <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+                <span class="lbl"></span>
+            </label>
+}
+
+    @helper GridColumnCommand(int? KH_GIOITHIEU_ID)
+        {
+            <p>
+                <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                </button>
+            </p>
+}
+
+    @helper GridColumnName(int? KHACHHANG_ID, int? KH_GIOITHIEU_ID, string name, bool isPopup = true, string jsCallback = null)
+        {
+            @*<a href="@Url.Action("Create", "KH_GIOITHIEU", new { KH_GIOITHIEU_ID = KH_GIOITHIEU_ID,onclick = "OpenPopup('" + Url.Action("Create","KH_GIOITHIEU", new { IsPopup = true }) + "', '', 0, 0)"  })">@name</a>*@
+            <a onclick="OpenPopup('@Url.Action("Create", "KH_GIOITHIEU", new { area = "Crm", KH_GIOITHIEU_ID = KH_GIOITHIEU_ID,KHACHHANG_ID=KHACHHANG_ID, IsPopup = true })', '', 0, 0)">@name</a>
+}
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+        <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+        <p>
+            <label style="padding-left:40px">Chi nhánh</label>
+            @Html.DropDownList("BranchId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"), new { style = "width:138.4px" })
+            <label style="padding-left:63px">NV QLý</label>
+            <select style="width:150px" name="ManagerStaffId" id="ManagerStaffId">
+                <option>-Nhân viên QL-</option>
+                @foreach (var item in user)
+                {
+                    <option value="@item.Id">@item.FullName</option>
+                }
+            </select>
+            @*@Html.DropDownList("ManagerStaffId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_User(Request["ManagerStaffId"], "NV QLý"))*@
+            <label style="padding-left:13px">Người cập nhật</label>
+            @Html.TextBox("ModifiedUserName", Request["ModifiedUserName"], new { @class = "", autocomplete = "off", placeholder = "Người cập nhật",style="width:150px" })
+            <label style="padding-left:17px">Trạng thái</label>
+            <select style=" text-align-last:center;width:125px" class="TRANGTHAI" id="TRANGTHAI" name="TRANGTHAI">
+                <option value="">-- Rỗng --</option>
+                @foreach (var item in ViewBag.TRANGTHAIGIOITHIEU)
+                {
+                    <option value="@item.Name">@item.Name</option>
+                }
+            </select>
+        </p>
+        <p>
+            @*<label>Tỷ lệ thành công (%)</label>
+                @Html.TextBox("txtGioiThieu", Request["txtGioiThieu"], new { @class = "", autocomplete = "off", placeholder = "Giới thiệu đạt (%)" })*@
+            <label>Tỷ lệ thành công</label>
+            <span class="input-group">
+                @Html.TextBox("TU", Request["TU"], new { autocomplete = "off", placeholder = "Từ %", style = "width:50px" })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("DEN", Request["DEN"], new { autocomplete = "off", placeholder = "Đến %", style = "width:50px" })
+            </span>
+            <label style="padding-left:10px">Mã khách hàng</label>
+            @Html.TextBox("CustomerCode", Request["CustomerCode"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng", style = "width:150px" })
+            <label style="padding-left:10px">Tên khách hàng</label>
+            @Html.TextBox("CustomerName", Request["CustomerName"], new { @class = "", autocomplete = "off", placeholder = "Tên khách hàng", style = "width:150px" })
+        </p>
+}
+
+    @if (!isPopup)
+    {
+        using (Html.BeginForm("Delete", pageSetting.ModuleName, FormMethod.Post))
+        {
+            <div class="table table-responsive">
+                @Html.Grid(Model).Columns(columns =>
+                                                         {
+                                                             columns.Add().Titled("#").SetWidth(25).RenderValueAs(o =>
+                                                         {
+                                                             rowNumber++;
+
+                                                             return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+                                                             });
+                                                                 columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.KH_GIOITHIEU_ID));
+                                                                 columns.Add(u => u.BranchName).Titled(Wording.BranchName).RenderValueAs(u => u.BranchName);
+                                                                 columns.Add().Titled(Wording.CustomerName).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.KHACHHANG_ID, u.KH_GIOITHIEU_ID, u.CustomerName));
+                                                                 columns.Add(u => u.CustomerCode).Titled(Wording.CustomerCode).RenderValueAs(u => u.CustomerCode);
+                                                                 columns.Add(u => u.Phone).Titled(Wording.Phone).RenderValueAs(u => u.Phone);
+                                                                 columns.Add(u => u.LOAI_GIOITHIEU).Titled("Loại giới thiệu").RenderValueAs(u => u.LOAI_GIOITHIEU);
+                                                                 columns.Add(u => u.CreatedDate).Titled("Thời gian giới thiệu").SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+                                                                 columns.Add(u => u.NOIDUNG).Titled("Nội dung").SetWidth(200).RenderValueAs(u => u.NOIDUNG);
+                                                                 columns.Add(u => u.TYLE_THANHCONG).Titled("Tỷ lệ thành công").Sortable(true).SetWidth(50).RenderValueAs(n => CommonSatic.ToCurrencyStr(n.TYLE_THANHCONG, null)).Css("text-left");
+                                                                 columns.Add(u => u.TRANGTHAI_GIOITHIEU).Titled("Trạng thái").RenderValueAs(u => u.TRANGTHAI_GIOITHIEU);
+                                                                 columns.Add(u => u.ManagerUserName).Titled("Người quản lý").RenderValueAs(u => u.ManagerUserName);
+                                                                 columns.Add(u => u.ModifiedUserName).Titled("Người cập nhật").RenderValueAs(u => u.ModifiedUserName);
+                                                                 columns.Add(u => u.KH_GIOITHIEU_ID).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.KH_GIOITHIEU_ID)).SetWidth(20);
+                                                             }).WithPaging(30)
+            </div>
+            using (Html.BeginButtonContainer(pageSetting))
+            {
+                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", pageSetting.ModuleName, "Crm"))
+                {
+                    @Html.Button(Wording.CreateNew, ButtonType.aTag, ButtonColor.Primary, ButtonSize.Mini, true, IconType.Plus, IconSize.Default, false, new { onclick = "OpenPopup('" + Url.Action("Create", pageSetting.ModuleName, new { IsPopup = true }) + "', '', 0, 0)" })
+                }
+            }
+        }
+    }
+    @section Scripts {
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+        <script type="text/javascript">
+
+            function CheckIsval() {
+                if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+
+            $('[name="Delete"]').click(function () {
+                if (confirm('Bạn có chắc muốn xóa item ?')) {
+                    $(this).closest('tr').children('td').each(function (i, e) {
+                        $(this).find("input.class-delete-all").prop("checked", true);
+                        return true;
+                    })
+                }
+                else {
+                    return false;
+                }
+
+            })
+
+        </script>
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @*@using Erp.BackOffice.Account.Models
+    @using Erp.BackOffice.Areas.Cms.Models
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Helpers
+    @using Erp.BackOffice.Sale.Models
+
+    @model CRM_KH_GIOITHIEUViewModel
+    @{
+        ViewBag.Title = "Thông tin chung";
+
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+
+        var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "KH_GIOITHIEU",
+            ActionName = "Create",
+            PageTitle = "",
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        string TRANGTHAIGIOITHIEU = Request["TRANGTHAI_GIOITHIEU"] != null ? Request["TRANGTHAI_GIOITHIEU"] : "";
+        int index = 0;
+        IEnumerable<CategoryViewModel> LOAIGIOITHIEU = (IEnumerable<CategoryViewModel>)ViewBag.LOAIGIOITHIEU;
+        IEnumerable<CRM_KH_GIOITHIEUViewModel> KH_GIOITHIEU = (IEnumerable<CRM_KH_GIOITHIEUViewModel>)ViewBag.KH_GIOITHIEU;
+    }
+
+    @section HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+    }
+
+    @using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+    {
+        if (Model != null)
+        {
+            @Html.TextBox("KH_GIOITHIEU_ID", Request["KH_GIOITHIEU_ID"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng", hidden = "hidden" })
+            @Html.TextBox("CreatedUserId", Request["CreatedUserId"], new { @class = "", autocomplete = "off", hidden = "hidden" })
+            @Html.TextBox("CreatedDate", Request["CreatedDate"], new { @class = "", autocomplete = "off", hidden = "hidden" })
+            @Html.TextBox("IsDeleted", Request["IsDeleted"], new { @class = "", autocomplete = "off", hidden = "hidden" })
+            @Html.TextBox("KHACHHANG_ID", Request["KHACHHANG_ID"], new { @class = "", autocomplete = "off", hidden = "hidden" })
+            @Html.TextBox("CustomerName", Request["CustomerName"], new { @class = "", autocomplete = "off", hidden = "hidden" })
+        }
+        <div class="tabbable" style="margin-bottom:50px;">
+            <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab" style="height:30px">
+                <li>Cập nhật thông tin giới thiệu</li>
+            </ul>
+
+            <div class="tab-content clear-fix">
+                <div id="tab1" class="tab-pane active" style="margin-left:20px">
+                    <div class="row">
+                        <p>
+                            <div>
+                                <label style="float:left">Khách hàng</label>
+                                <div class="input-group" style="width:200px;float:left">
+                                    <input data-val="true" data-val-number="The field Khách hàng must be a number." id="CustomerId" name="CustomerId" type="hidden" value="">
+                                    <input style="width:170px" data-val="true" data-val-required="Bắt buộc nhập" id="CustomerId_DisplayText" name="CustomerId_DisplayText" type="text" value="">        <span class="input-group-addon customerid" onclick="OpenPopup('/Customer/IndexSearch?IsPopup=true&amp;module_list=&amp;jsCallback=selectItem_CustomerId', 'Tìm kiếm dữ liệu', 800, 600)" style="cursor:pointer">
+                                        <i class="ace-icon fa fa-search"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </p>
+                        <p>
+                            <label>Mã khách hàng</label>
+                            @Html.TextBox("CustomerCode", Request["CustomerCode"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng", style = "width:110px" })
+                            <label>Số ĐT</label>
+                            @Html.TextBox("Phone", Request["Phone"], new { @class = "", autocomplete = "off", placeholder = "Số điện thoại...", style = "width:150px" })
+                        </p>
+                        <p>
+                            <label>Loại giới thiệu</label>
+                            @Html.DropDownList("LOAIGIOITHIEU", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("LOAIGIOITHIEU", Request["LOAIGIOITHIEU"], "-Rỗng-"), new { style = "width:200px" })
+                            <label>Tỷ lệ thành công (%)</label>
+                            @Html.TextBox("TYLE_THANHCONG", Request["TYLE_THANHCONG"], new { @class = "", autocomplete = "off", placeholder = "Tỷ lệ thành công", style = "width:120px" })
+                            @Html.ValidationMessageFor(m => m.TYLE_THANHCONG, "", new { @class = "text-danger" })
+                            <label>Trạng thái sử lý</label>
+                            @Html.DropDownList("TRANGTHAI_GIOITHIEU", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("TRANGTHAIGIOITHIEU", Request["TRANGTHAI_GIOITHIEU"], "-Rỗng-"), new { style = "width:200px" })
+                        </p>
+                        <p>
+                            @Html.TextAreaFor(m => m.NOIDUNG, new { rows = "10", cols = "150", @class = "form-control", @maxlength = "10000", placeholder = "Nội dung", style = "width:800px" })
+                            @Html.ValidationMessageFor(m => m.NOIDUNG, "", new { @class = "text-danger" })
+                        </p>
+                    </div>
+                </div>
+                @if (KH_GIOITHIEU != null)
+                {
+                    <div id="listOrderDetail" class="table-responsive top-10 ">
+                        <table class="table table-bordered grid-table bottom-5">
+                            <thead>
+                                <tr>
+                                    <th class="grid-header" width="30">STT</th>
+                                    <th class="grid-header">Ngày cập nhật</th>
+                                    <th class="grid-header">Người cập nhật</th>
+                                    <th class="grid-header">Loại giới thiệu</th>
+                                    <th class="grid-header" width="200px">Nội dung giới thiệu</th>
+                                    <th class="grid-header">Tỷ lệ thành công</th>
+                                    <th class="grid-header">Trạng thái sử lý</th>
+                                </tr>
+                            </thead>
+                            <tbody class="detailList">
+                                @foreach (var i in KH_GIOITHIEU)
+                                {
+                                    <tr>
+                                        <td>@(index += 1)</td>
+                                        <td>@i.ModifiedDate</td>
+                                        <td>@ViewBag.UserName</td>
+                                        <td>@i.LOAI_GIOITHIEU</td>
+                                        <td>@i.NOIDUNG</td>
+                                        <td>@i.TYLE_THANHCONG</td>
+                                        <td>@i.TRANGTHAI_GIOITHIEU</td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+
+            </div>
+        </div>
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            <button id="save" class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save" onclick="Check();">
+                <i class="ace-icon fa fa-save"></i>
+                @Wording.Save
+            </button>
+        }
+    }
+
+
+    @section Scripts {
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_ChosenStyle()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+        <script src="/Scripts/combojax.js?=vs1.01211"></script>
+        <script type="text/javascript">
+            $(function () {
+                $("#CustomerId").val($("#KHACHHANG_ID").val());
+                $("#CustomerId_DisplayText").val($("#CustomerName").val());
+            });
+            function Check() {
+                ShowLoading();
+                var CustomerId = $("#CustomerId").val();
+                var messagge = "";
+                if (CustomerId == '') {
+                    messagge += "Chưa chọn khách hàng<br>";
+                }
+                if (messagge != '') {
+                    alertPopup('Lỗi!', messagge, 'error');
+                    HideLoading();
+                }
+            }
+            function ClosePopupAndDoSomethings(optionSelect) {
+                ClosePopup(false);
+                $("#CustomerId").val($(optionSelect).val()).triggerHandler('change');
+                $("#CustomerId_DisplayText").val($(optionSelect).text()).triggerHandler('change');
+            }
+            function selectItem_CustomerId(id, name, pluspoint, code, phone) {
+                $("#CustomerId").val(id).trigger('change');
+                $("#CustomerId_DisplayText").val(name).trigger('change');
+                $("#CustomerId_DisplayText").focus().blur();
+                ClosePopup();
+                $('#CustomerCode').val(code);
+                $('#CustomerId').val(id);
+                $('#Phone').val(phone)
+            }
+
+        </script>
+    }*@

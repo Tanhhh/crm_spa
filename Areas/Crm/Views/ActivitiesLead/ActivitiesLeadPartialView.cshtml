@@ -1,0 +1,376 @@
+﻿@using Erp.BackOffice.Sale.Controllers
+@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@using PagedList.Mvc;
+@using PagedList;
+@using Erp.BackOffice.Crm.Models;
+
+@{
+    Layout = null;
+    int stt = 1;
+    var user = ViewBag.user as Erp.Domain.Repositories.UserRepository;
+    var pagelist = ViewBag.PageList as IPagedList<ActivitiesLeadLogsModel>;
+    var datalist = ViewBag.DataList as IEnumerable<ActivitiesLeadLogsModel>;
+    var countlt = datalist.Count();
+    IEnumerable<Erp.Domain.Entities.User> users = user.GetAllUsers();
+}
+<style>
+    .table > thead:first-child > tr:first-child > th {
+        background: #fff;
+        color: #152cad !important;
+        text-transform: capitalize;
+        text-align: center;
+    }
+
+    .clSortable:hover {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .btn-option {
+        padding: .3rem 1.3rem;
+        background: #bada05 !important;
+        color: #fff;
+        border-radius: 3px;
+        border: none;
+    }
+
+        .btn-option:hover {
+            background: #727dff !important;
+            color: #fff;
+            transition: .3s linear;
+            transform: scale(.98)
+        }
+    .itemLeadName:hover {
+        text-decoration: underline !important;
+    }
+    .itemLeadName {
+        color: #576297;
+        text-decoration: none;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+</style>
+
+<form>
+    <table id="ActivitiesLeadTb" class="table table-hover" style="display: block; width: 100% !important; overflow: auto; white-space: nowrap; height: 52rem">
+        <thead>
+            @{
+                var properties = typeof(ActivitiesLeadLogsModel).GetProperties();
+                var prop = properties.Where(x => x.Name != "LeadId" && x.Name != "TypeLead");
+                string thele = "";
+            }
+            @foreach (var item1 in prop)
+            {
+                var display = item1.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;
+                string displayname = display != null ? display.DisplayName : "";
+                if (ViewBag.ColumnSort != null && ViewBag.ColumnSort == item1.Name)
+                {
+                    if (ViewBag.SortDir == 1)
+                    {
+                        thele += "<th class=\"clSortable\" data-id=" + item1.Name + ">" + displayname + "<i class=\"fa fa-sort-down\" style=\"vertical-align: text-top; margin-left: 4px;\"></i>";
+
+                    }
+                    else
+                    {
+                        thele += "<th class=\"clSortable\" data-id=" + item1.Name + ">" + displayname + "<i class=\"fa fa-sort-up\" style=\"vertical-align: bottom; margin-left: 4px;\"></i> </th>";
+                    }
+
+                }
+                else
+                {
+                    thele += "<th class=\"clSortable\" data-id=" + item1.Name + ">" + displayname + "</th>";
+                }
+            }
+            <tr>
+                <th><input type="checkbox" class="checkbox chkall" /></th>
+                <th>STT</th>
+                @Html.Raw(@thele)
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in datalist)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" class="checkbox child" />
+                    </td>
+                    <td id="IdSTTListLead"> @(stt++) </td>
+                    <td>
+                        <span class="itemId">@item.Id</span>
+                    </td>
+                    <td>
+                        <span class="itemAction">@item.Action</span>
+                    </td>
+                    <td>
+                        <span class="itemAssigned"> @item.AssignedUserName</span>
+                    </td>
+                    <td name='Link'>
+                        <input style="display:none" class="typelead" value="@item.TypeLead" />
+                        <span class="itemLeadName" id="@item.LeadId" name="Link"> @item.LeadName</span>
+                    </td>
+                    <td>
+                        <span class="itemCreateDate">@item.CreatedDate.ToString("dd/MM/yyyy")</span>
+                    </td>
+                    <td style="text-align:center">
+                        @if (item.Status)
+                        {
+                            <i style="color:#0CD9E8" class="fa fa-flag-checkered"></i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-ellipsis-h"></i>
+                        }
+                        <span style="display:none" class="itemStatus">@item.Status</span>
+                    </td>
+                    <td>
+                        <span class="itemCreateDates">@item.CreatedDates.ToString("dd/MM/yyyy hh:mm tt").Replace("AM", "SA").Replace("PM", "CH")</span>
+                    </td>
+                    <td>
+                        <span class="itemCombinedDateTime">@item.CombinedDateTime.ToString("dd/MM/yyyy hh:mm tt").Replace("AM", "SA").Replace("PM", "CH")</span>
+                    </td>
+                    <td>
+                        <span class="itemContent">@item.Content</span>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</form>
+<div style="display:flex; justify-content:space-between; align-items:center">
+
+    <div style="display: flex; width: 15rem; justify-content: space-between; align-items: center;">
+        <ul class="nav navbar-nav navbar-right">
+            <div style="visibility: hidden; position: relative" id="optionActivitties" class="dropdown-modal">
+                <button  type="button" class="btn btn-option dropdown-toggle" data-toggle="dropdown" aria-expanded="false" ">Tùy chọn</button>
+
+                <ul style="position: absolute; top: -7rem; left: 0rem; width: 22rem;" class=" dropdown-menu-right dropdown-menu dropdown-yellow dropdown-close">
+                    <li style="background:white">
+                        <a id="btncompleteaction">Hoàn thành</a>
+                    </li>
+                    <li style="background:white">
+                        <a id="btnChangeAss">Thay đổi người chịu trách nhiệm</a>
+                    </li>
+                </ul>
+            </div>
+        </ul>
+    </div>
+    <div style="display: flex; width: 100%; justify-content: flex-end; align-items: center;">
+        <div class="pagination-container" style="display: flex; align-items: center;">
+            <ul class="pagination">
+                <li><a>&laquo;&laquo;</a></li>
+                <li><a>&laquo;</a></li>
+                @if (pagelist.PageNumber > 1)
+                {
+                    if (pagelist.PageNumber < 5)
+                    {
+                        for (int i = 1; i < pagelist.PageNumber; i++)
+                        {
+                            <li><a>@i</a></li>
+                        }
+                    }
+                    else
+                    {
+                        <li><a>1</a></li>
+                        <li><a>...</a></li>
+                        <li><a>@(pagelist.PageNumber - 2)</a></li>
+                        <li><a>@(pagelist.PageNumber - 1)</a></li>
+                    }
+                }
+                @for (int i = pagelist.PageNumber; i < (pagelist.PageNumber + 10 < pagelist.PageCount + 1 ? pagelist.PageNumber + 10 : pagelist.PageCount + 1); i++) //pagelist.PageCount + 1
+                {
+                    <li @(pagelist.PageNumber == i ? "class=active" : "")><a>@i</a></li>
+                }
+                @if (pagelist.PageNumber + 10 < pagelist.PageCount + 1)
+                {
+                    <li><a>...</a></li>
+                    <li><a>»</a></li>
+                    <li><a>»»</a></li>
+                }
+                else
+                {
+                    <li><a>»</a></li>
+                    <li><a>»»</a></li>
+                }
+            </ul>  <select id="pageSize" style="height: 32px;">
+                <option value="15">15</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="150">150</option>
+                <option value="200">200</option>
+                <option value="500">500</option>
+            </select>
+        </div>
+    </div>
+</div>
+<script>
+    var editEnable = false;
+    var table = document.getElementById("ActivitiesLeadTb");
+    var rows = table.getElementsByTagName("tr");
+
+    // Gắn sự kiện click vào bảng
+    table.addEventListener('click', function (e) {
+        if (e.target !== this && $(e.target).attr('name') != 'Link') {
+            if ($(e.target).hasClass('clSortable')) {
+                let pageSize = $('#pageSize').val();
+                let pag = $('ul.pagination li.active').text();
+                let columnsort = $(e.target).data('id');
+                if ($(e.target).find('i.fa-sort-down').length > 0) {
+                    SearchActivitiesLeadFunc(pag, pageSize, columnsort, 0)
+                } else {
+                    SearchActivitiesLeadFunc(pag, pageSize, columnsort, 1)
+                }
+            } else if ($(e.target).is('.checkbox.child')) {
+                var ele = $('#ActivitiesLeadTb').find('.checkbox.child:checked');
+                if (ele.length > 0) {
+                    $('#optionActivitties').css('visibility', 'visible');
+                } else {
+                    $('#optionActivitties').css('visibility', 'hidden');
+                }
+            }
+            return; // Clicked on a child element, do nothing
+        }
+
+    })
+    for (i = 0; i < rows.length; i++) {
+        let currentRow = table.rows[i];
+        var createClickHandler = function (currentRow) {
+            return function () {
+                debugger
+                var leadid = $(currentRow).find('.itemLeadName').attr('id');
+                var typelead = $(currentRow).find('.typelead').val();
+                DetailLead(leadid, typelead == 1 ? 2 : -1);
+            };
+        };
+        $(currentRow).on('click', function (e) {
+            debugger
+            if ($(e.target).attr('name') == 'Link') {
+                let func = createClickHandler(currentRow);
+                func()
+            }
+        })
+    }
+    $(function () {
+        debugger
+        $('ul.pagination li').click(function () {
+            debugger
+            pagination(this)
+        })
+        $('#pageSize').change(function () {
+            debugger
+            document.cookie ='pageSizeAt='+ $(this).val();
+            SearchActivitiesLeadFunc(1, $(this).val())
+        })
+        $('#pageSize').val(@pagelist.PageSize)
+        $('.checkbox.chkall').change(function () {
+            debugger
+            var ele = $('#ActivitiesLeadTb').find('.checkbox.child')
+            let chkall=$(this).prop('checked')
+            $.each(ele, function (idx,item) {
+                if (chkall == true) {
+                    $(item).prop('checked', true);
+                } else {
+                    $(item).prop('checked', false)
+                }
+            })
+            var ele = $('#ActivitiesLeadTb').find('.checkbox.child:checked')
+            if (ele.length > 0) {
+                $('#optionActivitties').css('visibility', 'visible');
+            } else {
+                $('#optionActivitties').css('visibility', 'hidden');
+            }
+        })
+
+    })
+    function pagination(a) {
+        debugger
+        if ($(a).attr('class') == 'active') {
+            return
+        }
+        if ($(a).is('select')) {
+        } else {
+            let ele = $('ul.pagination').find('li.active')
+            if (!['»', '»»', '«', '««'].includes($(a).text())) {
+                $.each(ele, function (idx, item) {
+                    $(item).removeClass('active')
+                })
+                $(a).attr('class', 'active')
+            }
+        }
+        let pageSize = $('#pageSize').val()
+        let pagcurr = $(a).text()
+        let pag = $('ul.pagination li.active').text()
+        let pageNumber;
+        switch (pagcurr) {
+            case '»': pageNumber = (parseInt(pag) + 1) < pagelist.PageCount ? (parseInt(pag) + 1).toString() :'@pagelist.PageCount'
+            break
+            case '«': pageNumber = parseInt(pag)>1?(parseInt(pag) - 1).toString():'1'
+            break
+            case '»»': pageNumber = '@pagelist.PageCount'
+            break
+            case '««': pageNumber = '1'
+            break
+            default: pageNumber= pag
+            break
+        }
+        SearchActivitiesLeadFunc(pageNumber, pageSize)
+    }
+    $(document).ready(function () {
+        $('#btncompleteaction').click(function () {
+            var chkele = $('#ActivitiesLeadTb').find('.checkbox.child').filter(':checked');
+            var requestData = [];
+            chkele.each(function () {
+                debugger;
+                var currentRow = $(this).closest('tr');
+                var leadid = currentRow.find('.itemId').text();
+                requestData.push(leadid);
+            });
+            let pageSize = $('#pageSize').val();
+            let pag = $('ul.pagination li.active').text();
+            updateLeadLog(requestData, pageSize, pag);
+        });
+        $('#btnChangeAss').click(function () {
+            var chkele = $('#ActivitiesLeadTb').find('.checkbox.child').filter(':checked');
+            var requestData = [];
+            chkele.each(function () {
+                debugger;
+                var currentRow = $(this).closest('tr');
+                var leadid = currentRow.find('.itemId').text();
+                requestData.push(leadid);
+            });
+            var url = '/AssignedToU/ChangeAssIndex?total=' + requestData.length + '&listData=' + requestData.join(',');
+            OpenPopup(url, 'Thay đổi người chịu trách nhiệm', 300, 400);
+        });
+    });
+    function updateLeadLog(requestData, pageSize, pag) {
+        $.ajax({
+            url: '/ActivitiesLead/UpdateStatusLeadLogs',
+            type: 'POST',
+            data: { requestData: JSON.stringify(requestData) },
+            success: function (response) {
+                if (response.success) {
+                    toastr.success('Hoàn thành hoạt động thành công!', 'Thông báo');
+                    SearchActivitiesLeadFunc(pag, pageSize);
+                } else {
+                    toastr.warning('Hoàn thành hoạt động thất bại!', 'Thông báo');
+                }
+            },
+            error: function (xhr, status, error) {
+                toastr.warning('Hoàn thành hoạt động thất bại!', 'Thông báo');
+                console.log("Lỗi khi gửi yêu cầu:", error);
+            }
+        });
+    }
+    window.addEventListener('message', eventListenerAddNewModal);
+    function eventListenerAddNewModal(event) {
+        if (event.data === 'reloadActivitiesLeadPartialView') {
+            toastr.success('Thay đổi người chịu trách nhiệm thành công!', 'Thông báo');
+            let pageSize = $('#pageSize').val();
+            let pageNumber = $('ul.pagination li.active').text();
+            SearchActivitiesLeadFunc(pageNumber, pageSize);
+        }
+    };
+</script>

@@ -1,0 +1,448 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Sale.Models
+@model KH_TUONGTACViewModel
+
+@{
+    ViewBag.Title = "Cập nhật tương tác";
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Plan",
+        ActionName = "ViewKeThua",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    int index = 0;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    //DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    string MUCDO_TUONGTAC = Request["MUCDO_TUONGTAC"] != null ? Request["MUCDO_TUONGTAC"] : "";
+    string MUCCANHBAO_TUONGTAC = Request["MUCCANHBAO_TUONGTAC"] != null ? Request["MUCCANHBAO_TUONGTAC"] : "";
+    IEnumerable<KH_TUONGTACViewModel> KH_TUONGTAC = (IEnumerable<KH_TUONGTACViewModel>)ViewBag.KH_TUONGTAC;
+    IEnumerable<CustomerViewModel> customerList = (IEnumerable<CustomerViewModel>)ViewBag.CustomerList;
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <style type="text/css">
+        .has_error {
+            border: 1px #f2a696 solid !important;
+            color: #D68273;
+        }
+
+        .mini-popup {
+            position: relative;
+            display: inline;
+        }
+
+        #popup_archive {
+            position: absolute;
+            bottom: 34px;
+            left: -154px;
+            width: 410px;
+            height: 235px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+
+        #myImg {
+            outline: none;
+        }
+    </style>
+}
+@helper CheckDeleteColumns(int? KH_TUONGTAC_ID)
+    {
+        /**/
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_TUONGTAC_ID">
+            <span class="lbl"></span>
+        </label>
+}
+
+@helper GridColumnCommand(int? KH_TUONGTAC_ID)
+    {
+        /**/
+        <p>
+            <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+            </button>
+        </p>
+        /**/
+
+}
+@helper GridColumnName(string HINH_ANH)
+    {
+        /**/
+
+        <div class="itemdiv commentdiv">
+            <div class="user">
+                <div class="ace-thumbnails">
+                    <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(HINH_ANH,"Plan","user"))" data-rel="colorbox" class="cboxElement">
+                        <img id="myImg" style="text-align:center" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(HINH_ANH, "Plan", "user"))">
+                    </a>
+                </div>
+            </div>
+        </div>
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "CreatePlan", @class = "form-horizontal clearfix", enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" name="Type" value="plan" />
+
+    @*<div class="row">
+            <div class="col-sm-12">
+                <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                    <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                        <div class="widget-header widget-header-small">
+                            <div class="widget-toolbar no-border pull-left">
+                                <ul class="nav nav-tabs" id="myTab">
+                                    <li class="active">
+                                        <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-info-circle"></i> Tổng quan</a>
+                                    </li>
+                                    <li class="">
+                                        <a data-toggle="tab" href="#image" aria-expanded="false"><i class="fa fa-image"></i> Ảnh minh họa</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main padding-6">
+                                <div class="tab-content">
+                                    <div id="home" class="tab-pane active">
+                                        <p>
+                                            <span class="input-daterange" style="width:250px;margin-right:155px;margin-left:55px;">
+                                                <label>Ngày KH</label>
+                                                @Html.TextBox("NGAYLAP", Request["NGAYLAP"] != null ? Request["NGAYLAP"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Ngày lập", style = "width:200px" })
+                                            </span>
+
+                                            <label>Khách hàng</label>
+                                            @Html.TextBox("KHACHHANG_ID", Request["KHACHHANG_ID"], new { @class = "hide", autocomplete = "off", placeholder = "Khách hàng", style = "width:200px" })
+                                            <input id="product_barcode" type="text" placeholder="Tên khách hàng" autocomplete="off" style="width:200px" />
+                                            <select id="productSelectList" name="productSelectList" style="width:300px">
+                                                <option value="">- Tìm khách hàng -</option>
+                                                @foreach (var item in customerList)
+                                                {
+                                                    <option value="@item.Id" data-selected="0" data-value="@item.Id | @(Common.KiemTraTonTaiHinhAnh(item.Image,"product-image-folder","product"))  | @(item.Code + " - " + item.CompanyName )">@item.Code - @item.CompanyName</option>
+                                                }
+                                            </select>
+
+                                        </p>
+                                        <p>
+                                            <span class="input-daterange input-group" style="padding-left:50px;">
+                                                <label>Hình thức</label>
+                                                @Html.DropDownList("HINHTHUC_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("HINHTHUC_GIOITHIEU", Request["HINHTHUC_TUONGTAC"], "-Rỗng-"), new { style = "width: 200px;/* padding-right: 0px; */margin-right: 150px;" })
+                                                <label>Giờ tương tác</label>
+                                                @Html.TextBox("GIO_TUONGTAC", Request["GIO_TUONGTAC"] != null ? Request["GIO_TUONGTAC"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("HH:mm"), new { autocomplete = "off", placeholder = "Từ ngày", style = "width:200px" })
+                                            </span>
+                                        </p>
+
+                                        <p>
+                                            <label>Thông tin các loại</label>
+                                            @Html.DropDownList("LOAI_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("LOAI_TUONGTAC", Request["LOAI_TUONGTAC"], "-Rỗng-"), new { style = "width:200px;margin-right: 170px;" })
+                                            <label>Phân loại</label>
+                                            @Html.DropDownList("PHANLOAI_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("TOC", Request["PHANLOAI_TUONGTAC"], "-Rỗng-"), new { style = "width:200px;margin-right: 121px;" })
+                                            <label>Tình trạng</label>
+                                            <select style="width:200px" id="TINHTRANG_TUONGTAC" name="TINHTRANG_TUONGTAC">
+                                                <option value="">-Rỗng-</option>
+                                                @foreach (var item in ViewBag.DODAITOC)
+                                                {
+                                                    <option class="TINHTRANG" id="@item.Code" value="@item.Value">@item.Name</option>
+                                                }
+                                                @foreach (var item1 in ViewBag.DUOITOC)
+                                                {
+                                                    <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                }
+                                                @foreach (var item1 in ViewBag.DADAU)
+                                                {
+                                                    <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                }
+                                                @foreach (var item1 in ViewBag.MAMTOC)
+                                                {
+                                                    <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                }
+                                                @foreach (var item1 in ViewBag.THANTOC)
+                                                {
+                                                    <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                }
+                                                @foreach (var item1 in ViewBag.CO)
+                                                {
+                                                    <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                }
+                                                @foreach (var item1 in ViewBag.MAT)
+                                                {
+                                                    <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                }
+                                                @foreach (var item1 in ViewBag.BODY)
+                                                {
+                                                    <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                }
+                                                @foreach (var item1 in ViewBag.DAMAT)
+                                                {
+                                                    <option class="TINHTRANG" id="@item1.Code" value="@item1.Value">@item1.Name</option>
+                                                }
+                                            </select>
+                                        </p>
+                                        <p>
+
+                                            <span class="input-daterange">
+                                                <label>Mức độ đánh giá </label>
+                                                @Html.DropDownList("MUCDO_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("MUCDO_DANHGIA", Request["MUCDO_TUONGTAC"], "-Rỗng-"), new { style = "width:200px;margin-right: 170px;margin-left: 2px;" })
+                                                <label>Giải pháp</label>
+                                                @Html.DropDownList("GIAIPHAP_TUONGTAC", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("GIAIPHAP_TUONGTAC", Request["GIAIPHAP_TUONGTAC"], "-Rỗng-"), new { style = "width:200px;margin-right:100px;" })
+
+                                                <label>Lịch tiếp theo</label>
+                                                @Html.TextBox("NGAYTUONGTAC_TIEP", Request["NGAYTUONGTAC_TIEP"] != null ? Request["NGAYTUONGTAC_TIEP"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("dd/MM/yyyy HH:mm"), new { autocomplete = "off", placeholder = "Từ ngày", style = "width:200px;margin-right:100px;" })
+                                                <label>Mức cảnh báo</label>
+                                                <select id="MUCCANHBAO_TUONGTAC" name="MUCCANHBAO_TUONGTAC" style="width:100px">
+                                                    <option value="BT"> Bình thường</option>
+                                                    @for (int i = 1; i <= 3; i++)
+                                                    {
+                                                        <option @(MUCCANHBAO_TUONGTAC == i.ToString() ? "Selected" : "") value="@i">Mức @i</option>
+                                                    }
+                                                </select>
+                                            </span>
+                                        </p>
+                                        <p>
+                                            <span class="note" style="margin-left:60px;">
+                                                <label>Ghi Chú</label>
+                                                @Html.TextBox("GHI_CHU", Request["GHI_CHU"], new { @class = "", autocomplete = "off", placeholder = "Ghi chú", style = "width:400px" })
+                                            </span>
+                                        </p>
+
+
+
+                                    </div>
+                                    <div id="image" class="tab-pane">
+                                        <div class="wrap-btn-upload">
+                                            <a class="btn btn-primary btn-sm btn-white"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                                            <input type="file" id="file-image" name="file-image" class="file-image" onchange="previewFileImage(event, '#display-image img')" />
+                                        </div>
+                                        <div class="text-center" id="display-image">
+                                            <img src="/assets/css/images/noimage.gif" id="" style="max-height:250px;max-width:300px" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            <button id="save" class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+                <i class="ace-icon fa fa-save"></i>
+                @Wording.Save
+            </button>
+        }*@
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "ViewKeThua", pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.HiddenFor(model => model.NGAYLAP)
+    <div id="" class="table-responsive top-10 ">
+        <table id="CTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th rowspan="2">
+                        <input id="checkAll" name="checkAll" type="checkbox" class="ace" value="1">
+                        <span class="lbl"></span>
+                    </th>
+                    <th rowspan="2">Stt</th>
+                    <th rowspan="2">Mã khách hàng</th>
+                    <th rowspan="2">Tên khách hàng</th>
+                    <th rowspan="2">Điện thoại</th>
+                    <th colspan="2" style="text-align:center">Tương tác</th>
+                    <th colspan="4" style="text-align:center">Thông tin kỹ thuật</th>
+                    <th rowspan="2">Ghi chú</th>
+                    <th rowspan="2">Giải pháp</th>
+                    <th rowspan="2">Lịch tiệp theo</th>
+                    <th rowspan="2">Mức cảnh báo</th>
+                    @*<th rowspan="2">Lịch sử tương tác</th>*@
+                    <th rowspan="2">Hình đính kèm</th>
+                    @*<th rowspan="2"></th>*@
+                </tr>
+                <tr>
+                    <th>Hình thức</th>
+                    <th>Giờ</th>
+                    <th>Loại</th>
+                    <th>Phân loại</th>
+                    <th>Tình trạng</th>
+                    <th>Đánh giá mức độ</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.KH_TUONGTAC.Count(); i++)
+                {
+                    <tr>
+                        <td>
+                            <input id="KH_TUONGTAC_@(i)__is_checked" name="KH_TUONGTAC[@(i)].is_checked" type="checkbox" class="ace item_is_checked" value="1">
+                            <span class="lbl"></span>
+                        </td>
+                        <td>@(index += 1)</td>
+                        <td>
+
+                            <input class="CustomerCode" type="hidden" id="KH_TUONGTAC_@(i)__CustomerCode" name="KH_TUONGTAC[@(i)].CustomerCode" value="@Model.KH_TUONGTAC[i].CustomerCode" />
+                            <input class="CustomerId" type="hidden" id="KH_TUONGTAC_@(i)__CustomerId" name="KH_TUONGTAC[@(i)].CustomerId" value="@Model.KH_TUONGTAC[i].CustomerId" />
+                            <span>@Model.KH_TUONGTAC[i].CustomerCode</span>
+                        </td>
+                        <td>
+                            <input class="CustomerName" type="hidden" id="KH_TUONGTAC_@(i)__CustomerName" name="KH_TUONGTAC[@(i)].CustomerName" value="@Model.KH_TUONGTAC[i].CustomerName" />
+                            <span>@Model.KH_TUONGTAC[i].CustomerName</span>
+                            @*@GridColumnName(item.NGUOILAP_ID, item.NGAYLAP,item.CustomerId,item.KH_TUONGTAC_ID, item.CustomerName)*@
+                        </td>
+                        <td>
+                            <input class="Phone" type="hidden" id="KH_TUONGTAC_@(i)__Phone" name="KH_TUONGTAC[@(i)].Phone" value="@Model.KH_TUONGTAC[i].Phone" />
+                            <span>@Model.KH_TUONGTAC[i].Phone</span>
+                        </td>
+                        <td>
+                            <input class="HINHTHUC_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__HINHTHUC_TUONGTAC" name="KH_TUONGTAC[@(i)].HINHTHUC_TUONGTAC" value="@Model.KH_TUONGTAC[i].HINHTHUC_TUONGTAC" />
+                            <span>@Model.KH_TUONGTAC[i].HINHTHUC_TUONGTAC</span>
+                        </td>
+                        <td>
+                            <input class="GIO_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__GIO_TUONGTAC" name="KH_TUONGTAC[@(i)].GIO_TUONGTAC" value="@Model.KH_TUONGTAC[i].GIO_TUONGTAC" />
+                            <span>@Model.KH_TUONGTAC[i].GIO_TUONGTAC</span>
+                        </td>
+                        <td>
+                            <input class="LOAI_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__LOAI_TUONGTAC" name="KH_TUONGTAC[@(i)].LOAI_TUONGTAC" value="@Model.KH_TUONGTAC[i].LOAI_TUONGTAC" />
+                            <span>@Model.KH_TUONGTAC[i].LOAI_TUONGTAC</span>
+                        </td>
+                        <td>
+                            <input class="PHANLOAI_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__PHANLOAI_TUONGTAC" name="KH_TUONGTAC[@(i)].PHANLOAI_TUONGTAC" value="@Model.KH_TUONGTAC[i].PHANLOAI_TUONGTAC" />
+                            <span>@Model.KH_TUONGTAC[i].PHANLOAI_TUONGTAC</span>
+                        </td>
+                        <td>
+                            <input class="TINHTRANG_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__TINHTRANG_TUONGTAC" name="KH_TUONGTAC[@(i)].TINHTRANG_TUONGTAC" value="@Model.KH_TUONGTAC[i].TINHTRANG_TUONGTAC" />
+                            <span>@Model.KH_TUONGTAC[i].TINHTRANG_TUONGTAC</span>
+                        </td>
+                        <td>
+                            <input class="MUCDO_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__MUCDO_TUONGTAC" name="KH_TUONGTAC[@(i)].MUCDO_TUONGTAC" value="@Model.KH_TUONGTAC[i].MUCDO_TUONGTAC" />
+                            <span>@Model.KH_TUONGTAC[i].MUCDO_TUONGTAC</span>
+                        </td>
+                        <td>
+                            <input class="GHI_CHU" type="hidden" id="KH_TUONGTAC_@(i)__GHI_CHU" name="KH_TUONGTAC[@(i)].GHI_CHU" value="@Model.KH_TUONGTAC[i].GHI_CHU" />
+                            <span>@Model.KH_TUONGTAC[i].GHI_CHU</span>
+                        </td>
+                        <td>
+                            <input class="GIAIPHAP_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__GIAIPHAP_TUONGTAC" name="KH_TUONGTAC[@(i)].GIAIPHAP_TUONGTAC" value="@Model.KH_TUONGTAC[i].GIAIPHAP_TUONGTAC" />
+                            <span>@Model.KH_TUONGTAC[i].GIAIPHAP_TUONGTAC</span>
+                        </td>
+                        <td>
+                            <input class="LICHTUONGTATIEP" type="hidden" id="KH_TUONGTAC_@(i)__LICHTUONGTATIEP" name="KH_TUONGTAC[@(i)].LICHTUONGTATIEP" value="@Model.KH_TUONGTAC[i].NGAYTUONGTAC_TIEP/@Model.KH_TUONGTAC[i].THANG/@Model.KH_TUONGTAC[i].NAM/@Model.KH_TUONGTAC[i].GIOTUONGTAC_TIEP" />
+                            <span>@Model.KH_TUONGTAC[i].NGAYTUONGTAC_TIEP/@Model.KH_TUONGTAC[i].THANG/@Model.KH_TUONGTAC[i].NAM/@Model.KH_TUONGTAC[i].GIOTUONGTAC_TIEP</span>
+                        </td>
+                        @if (@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC == "1")
+                        {
+                            <td style="color:cyan">
+                                <input class="MUCCANHBAO_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__MUCCANHBAO_TUONGTAC" name="KH_TUONGTAC[@(i)].MUCCANHBAO_TUONGTAC" value="@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC" />
+                                <span>@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC</span>
+                            </td>
+                        }
+                        else if (@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC == "2")
+                        {
+                            <td style="color:darkorange">
+                                <input class="MUCCANHBAO_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__MUCCANHBAO_TUONGTAC" name="KH_TUONGTAC[@(i)].MUCCANHBAO_TUONGTAC" value="@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC" />
+                                <span>@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC</span>
+                            </td>
+                        }
+                        else if (@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC == "3")
+                        {
+                            <td style="color:red">
+                                <input class="MUCCANHBAO_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__MUCCANHBAO_TUONGTAC" name="KH_TUONGTAC[@(i)].MUCCANHBAO_TUONGTAC" value="@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC" />
+                                <span>@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC</span>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <input class="MUCCANHBAO_TUONGTAC" type="hidden" id="KH_TUONGTAC_@(i)__MUCCANHBAO_TUONGTAC" name="KH_TUONGTAC[@(i)].MUCCANHBAO_TUONGTAC" value="@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC" />
+                                <span>@Model.KH_TUONGTAC[i].MUCCANHBAO_TUONGTAC</span>
+                            </td>
+                        }
+                        @*<td>@GridColumnNGUOILAP(item.NGUOILAP_ID)</td>*@
+                        <td>@GridColumnName(Model.KH_TUONGTAC[i].HINH_ANH)</td>
+                        @*<td>@GridColumnCommand(item.KH_TUONGTAC_ID)</td>*@
+                    </tr>
+                }
+            </tbody>
+            <thead>
+            </thead>
+        </table>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button id="save" class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+@section Scripts {
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    <script type="text/javascript">
+        $(function () {
+            $('th > :checkbox').click(function () {
+                $(this).closest('table')
+                    .find('td > :checkbox')
+                    .attr('checked', $(this).is(':checked'));
+            });
+        });
+    </script>
+}

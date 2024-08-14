@@ -1,0 +1,84 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<spSale_Get_TrangThietBiViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+    @helper GridColumnStatusEquipment(string status)
+        {
+            /**/
+
+            switch (status)
+            {
+                case "pending":
+                    <span class="label label-info label-sm">@Wording.Unconfimred</span>
+                    break;
+                case "accept":
+                    <span class="label-success label label-sm">@Wording.accept</span>
+                    break;
+                case "cancel":
+                    <span class="label-default label label-sm">@Wording.Cancel</span>
+                    break;
+                case "refure":
+                    <span class="label-danger label label-sm">@Wording.StatusSalaryAdvance_Refure</span>
+                    break;
+            }
+}
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Ngày tạo</th>
+                <th class="text-center">Trang thiết bị</th>
+                <th class="text-center">Tên khách hàng</th>
+                <th class="text-center">Mã khách hàng</th>
+                <th class="text-center">Mã xếp lịch</th>
+                <th class="text-center">Ngày làm</th>
+                <th class="text-center">Ngày kết thúc</th>
+                <th class="text-center">Thời gian</th>
+                <th class="text-center">Phòng</th>
+                <th class="text-center">Trạng thái</th>
+                <td class="text-center">Ghi chú</td>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td class="text-center">
+                    <span>@(index++)</span>
+                </td>
+                <td class="text-center">@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                <td class="text-center">@item.EquipmentName</td>
+                <td class="text-center">@item.CustomerName</td>
+                <td class="text-center">@item.CustomerCode</td>
+                <td class="text-center">@item.Code</td>
+                <td class="text-center">@(item.WorkDay.HasValue ? item.WorkDay.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                <td class="text-center">@(item.EndDate.HasValue ? item.EndDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                <td class="text-center">@(CommonSatic.ToCurrencyStr(item.TotalMinute, null))</td>
+                <td class="text-center">@item.RoomName</td>
+                <td>@GridColumnStatusEquipment(item.Status)</td>
+                <td class="text-center">@item.Note</td>
+            </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+                <td class="text-center"></td>
+            </tr>
+        </tfoot>
+    </table>

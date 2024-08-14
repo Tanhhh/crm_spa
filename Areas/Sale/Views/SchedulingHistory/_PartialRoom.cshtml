@@ -1,0 +1,197 @@
+﻿@model List<Erp.BackOffice.Staff.Models.RoomViewModel>
+    @using Erp.BackOffice.App_GlobalResources
+    @{
+
+    }
+    <style>
+        .infobox {
+            width: 100% !important;
+            border: 0px !important;
+            height: 104px !important;
+        }
+
+        .dayoff-wrap .dayoff-item {
+            width: 100% !important;
+        }
+
+        .search-media .search-actions {
+            width: 30% !important;
+            max-width: 250px !important;
+            min-width: 150px !important;
+        }
+
+        .fa-150 {
+            font-size: 1.5em;
+        }
+       
+    </style>
+    @helper GridColumnStatusName(string status, int? roomId)
+    {
+        switch (status)
+        {
+            case "pending":
+                <span class="label label-info" style="width:100%" id="status_room_@roomId">Phòng trống</span>
+                break;
+            case "tranfer":
+                <span class="label-danger label" style="width:100%" id="status_room_@roomId">@Wording.Membership_Tranfer</span>
+                break;
+            case "complete":
+                <span class="label-success label" style="width:100%" id="status_room_@roomId">@Wording.Membership_Complete</span>
+                break;
+            case "expired":
+                <span class="label-default label" style="width:100%" id="status_room_@roomId">@Wording.Membership_Expired</span>
+                break;
+            case "inprocess":
+                <span class="label-warning label" style="width:100%" id="status_room_@roomId">@Wording.Membership_Inprocess</span>
+                break;
+        }
+    }
+
+    @helper GridColumnImage(int roomid, string roomCode, string Room, string customername, string Image)
+    {
+        <div class="itemdiv commentdiv" style="height:50px!important;width:100%!important">
+            <div class="user" style="height:72px;width:100%!important;">
+                <div class="ace-thumbnails">
+                    <a id="aImg_@roomid" href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))" title="" data-rel="colorbox" class="cboxElement">
+                        <img id="myImg" name="img_@roomid" alt="" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))">
+                    </a>
+                </div>
+            </div>
+            <div class="body">
+                <div class="name" data-toggle="tooltip" title="Tên phòng">
+                    <h5 class="red"> @Room</h5>
+                </div>
+               
+            </div>
+        </div>
+    }
+    <div class="widget-box">
+        <div class="widget-header">
+            <h4 class="widget-title">
+                <i class="ace-icon fa fa-line-chart"></i>
+                Tình trạng các phòng hiện tại
+            </h4>
+        </div>
+        <div class="widget-body">
+            <div class="widget-main clearfix">
+                @*<p><b>@ViewBag.DateRangeText Doanh số tổng: @(Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Model.Sum(x=>x.Amount),null))</b></p>*@
+                @if (Model.Count() > 0)
+                {
+                    foreach (var group in Model.GroupBy(x => x.Floor).ToList())
+                    {
+                        int count = 1;
+                        int index = 0;
+                        int totalRows = Model.Where(x => x.Floor == group.Key).Count();
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <p><h5 style="border-bottom: #ccc 1px solid;padding-bottom: 5px;">@group.Key</h5></p>
+
+                                @foreach (var item in Model.Where(x => x.Floor == group.Key).ToList())
+                                {
+
+                                    if (count == 1)
+                                    {
+                                        @Html.Raw("<div class=\"dayoff-wrap\">\r\n");
+                                    }
+                                    <div class="col-xs-12" style="padding:2px;width:auto!important">
+
+                                        <div id="dayoff-item-@item.Id" class="dayoff-item">
+                                            <div class="row">
+                                                <div class="col-xs-12">
+                                                    @GridColumnImage(item.Id, item.Code, item.Name, null, null)
+                                                </div>
+                                            </div>
+                                            @*
+                                                 <div class="row">
+                                                    <div class="col-sm-12 text-center">
+                                                        <p class="pull-right" id="countdown_@item.Id">00:00:00</p>
+                                                        <div class="pull-left action-buttons bigger-125">
+                                                            <a title="Thông tin chi tiết xếp lịch" id="info_customer_@item.Id" class="info_customer"><i class="ace-icon fa fa-info-circle blue"></i></a>
+                                                            <a title="Hoàn thành" id="status_complete_@item.Id" class="status_complete">
+                                                                <i class="ace-icon fa fa-check-square-o green"></i>
+                                                            </a>
+                                                            @*<a title="Gia hạn phiếu" class="">
+                                                                <i class="ace-icon fa fa-clock-o orange2"></i>
+                                                            </a>
+                                                            <a id="status_remove_@item.Id" title="Xóa dữ liệu khách hàng khỏi phòng" class="status_remove">
+                                                                <i class="ace-icon fa fa-trash red"></i>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            *@
+                                            @{
+                                                foreach (var items in item.bedList)
+                                                {
+                                                    <div class="row">
+                                                        <div class="col-sm-3 text-center">
+                                                            <i class="fa fa-bed"id="iconbed_@items.Bed_ID" aria-hidden="true"style="font-size: 29px;"></i>
+                                                            @items.Name_Bed
+                                                        </div>
+                                                        <div class="col-sm-9 text-center">
+                                                            <p class="pull-right" id="countdown_@items.Bed_ID">00:00:00</p>
+                                                            <div class="pull-left action-buttons bigger-125">
+                                                                <a title="Thông tin chi tiết xếp lịch" id="info_customer_@items.Bed_ID" class="info_customer"><i class="ace-icon fa fa-info-circle blue"></i></a>
+                                                                <a title="Hoàn thành" id="status_complete_@items.Bed_ID" class="status_complete">
+                                                                    <i class="ace-icon fa fa-check-square-o green"></i>
+                                                                </a>
+                                                                <a title="Thêm giờ" id="status_plustime_@items.Bed_ID" class="status_plustime">
+                                                                    <i class="fa fa-id-card-o" aria-hidden="true"></i>
+
+                                                                </a>
+                     
+                                                                    @*<a title="Gia hạn phiếu" class="">
+            <i class="ace-icon fa fa-clock-o orange2"></i>
+        </a>*@
+                                                                    <a id="status_remove_@items.Bed_ID" title="Xóa dữ liệu khách hàng khỏi phòng" class="status_remove">
+                                                                        <i class="ace-icon fa fa-trash red"></i>
+                                                                    </a>
+                                                                    <dialog id="myDialog">Th</dialog>
+                                                                </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    }
+
+                                                    <div class="row">
+                                                        <div class="col-xs-12 text-center">
+                                                            @GridColumnStatusName("pending", item.Id)
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            if (index == totalRows - 1)
+                                            {
+                                                @Html.Raw("</div>\r\n");
+                                            }
+                                            else
+                                            {
+                                                if (count == 4)
+                                                {
+                                                    count = 1;
+                                                    @Html.Raw("</div>\r\n");
+                                                }
+                                                else
+                                                {
+                                                    count++;
+                                                }
+
+                                                index++;
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-block alert-info">
+                                Không có dữ liệu
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>

@@ -1,0 +1,212 @@
+﻿@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.Domain.Entities
+@{
+    List<UserOnlineViewModel> user = Erp.BackOffice.Helpers.SelectListHelper.GetListUserOnline();
+    List<vwUsers> vwUsers = Erp.BackOffice.Helpers.SelectListHelper.GetSelectvwAllUser();
+    List<UserType> userTypeList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectUserType();
+}
+<style>
+    .infobox {
+        width: 100% !important;
+        border: 0px !important;
+        height: 104px !important;
+    }
+
+    .dayoff-wrap .dayoff-item {
+        width: 100% !important;
+    }
+
+    .search-media .search-actions {
+        width: 30% !important;
+        max-width: 250px !important;
+        min-width: 150px !important;
+    }
+
+    .fa-150 {
+        font-size: 1.5em;
+    }
+
+    .itemdiv.memberdiv {
+        min-width: 195px;
+        width: 100% !important;
+        border-bottom: 0px !important;
+    }
+   
+
+    /*inline block*/
+     .itemdiv.memberdiv > .body > .name{
+    min-width:195px;
+         width: 100%;
+    display:inline-block;         
+    }
+
+    .control-label{
+        text-align:center;
+        color:black;
+        font-size:small;
+        font-weight:bold;       
+    }
+    .form-control {
+        height: 25px;
+        font-size:small;
+    }
+</style>
+@helper GridColumnStatusName(string status, int userid)
+    {
+        switch (status)
+        {
+            case "no_shift":
+                <span class="label label-default label-sm" id="check_user_status_@userid">Không có ca</span>
+                break;
+            case "inprocess":
+                <span class="label-warning label label-sm" id="check_user_status_@userid">Đang làm việc</span>
+                break;
+
+        }
+}
+
+@helper GridColumnImage(int userid, string name, string UserCode, string Image, string Status, DateTime? InTime, DateTime? OutTime)
+    {
+      <div class="itemdiv memberdiv">
+            <div class="user">
+                <div class="ace-thumbnails">
+                    <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "User", "user"))" title="@name" data-rel="colorbox" class="cboxElement">
+                        <img id="myImg" alt="@name" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "User", "user"))">
+                    </a>
+                </div>
+            </div>
+
+            <div class="body">
+                <div class="name">
+                    <b class="red">@name</b>
+
+                </div>
+                <div class="time">
+                    <i class="ace-icon fa fa-clock-o"></i>
+                    <span class="green"><span class="time_in_@userid">@(InTime.HasValue ? InTime.Value.ToString("HH:mm") : "chưa có")</span> - <span class="time_out_@userid">@(OutTime.HasValue ? OutTime.Value.ToString("HH:mm") : "chưa có")</span></span>
+                </div>
+                <div>
+                  
+                    @GridColumnStatusName(Status, userid)
+                    @if (InTime == null || OutTime == null)
+                    {
+                        <div class="inline position-relative">
+                            <button class="btn btn-minier btn-yellow btn-no-border dropdown-toggle" data-toggle="dropdown" data-position="auto">
+                                <i class="ace-icon fa fa-angle-down icon-only bigger-120"></i>
+                            </button>
+
+                            <ul class="dropdown-menu dropdown-only-icon dropdown-yellow dropdown-menu-right dropdown-caret dropdown-close">
+
+                                @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CheckInOut", "SchedulingHistory", "Sale"))
+                                {
+                                    if (InTime == null)
+                                    {
+                                        <li id="checkIn_@userid">
+                                            <a onclick="CheckInOut(@userid,'In')" class="tooltip-success" data-rel="tooltip" title="">
+                                                <span class="green">
+                                                    <i class="ace-icon fa fa-sign-in bigger-110"></i> Xác nhận vào ca
+                                                </span>
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                                @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CheckInOut", "SchedulingHistory", "Sale"))
+                                {
+                                    if (OutTime == null)
+                                    {
+                                        <li id="checkOut_@userid">
+                                            <a onclick="CheckInOut(@userid,'Out')" class="tooltip-warning" data-rel="tooltip" title="">
+                                                <span class="orange">
+                                                    <i class="ace-icon fa fa-sign-out bigger-110"></i> Xác nhận tan ca
+                                                </span>
+                                            </a>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+}
+<div class="widget-box">
+    <div class="widget-header" style="height:auto">
+        @*<i class="ace-icon fa fa-clock-o"></i>
+            Xác nhận ca làm việc của nhân viên*@
+        @*<select id="colorselector">
+                <option value="all">Tất cả nhân viên</option>
+                @foreach (var item in user)
+                {
+                    <option value="@item.Id">@item.FullName</option>
+                }
+            </select>*@
+        <label class="control-label" for="userTypeId" >Lọc theo Nhóm người dùng</label>
+        <div class="button dropdown">
+            <select id="userTypeId" class="form-control ">
+                <option value="all">Tất cả nhân viên</option>
+                @foreach (var item in userTypeList)
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="widget-body">
+        <div id="userStatusList" class="widget-main clearfix">
+            @foreach (var item in user)
+            {
+                foreach (var vwuser in vwUsers)
+                {
+                    if (vwuser.Id == item.Id && vwuser.Status.ToString() == "Active")
+                    {
+                        <div id="@item.UserTypeId"  class="users @item.UserTypeName" data-vwuser-status="@vwuser.Status">
+                            @GridColumnImage(item.Id, item.FullName, item.UserCode, item.ProfileImage, item.Status, item.InTime, item.OutTime)
+                        </div>
+                    }
+                }
+            }
+        </div>
+    </div>
+</div>
+<script>
+    function CheckInOut(id, status) {
+        ShowLoading();
+        var url = "/SchedulingHistory/CheckInOut";
+        $.post(url, { id: id, status: status }, function (res) {
+            if (res != null) {
+                var _li_remove = "#check" + status + "_" + id;
+                $(_li_remove).closest('li').remove();
+                alertPopup("Thông báo", "Xác nhận thành công", "success");
+                if (status == "In") {
+                    $("#check_user_status_" + id).removeClass("label-default").addClass("label-warning").text("Đang làm việc");
+                    $(".time_in_" + id).text(res.strTime);
+                }
+                else {
+                    $("#check_user_status_" + id).removeClass("label-warning").addClass("label-default").text("Không có ca");
+                    $(".time_out_" + id).text(res.strTime);
+                }
+
+            }
+            else {
+                alertPopup("Thông báo", "Xác nhận thất bại", "warning");
+            }
+            HideLoading();
+        });
+    }
+
+    $(function () {
+        $('#userTypeId').change(function () {
+            var selectedEventType = this.options[this.selectedIndex].value;
+            if (selectedEventType == "all") {
+                $('.users').show();
+            } else {
+                
+                $('.users').hide().filter('#' + selectedEventType).show();
+            }
+        });
+    });
+</script>

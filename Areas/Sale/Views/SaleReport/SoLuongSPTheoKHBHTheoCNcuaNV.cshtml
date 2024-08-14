@@ -1,0 +1,257 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@using Erp.BackOffice.Areas.Cms.Models
+@model IEnumerable<ProductInvoiceDetailViewModel>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+    @{
+        ViewBag.Title = "Số Lượng Sản Phẩm Theo KHBH Theo CN của NV";
+        if (Request["IsPopup"] == "true")
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            if (Request["IsPopup"] == "null")
+            {
+                Layout = null;
+            }
+            else
+            {
+                Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+            }
+        }
+        bool IsDisplaySearchPanel = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? false : true;
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "SoLuongSPTheoKHBHTheoCNcuaNV",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = IsDisplaySearchPanel,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int index = 1;
+
+        string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        string countForBrand = Request["countForBrand"];
+        IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.category;
+        string branchId = Request["BranchId"] != null ? Request["BranchId"] : Common.CurrentUser.BranchId.ToString();
+        string ManagerStaffId = Request["ManagerStaffId"];
+        //DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        //// Cộng thêm 1 tháng và trừ đi một ngày.
+        //DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+
+    }
+
+
+    <script type="text/javascript">
+    var exportThis = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function () {
+            var ctx = { worksheet: '@ViewBag.Title' || 'Worksheet', table: document.getElementById("cTable").innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+
+    var exportThisWithParameter = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function (tableID, excelName) {
+            tableID = document.getElementById(tableID)
+            var ctx = { worksheet: excelName || 'Worksheet', table: tableID.innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+    </script>
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+                  <p>
+                      <select id="month" name="month">
+                          @for (int i = 1; i <= 12; i++)
+                          {
+                              <option @(Month == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+                          }
+                      </select>
+                      <select id="year" name="year">
+                          @for (int i = 2016; i <= (DateTime.Now.Year + 1) + 1; i++)
+                          {
+                              <option @(Year == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+                          }
+                      </select>
+
+                      <select style="text-align-last:center;width:125px" class="item_countForBrand" id="countForBrand" name="countForBrand">
+                          <option value=""> Chọn nhãn hàng</option>
+
+
+
+                          @foreach (var item in origin)
+                          {
+
+                              <option @(countForBrand == item.Value ? "Selected" : "") value="@item.Value"> @item.Name </option>
+
+
+                          }
+
+                      </select>
+                      @Html.DropDownList("ManagerStaffId", SelectListHelper.GetSelectList_User(ManagerStaffId,"Người quản lý"))
+                      @Html.TextBox("txtproductname", Request["txtproductname"], new { @class = "", autocomplete = "off", placeholder = "Tên sản phẩm" })
+                  </p>
+
+    }
+
+    <div class="table-responsive" id="dudoanBH" style="margin-bottom:40px">
+        <table id="cTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:40px;text-align:center">STT</th>
+                    <th style="width: 300px; text-align: center;">KẾ HOẠCH THÁNG</th>
+                    <th style="width: 300px; text-align:center;">NGƯỜI QUẢN LÝ</th>
+                    <th style="width: 300px; text-align:center;">NHÓM HƯỞNG DOANH SỐ</th>
+                    <th style="width: 300px; text-align: center; ">NHÃN HÀNG</th>
+                    <th style="width: 300px; text-align: center; ">TÊN SẢN PHẨM</th>
+                    <th style="width: 150px; text-align: center; ">SỐ LƯỢNG SẢN PHẨM</th>
+                    @*<th style="width: 300px; text-align: center; ">Số Lần CSD</th>*@
+
+                </tr>
+            </thead>
+            @foreach (var item in Model)
+            {
+                <tr class="@(index%2==0?"alert-warning":"")">
+                    <td>
+                        <span>@(index++)</span>
+                    </td>
+                    <td>@(item.Month) / @(item.Year)</td>
+                    <td>@(item.ManagerStaffName)</td>
+                    <td>@(item.NhomNVKD)</td>
+                    <td>@(item.CountForBrand)</td>
+                    <td>@(item.ProductName) </td>
+                    <td>@(item.Quantity)</td>
+                    @*<td>@(item.solan)</td>*@
+
+                </tr>
+            }
+            <thead>
+                <tr class="">
+
+                    <td class="text-center" style="font-weight:bold" colspan="6">Tổng</td>
+                    <td> @ViewBag.soluong</td>
+            </thead>
+        </table>
+
+    </div>
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportThis()">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    }
+
+    <script src="~/Scripts/jquery.floatThead.js"></script>
+<script src="~/Scripts/jquery.table.marge.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#cTable").floatThead({ top: 30 });
+        });
+    </script>
+
+<script>
+    $('.table').margetable({
+        type: 1,
+        colindex: [{
+            index: 1,
+            dependent: [0]
+        }]
+    });
+
+    //$('.table').margetable({
+    //    type: 1,
+    //    colindex: [{
+    //        index: 8,
+    //        dependent: [0, 4]
+    //    }]
+    //});
+
+    $('.table').margetable({
+            type: 2,
+    colindex: [0] // column 1, 2
+    });
+</script>
+
+
+    @section Scripts {
+        <script>
+            function exportThis() {
+
+                var month = $('#month').val();
+                var year = $('#year').val();
+                var Brand = $('#countForBrand').val();
+                var managerstaffid = $('#ManagerStaffId').val();
+
+                OpenPopup('/SaleReport/ExportSLdudoanduatrenKHBHtheothangcuaNV?month=' + month + '&year=' + year + '&ManagerStaffName=' + managerstaffid + '&countForBran=d' + Brand + '&IsPopup=true', '', 0, 900);
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 200000);
+                HideLoading();
+            }
+
+            $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+            });
+
+            //$(function () {
+                
+            //    function groupTable($rows, startIndex, total) {
+            //        if (total === 0) {
+            //            return;
+            //        }
+            //        debugger
+            //        var i, currentIndex = startIndex, count = 1, lst = [];
+            //        var tds = $rows.find('td:eq(' + currentIndex + ')');
+            //        var ctrl = $(tds[0]);
+            //        lst.push($rows[0]);
+            //        for (i = 1; i <= tds.length; i++) {                       
+            //            if (ctrl.text() == $(tds[i]).text()) {
+            //                count++;
+            //                $(tds[i]).addClass('deleted');
+            //                lst.push($rows[i]);
+            //            }   
+            //            else {
+            //                if (count > 1) {
+            //                    ctrl.attr('rowspan', count);
+            //                    groupTable($(lst), startIndex + 1, total - 1)
+            //                }
+            //                count = 1;
+            //                lst = [];
+            //                ctrl = $(tds[i]);
+            //                lst.push($rows[i]);
+            //            }
+            //        }
+            //    }
+            //    groupTable($('#cTable tr:has(td)'), 0, 4);
+            //    $('#cTable .deleted').remove();
+            //});
+        </script>
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    }

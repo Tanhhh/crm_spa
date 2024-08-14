@@ -1,0 +1,488 @@
+﻿<error errorId="1bff8594-d535-49a2-953c-7944972bc6f5" application="/LM/W3SVC/2/ROOT" host="DESKTOP-H6FQOND" type="System.InvalidOperationException" message="Cannot retrieve property 'Name' because localization failed.  Type 'Erp.BackOffice.App_GlobalResources.Wording' is not public or does not contain a public static string property with the name 'TotalMinute'." source="System.ComponentModel.DataAnnotations" detail="System.InvalidOperationException: Cannot retrieve property 'Name' because localization failed.  Type 'Erp.BackOffice.App_GlobalResources.Wording' is not public or does not contain a public static string property with the name 'TotalMinute'.&#xD;&#xA;   at System.ComponentModel.DataAnnotations.LocalizableString.&lt;&gt;c__DisplayClass12_0.&lt;GetLocalizableValue&gt;b__1()&#xD;&#xA;   at System.ComponentModel.DataAnnotations.LocalizableString.GetLocalizableValue()&#xD;&#xA;   at System.Web.Mvc.CachedDataAnnotationsModelMetadata.ComputeDisplayName()&#xD;&#xA;   at System.Web.Mvc.CachedModelMetadata`1.CacheOrCompute[TResult](Func`1 computeThunk, TResult&amp; value, Boolean&amp; computed)&#xD;&#xA;   at System.Web.Mvc.CachedModelMetadata`1.get_DisplayName()&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindProperty(ControllerContext controllerContext, ModelBindingContext bindingContext, PropertyDescriptor propertyDescriptor)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindProperties(ControllerContext controllerContext, ModelBindingContext bindingContext)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindComplexElementalModel(ControllerContext controllerContext, ModelBindingContext bindingContext, Object model)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindComplexModel(ControllerContext controllerContext, ModelBindingContext bindingContext)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.UpdateCollection(ControllerContext controllerContext, ModelBindingContext bindingContext, Type elementType)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindComplexModel(ControllerContext controllerContext, ModelBindingContext bindingContext)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.GetPropertyValue(ControllerContext controllerContext, ModelBindingContext bindingContext, PropertyDescriptor propertyDescriptor, IModelBinder propertyBinder)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindProperty(ControllerContext controllerContext, ModelBindingContext bindingContext, PropertyDescriptor propertyDescriptor)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindProperties(ControllerContext controllerContext, ModelBindingContext bindingContext)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindComplexElementalModel(ControllerContext controllerContext, ModelBindingContext bindingContext, Object model)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindComplexModel(ControllerContext controllerContext, ModelBindingContext bindingContext)&#xD;&#xA;   at System.Web.Mvc.DefaultModelBinder.BindModel(ControllerContext controllerContext, ModelBindingContext bindingContext)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.GetParameterValue(ControllerContext controllerContext, ParameterDescriptor parameterDescriptor)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.GetParameterValues(ControllerContext controllerContext, ActionDescriptor actionDescriptor)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;BeginInvokeAction&gt;b__1e(AsyncCallback asyncCallback, Object asyncState)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.Begin(AsyncCallback callback, Object state, Int32 timeout)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.BeginInvokeAction(ControllerContext controllerContext, String actionName, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.Controller.&lt;&gt;c__DisplayClass1d.&lt;BeginExecuteCore&gt;b__17(AsyncCallback asyncCallback, Object asyncState)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.Begin(AsyncCallback callback, Object state, Int32 timeout)&#xD;&#xA;   at System.Web.Mvc.Controller.BeginExecuteCore(AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.Begin(AsyncCallback callback, Object state, Int32 timeout)&#xD;&#xA;   at System.Web.Mvc.Controller.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.Controller.System.Web.Mvc.Async.IAsyncController.BeginExecute(RequestContext requestContext, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.&lt;&gt;c__DisplayClass8.&lt;BeginProcessRequest&gt;b__2(AsyncCallback asyncCallback, Object asyncState)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.Begin(AsyncCallback callback, Object state, Int32 timeout)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.BeginProcessRequest(HttpContext httpContext, AsyncCallback callback, Object state)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.System.Web.IHttpAsyncHandler.BeginProcessRequest(HttpContext context, AsyncCallback cb, Object extraData)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="adminq1" time="2019-05-31T02:26:44.0188063Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CACHE_CONTROL:max-age=0&#xD;&#xA;HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_CONTENT_LENGTH:11279&#xD;&#xA;HTTP_CONTENT_TYPE:multipart/form-data; boundary=----WebKitFormBoundaryoH7cfwmd9Gu7uhMn&#xD;&#xA;HTTP_ACCEPT:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate, br&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=kh03fm1knchgleidwarmj5os; __RequestVerificationToken=z1m5_6Ox0Y-hnyzHbW2Omh-AthTQPFnAVaEPDLbX4yyZlVrBrbrTdD0Ls64beXUpeFWS3V-UDhnOmIgQ-L8Z13C22i3Eejyk11f6G95QaHE1; BO=4C556E41723C6028CD04B32509787D6A0709E263E3A7797C01199A20A46AF390C420F38592D3F3948C0362207903A2E69FB50498DDAAF84256862C9003B783DAE586A3322614DDCC177502744B36D38F66D89EEA6DDAB102EF0F9CAD7179FADE&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/Service/Edit/12657&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36&#xD;&#xA;HTTP_ORIGIN:http://localhost:53200&#xD;&#xA;HTTP_UPGRADE_INSECURE_REQUESTS:1&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Cache-Control: max-age=0&#xD;&#xA;Connection: keep-alive&#xD;&#xA;Content-Length: 11279&#xD;&#xA;Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryoH7cfwmd9Gu7uhMn&#xD;&#xA;Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3&#xD;&#xA;Accept-Encoding: gzip, deflate, br&#xD;&#xA;Accept-Language: vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5&#xD;&#xA;Cookie: ASP.NET_SessionId=kh03fm1knchgleidwarmj5os; __RequestVerificationToken=z1m5_6Ox0Y-hnyzHbW2Omh-AthTQPFnAVaEPDLbX4yyZlVrBrbrTdD0Ls64beXUpeFWS3V-UDhnOmIgQ-L8Z13C22i3Eejyk11f6G95QaHE1; BO=4C556E41723C6028CD04B32509787D6A0709E263E3A7797C01199A20A46AF390C420F38592D3F3948C0362207903A2E69FB50498DDAAF84256862C9003B783DAE586A3322614DDCC177502744B36D38F66D89EEA6DDAB102EF0F9CAD7179FADE&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/Service/Edit/12657&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36&#xD;&#xA;Origin: http://localhost:53200&#xD;&#xA;Upgrade-Insecure-Requests: 1&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="11279" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="multipart/form-data; boundary=----WebKitFormBoundaryoH7cfwmd9Gu7uhMn" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/Service/Edit/12657" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Service\Edit\12657" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="2870" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="POST" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/Service/Edit/12657" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/Service/Edit/12657" />
+    </item>
+    <item name="HTTP_CACHE_CONTROL">
+      <value string="max-age=0" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_CONTENT_LENGTH">
+      <value string="11279" />
+    </item>
+    <item name="HTTP_CONTENT_TYPE">
+      <value string="multipart/form-data; boundary=----WebKitFormBoundaryoH7cfwmd9Gu7uhMn" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate, br" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="vi-VN,vi;q=0.9,fr-FR;q=0.8,fr;q=0.7,en-US;q=0.6,en;q=0.5" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=kh03fm1knchgleidwarmj5os; __RequestVerificationToken=z1m5_6Ox0Y-hnyzHbW2Omh-AthTQPFnAVaEPDLbX4yyZlVrBrbrTdD0Ls64beXUpeFWS3V-UDhnOmIgQ-L8Z13C22i3Eejyk11f6G95QaHE1; BO=4C556E41723C6028CD04B32509787D6A0709E263E3A7797C01199A20A46AF390C420F38592D3F3948C0362207903A2E69FB50498DDAAF84256862C9003B783DAE586A3322614DDCC177502744B36D38F66D89EEA6DDAB102EF0F9CAD7179FADE" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/Service/Edit/12657" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36" />
+    </item>
+    <item name="HTTP_ORIGIN">
+      <value string="http://localhost:53200" />
+    </item>
+    <item name="HTTP_UPGRADE_INSECURE_REQUESTS">
+      <value string="1" />
+    </item>
+  </serverVariables>
+  <form>
+    <item name="Id">
+      <value string="12657" />
+    </item>
+    <item name="CreatedUserId">
+      <value string="" />
+    </item>
+    <item name="AssignedUserId">
+      <value string="" />
+    </item>
+    <item name="CreatedDate">
+      <value string="12/05/2019 11:10:36 SA" />
+    </item>
+    <item name="IsDeleted">
+      <value string="False" />
+    </item>
+    <item name="Image_Name">
+      <value string="" />
+    </item>
+    <item name="Type">
+      <value string="service" />
+    </item>
+    <item name="IsPopup">
+      <value string="" />
+    </item>
+    <item name="Name">
+      <value string="1L/BDY DA NONG 10L GIAM 20%" />
+    </item>
+    <item name="Code">
+      <value string="1L/BDY DA NONG 10L GIAM 20%" />
+    </item>
+    <item name="Origin">
+      <value string="DICHVU" />
+    </item>
+    <item name="CategoryCode">
+      <value string="" />
+    </item>
+    <item name="ProductGroup">
+      <value string="" />
+    </item>
+    <item name="Unit">
+      <value string="" />
+    </item>
+    <item name="ProductLinkId">
+      <value string="" />
+    </item>
+    <item name="PriceOutbound">
+      <value string="400000" />
+    </item>
+    <item name="TimeForService">
+      <value string="247.4" />
+    </item>
+    <item name="QuantityDayUsed">
+      <value string="" />
+    </item>
+    <item name="QuantityDayNotify">
+      <value string="" />
+    </item>
+    <item name="MinQuantityforSevice">
+      <value string="1" />
+    </item>
+    <item name="Description">
+      <value string="" />
+    </item>
+    <item name="DetailList[0].Id">
+      <value string="0" />
+    </item>
+    <item name="DetailList[0].Name">
+      <value string="" />
+    </item>
+    <item name="DetailList[0].TotalMinute">
+      <value string="" />
+    </item>
+    <item name="DetailList[0].Note">
+      <value string="" />
+    </item>
+    <item name="DetailList[1].Id">
+      <value string="12179" />
+    </item>
+    <item name="DetailList[1].Name">
+      <value string="TẨY TRANG" />
+    </item>
+    <item name="DetailList[1].TotalMinute">
+      <value string="5.4" />
+    </item>
+    <item name="DetailList[1].Note">
+      <value string="1" />
+    </item>
+    <item name="DetailList[2].Id">
+      <value string="12180" />
+    </item>
+    <item name="DetailList[2].Name">
+      <value string="Calms" />
+    </item>
+    <item name="DetailList[2].TotalMinute">
+      <value string="10" />
+    </item>
+    <item name="DetailList[2].Note">
+      <value string="2" />
+    </item>
+    <item name="DetailList[3].Id">
+      <value string="12181" />
+    </item>
+    <item name="DetailList[3].Name">
+      <value string="ĐẮP BÙN BODY" />
+    </item>
+    <item name="DetailList[3].TotalMinute">
+      <value string="20" />
+    </item>
+    <item name="DetailList[3].Note">
+      <value string="3" />
+    </item>
+    <item name="DetailList[4].Id">
+      <value string="12182" />
+    </item>
+    <item name="DetailList[4].Name">
+      <value string="MASSAGE BODY" />
+    </item>
+    <item name="DetailList[4].TotalMinute">
+      <value string="55" />
+    </item>
+    <item name="DetailList[4].Note">
+      <value string="4" />
+    </item>
+    <item name="DetailList[5].Id">
+      <value string="12183" />
+    </item>
+    <item name="DetailList[5].Name">
+      <value string="Massage" />
+    </item>
+    <item name="DetailList[5].TotalMinute">
+      <value string="20" />
+    </item>
+    <item name="DetailList[5].Note">
+      <value string="5" />
+    </item>
+    <item name="DetailList[6].Id">
+      <value string="12184" />
+    </item>
+    <item name="DetailList[6].Name">
+      <value string="pro massage (mặt + mắt)" />
+    </item>
+    <item name="DetailList[6].TotalMinute">
+      <value string="30" />
+    </item>
+    <item name="DetailList[6].Note">
+      <value string="5" />
+    </item>
+    <item name="DetailList[7].Id">
+      <value string="12185" />
+    </item>
+    <item name="DetailList[7].Name">
+      <value string="MASSAGE MẮT " />
+    </item>
+    <item name="DetailList[7].TotalMinute">
+      <value string="10" />
+    </item>
+    <item name="DetailList[7].Note">
+      <value string="6" />
+    </item>
+    <item name="DetailList[8].Id">
+      <value string="12186" />
+    </item>
+    <item name="DetailList[8].Name">
+      <value string="RỬA MẶT ORLANE" />
+    </item>
+    <item name="DetailList[8].TotalMinute">
+      <value string="10" />
+    </item>
+    <item name="DetailList[8].Note">
+      <value string="7" />
+    </item>
+    <item name="DetailList[9].Id">
+      <value string="12187" />
+    </item>
+    <item name="DetailList[9].Name">
+      <value string="tẩy quầng thâm mắt" />
+    </item>
+    <item name="DetailList[9].TotalMinute">
+      <value string="10" />
+    </item>
+    <item name="DetailList[9].Note">
+      <value string="8" />
+    </item>
+    <item name="DetailList[10].Id">
+      <value string="12188" />
+    </item>
+    <item name="DetailList[10].Name">
+      <value string="MÁY MẮT" />
+    </item>
+    <item name="DetailList[10].TotalMinute">
+      <value string="10" />
+    </item>
+    <item name="DetailList[10].Note">
+      <value string="9" />
+    </item>
+    <item name="DetailList[11].Id">
+      <value string="12189" />
+    </item>
+    <item name="DetailList[11].Name">
+      <value string="Mặt nạ ORLANE" />
+    </item>
+    <item name="DetailList[11].TotalMinute">
+      <value string="5" />
+    </item>
+    <item name="DetailList[11].Note">
+      <value string="9" />
+    </item>
+    <item name="DetailList[12].Id">
+      <value string="12190" />
+    </item>
+    <item name="DetailList[12].Name">
+      <value string="MÁY PRO" />
+    </item>
+    <item name="DetailList[12].TotalMinute">
+      <value string="15" />
+    </item>
+    <item name="DetailList[12].Note">
+      <value string="10" />
+    </item>
+    <item name="DetailList[13].Id">
+      <value string="12191" />
+    </item>
+    <item name="DetailList[13].Name">
+      <value string="Lotion" />
+    </item>
+    <item name="DetailList[13].TotalMinute">
+      <value string="5" />
+    </item>
+    <item name="DetailList[13].Note">
+      <value string="10" />
+    </item>
+    <item name="DetailList[14].Id">
+      <value string="12192" />
+    </item>
+    <item name="DetailList[14].Name">
+      <value string="Serum" />
+    </item>
+    <item name="DetailList[14].TotalMinute">
+      <value string="1" />
+    </item>
+    <item name="DetailList[14].Note">
+      <value string="11" />
+    </item>
+    <item name="DetailList[15].Id">
+      <value string="12193" />
+    </item>
+    <item name="DetailList[15].Name">
+      <value string="Cream" />
+    </item>
+    <item name="DetailList[15].TotalMinute">
+      <value string="11" />
+    </item>
+    <item name="DetailList[15].Note">
+      <value string="12" />
+    </item>
+    <item name="DetailList[16].Id">
+      <value string="12194" />
+    </item>
+    <item name="DetailList[16].Name">
+      <value string="Máy" />
+    </item>
+    <item name="DetailList[16].TotalMinute">
+      <value string="10" />
+    </item>
+    <item name="DetailList[16].Note">
+      <value string="13" />
+    </item>
+    <item name="DetailList[17].Id">
+      <value string="12195" />
+    </item>
+    <item name="DetailList[17].Name">
+      <value string="THOA KEM BODY" />
+    </item>
+    <item name="DetailList[17].TotalMinute">
+      <value string="15" />
+    </item>
+    <item name="DetailList[17].Note">
+      <value string="14" />
+    </item>
+    <item name="DetailList[18].Id">
+      <value string="12196" />
+    </item>
+    <item name="DetailList[18].Name">
+      <value string="Tẩy tế bào chết" />
+    </item>
+    <item name="DetailList[18].TotalMinute">
+      <value string="5" />
+    </item>
+    <item name="DetailList[18].Note">
+      <value string="15" />
+    </item>
+    <item name="Product">
+      <value string="" />
+    </item>
+    <item name="DetailServiceList[0].ProductId">
+      <value string="0" />
+    </item>
+    <item name="DetailServiceList[0].Id">
+      <value string="0" />
+    </item>
+    <item name="DetailServiceList[0].Quantity">
+      <value string="" />
+    </item>
+  </form>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="kh03fm1knchgleidwarmj5os" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="z1m5_6Ox0Y-hnyzHbW2Omh-AthTQPFnAVaEPDLbX4yyZlVrBrbrTdD0Ls64beXUpeFWS3V-UDhnOmIgQ-L8Z13C22i3Eejyk11f6G95QaHE1" />
+    </item>
+    <item name="BO">
+      <value string="4C556E41723C6028CD04B32509787D6A0709E263E3A7797C01199A20A46AF390C420F38592D3F3948C0362207903A2E69FB50498DDAAF84256862C9003B783DAE586A3322614DDCC177502744B36D38F66D89EEA6DDAB102EF0F9CAD7179FADE" />
+    </item>
+  </cookies>
+</error>

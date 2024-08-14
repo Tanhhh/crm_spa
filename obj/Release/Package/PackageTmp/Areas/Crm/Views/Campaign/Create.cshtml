@@ -1,0 +1,165 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Crm.Models
+
+@model CampaignViewModel
+
+@{
+    ViewBag.Title = Wording.PageCreate_Campaign;
+    bool isPopup = Request["popup"] != null && Request["popup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Campaign",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true,
+        AdvancedSearch = true,
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Create", "Campaign", null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+
+    @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span4, true)
+    @Html.CustomDropDownListFor(model => model.Type, Model.TypeSelectList, WidthType.span2, true, null, DropdownListStyle.DropdownListStyleDefault)
+    @Html.CustomDropDownListFor(model => model.Status, Model.StatusSelectList, WidthType.span2, true, null, DropdownListStyle.DropdownListStyleDefault)
+    @Html.DateInput(model => model.StartDate, "dd/MM/yyyy", "99/99/9999", true, WidthType.span12)
+    @Html.DateInput(model => model.EndDate, "dd/MM/yyyy", "99/99/9999", true, WidthType.span12)
+    
+    //@SpinnerFor chrome k hỗ trợ
+    @*@Html.SpinnerFor(model => model.BudgetedCost, 100, 0, 1, SpinnerStyle.SpinnerStyle1, true)
+    @Html.SpinnerFor(model => model.ExpectedRevenue, 100, 0, 1, SpinnerStyle.SpinnerStyle1, true)
+    @Html.SpinnerFor(model => model.ActualCost, 100, 0, 1, SpinnerStyle.SpinnerStyle1, true)
+    @Html.SpinnerFor(model => model.ExpectedResponse, 100, 0, 1, SpinnerStyle.SpinnerStyle1, true)
+    @Html.SpinnerFor(model => model.Commision, 100, 0, 1, SpinnerStyle.SpinnerStyle1, true)*@
+    
+    @Html.CustomTextboxFor(model => model.BudgetedCost, null, null, WidthType.span4, true)
+    @Html.CustomTextboxFor(model => model.ExpectedRevenue, null, null, WidthType.span4, true)
+    @Html.CustomTextboxFor(model => model.ActualCost, null, null, WidthType.span4, true)
+    @Html.CustomTextboxFor(model => model.ExpectedResponse, null, null, WidthType.span4, true)
+    @Html.CustomTextboxFor(model => model.Commision, null, null, WidthType.span4, true)
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button style="margin-top:10px" type="submit" class="btn btn-info" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save bigger-110"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $("#BudgetedCost").attr("value", "0");
+        $("#ExpectedRevenue").attr("value", "0");
+        $("#ActualCost").attr("value", "0");
+        $("#ExpectedResponse").attr("value", "0");
+        $("#Commision").attr("value", "0");
+        $(function () {
+            $(".datetype").datepicker({ dateFormat: 'dd/MM/yyyy' });
+        });
+
+        $(document).ready(function () {
+            // kiểm tra nhập chữ số ký tự đặc biệt
+            $('#BudgetedCost').change(function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(0);
+                }
+            });
+
+            $('#ExpectedRevenue').change(function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(0);
+                }
+            });
+
+            $('#ActualCost').change(function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(0);
+                }
+            });
+
+            $('#ExpectedResponse').change(function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(0);
+                }
+            });
+
+            $('#Commision').change(function () {
+                $(this).val($(this).val().replace(/\-/g, ''));
+                $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+                var ralVal = numeral($(this).val());
+                if (ralVal <= 0) {
+                    $(this).val(0);
+                }
+                else if (ralVal > 100) {
+                    $(this).val(100);
+                }
+            });
+
+            $('#StartDate').change(function () {
+                //debugger
+                var from = $("#StartDate").val();
+                var to = $("#EndDate").val();
+                var f = toDate(from).getTime();
+                var t = toDate(to).getTime();
+
+                if (t < f || to == '' || to == null) {
+                    $('#EndDate').val(from);
+                }
+            });
+
+            $('#EndDate').change(function () {
+                var from = $("#StartDate").val();
+                var to = $("#EndDate").val();
+                var f = toDate(from).getTime();
+                var t = toDate(to).getTime();
+
+                if (t < f || to == '' || to == null) {
+                    $('#EndDate').val(from);
+                }
+            });
+        });
+
+        function toDate(selector) {
+            var from = selector.split("/");
+            return new Date(from[2], from[1], from[0]);
+        }
+    </script>
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/mm/yyyy")
+}

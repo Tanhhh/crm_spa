@@ -1,0 +1,48 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@model CategoryViewModel
+
+@{
+    Layout = null;
+}
+
+<table class="table table-responsive table-bordered">
+    <thead>
+        <tr>
+            <td style="width:5%"></td>
+            <td style="width:15%">Trạng thái</td>
+            <td style="width:40%">Chi tiết</td>
+            <td style="width:40%">Ghi chú</td>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.ListQuestion.Count(); i++)
+        {
+            <tr>
+                <td>@(Model.ListQuestion[i].OrderNo)</td>
+                <td>
+                @(Model.ListQuestion[i].Name)
+                    <label style="margin-right:30px !important">
+                        <input name="QuestionId_@Model.ListQuestion[i].Id" value="@Model.ListQuestion[i].Id" type="checkbox" class="ace check_all" />
+                        <span class="lbl"></span>
+                    </label>
+                </td>
+                <td>
+                    @foreach (var answer in Model.ListQuestion[i].DetailList)
+                    {
+                        <label style="margin-right:30px !important">
+                            <input name="TargetId_@(Model.ListQuestion[i].Id)_@answer.Id" type="checkbox" class="ace" data-question-id="@Model.ListQuestion[i].Id" data-target-module="Answer" data-target-id="@answer.Id" value="@answer.Id" />
+                            <span class="lbl"> @answer.Content</span>
+                        </label>
+                    }
+                </td>
+                <td>
+                    <textarea class="textarea" id="Content_@(Model.ListQuestion[i].Id)_0" data-question-id="@Model.ListQuestion[i].Id" data-target-module="Answer" data-target-id="0"></textarea>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>

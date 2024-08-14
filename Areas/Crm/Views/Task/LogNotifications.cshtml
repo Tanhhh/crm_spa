@@ -1,0 +1,270 @@
+﻿@model List<Erp.BackOffice.Crm.Models.TaskMeetingViewModel>
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+    @{
+        var path = Erp.BackOffice.Helpers.Common.GetSetting("Staff");
+        ViewBag.Title = "Log notifications";
+        bool isPopup = Request["popup"] != null && Request["popup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Task",
+            ActionName = "LogNotifications",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = false,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        var mau = "";
+    }
+    <style type="text/css">
+        /* Create the blue navigation bar */
+        /*.navbar {
+            background-color: #3b5998;
+            font-size: 22px;
+            padding: 5px 10px;
+        }*/
+
+        /* Define how each icon button should look like */
+        .button {
+            color: white;
+            display: inline-block; /* Inline elements with width and height. TL;DR they make the icon buttons stack from left-to-right instead of top-to-bottom */
+            position: relative; /* All 'absolute'ly positioned elements are relative to this one */
+            padding: 2px 5px; /* Add some padding so it looks nice */
+        }
+
+        /* Make the badge float in the top right corner of the button */
+        .button__badge {
+            background-color: #fa3e3e;
+            border-radius: 2px;
+            color: white;
+            padding: 1px 3px;
+            font-size: 10px;
+            position: absolute; /* Position the badge within the relatively positioned button */
+            top: 0px;
+            right: 0px;
+            height: 17px;
+            line-height: 15px;
+        }
+
+        .nav .open > a:focus {
+            color: #2c5976;
+        }
+
+        .ace-nav > li > a {
+            min-width: 30px !important;
+        }
+
+        .dropdown-navbar .msg-photo {
+            max-height: 45px;
+            border-radius: 100%;
+            max-width: 45px;
+        }
+
+        .mss-style {
+            padding: 10px 2px;
+            margin: 0;
+            border-top: 1px solid;
+            font-size: 12px;
+            line-height: 16px;
+            color: #555 !important;
+            background-color: transparent !important;
+            white-space: normal;
+            border-top-color: #E4ECF3;
+        }
+
+        .dropdown-navbar .msg-photo {
+            max-width: 45px;
+            float: left;
+            margin-top: 2px;
+            max-height: 45px;
+            border-radius: 100%;
+        }
+
+        .dropdown-navbar .msg-body {
+            display: block;
+            line-height: 20px;
+            white-space: normal;
+            vertical-align: middle;
+            margin-left: 50px;
+            margin-right: 40px;
+        }
+
+        .msg-title {
+            display: inline-block;
+            line-height: 14px;
+            font-size: 12px !important;
+            color: black !important;
+        }
+
+        .msg-time {
+            display: block;
+            font-size: 11px;
+            color: #777;
+        }
+
+        .dropdown-navbar {
+            padding: 0;
+            width: 400px !important;
+        }
+
+        .gritter-image {
+            border-radius: 100%;
+        }
+
+        .notifications-action a {
+            margin: 0px !important;
+            height: 25px !important;
+            max-width: 20px !important;
+        }
+
+        .notifications-action {
+            max-width: 40px;
+            margin: 0px;
+            float: right;
+            position: initial;
+            display: grid !important;
+        }
+
+        .dropdown-navbar > li {
+            padding: 10px 8px;
+            background-color: #FFF;
+        }
+
+        .dropdown-navbar > .dropdown-content {
+            padding: 0;
+            width: 400px;
+        }
+
+        .dropdown-footer {
+            padding: 0px !important;
+        }
+
+        .dropdown-navbar.navbar-pink > li.dropdown-header {
+            background-color: #ECF2F7 !important;
+            color: #8090A0 !important;
+            border-bottom-color: #BCD4E5 !important;
+        }
+        .msg-photoall {
+            display: inline-block;
+            width: 60px;
+        }
+
+
+
+        .notificationAllLead {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: black;
+            width: 100%;
+            background-color: #fbf8df;
+            border-radius: 15px;
+            border: 1px solid #fbf8df;
+        }
+
+        .msg-bodyall {
+            margin-left: 20px;
+        }
+
+        .notificationAllLeadli {
+            list-style-type: none;
+            margin-left: 40px;
+            margin-bottom: 5px;
+        }
+
+        .notificationAllLead:hover {
+            background-color: #efefef;
+            text-decoration: none;
+        }
+    </style>
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    <ul>
+        <div style="display: flex; align-items: center; gap: 1rem; margin: 1.5rem 0; border-bottom: 1.5px dashed #dbdbdb; padding-bottom: 1.5rem; margin-left: 40px;">
+            <img src="~/assets/img/bell.png" alt="Alternate Text" />
+            <h3 style="margin: 0; text-transform: capitalize; font-size: 2rem; font-weight: 500;">Các Thông báo</h3>
+        </div>
+        @foreach (var item in Model)
+        {
+            <li class="notificationAllLeadli">
+                <a data-lead-id="@item.LeadId" data-is-send-notifications="@item.IsSendNotifications" data-id="@item.Id" class="clickLead notificationAllLead">
+                    @if (item.Source == "ZALO")
+                    {
+                        <span class="msg-photo">
+                            <img src="~/assets/img/zalooa.png" alt="User Avatar" class="msg-photoall" style="width:50px;height:50px;margin-left:5px">
+
+
+                        </span>
+
+                        <div class="msg-bodyall">
+                            <div style="display; flex; align-items:center; gap: 1rem">
+                                <span class="msg-title-leadmeetingall"><strong>Tin nhắn Zalo OA</strong></span>
+                                <span class="msg-timeall">
+                                    <i class="ace-icon fa fa-clock-o"></i>
+                                    @item.CreatedDate.Value.ToString("HH:mm dd/MM/yyyy")
+                                </span>
+                            </div>
+                            <span class="msg-locationall" style="display: block;">Tin nhắn: @item.MeetingTitle</span>
+
+                            <span class="msg-locationall" style="display: block;">Link: @item.MeetingLocation</span>
+
+                        </div>
+                    }
+                    else if (item.Source == "FACEBOOK")
+                    {
+                        <span class="msg-photo">
+                            <img src="https://img.icons8.com/?size=256&id=118568&format=png" alt="User Avatar" class="msg-photoall">
+
+
+                        </span>
+
+                        <div class="msg-bodyall">
+                            <div style="display; flex; align-items:center; gap: 1rem">
+                                <span class="msg-title-leadmeetingall"><strong>Facebook</strong></span>
+                                <span class="msg-timeall">
+                                    <i class="ace-icon fa fa-clock-o"></i>
+                                    @item.CreatedDate.Value.ToString("HH:mm dd/MM/yyyy")
+                                </span>
+                            </div>
+                            <span class="msg-locationall" style="display: block;">Nội dung: @item.MeetingTitle</span>
+
+                            <span class="msg-locationall" style="display: block;">Link: @item.MeetingLocation</span>
+
+                        </div>
+                    }
+
+
+                </a>
+            </li>
+        }
+    </ul>
+
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js" type="text/javascript"></script>
+    <script src="~/signalr/hubs"></script>
+    @section Scripts {
+        <script type="text/javascript">
+
+
+            // This optional function html-encodes messages for display in the page.
+            function htmlEncode(value) {
+                var encodedValue = $('<div />').text(value).html();
+                return encodedValue;
+            }
+
+            $(document).ready(function () {
+                $('[data-rel="tooltip"]').tooltip({ container: 'body' });
+
+            });
+
+        </script>
+    }

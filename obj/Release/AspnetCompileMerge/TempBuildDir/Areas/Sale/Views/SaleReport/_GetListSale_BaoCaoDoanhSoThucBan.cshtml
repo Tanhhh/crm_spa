@@ -1,0 +1,47 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_BaoCaoDoanhSoThucBanViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Ngày tạo</th>
+                <th class="text-center">Mã đơn hàng</th>
+                <th class="text-center">Chi nhánh</th>
+                <th class="text-center">Tên khách hàng</th>
+                <th class="text-center">Doanh số</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+                {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+                <td class="text-center">@(item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm"))</td>
+                <td>
+                    <a href="@Url.Action("Detail", "ProductInvoice", new { Id = @item.Id })">@item.ProductInvoiceCode</a>
+                </td>
+                <td class="text-center">@item.BranchName</td>
+                <td class="text-center">
+                    <a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = item.CustomerId, IsPopup = true })', '', 0, 0)">@item.CustomerName</a>
+                </td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(item.TotalAmount, null))</td>
+            </tr>
+                }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" style="text-align:right"><b>Tổng</b></td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalAmount), null))</td>
+            </tr>
+        </tfoot>
+    </table>

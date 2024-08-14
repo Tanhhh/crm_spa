@@ -1,0 +1,182 @@
+﻿<error errorId="5ae72cb7-f7cc-498d-8cdf-ba4f21fe898a" application="/LM/W3SVC/2/ROOT" host="DESKTOP-H6FQOND" type="System.InvalidOperationException" message="Collection was modified; enumeration operation may not execute." source="mscorlib" detail="System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation. ---&gt; System.InvalidOperationException: Collection was modified; enumeration operation may not execute.&#xD;&#xA;   at System.ThrowHelper.ThrowInvalidOperationException(ExceptionResource resource)&#xD;&#xA;   at System.Collections.Generic.List`1.Enumerator.MoveNextRare()&#xD;&#xA;   at System.Collections.Generic.List`1.Enumerator.MoveNext()&#xD;&#xA;   at System.Linq.Enumerable.&lt;TakeIterator&gt;d__25`1.MoveNext()&#xD;&#xA;   at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)&#xD;&#xA;   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)&#xD;&#xA;   at Erp.BackOffice.MvcApplication.Application_BeginRequest() in D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Global.asax.cs:line 69&#xD;&#xA;   --- End of inner exception stack trace ---&#xD;&#xA;   at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor)&#xD;&#xA;   at System.Reflection.RuntimeMethodInfo.UnsafeInvokeInternal(Object obj, Object[] parameters, Object[] arguments)&#xD;&#xA;   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)&#xD;&#xA;   at System.Reflection.MethodBase.Invoke(Object obj, Object[] parameters)&#xD;&#xA;   at System.Web.Util.ArglessEventHandlerProxy.Callback(Object sender, EventArgs e)&#xD;&#xA;   at System.Web.HttpApplication.SyncEventExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" time="2019-05-04T07:48:00.3707866Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_ACCEPT:*/*&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:en-US,en;q=0.5&#xD;&#xA;HTTP_COOKIE:ASP.NET_SessionId=t335dcyssicjqrucejztwcu4; __RequestVerificationToken=BGK39agYB4FzOdz3pZp6udY3x3sgLktlnKbaJsWFAiEf-F_4yKb3e3hhX8eJn-2OY4DNpm3wfuNExHRZY7pLFXo6RryJQcPUJATHf2boXHk1; BO=1E02403F6AB719E2188BFE32925CED5D34F107741D55251AD1C84FAC41B832A7EDDB85606BE2C5938559418DFA224F02BE7633CB7F9F82A06729C9BA5BCEF6848FBD56D8BD5D637124B4FB25845F61AA728455CA42C0480227C090DFB2EC8D88&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/Home/DashboardInventory&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0&#xD;&#xA;HTTP_X_REQUESTED_WITH:XMLHttpRequest&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Connection: keep-alive&#xD;&#xA;Accept: */*&#xD;&#xA;Accept-Encoding: gzip, deflate&#xD;&#xA;Accept-Language: en-US,en;q=0.5&#xD;&#xA;Cookie: ASP.NET_SessionId=t335dcyssicjqrucejztwcu4; __RequestVerificationToken=BGK39agYB4FzOdz3pZp6udY3x3sgLktlnKbaJsWFAiEf-F_4yKb3e3hhX8eJn-2OY4DNpm3wfuNExHRZY7pLFXo6RryJQcPUJATHf2boXHk1; BO=1E02403F6AB719E2188BFE32925CED5D34F107741D55251AD1C84FAC41B832A7EDDB85606BE2C5938559418DFA224F02BE7633CB7F9F82A06729C9BA5BCEF6848FBD56D8BD5D637124B4FB25845F61AA728455CA42C0480227C090DFB2EC8D88&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/Home/DashboardInventory&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0&#xD;&#xA;X-Requested-With: XMLHttpRequest&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="0" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/SaleReport/ChartInboundAndOutbound" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\SaleReport\ChartInboundAndOutbound" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="single=month&amp;amp;year=2019&amp;amp;month=5" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="::1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="6435" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="GET" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/SaleReport/ChartInboundAndOutbound" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/SaleReport/ChartInboundAndOutbound" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="*/*" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="en-US,en;q=0.5" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="ASP.NET_SessionId=t335dcyssicjqrucejztwcu4; __RequestVerificationToken=BGK39agYB4FzOdz3pZp6udY3x3sgLktlnKbaJsWFAiEf-F_4yKb3e3hhX8eJn-2OY4DNpm3wfuNExHRZY7pLFXo6RryJQcPUJATHf2boXHk1; BO=1E02403F6AB719E2188BFE32925CED5D34F107741D55251AD1C84FAC41B832A7EDDB85606BE2C5938559418DFA224F02BE7633CB7F9F82A06729C9BA5BCEF6848FBD56D8BD5D637124B4FB25845F61AA728455CA42C0480227C090DFB2EC8D88" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/Home/DashboardInventory" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0" />
+    </item>
+    <item name="HTTP_X_REQUESTED_WITH">
+      <value string="XMLHttpRequest" />
+    </item>
+  </serverVariables>
+  <queryString>
+    <item name="single">
+      <value string="month" />
+    </item>
+    <item name="amp;year">
+      <value string="2019" />
+    </item>
+    <item name="amp;month">
+      <value string="5" />
+    </item>
+  </queryString>
+  <cookies>
+    <item name="ASP.NET_SessionId">
+      <value string="t335dcyssicjqrucejztwcu4" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="BGK39agYB4FzOdz3pZp6udY3x3sgLktlnKbaJsWFAiEf-F_4yKb3e3hhX8eJn-2OY4DNpm3wfuNExHRZY7pLFXo6RryJQcPUJATHf2boXHk1" />
+    </item>
+    <item name="BO">
+      <value string="1E02403F6AB719E2188BFE32925CED5D34F107741D55251AD1C84FAC41B832A7EDDB85606BE2C5938559418DFA224F02BE7633CB7F9F82A06729C9BA5BCEF6848FBD56D8BD5D637124B4FB25845F61AA728455CA42C0480227C090DFB2EC8D88" />
+    </item>
+  </cookies>
+</error>

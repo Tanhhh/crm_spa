@@ -1,0 +1,187 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using System.Globalization;
+@using Erp.BackOffice.Areas.Cms.Models
+@model List<OldCusListSkinCareViewModel>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+@{
+    ViewBag.Title = "Danh sách khách hàng cũ đặt hẹn chăm sóc da";
+    if (Request["IsPopup"] == "true")
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        if (Request["IsPopup"] == "null")
+        {
+            Layout = null;
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+    }
+    bool IsDisplaySearchPanel = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? false : true;
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "DSKHC_HenCSD",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = IsDisplaySearchPanel,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int index = 1;
+    Calendar calendar = CultureInfo.InvariantCulture.Calendar;
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+}
+<style>
+    .datepicker {
+        z-index:10000 !important;
+    }
+</style>
+
+<script type="text/javascript">
+    var exportThis = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function () {
+            var ctx = { worksheet: '@ViewBag.Title' || 'Worksheet', table: document.getElementById("cTable").innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+
+    var exportThisWithParameter = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,',
+            template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"  xmlns="http://www.w3.org/TR/REC-html40"><head> <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets> <x:ExcelWorksheet><x:Name>{worksheet}</x:Name> <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions> </x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook> </xml><![endif]--></head><body> <table>{table}</table></body></html>',
+            base64 = function (s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            },
+            format = function (s, c) {
+                return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; })
+            }
+        return function (tableID, excelName) {
+            tableID = document.getElementById(tableID)
+            var ctx = { worksheet: excelName || 'Worksheet', table: tableID.innerHTML }
+            window.location.href = uri + base64(format(template, ctx))
+        }
+    })()
+</script>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+        <span class="input-daterange input-group">
+            @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : aDateTime.ToString("dd/MM/yyyy"), new { @class = "", autocomplete = "off", placeholder = "Từ ngày..." })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : retDateTime.ToString("dd/MM/yyyy"), new { @class = "", autocomplete = "off", placeholder = "Đến ngày..." })
+        </span>
+
+        @Html.TextBox("txtCusInfo", Request["txtCusInfo"], new { @class = "", autocomplete = "off", placeholder = "Mã hoặc Tên khách hàng..." })
+        <select class="chzn-select" style="width:250px; float:left" name="SalerId">
+            <option value="">- Nhân viên QL -</option>
+            @foreach (var item in SelectListHelper.GetSelectList_User(null, null))
+                {
+                <option @(Request["SalerId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+
+    </p>
+   
+}
+
+<div class="table-responsive" id="BCDoanhthu" style="margin-bottom:40px">
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th style="width:100px;text-align:center">Nhân Viên Quản Lý</th>
+                <th style="width:100px;text-align:center">Nhóm Hưởng DS</th>
+                <th style="min-width:100px;text-align:center">Mã Khách Hàng</th>
+                <th style="min-width:100px;text-align:center">Tên Khách Hàng</th>
+                <th style="width:100px;text-align:center">SĐT</th>
+                <th style="width:100px;text-align:center">Địa Chỉ</th>
+                <th style="width:100px;text-align:center">Thời Gian CSDGN</th>
+                <th style="width:100px;text-align:center">Ngày Đặt Hẹn CSD</th>
+                <th style="width:100px;text-align:center">Giờ Đặt Hẹn CSD</th>
+                <th style="width:100px;text-align:center">Chương Trình Đặt</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(index%2==0?"alert-warning":"")">
+                    <td>
+                        <span>@(index++)</span>
+                    </td>
+                    <td>@(item.NhanVienQL)</td>
+                    <td>@(item.NHomHuongDS)</td>
+                    <td>@(item.CustomerCode)</td>
+                    <td>@(item.CustomerName)</td>
+                    <td>@(item.Phone)</td>
+                    <td>@(item.Address)</td>
+                    <td>@(Convert.ToDateTime(item.NgayCSDGN).ToString("dd/MM/yyyy"))</td>
+                    <td>@(Convert.ToDateTime(item.NgayHen).ToString("dd/MM/yyyy"))</td>
+                    <td>@(Convert.ToDateTime(item.GioHen).ToString("hh:mm:ss tt"))</td>
+                    <td>@(item.ChuongTrinh)</td>
+                </tr>
+            }
+        </tbody>
+        <thead>
+
+        </thead>
+    </table>
+
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportThis()">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+}
+
+<script src="~/Scripts/jquery.floatThead.js"></script>
+<script>
+        $(document).ready(function () {
+            $("#cTable").floatThead({ top: 30 });
+        });
+</script>
+
+
+@section Scripts {
+    <script>
+
+            function exportThis() {
+                var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+                var txtCusInfo = $('#txtCusInfo').val();
+                var SalerId = $('#SalerId').val();
+
+                OpenPopup('/SaleReport/ExportDSKHC_HenCSD?startDate=' + startDate + '&endDate=' + endDate + '&SalerId=' + SalerId + '&txtCusInfo=' + txtCusInfo + '&IsPopup=true', '', 0, 900);
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 200000);
+                HideLoading();
+            }
+            $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+
+            });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

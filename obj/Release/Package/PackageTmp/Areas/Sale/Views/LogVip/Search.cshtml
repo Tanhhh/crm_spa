@@ -1,0 +1,268 @@
+﻿@model List<SearchLogVipViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+    @using PagedList.Mvc;
+
+    @{
+        ViewBag.Title = "Tìm kiếm xếp hạng";
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+
+        var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+        PagedList.IPagedList<SearchLogVipViewModel> data = (PagedList.IPagedList<SearchLogVipViewModel>)ViewBag.data;
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "LogVip",
+            ActionName = "Search",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int rowNumber = 0;
+        int numberOfItem = 30;
+        int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+        var top1 = "";
+        string Status = Request["Status"] != null ? Request["Status"] : "";
+        var url = Request.Url;
+        string year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        string branchId = Request["branchId"] != null ? Request["branchId"] : "";
+        if (Request["branchId"] == null)
+        {
+            branchId = Erp.BackOffice.Helpers.Common.CurrentUser.BranchId.Value.ToString();
+        }
+        ViewData["branchId"] = branchId;
+    }
+
+
+    <style type="text/css">
+        .product-invoice-isdeleted {
+            text-decoration: line-through;
+        }
+        .grid-mvc{
+            overflow-x:auto !important;
+        }
+    </style>
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+    @helper GridColumnCommand(string id)
+    {
+        @*<a onclick="printInvoice(@id)" class="btn btn-primary btn-mini"><i class="fa fa-print"></i></a>*@
+
+        <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+            <i class="ace-icon fa fa-trash"></i>
+        </button>
+    }
+
+    @helper GridColumnName(int? customerid, string customername, string name, int id, string note, string reason, bool isPopup = false, string jsCallback = null)
+    {
+        if (isPopup)
+        {
+            <a onclick="parent.selectItemCustomer(@id, '@name','@customername','@customerid')">@name</a>
+        }
+        else
+        {
+            name = string.IsNullOrEmpty(name) ? "No Title" : name;
+            <a href="@Url.Action("Search", "LogVip", new { Id = id })">@name</a>
+
+            if (!string.IsNullOrEmpty(note) || !string.IsNullOrEmpty(reason))
+            {
+                note = note + "; " + reason;
+                <span class="help-button" data-rel="tooltip" data-placement="bottom" data-original-title="@note">?</span>
+            }
+        }
+
+    }
+
+    @helper CheckDeleteColumns(int? Id)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper GridColumnStatusName(string status)
+    {
+        switch (status)
+        {
+            case "pending":
+                <span class="label label-info">@Wording.OrderStatusDisplay_pending</span>
+                break;
+            case "inprogress":
+                <span class="label label-warning">@Wording.OrderStatusDisplay_inprogress</span>
+                break;
+            case "shipping":
+                <span class="label label-warning">@Wording.OrderStatusDisplay_shipping</span>
+                break;
+            case "complete":
+                <span class="label label-success">@Wording.OrderStatusDisplay_complete</span>
+                break;
+            case "delete":
+                <span class="label label-danger">@Wording.OrderStatusDisplay_delete</span>
+                break;
+            case "deposit":
+                <span class="label label-warning">Đặt cọc</span>
+                break;
+
+        }
+    }
+    @helper renderCusstomer(int? CustomerId, string CustomerName)
+    {
+        @CustomerName
+        @*<a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = CustomerId, IsPopup = true })', '', 0, 0)">
+                @CusromerName
+            </a>*@
+    }
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+           <p>
+               @*@Html.DropDownList("branchId", SelectListHelper.GetSelectList_BranchByUser(Request["branchId"], "Chi nhánh"))*@
+
+               @Html.DropDownList("branchId", SelectListHelper.GetSelectList_Branch(ViewData["branchId"], Wording.BranchName))
+               @*@Html.DropDownList("branchId", SelectListHelper.GetSelectList_Branch(Request["branchId"], "Chi nhánh"))*@
+
+
+               @Html.TextBox("year", Request["year"], new { @class = "", autocomplete = "off", placeholder = System.DateTime.Now.Year })
+               @*<select id="year" name="year">
+            @for (int i = 2016; i <= (DateTime.Now.Year +1); i++)
+            {
+                <option @(year == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+            }
+        </select>*@
+               <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+               <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+           </p>
+    }
+
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+
+    
+    @using (Html.BeginForm("Change", "LogVip", new { branchId = Request["branchId"], year = Request["year"] }, FormMethod.Post))
+    {
+        <div class="row" style="padding-top: 5px;">
+            <div class="col-xs-12">
+                <div id="react_report" class="table-responsive">
+
+                    @Html.Grid(Model).Columns(columns =>
+               {
+                   columns.Add(n => n.Code).Titled("Mã khách hàng").Sortable(true);
+                   columns.Add().Titled("Tên khách hàng").Sortable(false).RenderValueAs(n => (n.FirstName + " " + n.LastName));
+                   columns.Add(n => n.Phone).Titled("Số điện thoại").Sortable(false);
+                   columns.Add().Titled("Năm").Sortable(false).RenderValueAs(n => n.NAM.ToString());
+                   columns.Add().Titled("Tiền mua hàng").Sortable(false).RenderValueAs(n => CommonSatic.ToCurrencyStr(n.tienmuahang, null));
+                   columns.Add().Titled("Tiền trả lại").Sortable(false).RenderValueAs(u => CommonSatic.ToCurrencyStr(u.tientralai, null));
+                   columns.Add().Titled("Tổng mua").Sortable(true).RenderValueAs(n => CommonSatic.ToCurrencyStr(n.tongmua, null));
+                   columns.Add().Titled("Điểm").Sortable(false).RenderValueAs(n => n.PlusPoint.ToString());
+                   //columns.Add().Titled("GD NĐT").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GDNDTTH(u.Id, u.GDNgayDauTienThanhToanHet));
+                   columns.Add(n => n.TenHang).Titled("Hạng").Sortable(true);
+                   columns.Add().Titled("Xếp hạng cũ").Sortable(true).RenderValueAs(n => n.Idxephangcu.ToString());
+                   columns.Add(n => n.loai).Titled("Loại").Sortable(true);
+                   columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(50).Sanitized(false).Encoded(false).RenderValueAs(u => CheckDeleteColumns(u.CustomerId));
+                   
+}).WithPaging(50)
+                    @*@Html.PagedListPager(data, page => Url.Action("Search", "LogVip", new { page, branchId = Request["branchId"], year = Request["year"] }))*@
+
+                </div>
+            </div>
+        </div>
+
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Change", "LogVip", "Sale"))
+            {
+                <button class="btn btn-mini btn-primary" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                    Duyệt
+                </button>
+            }
+        }
+
+    }
+    @section Scripts {
+        <script type="text/javascript">
+        $(function () {
+            $('[data-rel=tooltip]').tooltip({ container: 'body' });
+
+            $(window).keydown(function (e) {
+                if (e.which == 113) {
+                    e.preventDefault();
+                    window.location = '@Url.Action("Create")';
+                }
+            });
+        });
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+        $(function () {
+            $("#txtCode").focus().select();
+            $('[data-rel=tooltip]').tooltip({ container: 'body' });
+            $("#txtCode").click(function () {
+                $("#txtCode").select();
+            });
+        });
+        </script>
+
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    }

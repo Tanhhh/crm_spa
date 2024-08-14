@@ -1,0 +1,308 @@
+@using Erp.BackOffice.Sale.Controllers
+@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@using PagedList.Mvc;
+@using PagedList;
+@model List<LeadModel>
+
+
+
+    @{
+        Layout = null;
+        var tuple = ViewData["section"] as Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>;
+        var user = ViewBag.user as Erp.Domain.Repositories.UserRepository;
+        var lsstatus = ViewBag.lsstatus as IEnumerable<StatusLeadModel>;
+        int stt = 1;
+        int radioStt = 1;
+        var category = ViewBag.category as Erp.Domain.Interfaces.ICategoryRepository;
+        long mainId = ViewBag.mainId;
+
+    }
+    <style>
+        .dropdown-menu.dropdown-close.dropdown-menu-right {
+            left: 10% !important;
+            right: 100% !important;
+        }
+
+        .sub {
+            background-color: #f4faff !important;
+        }
+
+        .table-hover > tbody > tr:hover .sub {
+            background-color: #eaf4fd !important;
+        }
+
+        .edit-iput {
+            width: calc(100% + 5px);
+            font-size: 13px !important;
+            height: 33px;
+        }
+
+
+        .text-name:hover {
+            text-decoration: underline !important;
+        }
+
+        #pageSize {
+            height: 100%;
+        }
+
+        .quickedit {
+            border: none;
+            outline: none;
+        }
+
+        .pagination-container {
+            height: 32px;
+            display: flex;
+            margin-left: 15px;
+        }
+
+        .quickedit {
+            border: none;
+            outline: none;
+        }
+
+        td:nth-child(2), th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            color: white;
+        }
+
+        td:nth-child(3), th:nth-child(2) {
+            position: sticky;
+            left: 21px;
+            z-index: 1;
+            color: white;
+        }
+    </style>
+    <form id="GopLeadDetailForm" >
+        <table id="GopLeadDetailTbl" class="table table-hover" style="display: block; overflow-x: auto; white-space: nowrap;">
+
+
+            <thead>
+
+                @{
+                    var properties = typeof(LeadModel).GetProperties();
+                    int outchk;
+                    string[] dont = new string[] { "IsDeleted", "CreatedDate", "CreatedUserId", "ModifiedDate", "ModifiedUserId", "AssignedUserId" };
+                    var prop = properties.Where(x => !x.Name.StartsWith("F") && !int.TryParse(x.Name.Remove(0, 1).ToString(), out outchk) && x.Name != "Id" && !dont.Contains(x.Name));
+                    string thele = "";
+                    string trele = "";
+                    string tdele = "";
+                }
+                @foreach (var item1 in prop)
+                {
+                    var display = item1.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;
+                    string displayname = display != null ? display.DisplayName : "";
+                    thele += "<th>" + displayname + "</th>";
+                }
+
+                @foreach (var item in tuple.Item1)
+                {
+                    var itemField = tuple.Item2.Where(x => x.LeadSectionId == item.Id);
+
+                    foreach (var item1 in itemField)
+                    {
+                        if (item1.IsHiden != true)
+                        {
+                            thele += "<th>" + item1.NameLabel + "</th>";
+                        }
+                    }
+                }
+                <tr>
+                    <th class="sub"></th>
+                    <th class="sub">STT</th>
+                    @Html.Raw(@thele)
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    foreach (var item1 in prop)
+                    {
+
+                        object dsplay = item1.GetValue(item);
+                        string dsplay1 = dsplay != null ? dsplay.ToString().Trim() : "";
+                        string dsplay2 = dsplay1 == "1" ? "Có" : dsplay1 == "0" ? "Không" : dsplay1;
+                        if (item1.Name == "ReceptionStaffId")
+                        {
+                            string inputele;
+                            IEnumerable<Erp.Domain.Entities.User> users = user.GetAllUsers();
+                            List<SelectListItem> lstcus = new List<SelectListItem>();
+                            foreach (var item2 in users)
+                            {
+                                SelectListItem selectListItem = new SelectListItem() { Text = item2.FullName, Value = item2.Id.ToString() };
+                                lstcus.Add(selectListItem);
+                            }
+                            string optionele = "";
+                            foreach (var item2 in lstcus)
+                            {
+                                if (item != null && item1.GetValue(item) != null && item2.Value == item1.GetValue(item).ToString())
+                                {
+                                    optionele += "<option selected value=" + @item2.Value + ">" + @item2.Text + "</option>";
+
+                                }
+                                else
+                                {
+                                    optionele += "<option value='" + @item2.Value + "'>" + @item2.Text + "</option>";
+
+                                }
+                            }
+                            inputele = "<select class='edit-iput' hidden disabled class=\"js-example-basic-singleq\" name='LeadModel[" + (stt - 1).ToString() + "]." + item1.Name + "'><option " + (item != null && item1.GetValue(item) != null ? "" : "selected") + " value=''></option>" + optionele + "</select>";
+                            Erp.Domain.Entities.User single = users.Where(x => x.Id == (!string.IsNullOrEmpty(dsplay1) ? int.Parse(dsplay1) : 0)).FirstOrDefault();
+                            tdele += "<td>" + inputele + "<span class='txt'>" + (single != null ? single.FullName : "") + "</span></td>";
+                        }
+                        else if (item1.Name == "IsCancel")
+                        {
+                            string kq = item1.GetValue(item) != null ? item1.GetValue(item).ToString() : "";
+
+                            tdele += "<td><select class='edit-iput' hidden disabled name='LeadModel[" + (stt - 1) + "]." + @item1.Name + "'><option value='' " + (kq == "" ? "selected" : "") + "></option><option value='0' " + (kq == "0" ? "selected" : "") + ">Không</option><option value='1' " + (kq == "1" ? "selected" : "") + ">Có</option></select><span class='txt'>" + dsplay2 + "</span></td>";
+                        }
+                        else if (item1.Name == "StatusId")
+                        {
+                            string inputele;
+                            string optionele = "";
+                            var statusval = lsstatus.Where(x => x.Id == (!string.IsNullOrEmpty(dsplay1) ? int.Parse(dsplay1) : 0)).FirstOrDefault();
+                            foreach (var status in lsstatus)
+                            {
+                                if (status.Name == (statusval != null ? statusval.Name : ""))
+                                {
+                                    optionele += "<option selected value='" + status.Id + "'>" + status.Name + "</option>";
+                                }
+                                else
+                                {
+                                    optionele += "<option value='" + status.Id + "'>" + status.Name + "</option>";
+
+                                }
+                            }
+                            //  inputele = "<input type='text' hidden disabled value = '" + (statusval != null ? statusval.Name : "") + "'" + "name='LeadModel[" + (stt - 1).ToString() + "]." + item1.Name + "'/>";
+                            inputele = "<select class='edit-iput' hidden disabled class=\"js-example-basic-singleq\" name='LeadModel[" + (stt - 1).ToString() + "]." + @item1.Name + "'>" + optionele + "</select>";
+                            //   tdele += "<td>" + (statusval != null ? statusval.Name : "") + "</td>";
+                            tdele += "<td>" + inputele + "<span class='txt'>" + (statusval != null ? statusval.Name : "") + "</span></td>";
+
+
+
+                        }
+                        else if (item1.Name == "YearofBirth")
+                        {
+                            //Khang_test
+                            string inputele;
+                            inputele = "<input class='edit-iput' type='number' min = '1900' max='2100' hidden disabled value = '" + dsplay2 + "'" + "name='LeadModel[" + (stt - 1).ToString() + "]." + item1.Name + "'/>";
+                            //tdele += "<td>" + dsplay2 + "</td>";
+                            tdele += "<td>" + inputele + "<span class='txt'>" + dsplay2 + "</span></td>";
+                        }
+                        else if (item1.Name == "Mobile")
+                        {
+                            //Khang_test
+                            string inputele;
+                            inputele = "<input class='edit-iput' type='tel' hidden disabled value = '" + dsplay2 + "'" + "name='LeadModel[" + (stt - 1).ToString() + "]." + item1.Name + "'/>";
+                            //tdele += "<td>" + dsplay2 + "</td>";
+                            tdele += "<td>" + inputele + "<span class='txt'>" + dsplay2 + "</span></td>";
+                        }
+                        else if (item1.Name == "LeadName")
+                        {
+                            string inputele;
+                            inputele = "<input class='edit-iput' type='text' hidden disabled value = '" + dsplay2 + "'" + "name='LeadModel[" + (stt - 1).ToString() + "]." + item1.Name + "'/>";
+                            //tdele += "<td style='text-decoration:underline' name='Link'>" + dsplay2 + "</td>";
+                            tdele += "<td style='' name='Link'>" + inputele + "<span style='color:#576297; text-decoration:none; cursor:pointer; font-weight:bold;text-transform: uppercase;' class='txt text-name' name='Link'>" + dsplay2 + "</span></td>";
+                        }
+                        else
+                        {
+                            //Khang_test
+                            string inputele;
+                            inputele = "<input class='edit-iput' type='text' hidden disabled value = '" + dsplay2 + "'" + "name='LeadModel[" + (stt - 1).ToString() + "]." + item1.Name + "'/>";
+                            //tdele += "<td>" + dsplay2 + "</td>";
+                            tdele += "<td>" + inputele + "<span class='txt'>" + dsplay2 + "</span></td>";
+                        }
+                    }
+                    foreach (var item2 in tuple.Item1)
+                    {
+                        var itemField = tuple.Item2.Where(x => x.LeadSectionId == item2.Id);
+
+                        foreach (var item13 in itemField)
+                        {
+                            if (item13.IsHiden != true)
+                            {
+                                object dsplay = typeof(LeadModel).GetProperty(item13.FieldName).GetValue(item);
+                                string dsplay1 = dsplay != null ? dsplay.ToString().Trim() : "";
+                                string dsplay2 = dsplay1 == "1" ? "Có" : dsplay1 == "0" ? "Không" : dsplay1;
+                                //   if (item13.FieldName == "F2" || item13.FieldName == "F3") //Khang test
+                                if (true)
+                                {
+                                    string inputele = "";
+                                    switch (item13.TypeField)
+                                    {
+                                        case "Datetime":
+                                            tdele += "<td><input class='edit-iput' hidden value='" + (typeof(LeadModel).GetProperty(item13.FieldName).GetValue(item) != null ? typeof(LeadModel).GetProperty(item13.FieldName).GetValue(item).ToString() : "") + "' disabled type='datetime-local' name='LeadModel[" + (stt - 1) + "]." + item13.FieldName + "'/><span class='txt'>" + dsplay2 + "</span></td>";
+                                            break;
+                                        case "List":
+                                            var itemList = category.GetListCategoryByCode(item13.CodeList);
+                                            string optionele = "";
+                                            foreach (var item23 in itemList)
+                                            {
+                                                if (typeof(LeadModel).GetProperty(item13.FieldName).GetValue(item) != null && item23.Value == typeof(LeadModel).GetProperty(item13.FieldName).GetValue(item).ToString())
+                                                {
+                                                    optionele += "<option selected value='" + item23.Value + "'>" + item23.Name + "</option>";
+
+                                                }
+                                                else
+                                                {
+                                                    optionele += "<option value='" + item23.Value + "'>" + item23.Name + "</option>";
+
+                                                }
+                                            }
+                                            inputele += "<select class='edit-iput' hidden disabled class='js-example-basic-singleq' name='LeadModel[" + (stt - 1) + "]." + item13.FieldName + "'> <option " + (typeof(LeadModel).GetProperty(item13.FieldName).GetValue(item) != null ? "" : "selected") + " value =''></option>" + optionele + "</select><span class='txt'>" + dsplay2 + "</span>";
+                                            tdele += "<td>" + inputele + "</td>";
+                                            break;
+                                        default:
+
+                                            tdele += "<td><input hidden value='" + dsplay2 + "' disabled class='edit-iput' type='text' name='LeadModel[" + (stt - 1) + "]." + item13.FieldName + "'/><span class='txt'>" + dsplay2 + "</span></td>";
+                                            //  tdele += "<td>" + dsplay2 + "</td>"; Khang test
+                                            break;
+
+                                    }
+                                }
+                                //else
+                                //{
+
+                                //    tdele += "<td>" + dsplay2 + "</td>";
+                                //}
+                            }
+                        }
+                    }
+                    if (item.Id == mainId)
+                    {
+                        trele += "<tr><td hidden><input data-id='1' name=LeadModel[" + (stt - 1) + "].Id value='" + item.Id + "'/>" + item.Id + "</td><td class='sub'><input type='radio' class='radio' value='"+ item.Id + "' checked name='GopLeadDetailSelectMainId'/></td><td class='sub' style=\"color:#333 !important;\">" + (stt++) + "</td>" + tdele + "</tr>";
+                    }
+                    else
+                    {
+                        trele += "<tr><td hidden><input data-id='1' name=LeadModel[" + (stt - 1) + "].Id value='" + item.Id + "'/>" + item.Id + "</td><td class='sub'><input type='radio' class='radio' value='"+ item.Id + "' name='GopLeadDetailSelectMainId'/></td><td class='sub' style=\"color:#333 !important;\">" + (stt++) + "</td>" + tdele + "</tr>";
+                    }
+
+                    tdele = "";
+
+
+                }
+                @Html.Raw(trele)
+            </tbody>
+
+
+
+        </table>
+
+    </form>
+    <script>
+         var stt = @Html.Raw(Json.Encode(ViewBag.sttSelection));
+        $(document).ready(function () {
+            $('input[type=radio][name=GopLeadDetailSelectMainId]').change(function () {
+                var gopLeadTable = document.getElementById("GopLeadCheckTbl");
+                let currentRow = gopLeadTable.rows[stt];
+                currentRow.querySelector('td[name="MainId"] span').innerText = this.value;
+                var idInput = currentRow.querySelector('td[name="MainId"] input[name=MainId]');
+                idInput.value = this.value;
+            })
+        });
+
+    </script>

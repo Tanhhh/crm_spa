@@ -1,0 +1,338 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model Sale_TotalCustomerOfDayViewModel
+@{
+    Layout = null;
+    int index = 1;
+    int tongkhach = Model.totalNewCustomer + Model.totalOldCustomer;
+}
+
+@*<table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center" style="width:30%">Loại khách</th>
+                <th class="text-center">số lượng</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="1">
+                <td class="text-center">
+                    <span>1</span>
+                </td>
+                <td style="text-align:center">Khách mới</td>
+                <td style="text-align:center">
+                    <a class="tour_detail" onclick="GetDetailListOfCustomer(2)">
+                        @Model.totalNewCustomer
+                    </a>
+                </td>
+            </tr>
+            <tr class="2">
+                <td class="text-center">
+                    <span>2</span>
+                </td>
+                <td style="text-align:center">Khách cũ</td>
+                <td style="text-align:center">
+                    <a class="tour_detail" onclick="GetDetailListOfCustomer(1)">
+                        @Model.totalOldCustomer
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+
+        </tfoot>
+    </table>*@
+
+<table class="table table-striped grid-table">
+    <thead>
+        <tr>
+            @if (ViewBag.typeReport == "SPDV")
+            {
+                <th class="grid-header" style="width:5%; text-align: center;"></th>
+            }
+                <th class="grid-header" style="width:10%;text-align: center;">STT</th>
+                <th class="grid-header" style="width:45%; text-align: center;">Loại khách</th>
+                <th class="grid-header" style="width:45%; text-align: center;">Số lượng</th>
+            </tr>
+    </thead>
+    <tbody>
+        <tr class="1">
+            @if (ViewBag.typeReport == "SPDV")
+            {
+                <td class="grid-cell text-center">
+                    <a id="table1" href="#" class="green show-details-btn" title="Show Details" onclick="Dropdowntable('#table1')">
+                        <i class="ace-icon fa fa-angle-double-down bigger-120"></i>
+                    </a>
+                </td>
+            }
+                <td class="grid-cell text-center">
+                    <span>1</span>
+                </td>
+                <td style="text-align:center">Khách mới</td>
+                <td style="text-align:center">
+                    <a class="tour_detail" onclick="GetDetailListOfCustomer(2)">
+                        @Model.totalNewCustomer
+                    </a>
+                </td>
+            </tr>
+        <tr class="detail-row">
+            <td colspan="11">
+                <div class="table-detail clearfix">
+                    @LoadSubTableKHMoi(@ViewBag.TongAoMoiANNAYAKE
+                                       , @ViewBag.TongAoMoiORLANEPARIS
+                                       , @ViewBag.TongAoMoiDICHVU
+                                       , @ViewBag.TongAoMoiLEONORGREYL
+                                       , @ViewBag.TongAoMoiCONGNGHECAO
+                                       , @ViewBag.TongThucMoiANNAYAKE
+                                       , @ViewBag.TongThucMoiORLANEPARIS
+                                       , @ViewBag.TongThucMoiDICHVU
+                                       , @ViewBag.TongThucMoiLEONORGREYL
+                                       , @ViewBag.TongThucMoiCONGNGHECAO
+                                       , @ViewBag.TongAoMoi
+                                       , @ViewBag.TongThucMoi
+                                       , @ViewBag.TongNoMoi)
+                </div>
+            </td>
+        </tr>
+        <tr class="2">
+            @if (ViewBag.typeReport == "SPDV")
+            {
+                <td class="grid-cell text-center">
+                    <a id="table2" href="#" class="green show-details-btn" title="Show Details" onclick="Dropdowntable('#table2')">
+                        <i class="ace-icon fa fa-angle-double-down bigger-120"></i>
+                    </a>
+                </td>
+            }
+                <td class="grid-cell text-center">
+                    <span>2</span>
+                </td>
+                <td style="text-align:center">Khách cũ</td>
+                <td style="text-align:center">
+                    <a class="tour_detail" onclick="GetDetailListOfCustomer(1)">
+                        @Model.totalOldCustomer
+                    </a>
+                </td>
+            </tr>
+        <tr class="detail-row">
+            <td colspan="11">
+                <div class="table-detail clearfix">
+                    @LoadSubTableKHCU(@ViewBag.TongAoCuANNAYAKE
+                                       , @ViewBag.TongAoCuORLANEPARIS
+                                       , @ViewBag.TongAoCuDICHVU
+                                       , @ViewBag.TongAoCuLEONORGREYL
+                                       , @ViewBag.TongAoCuCONGNGHECAO
+                                       , @ViewBag.TongThucCuANNAYAKE
+                                       , @ViewBag.TongThucCuORLANEPARIS
+                                       , @ViewBag.TongThucCuDICHVU
+                                       , @ViewBag.TongThucCuLEONORGREYL
+                                       , @ViewBag.TongThucCuCONGNGHECAO
+                                       , @ViewBag.TongAoCu
+                                       , @ViewBag.TongTHucCu
+                                       , @ViewBag.TongNoCu)
+                </div>
+            </td>
+        </tr>
+        @if (ViewBag.typeReport == "SPDV")
+        {
+    <tfoot>
+        <tr>
+            <th class="grid-footer" colspan="3" style="text-align:center">Tổng khách:</th>
+            <th class="grid-footer" style="text-align:center"> @(CommonSatic.ToCurrencyStr(@tongkhach, null))</th>
+        </tr>
+        <tr class="grid-r">
+            <th class="grid-footer" colspan="3" style="text-align:center">Tổng Doanh Số:</th>
+            <th class="grid-footer" style="text-align:center"> @(CommonSatic.ToCurrencyStr(@ViewBag.TongDoanhSo, null))</th>
+        </tr>
+        <tr>
+            <th class="grid-footer" colspan="3" style="text-align:center">Tổng doanh thu:</th>
+            <th class="grid-footer" style="text-align:center"> @(CommonSatic.ToCurrencyStr(@ViewBag.TongDoanhThu, null))</th>
+        </tr>
+        
+        <tr>
+            <th class="grid-footer" colspan="3" style="text-align:center">Tổng nợ:</th>
+            <th class="grid-footer" style="text-align:center"> @(CommonSatic.ToCurrencyStr(@ViewBag.TongNo, null))</th>
+        </tr>
+        <tr>
+            <th class="grid-footer" colspan="3" style="text-align:center">Thu nợ:</th>
+            <th class="grid-footer" style="text-align:center"><a onclick="GetListThuNo()">  @(CommonSatic.ToCurrencyStr(@ViewBag.thuno, null))</a></th>
+        </tr>
+        <tr>
+            <th class="grid-footer" colspan="3" style="text-align:center">Doanh thu thực tế:</th>
+            <th class="grid-footer" style="text-align:center"> @(CommonSatic.ToCurrencyStr(@ViewBag.thuno + @ViewBag.TongDoanhThu, null))</th>
+        </tr>
+        <tr>
+            <th class="grid-footer" colspan="3" style="text-align:center">Tổng đơn hàng hủy chuyển:</th>
+            <th class="grid-footer" style="text-align:center">
+                <a onclick="GetListMoneyMove()"> 
+                    @(CommonSatic.ToCurrencyStr(@ViewBag.TongDonHangHuyTrongNgay, null))
+                </a>
+            </th>
+        </tr>
+    </tfoot>
+   }
+</table>
+
+@helper LoadSubTableKHMoi(decimal TongAoMoiANNAYAKE
+                          , decimal TongAoMoiORLANEPARIS
+                          , decimal TongAoMoiDICHVU
+                          , decimal TongAoMoiLEONORGREYL
+                          , decimal TongAoMoiCONGNGHECAO
+                          , decimal TongThucMoiANNAYAKE
+                          , decimal TongThucMoiORLANEPARIS
+                          , decimal TongThucMoiDICHVU
+                          , decimal TongThucMoiLEONORGREYL
+                          , decimal TongThucMoiCONGNGHECAO
+                          , decimal TongAoMoi
+                          , decimal TongThucMoi
+                          , decimal TongNoMoi)
+{
+    <label>Báo cáo chi tiết</label>
+    <table id="CTable" class="table table-bordered">
+        <tbody>
+            <tr class="theader" style="text-align:center"> <td colspan="2">Ảo mới</td></tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo mới ANNAYAKE:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoMoiANNAYAKE, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo mới ORLANE PARIS:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoMoiORLANEPARIS, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo mới DICHVU:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoMoiDICHVU, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo mới LEONOR GREYL:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoMoiLEONORGREYL, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo mới CONGNGHECAO:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoMoiCONGNGHECAO, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo mới:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoMoi, null)</td>
+            </tr>
+
+            <tr class="theader" style="text-align:center"><td colspan="2" >Thực mới</td></tr>
+
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực mới ANNAYAKE:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucMoiANNAYAKE, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực mới ORLANEPARIS:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucMoiORLANEPARIS, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực mới DICHVU:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucMoiDICHVU, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực mới LEONORGREYL:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucMoiLEONORGREYL, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực mới CONGNGHECAO:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucMoiCONGNGHECAO, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực mới:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucMoi, null)</td>
+            </tr>
+
+            <tr class="theader" style="text-align:center"><td colspan="2">Nợ</td colspan="2"></tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng nợ mới:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongNoMoi, null)</td>
+            </tr>
+
+        </tbody>
+    </table>
+}
+
+@helper LoadSubTableKHCU(decimal TongAoCuANNAYAKE
+                          , decimal TongAoCuORLANEPARIS
+                          , decimal TongAoCuDICHVU
+                          , decimal TongAoCuLEONORGREYL
+                          , decimal TongAoCuCONGNGHECAO
+                          , decimal TongThucCuANNAYAKE
+                          , decimal TongThucCuORLANEPARIS
+                          , decimal TongThucCuDICHVU
+                          , decimal TongThucCuLEONORGREYL
+                          , decimal TongThucCuCONGNGHECAO
+                          , decimal TongAoCu
+                          , decimal TongThucCu
+                          , decimal TongNoCu)
+{
+    <label>Báo cáo chi tiết</label>
+    <table id="CTable" class="table table-bordered">
+        <tbody>
+            <tr class="theader" style="text-align:center"><td colspan="2"> Ảo Cũ </td></tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo Cũ ANNAYAKE:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoCuANNAYAKE, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo Cũ ORLANE PARIS:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoCuORLANEPARIS, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo Cũ DICHVU:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoCuDICHVU, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo Cũ LEONOR GREYL:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoCuLEONORGREYL, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo Cũ CONGNGHECAO:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoCuCONGNGHECAO, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng ảo Cũ:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongAoCu, null)</td>
+            </tr>
+
+            <tr class="theader" style="text-align:center"> <td  colspan="2"> Thực Cũ </td></tr>
+
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực cũ ANNAYAKE:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucCuANNAYAKE, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực cũ ORLANEPARIS:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucCuORLANEPARIS, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực cũ DICHVU:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucCuDICHVU, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực cũ LEONORGREYL:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucCuLEONORGREYL, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực cũ CONGNGHECAO:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucCuCONGNGHECAO, null)</td>
+            </tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng Thực cũ:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongThucCu, null)</td>
+            </tr>
+
+            <tr class="theader" style="text-align:center"><td colspan="2" > Nợ</td></tr>
+            <tr>
+                <td style="width:40px;text-align:center">Tổng nợ cũ:</td>
+                <td style="width:40px;text-align:center">@CommonSatic.ToCurrencyStr(TongNoCu, null)</td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+
+
+

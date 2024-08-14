@@ -1,0 +1,675 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Staff.Models
+@model CommissionCusViewModel
+
+
+@{
+    ViewBag.Title = Wording.PageIndex_CommisionDetail;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CommissionCus",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    //IEnumerable<SelectListItem> CategoryList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("product", null, "value");
+    IEnumerable<SelectListItem> typeList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("TypeCommission", null, null);
+    IEnumerable<SelectListItem> BranchList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_BranchAllNew(null, Wording.Empty);
+    List<BranchViewModel> departmentList = (List<BranchViewModel>)ViewBag.departmentList;
+    int orderNo = 0;
+    Model.Type = Model.Type == "FixedDiscount" ? "Chiết khấu cố định" : "Chiết khấu đột xuất";
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+<style>
+    .box {
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+        margin-top: 0px !important;
+    }
+</style>
+<style type="text/css">
+    .table-detail {
+        display: none;
+    }
+
+    .open {
+        display: block;
+    }
+
+    .show-details-btn {
+        cursor: pointer;
+    }
+
+    table > tbody > tr > td.cell-has-table {
+        padding: 0 !important;
+    }
+
+        table > tbody > tr > td.cell-has-table.open {
+            padding: 8px;
+            display: table-cell;
+        }
+</style>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "CommissionCus", @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    <div class="row">
+        <div class="col-sm-7 ">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home1" aria-expanded="true"><i class="fa fa-cubes"></i> Khuyến mãi theo sản phẩm/dịch vụ</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#home2" aria-expanded="false"><i class="fa fa-list-alt"></i> Khuyến mãi theo hóa đơn</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#home3" aria-expanded="false"><i class="fa fa-list-alt"></i> Khuyến mãi khác</a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home1" class="tab-pane active clearfix">
+                                    <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                                        <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                                            <div class="widget-header widget-header-small">
+                                                <div class="widget-toolbar no-border pull-left">
+                                                    <ul class="nav nav-tabs" id="myTab">
+
+                                                        <li class="active">
+                                                            <a data-toggle="tab" href="#discount" aria-expanded="true"><i class="fa fa-percent"></i> Chiết khấu sản phẩm/dịch vụ</a>
+                                                        </li>
+                                                        <li class="">
+                                                            <a data-toggle="tab" href="#donate" aria-expanded="false"><i class="fa fa-plus"></i> Tặng sản phẩm/dịch vụ</a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="widget-body">
+                                                <div class="widget-main padding-6">
+                                                    <div class="tab-content">
+                                                        <div id="discount" class="tab-pane active table-responsive clearfix">
+                                                            <table class="table table-bordered grid-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="grid-header" width="30">STT</th>
+                                                                        <th class="grid-header">Sản phẩm/Dịch vụ</th>
+                                                                        <th class="grid-header">Giá bán</th>
+                                                                        <th class="grid-header" width="115">Số lượng</th>
+                                                                        <th class="grid-header">HSD (tháng)</th>
+                                                                        <th class="grid-header" width="150">Giá trị (% hoặc số tiền)</th>
+                                                                        <th rowspan="2" style="text-align:center"></th>
+
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="detailList">
+                                                                    @if (Model.DetailList.Count > 0)
+                                                                    {
+                                                                        foreach (var item in Model.DetailList.Where(x => x.Type == "discount"))
+                                                                        {
+                                                                            orderNo++;
+
+                                                                            <tr>
+                                                                                <td>@orderNo</td>
+                                                                                <td>@item.ProductCode -  @item.ProductName</td>
+                                                                                <td class="text-right">@Common.PhanCachHangNgan2(item.Price)</td>
+                                                                                <td class="text-right">@item.Symbol @item.Quantity</td>
+                                                                                <td class="text-right">@item.ExpiryMonth</td>
+                                                                                <td class="text-right">
+                                                                                    @item.CommissionValue @(item.IsMoney != null && item.IsMoney == true ? "VNĐ" : "%")
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "CommissionCus", "Sale"))
+                                                                                    {
+                                                                                        <p>
+                                                                                            <a id="Delete" class="btn-delete-item" name="Delete" value="@item.Id" onclick="Delete('@item.Id.ToString()')">
+                                                                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                                                            </a>
+                                                                                        </p>
+                                                                                    }
+                                                                                </td>
+                                                                            </tr>
+
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+
+                                                        </div>
+                                                        <div id="donate" class="tab-pane">
+                                                            <table class="table table-bordered grid-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="grid-header" width="30">STT</th>
+                                                                        <th class="grid-header">Sản phẩm/Dịch vụ</th>
+                                                                        <th class="grid-header" width="100">Giá bán</th>
+                                                                        <th class="grid-header" width="115">Số lượng</th>
+                                                                        <th class="grid-header" width="100">HSD (tháng)</th>
+                                                                        <th class="grid-header" width="30"></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="detailListDonate">
+                                                                    @if (Model.DetailList.Count > 0)
+                                                                    {
+                                                                        var donateOrderNo = 0;
+                                                                        foreach (var item in Model.DetailList.Where(x => x.Type == "donate"))
+                                                                        {
+                                                                            donateOrderNo++;
+                                                                            <tr class="load-product-donate" data-id="@(item.Index)">
+                                                                                <td>@donateOrderNo</td>
+                                                                                <td>
+                                                                                    <p class="show-details-btn" data-target="@item.Index" onclick="ShowDetailBtn(@item.Index)">
+                                                                                        <a class="green bigger-140" title="Xem chi tiết">
+                                                                                            <i class="ace-icon fa fa-angle-double-down"></i>
+                                                                                        </a>
+                                                                                        @item.ProductCode - @item.ProductName
+                                                                                    </p>
+                                                                                </td>
+                                                                                <td class="text-right">@Common.PhanCachHangNgan2(item.Price)</td>
+                                                                                <td class="text-right">@item.Symbol @item.Quantity</td>
+                                                                                <td class="text-right">@item.ExpiryMonth</td>
+                                                                                <td class="text-center">
+                                                                                    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "CommissionCus", "Sale"))
+                                                                                    {
+                                                                                        <p>
+                                                                                            <a id="Delete" class="btn-delete-item" name="Delete" value="@item.Id" onclick="Delete('@item.Id.ToString()')">
+                                                                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                                                            </a>
+                                                                                        </p>
+                                                                                    }
+                                                                                </td>
+                                                                            </tr>
+
+                                                                            <tr>
+                                                                                <td colspan="6" class="cell-has-table">
+                                                                                    <div id="table-detail-@item.Index" class="table-detail">
+                                                                                        <div class="widget-box">
+                                                                                            <div class="widget-header">
+                                                                                                <h5 class="widget-title">Danh sách sản phẩm/dịch vụ tặng</h5>
+                                                                                            </div>
+                                                                                            <div class="widget-body">
+                                                                                                <div class="widget-main">
+                                                                                                    <div class="grid-mvc">
+                                                                                                        <div class="grid-wrap">
+                                                                                                            <table class="table table-striped grid-table">
+                                                                                                                <thead>
+                                                                                                                    <tr>
+                                                                                                                        <th class="grid-header" width="30">STT</th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">Mã SP/DV</div>
+                                                                                                                        </th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">Tên SP/DV</div>
+                                                                                                                        </th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">Đơn giá</div>
+                                                                                                                        </th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">Số lượng</div>
+                                                                                                                        </th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">Tổng SL hàng tặng</div>
+                                                                                                                        </th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">HSD (tháng)</div>
+                                                                                                                        </th>
+                                                                                                                    </tr>
+
+                                                                                                                </thead>
+                                                                                                                <tbody class="DonateDetailList_@item.Index">
+                                                                                                                    @if (item.DonateDetailList.Count > 0)
+                                                                                                                    {
+                                                                                                                        var detailDonateOrderNo = 0;
+                                                                                                                        foreach (var DonateDetailitem in item.DonateDetailList)
+                                                                                                                        {
+                                                                                                                            detailDonateOrderNo++;
+                                                                                                                            <tr data-id="@(DonateDetailitem.OrderNo)">
+                                                                                                                                <td class="orderNo">
+                                                                                                                                    @detailDonateOrderNo
+                                                                                                                                </td>
+                                                                                                                                <td>@DonateDetailitem.ProductCode</td>
+                                                                                                                                <td>@DonateDetailitem.ProductName</td>
+                                                                                                                                <td class="text-right">@CommonSatic.ToCurrencyStr(DonateDetailitem.Price, null)</td>
+                                                                                                                                <td class="text-right">@DonateDetailitem.Quantity</td>
+                                                                                                                                <td class="text-right">@DonateDetailitem.TotalQuantity</td>
+                                                                                                                                <td class="text-right">@DonateDetailitem.ExpriryMonth </td>
+                                                                                                                            </tr>
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                </tbody>
+                                                                                                            </table>
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+
+                                                                        }
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div id="home2" class="tab-pane">
+                                    <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                                        <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                                            <div class="widget-header widget-header-small">
+                                                <div class="widget-toolbar no-border pull-left">
+                                                    <ul class="nav nav-tabs" id="myTab">
+
+                                                        <li class="active">
+                                                            <a data-toggle="tab" href="#discount2" aria-expanded="true"><i class="fa fa-percent"></i> Chiết khấu hóa đơn</a>
+                                                        </li>
+                                                        <li class="">
+                                                            <a data-toggle="tab" href="#donate2" aria-expanded="false"><i class="fa fa-plus"></i> Tặng sản phẩm/dịch vụ</a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="widget-body">
+                                                <div class="widget-main padding-6">
+                                                    <div class="tab-content">
+                                                        <div id="discount2" class="tab-pane active table-responsive clearfix">
+                                                            <table class="table table-bordered grid-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="grid-header" width="30">STT</th>
+                                                                        <th class="grid-header">Số tiền hóa đơn từ...đến...</th>
+                                                                        <th class="grid-header" width="150">Giá trị (% hoặc số tiền)</th>
+                                                                        <th class="grid-header" width="30"></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="InvoicedetailList">
+                                                                    @if (Model.InvoiceDetailList.Count > 0)
+                                                                    {
+                                                                        var invoiceOrderNo = 0;
+                                                                        foreach (var item in Model.InvoiceDetailList.Where(x => x.Type == "discount"))
+                                                                        {
+                                                                            invoiceOrderNo++;
+                                                                            <tr data-id="@item.Index">
+                                                                                <td>@invoiceOrderNo</td>
+                                                                                <td>
+                                                                                    <span class="col-sm-2 text-right">@item.StartAmount </span>
+                                                                                    <span class="col-sm-1">@item.StartSymbol </span>
+                                                                                    <span class="col-sm-1"><i class="fa fa-exchange"></i></span>
+                                                                                    <span class="col-sm-1">@item.EndSymbol </span>
+                                                                                    <span class="col-sm-2 text-right">@item.EndAmount</span>
+                                                                                </td>
+                                                                                <td class="text-right">
+                                                                                    @item.CommissionValue @(item.IsMoney != null && item.IsMoney == true ? "VNĐ" : "%")
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "CommissionCus", "Sale"))
+                                                                                    {
+                                                                                        <p>
+                                                                                            <a id="Delete" class="btn-delete-item" name="Delete1" value="@item.Id" onclick="Delete1('@item.Id.ToString()')">
+                                                                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                                                            </a>
+                                                                                        </p>
+                                                                                    }
+                                                                                </td>
+                                                                            </tr>
+
+                                                                        }
+                                                                    }
+                                                                </tbody>
+
+                                                            </table>
+
+                                                        </div>
+                                                        <div id="donate2" class="tab-pane">
+                                                            <table class="table table-bordered grid-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="grid-header" width="30">STT</th>
+                                                                        <th class="grid-header" width="30"></th>
+                                                                        <th class="grid-header">Số tiền hóa đơn từ...đến...</th>
+                                                                        <th class="grid-header" width="30"></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="InvoicedetailListDonate">
+                                                                    @if (Model.InvoiceDetailList.Count > 0)
+                                                                    {
+                                                                        var detailInvoiceOrderNo = 0;
+                                                                        foreach (var item in Model.InvoiceDetailList.Where(x => x.Type == "donate"))
+                                                                        {
+                                                                            detailInvoiceOrderNo++;
+                                                                            <tr data-id="@item.Index">
+                                                                                <td>@detailInvoiceOrderNo</td>
+                                                                                <td>
+                                                                                    <p class="show-invoice-details-btn" data-target="@item.Index" onclick="ShowDetailBtnInvoice(@item.Index)">
+                                                                                        <a class="green bigger-140" title="Xem chi tiết">
+                                                                                            <i class="ace-icon fa fa-angle-double-down"></i>
+                                                                                        </a>
+                                                                                    </p>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <label class="col-sm-2 text-right">
+                                                                                        @item.StartAmount
+                                                                                        @if (item.StartAmount == null)
+                                                                                        {<label>Min</label>}
+                                                                                    </label>
+                                                                                    <span class="col-sm-1">@item.StartSymbol </span>
+                                                                                    <span class="col-sm-1"><i class="fa fa-exchange"></i></span>
+                                                                                    <span class="col-sm-1">@item.EndSymbol </span>
+                                                                                    <label class="col-sm-2 text-right">
+                                                                                        @item.EndAmount
+                                                                                        @if (item.EndAmount == null)
+                                                                                        {<label>Max</label>}
+                                                                                    </label>
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "CommissionCus", "Sale"))
+                                                                                    {
+                                                                                        <p>
+                                                                                            <a id="Delete" class="btn-delete-item" name="Delete" value="@item.Id" onclick="Delete1('@item.Id.ToString()')">
+                                                                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                                                            </a>
+                                                                                        </p>
+                                                                                    }
+                                                                                </td>
+                                                                            </tr>
+
+                                                                            <tr>
+                                                                                <td colspan="4" class="cell-has-table">
+                                                                                    <div id="table-invoice-detail-@item.Index" class="table-detail">
+                                                                                        <div class="widget-box">
+                                                                                            <div class="widget-header">
+                                                                                                <h5 class="widget-title">Danh sách sản phẩm/dịch vụ tặng</h5>
+                                                                                            </div>
+                                                                                            <div class="widget-body">
+                                                                                                <div class="widget-main">
+                                                                                                    <div class="grid-mvc">
+                                                                                                        <div class="grid-wrap">
+                                                                                                            <table class="table table-striped grid-table">
+                                                                                                                <thead>
+                                                                                                                    <tr>
+                                                                                                                        <th class="grid-header" width="30">STT</th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">Mã SP/DV</div>
+                                                                                                                        </th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">Tên SP/DV</div>
+                                                                                                                        </th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">Đơn giá</div>
+                                                                                                                        </th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">Số lượng</div>
+                                                                                                                        </th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">Tổng SL hàng tặng</div>
+                                                                                                                        </th>
+                                                                                                                        <th class="grid-header">
+                                                                                                                            <div class="grid-header-title">HSD (tháng)</div>
+                                                                                                                        </th>
+                                                                                                                    </tr>
+
+                                                                                                                </thead>
+                                                                                                                <tbody class="InvoiceDonateDetailList_@item.Index">
+                                                                                                                    @if (item.DonateDetailList.Count > 0)
+                                                                                                                    {
+                                                                                                                        var donateDetailOrderNo = 0;
+                                                                                                                        foreach (var donateDetailListitem in item.DonateDetailList)
+                                                                                                                        {
+                                                                                                                            donateDetailOrderNo++;
+                                                                                                                            <tr data-id="@donateDetailListitem.OrderNo">
+                                                                                                                                <td class="orderNo">
+                                                                                                                                    @donateDetailOrderNo
+                                                                                                                                </td>
+                                                                                                                                <td>@donateDetailListitem.ProductCode</td>
+                                                                                                                                <td>@donateDetailListitem.ProductName</td>
+                                                                                                                                <td class="text-right">@CommonSatic.ToCurrencyStr(donateDetailListitem.Price, null)</td>
+                                                                                                                                <td class="text-right">
+                                                                                                                                    @donateDetailListitem.Quantity
+                                                                                                                                </td>
+                                                                                                                                <td class="text-right">
+                                                                                                                                    @donateDetailListitem.TotalQuantity
+                                                                                                                                </td>
+                                                                                                                                <td class="text-right">
+                                                                                                                                    @donateDetailListitem.ExpriryMonth
+                                                                                                                                </td>
+                                                                                                                            </tr>
+                                                                                                                        }
+                                                                                                                    }
+                                                                                                                </tbody>
+                                                                                                            </table>
+
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        }
+                                                                    }
+                                                                </tbody>
+
+                                                            </table>
+                                                        </div>
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div id="home3" class="tab-pane">
+                                    <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                                        <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                                            <div class="widget-header widget-header-small">
+                                                <div class="widget-toolbar no-border pull-left">
+                                                    <ul class="nav nav-tabs" id="myTab">
+
+                                                        <li class="active">
+                                                            <a data-toggle="tab" href="#discount3" aria-expanded="true"><i class="fa fa-percent"></i> Chiết khấu hóa đơn</a>
+                                                        </li>
+
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <div class="widget-body">
+                                                <div class="widget-main padding-6">
+                                                    <div class="tab-content">
+                                                        <div id="discount3" class="tab-pane active table-responsive clearfix">
+                                                            <table class="table table-bordered grid-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="grid-header" width="30">STT</th>
+                                                                        <th class="grid-header">Tên chương trình</th>
+                                                                        <th class="grid-header" width="150">Giá trị (% hoặc số tiền)</th>
+                                                                        <th class="grid-header" width="30"></th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody class="InvoicedetailListDif">
+                                                                    @if (Model.InvoiceDetailList.Count > 0)
+                                                                    {
+                                                                        var invoiceOrderNo = 0;
+                                                                        foreach (var item in Model.InvoiceDetailList.Where(x => x.Type == "discountdif"))
+                                                                        {
+                                                                            invoiceOrderNo++;
+                                                                            <tr data-id="@item.Index">
+                                                                                <td>@invoiceOrderNo</td>
+                                                                                <td>
+                                                                                    @*<span class="col-sm-2 text-right">@item.StartAmount </span>
+                                                                                    <span class="col-sm-1">@item.StartSymbol </span>
+                                                                                    <span class="col-sm-1"><i class="fa fa-exchange"></i></span>
+                                                                                    <span class="col-sm-1">@item.EndSymbol </span>
+                                                                                    <span class="col-sm-2 text-right">@item.EndAmount</span>*@
+                                                                                    @item.Name
+                                                                                </td>
+                                                                                <td class="text-right">
+                                                                                    @item.CommissionValue @(item.IsMoney != null && item.IsMoney == true ? "VNĐ" : "%")
+                                                                                </td>
+                                                                                <td class="text-center">
+                                                                                    @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "CommissionCus", "Sale"))
+                                                                                    {
+                                                                                        <p>
+                                                                                            <a id="Delete" class="btn-delete-item" name="Delete1" value="@item.Id" onclick="Delete1('@item.Id.ToString()')">
+                                                                                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                                                                                            </a>
+                                                                                        </p>
+                                                                                    }
+                                                                                </td>
+                                                                            </tr>
+
+                                                                        }
+                                                                    }
+                                                                </tbody>
+
+                                                            </table>
+
+                                                        </div>
+
+
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-5">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title">Thông tin chiết khấu</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <div class="detail-view">
+                            <div class="row control-group">
+                                @Html.DetailViewItemFor2(model => model.Name, true, null, "col-xs-4", "col-xs-8")
+                            </div>
+                            @*<div class="row control-group">
+                                @Html.DetailViewItemFor2(model => model.Type, true, null, "col-xs-4", "col-xs-8")
+                                </div>*@
+                            <div class="row control-group">
+                                @Html.DetailViewItemFor2(model => model.StartDate, true, null, "col-xs-4", "col-xs-8")
+                            </div>
+                            <div class="row control-group">
+                                @Html.DetailViewItemFor2(model => model.EndDate, true, null, "col-xs-4", "col-xs-8")
+                            </div>
+                            <div class="row control-group">
+                                @*@Html.DetailViewItemFor2(model => model.Note, true, null, "col-xs-4", "col-xs-8")*@
+                                <div class="col-xs-4 control-label"><label>Ghi chú</label></div><div class="col-xs-8 control-value" style=""><textarea readonly style="height:100px ; width:250px">@Model.Note</textarea></div>
+
+                            </div>
+                            @*@Html.DetailViewItemFor2(model => model.TyleHuong, true, null, "col-xs-4", "col-xs-8")*@
+
+                            <div class="row control-group">
+                                @if (Model.TyleHuong != null)
+                                {
+                                <div class="col-xs-4 control-label"><label for="InvoiceCode">Hưởng doanh thu</label></div><div class="col-xs-8 control-value" style="">@Model.TyleHuong %</div>
+                                }
+                                else
+                                {
+                                    <div class="col-xs-4 control-label"><label for="InvoiceCode">Hưởng doanh thu</label></div><div class="col-xs-8 control-value" style="">@Model.TyleHuong</div>
+
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p></p>
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title">Danh sách các chi nhánh áp dụng</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main clearfix">
+                        <div class="col-sm-12">
+                            @foreach (var item in Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_DepartmentByList(Model.ApplyFor, null, null))
+                            {
+                                <a class="label label-info">@item.Text</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+}
+
+
+<script src="~/Scripts/area_sale/CommissionCus.js?=vs1.111">
+
+</script>
+<script>
+
+    function Delete(id) {
+        if (confirm('Bạn có chắc muốn xóa item đã chọn ?')) {
+
+            location.href = '/CommissionCus/Delete_parent?id=' + id;
+        }
+        else {
+            return false;
+        }
+    };
+    function Delete1(id) {
+        if (confirm('Bạn có chắc muốn xóa item đã chọn ?')) {
+
+            location.href = '/CommissionCus/Delete_parent1?id=' + id;
+        }
+        else {
+            return false;
+        }
+    };
+</script>

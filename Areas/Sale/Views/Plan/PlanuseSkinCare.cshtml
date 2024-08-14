@@ -1,0 +1,357 @@
+﻿
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+@model IPagedList<int?>
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using PagedList;
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Kế hoạch sử dụng phiếu CSD";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Plan",
+        ActionName = "PlanUseSkinCare",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    List<KH_TUONGTACViewModel> LSTUONGTAC = ((IEnumerable<KH_TUONGTACViewModel>)ViewBag.LICHSUTUONGTAC).ToList();
+    List<vwPlanuseSkinCareViewModel> LSPlan = ((IEnumerable<vwPlanuseSkinCareViewModel>)ViewBag.LSPlan).ToList();
+    int index = (ViewBag.PageNumber - 1) * ViewBag.PageSize + 1;
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+@section HeadOfPage {
+
+    @Html.ScriptTop_ChosenStyle()
+    <style>
+
+        .search-view .input-group input {
+            width: 100px;
+            text-align: center;
+        }
+        .ui-ribbon {
+            position: relative;
+            display: block;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            transform: rotate(43deg);
+            padding: 7px 0;
+            left: -2px;
+            top: 19px;
+            width: 140px;
+            line-height: 20px;
+            /*background-color: rgba(183, 51, 51, 0.94);*/
+            box-shadow: 0 0 3px rgba(0,0,0,.3);
+        }
+
+        .ui-ribbon-wrapper {
+            position: absolute;
+            overflow: hidden;
+            width: 108px;
+            height: 103px;
+            top: 0px;
+            right: 12px;
+            z-index: 1;
+        }
+
+        #myImg {
+            height: 70px !important;
+            width: 70px !important;
+        }
+
+        .search-media .search-actions {
+            width: 30% !important;
+            max-width: 250px !important;
+            min-width: 150px !important;
+        }
+
+        .fa-150 {
+            font-size: 1.5em;
+        }
+
+        tr.chua {
+            background-color: #eababa;
+        }
+    </style>
+}
+
+
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@helper GridColumnImage(string customercode, string name, string Image)
+        {
+    <div class="itemdiv commentdiv" style="height:72px!important;width:100%!important">
+        <div class="user" style="height:72px;width:100%!important;">
+            <div class="ace-thumbnails">
+                <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))" title="@name" data-rel="colorbox" class="cboxElement">
+                    <img id="myImg" alt="@name" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))">
+                </a>
+            </div>
+        </div>
+        <div class="body">
+            <div class="name" data-toggle="tooltip" title="Tên khách hàng">
+                @name
+            </div>
+            <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+                @customercode
+            </div>
+
+        </div>
+    </div>
+}
+<div class="tabbable" style="margin-bottom:50px;">
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <p>
+            @*@Html.DropDownList("BranchId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"), new { style = "width:138.4px" })*@
+            <select class="chzn-select" style="width:303px !important; float:left" name="ManagerStaffId" id="ManagerStaffId">
+                <option value="">- Nhân viên QL -</option>
+                @foreach (var item in SelectListHelper.GetSelectList_FullUserName(null, null))
+                {
+                    <option @(Request["ManagerStaffId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+                }
+            </select>
+            <label style="padding-left: 36px;">CS gần nhất</label>
+            @*<span class="input-daterange input-group">
+                    @Html.TextBox("StartDate", Request["StartDate"] != null ? Request["StartDate"] : "", new { @class = "", autocomplete = "off", placeholder = "Từ ngày..." })
+                    <span class="input-group-addon">
+                        <i class="fa fa-exchange"></i>
+                    </span>
+                    @Html.TextBox("EndDate", Request["EndDate"] != null ? Request["EndDate"] : "", new { @class = "", autocomplete = "off", placeholder = "Đến ngày..." })
+                </span>*@
+
+            <span class="input-daterange input-group">
+                @Html.TextBox("StartDate", Request["StartDate"] != null ? Request["StartDate"] : "", new { autocomplete = "off", placeholder = "Từ ngày" })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("EndDate", Request["EndDate"] != null ? Request["EndDate"] : "", new { autocomplete = "off", placeholder = "Đến ngày" })
+            </span>
+
+            <label style="padding-left:10px"> Thanh toán</label>
+            <select style="width:150px" name="THANHTOAN" id="THANHTOAN">
+                <option value=""> -Rỗng -</option>
+                <option value="Het">Hết</option>
+                <option value="Chua"> Chưa </option>
+            </select>
+        </p>
+        <p>
+            @*<label style="padding-left:10px">Mã khách hàng</label>
+                 @Html.TextBox("CustomerCode", Request["CustomerCode"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng", style = "width:0px" })
+                 <label style="padding-left:10px">Tên khách hàng</label>
+                @Html.TextBox("CustomerName", Request["CustomerName"], new { @class = "", autocomplete = "off", placeholder = "Tên khách hàng", style = "width:0px" })*@
+            @*<label style="padding-left:10px">Mã (Tên) khách hàng</label>*@
+            @Html.TextBox("CustomerCodeOrName", Request["CustomerCodeOrName"], new { @class = "", autocomplete = "off", placeholder = "Tên, mã khách hàng", style = "width:150px" })
+
+            @*<label style="padding-left:10px">Tên dịch vụ</label>*@
+            @Html.TextBox("ProductName", Request["ProductName"], new { @class = "", autocomplete = "off", placeholder = "Dịch vụ", style = "width:150px" })
+
+            <label style="padding-left:10px"> Số phiếu còn lại</label>
+            <span class="input-group">
+                @Html.TextBox("PhieuConTu", Request["PhieuConTu"] != null ? Request["PhieuConTu"] : "", new { @class = "", autocomplete = "off", placeholder = "Từ" })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("PhieuConDen", Request["PhieuConDen"] != null ? Request["PhieuConDen"] : "", new { @class = "", autocomplete = "off", placeholder = "Đến"  })
+            </span>
+        </p>
+    }
+    <div class="tab-content clear-fix">
+        <div id="tab1" class="tab-pane active" style="margin-left:20px">
+        </div>
+        <div id="" class="table-responsive top-10 ">
+            <table id="CTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                        <th rowspan="2" style="text-align:center">Mã khách hàng</th>
+                        <th rowspan="2" style="text-align:center">Tên khách hàng</th>
+                        <th rowspan="2" style="text-align:center">Người quản lý</th>
+                        <th rowspan="2" style="text-align:center">Điện thoại</th>
+                        <th colspan="9" style="text-align:center"> Đơn hàng</th>
+                        <th rowspan="2" style="width:100px;text-align:center">Ngày chăm sóc gần nhất</th>
+                        <th rowspan="2" style="text-align:center"> Mức độ hài lòng</th>
+                        <th rowspan="2" style="text-align:center"> Lịch tương tác</th>
+                    </tr>
+                    <tr>
+                        <th style="text-align:center"> Đơn hàng</th>
+                        <th style="text-align:center"> Tên dịch vụ</th>
+                        <th style="text-align:center"> Số lượng tổng</th>
+                        <th style="text-align:center"> Đã sử dụng</th>
+                        <th style="text-align:center"> Số lượng trả</th>
+                        <th style="text-align:center"> Số lượng chuyển</th>
+                        <th style="text-align:center"> Còn lại</th>
+                        <th style="text-align:center"> Thanh toán hết</th>
+                        <th style="text-align:center"> Loại CS</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @if (Model != null)
+                    {
+                        foreach (var item in LSPlan)
+                        {
+                            @*<tr class="@(index%2==0?"alert-warning":"")">*@
+                            <tr class="@(item.THANGTOANHET == null ? "chua" : index % 2 == 0 ? "alert-warning" : "")">
+
+                                <td>
+                                    <span>@(index++)</span>
+                                </td>
+                                <td>@item.CustomerCode</td>
+                                <td>
+                                    <a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = item.CustomerId, IsPopup = "true" })', 'Trang chi tiết khách hàng', 0, 500)">
+                                        @(item.CustomerName)
+                                    </a>
+                                </td>
+                                <td>@item.ManagerName</td>
+                                <td>@(item.Phone)</td>
+                                <td style="text-align:center">
+                                    <a onclick="OpenPopup('@Url.Action("Detail", "ProductInvoice", new { area = "Sale", Id = item.ProductInvoiceId, IsPopup = "true" })', 'Trang chi tiết bán hàng', 0, 500)">
+                                        @(item.ProductInvoiceCode)
+                                    </a>
+                                    <br />
+                                    <p style="color:red"> (@item.CreatedDate.Value.ToString("dd/MM/yyyy")) </p>
+                                </td>
+                                <td> @item.ProductName </td>
+                                <td> @item.SOLUONG </td>
+                                <td> @item.soluongdung </td>
+                                <td> @item.soluongtra </td>
+                                <td> @item.soluongchuyen </td>
+                                @if (item.soluongconlai < 10)
+                                {
+                                    <td style="color:red"> @item.soluongconlai </td>
+                                }
+                                else
+                                {
+                                    <td>@item.soluongconlai</td>
+                                }
+
+                                <td style="width:100px">@(item.THANGTOANHET == "Het" ? "Hết" : item.THANGTOANHET == "null" ? "Chưa có đơn hàng trong phiếu thu" : "Chưa")</td>
+                                <td>@(item.Type == "SkinScan" ? "CSD" : item.Type == "CheckingHair" ? "CST" : "" )</td>
+
+                                <td>@(item.ModifiedDate == null ? "" : item.ModifiedDate.Value.ToString("dd/MM/yyyy"))</td>
+                                <td>@item.GladLevel</td>
+                                <td>
+                                   @{ var nguoitt = (LSTUONGTAC.Where(x => x.KHACHHANG_ID == item.CustomerId).FirstOrDefault()==null?null: LSTUONGTAC.Where(x => x.KHACHHANG_ID == item.CustomerId).FirstOrDefault().NGUOILAP_ID);
+                                   }
+                                    @if (nguoitt !=null)
+                                    {
+                                        var nguoilap = nguoitt;
+                                        <a onclick="OpenPopup('@Url.Action("LichSuTuongTac", "Plan", new { area = "Sale", NGUOILAP_ID = nguoilap, KHACHHANG_ID = item.CustomerId, IsPopup = true })', '', 0, 0)"> Xem </a>
+                                    }
+
+
+                                    @*<a onclick="OpenPopup('@Url.Action("LichSuTuongTac", "Plan", new {area = "Sale",Id = item.ProductInvoiceId, IsPopup = "true" })', 'Trang chi tiết bán hàng', 0, 500)">
+            @(item.ProductInvoiceCode)
+        </a>*@
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                <thead>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                    <tr></tr>
+                </thead>
+            </table>
+        </div>
+        @Html.PagedListPager(Model, page => Url.Action("PlanUseSkinCare", new { CustomerCodeOrName = Request["CustomerCodeOrName"], ProductName = Request["ProductName"], StartDate = Request["StartDate"], EndDate = Request["EndDate"], PhieuConTu = Request["PhieuConTu"], PhieuConDen = Request["PhieuConDen"], ManagerStaffId = Request["ManagerStaffId"], page = page }))
+    </div>
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="exportThis()">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+}
+<script>
+    $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+
+    });
+</script>
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    @Html.ScriptBottom_ChosenStyle()
+
+    <script>
+
+        function exportThis() {
+            var StartDate = $('#StartDate').val();
+            var EndDate = $('#EndDate').val();
+            var ManagerStaffId = $('#ManagerStaffId').val();
+            var THANHTOAN = $('#THANHTOAN').val();
+            var CustomerCodeOrName = $('#CustomerCodeOrName').val();
+            var ProductName = $('#ProductName').val();
+            var PhieuConTu = $('#PhieuConTu').val();
+            var PhieuConDen = $('#PhieuConDen').val();
+
+            OpenPopup('/Plan/ExportPlanUseSkinCare?StartDate=' + StartDate + '&EndDate=' + EndDate + '&ManagerStaffId=' + ManagerStaffId + '&THANHTOAN=' + THANHTOAN + '&CustomerCodeOrName=' + CustomerCodeOrName + '&ProductName=' + ProductName + '&PhieuConTu=' + PhieuConTu + '&PhieuConDen=' + PhieuConDen + '&IsPopup=true', '', 0, 900);
+            setTimeout(function () {
+                $("#myModal .modal-body .iframe-container").html("");
+                $('#myModal').modal('hide');
+            }, 300000);
+            HideLoading();
+        }
+    </script>
+
+    <script type="text/javascript">
+
+    </script>
+}

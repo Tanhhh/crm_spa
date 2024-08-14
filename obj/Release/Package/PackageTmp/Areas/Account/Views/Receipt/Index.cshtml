@@ -1,0 +1,325 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+@model List<ReceiptViewModel>
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Account.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+
+    @section HeadOfPage {
+        @Html.ScriptTop_ChosenStyle()
+
+    }
+
+    @{
+        ViewBag.Title = Wording.PageIndex_Receipt;
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Receipt",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+
+        //DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        //// Cộng thêm 1 tháng và trừ đi một ngày.
+        //DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+        DateTime retDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+
+    }
+    <style type="text/css">
+        .product-invoice-isdeleted {
+            text-decoration: line-through;
+        }
+    </style>
+
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    @helper GridColumnCommand(int id)
+    {
+        @*<div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+            <p>
+                <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                </button>
+                <a href="@Url.Action("Print", new { Id = id })" target="_blank" class="btn btn-primary btn-xs"><i class="fa fa-print"></i></a>
+            </p>
+            </div>*@
+
+
+        <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+            <p>
+
+            </p>
+        </div>
+    }
+
+
+
+    @helper GridColumnName(string name, int id, ReceiptViewModel data, bool isPopup = false, string jsCallback = null)
+    {
+        if (isPopup)
+        {
+            <a onclick="parent.selectItemReceipt(@data.Id,'@data.Code','@data.CompanyName','@data.Name',@data.Amount)">@name</a>
+        }
+        else
+        {
+            name = string.IsNullOrEmpty(name) ? "No Title" : name;
+            <a href="@Url.Action("Detail", "Receipt", new { Id = id })">@name</a>
+        }
+    }
+
+
+    @helper GridColumnChungTuGoc(string MaChungTuGoc, string LoaiChungTuGoc, bool isPopup)
+    {
+        if (isPopup)
+        {
+            @MaChungTuGoc
+        }
+        else
+        {
+            switch (LoaiChungTuGoc)
+            {
+                case "ProductInvoice":
+                    <a href="@Url.Action("Detail", "ProductInvoice", new { area = "Sale", TransactionCode = MaChungTuGoc })">@MaChungTuGoc</a>
+                    break;
+                case "SalesReturns":
+                    <a href="@Url.Action("Detail", "SalesReturns", new { area = "Sale", TransactionCode = MaChungTuGoc })">@MaChungTuGoc</a>
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    @helper GridColumnCategoryValue(object value)
+    {
+        var attr = Erp.BackOffice.Helpers.Common.GetCategoryByValueOrId("value", value);
+        <span>@(attr != null ? attr.Name : "")</span>
+    }
+    @helper CheckDeleteColumns(int Id)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+        <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+        @Html.TextBox("Code", Request["Code"], new { autocomplete = "off", placeholder = "Mã chứng từ..." })
+        @Html.TextBox("MaChungTuGoc", Request["MaChungTuGoc"], new { autocomplete = "off", placeholder = "Chứng từ gốc..." })
+        <span class="input-daterange input-group">
+            @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : "", new { autocomplete = "off", placeholder = "Ngày ghi sổ từ..." })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : "", new { autocomplete = "off", placeholder = "đến ngày..." })
+        </span>
+        <script>
+
+            $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+                var started = $('#startDate').datepicker('getDate');
+                var finished = $('#endDate').datepicker('getDate');
+                var date;
+                //if (started >= finished) {
+                //    if (e.target.id == 'startDate') {
+                //        date = new Date(started);
+                //        date.setDate(started.getDate() - 1);
+                //        $('#startDate').datepicker('setDate', date);
+                //    }
+                //    if (e.target.id == 'endDate') {
+                //        date = new Date(finished);
+                //        date.setDate(finished.getDate() + 1);
+                //        $('#endDate').datepicker('setDate', date);
+                //    }
+                //}
+            });
+        </script>
+        <label>Ngày chứng từ:</label>
+        <span class="input-daterange input-group">
+            @Html.TextBox("start", Request["start"] != null ? Request["start"] : aDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Ngày chứng từ từ..." })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("end", Request["end"] != null ? Request["end"] : retDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "đến ngày..." })
+        </span>
+        <select class="chzn-select" style="width:250px !important; float:left" name="SalerId">
+            <option value="">- Nhân viên QL -</option>
+            @foreach (var item in SelectListHelper.GetSelectList_FullUserName(null, null))
+            {
+                <option @(Request["SalerId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+
+        @*@Html.TextBox("CustomerCode", Request["CustomerCode"], new { autocomplete = "off", placeholder = "Mã khách hàng..." })
+            @Html.TextBox("CompanyName", Request["CompanyName"], new { autocomplete = "off", placeholder = "Tên khách hàng..." })*@
+        @Html.TextBox("CustomerInfo", Request["CustomerInfo"], new { autocomplete = "off", placeholder = "Mã hoặc Tên khách hàng..." })
+    }
+<script>
+    $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+       
+    });
+</script>
+    @if (!isPopup)
+    {
+        @Html.Grid(Model).Columns(columns =>
+        {
+            //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+            columns.Add(u => u.CreatedDate).Titled("Ngày ghi sổ").SetWidth(100).Format("{0:dd/MM/yyyy HH:mm}").Sortable(true);
+            columns.Add(u => u.VoucherDate).Titled("Ngày chứng từ").Format("{0:dd/MM/yyyy}").Sortable(true).SetWidth(100);
+            columns.Add(u => u.Code).Titled("Mã chứng từ").Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Id, u, false)).SetWidth(100);
+            columns.Add().Titled("Chứng từ gốc").Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnChungTuGoc(u.MaChungTuGoc, u.LoaiChungTuGoc, isPopup)).SetWidth(100);
+            columns.Add(u => u.CompanyName).Titled("Khách hàng");
+            columns.Add(u => u.CustomerCode).Titled("Mã khách hàng");
+            columns.Add(u => u.Amount).Titled("Số tiền (VNĐ)").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(u.Amount, null));
+            columns.Add(u => u.PaymentMethod).Titled("HTTT");
+            columns.Add(u => u.NVQL).Titled("Nhân viên QL KH");
+            columns.Add(u => u.Name).Titled("Lý do");
+            columns.Add(u => u.Note).Titled("Ghi chú");
+
+            columns.Add(u => u.IsArchive).Titled("TT ghi sổ").Sanitized(false).Encoded(false).RenderValueAs(n => (n.IsArchive ? "<span style=\"color:green\"><b>Đã ghi sổ</b></span>" : "<span style=\"color:red\"><b>Chưa ghi sổ</b></span>")).SetWidth(90).Sortable(true);
+            //columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+
+        })//.WithPaging(10)
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "Receipt", "Account"))
+            {
+                <a class="btn btn-mini btn-primary" href="@Url.Action("Create", pageSetting.ModuleName)">
+                    <i class="ace-icon fa fa-plus"></i>
+                    Thu chi phí khác
+                </a>
+            }
+            <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(true)">
+                <i class="ace-icon fa fa-file-excel-o"></i>
+                Xuất excel
+            </button>
+            <label>Tổng:</label>
+            <input type="text" readonly align="right" size="10" id="tongtien" style="color:red" value="@ViewBag.tongtien" name="tongtien" />
+            <label>Chưa ghi sổ:</label>
+            <input type="text" readonly align="right" size="10" id="tienchuanop" style="color:red" value="@ViewBag.tienchuanop" name="tienchuanop" />
+            <label>Đã ghi sổ:</label>
+            <input type="text" readonly align="right" size="10" id="tiendanop" style="color:blue" value="@ViewBag.tiendanop" name="tiendanop" />
+        }
+    }
+    else
+    {
+        @Html.Grid(Model).Columns(columns =>
+        {
+            //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+            columns.Add(u => u.CreatedDate).Titled("Ngày ghi sổ").SetWidth(100).Format("{0:dd/MM/yyyy HH:mm}").Sortable(true);
+            columns.Add(u => u.VoucherDate).Titled("Ngày chứng từ").Format("{0:dd/MM/yyyy}").Sortable(true).SetWidth(100);
+            columns.Add(u => u.Code).Titled("Mã chứng từ").Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Id, u, isPopup)).SetWidth(100);
+            columns.Add().Titled("Chứng từ gốc").Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnChungTuGoc(u.MaChungTuGoc, u.LoaiChungTuGoc, isPopup)).SetWidth(100);
+            columns.Add(u => u.CompanyName).Titled("Người nộp");
+            columns.Add(u => u.NVQL).Titled("Nhân viên QL KH");
+            columns.Add(u => u.Name).Titled("Lý do");
+            columns.Add(u => u.Amount).Titled("Số tiền (VNĐ)").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(u.Amount, null));
+            columns.Add(u => u.IsArchive).Titled("TT ghi sổ").Sanitized(false).Encoded(false).RenderValueAs(n => (n.IsArchive ? "<span style=\"color:green\"><b>Đã ghi sổ</b></span>" : "<span style=\"color:red\"><b>Chưa ghi sổ</b></span>")).SetWidth(90).Sortable(true);
+            //columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+
+        }).WithPaging(10)
+    }
+    @section Scripts {
+        <script type="text/javascript">
+
+            function GetPrint(type) {
+                var CustomerId = $('#CustomerId').val();
+                var SalerId = $('#SalerId').val();
+                var Code = $('#Code').val();
+                var MaChungTuGoc = $('#MaChungTuGoc').val();
+                //var CustomerCode = $('#CustomerCode').val();
+                //var CompanyName = $('#CompanyName').val();
+                var CustomerInfo = $('#CustomerInfo').val();
+                var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+                var start = $('#start').val();
+                var end = $('#end').val();
+                var tienchuanop = $('#tienchuanop').val();
+                var tiendanop = $('#tiendanop').val();
+
+                var txtCustomerCode = $('#txtCustomerCode').val();
+                OpenPopup('/Receipt/PrintReceipt?startDate=' + startDate + '&endDate=' + endDate + '&start=' + start + '&end=' + end + '&CustomerId=' + CustomerId + '&SalerId=' + SalerId + '&Code=' + Code + '&MaChungTuGoc=' + MaChungTuGoc + '&CustomerInfo=' + CustomerInfo + '&tienchuanop=' + tienchuanop + '&tiendanop=' + tiendanop + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 200000);
+                HideLoading();
+            };
+
+            function CheckIsval() {
+                if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            };
+
+            $('[name="Delete"]').click(function () {
+                if (confirm('Bạn có chắc muốn xóa item ?')) {
+                    $(this).closest('tr').children('td').each(function (i, e) {
+                        $(this).find("input.class-delete-all").prop("checked", true);
+                        return true;
+                    })
+                }
+                else {
+                    return false;
+                }
+
+            });
+
+
+        </script>
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/mm/yyyy")
+        @Html.ScriptBottom_ChosenStyle()
+    }

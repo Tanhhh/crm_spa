@@ -1,0 +1,212 @@
+﻿<error errorId="1ec2c58a-8226-4fb8-b384-7b934d1a4fa7" application="/LM/W3SVC/2/ROOT" host="DESKTOP-H6FQOND" type="System.NullReferenceException" message="Object reference not set to an instance of an object." source="Erp.BackOffice" detail="System.NullReferenceException: Object reference not set to an instance of an object.&#xD;&#xA;   at Erp.BackOffice.Account.Controllers.CustomerController.&lt;&gt;c__DisplayClass18_0.&lt;IndexSearch&gt;b__3(CustomerViewModel x)&#xD;&#xA;   at System.Linq.Enumerable.WhereEnumerableIterator`1.MoveNext()&#xD;&#xA;   at System.Linq.Buffer`1..ctor(IEnumerable`1 source)&#xD;&#xA;   at System.Linq.OrderedEnumerable`1.&lt;GetEnumerator&gt;d__1.MoveNext()&#xD;&#xA;   at System.Linq.Enumerable.Count[TSource](IEnumerable`1 source)&#xD;&#xA;   at ASP._Page_Areas_Account_Views_Customer_IndexSearch_cshtml.Execute() in d:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Areas\Account\Views\Customer\IndexSearch.cshtml:line 280&#xD;&#xA;   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy()&#xD;&#xA;   at System.Web.Mvc.WebViewPage.ExecutePageHierarchy()&#xD;&#xA;   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)&#xD;&#xA;   at System.Web.Mvc.RazorView.RenderView(ViewContext viewContext, TextWriter writer, Object instance)&#xD;&#xA;   at System.Web.Mvc.BuildManagerCompiledView.Render(ViewContext viewContext, TextWriter writer)&#xD;&#xA;   at System.Web.Mvc.ViewResultBase.ExecuteResult(ControllerContext context)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResult(ControllerContext controllerContext, ActionResult actionResult)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;InvokeActionResultWithFilters&gt;b__17()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilter(IResultFilter filter, ResultExecutingContext preContext, Func`1 continuation)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;&gt;c__DisplayClass1c.&lt;InvokeActionResultWithFilters&gt;b__19()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilter(IResultFilter filter, ResultExecutingContext preContext, Func`1 continuation)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;&gt;c__DisplayClass1c.&lt;InvokeActionResultWithFilters&gt;b__19()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilter(IResultFilter filter, ResultExecutingContext preContext, Func`1 continuation)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;&gt;c__DisplayClass1c.&lt;InvokeActionResultWithFilters&gt;b__19()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilter(IResultFilter filter, ResultExecutingContext preContext, Func`1 continuation)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;&gt;c__DisplayClass1c.&lt;InvokeActionResultWithFilters&gt;b__19()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultFilter(IResultFilter filter, ResultExecutingContext preContext, Func`1 continuation)&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.&lt;&gt;c__DisplayClass1a.&lt;&gt;c__DisplayClass1c.&lt;InvokeActionResultWithFilters&gt;b__19()&#xD;&#xA;   at System.Web.Mvc.ControllerActionInvoker.InvokeActionResultWithFilters(ControllerContext controllerContext, IList`1 filters, ActionResult actionResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;&gt;c__DisplayClass2a.&lt;BeginInvokeAction&gt;b__20()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.&lt;&gt;c__DisplayClass25.&lt;BeginInvokeAction&gt;b__22(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Async.AsyncControllerActionInvoker.EndInvokeAction(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.&lt;&gt;c__DisplayClass1d.&lt;BeginExecuteCore&gt;b__18(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecuteCore(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.Controller.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Controller.System.Web.Mvc.Async.IAsyncController.EndExecute(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.&lt;&gt;c__DisplayClass8.&lt;BeginProcessRequest&gt;b__3(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.&lt;&gt;c__DisplayClass4.&lt;MakeVoidDelegate&gt;b__3(IAsyncResult ar)&#xD;&#xA;   at System.Web.Mvc.Async.AsyncResultWrapper.WrappedAsyncResult`1.End()&#xD;&#xA;   at System.Web.Mvc.MvcHandler.EndProcessRequest(IAsyncResult asyncResult)&#xD;&#xA;   at System.Web.Mvc.MvcHandler.System.Web.IHttpAsyncHandler.EndProcessRequest(IAsyncResult result)&#xD;&#xA;   at System.Web.HttpApplication.CallHandlerExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)&#xD;&#xA;   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean&amp; completedSynchronously)" user="adminq1" time="2019-07-29T10:24:04.0606259Z">
+  <serverVariables>
+    <item name="ALL_HTTP">
+      <value string="HTTP_CONNECTION:keep-alive&#xD;&#xA;HTTP_ACCEPT:text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&#xD;&#xA;HTTP_ACCEPT_ENCODING:gzip, deflate&#xD;&#xA;HTTP_ACCEPT_LANGUAGE:en-US,en;q=0.5&#xD;&#xA;HTTP_COOKIE:_ga=GA1.1.174067613.1563788129; _fbp=fb.0.1563850201706.449722836; _hjid=24ab1a2c-99a5-431b-bdc7-e6449aba677e; ASP.NET_SessionId=ikjx1dykstdwyasbu3l0t3u2; __RequestVerificationToken=6Cd3QJY5lAUPf-T6GbYkl9Z2uUb66JUBi3k1PlPak-3O1mR_AOA6hfzyrfO57zG7uzcfwELYSxya5ywKYK6PQXI8v166e0sbYhrW-XaALtU1; BO=58611BF160282FD9154343E069809850BEB136AC2B3B06EE3D1D3F2DE688C8FED3499FDD8BCB9EB4EE6CC45D300E85E60D69E16218FEE996CE4A25BA667E2D0415FC3ADE5AF6AC656E69795EB18D2744B199D91B214DD41DA2D367C67E80D302&#xD;&#xA;HTTP_HOST:localhost:53200&#xD;&#xA;HTTP_REFERER:http://localhost:53200/Customer/IndexSearch?IsPopup=true&amp;module_list=&amp;jsCallback=selectItem_CustomerId&#xD;&#xA;HTTP_USER_AGENT:Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0&#xD;&#xA;HTTP_UPGRADE_INSECURE_REQUESTS:1&#xD;&#xA;" />
+    </item>
+    <item name="ALL_RAW">
+      <value string="Connection: keep-alive&#xD;&#xA;Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8&#xD;&#xA;Accept-Encoding: gzip, deflate&#xD;&#xA;Accept-Language: en-US,en;q=0.5&#xD;&#xA;Cookie: _ga=GA1.1.174067613.1563788129; _fbp=fb.0.1563850201706.449722836; _hjid=24ab1a2c-99a5-431b-bdc7-e6449aba677e; ASP.NET_SessionId=ikjx1dykstdwyasbu3l0t3u2; __RequestVerificationToken=6Cd3QJY5lAUPf-T6GbYkl9Z2uUb66JUBi3k1PlPak-3O1mR_AOA6hfzyrfO57zG7uzcfwELYSxya5ywKYK6PQXI8v166e0sbYhrW-XaALtU1; BO=58611BF160282FD9154343E069809850BEB136AC2B3B06EE3D1D3F2DE688C8FED3499FDD8BCB9EB4EE6CC45D300E85E60D69E16218FEE996CE4A25BA667E2D0415FC3ADE5AF6AC656E69795EB18D2744B199D91B214DD41DA2D367C67E80D302&#xD;&#xA;Host: localhost:53200&#xD;&#xA;Referer: http://localhost:53200/Customer/IndexSearch?IsPopup=true&amp;module_list=&amp;jsCallback=selectItem_CustomerId&#xD;&#xA;User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0&#xD;&#xA;Upgrade-Insecure-Requests: 1&#xD;&#xA;" />
+    </item>
+    <item name="APPL_MD_PATH">
+      <value string="/LM/W3SVC/2/ROOT" />
+    </item>
+    <item name="APPL_PHYSICAL_PATH">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\" />
+    </item>
+    <item name="AUTH_TYPE">
+      <value string="Forms" />
+    </item>
+    <item name="AUTH_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="AUTH_PASSWORD">
+      <value string="*****" />
+    </item>
+    <item name="LOGON_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="REMOTE_USER">
+      <value string="adminq1" />
+    </item>
+    <item name="CERT_COOKIE">
+      <value string="" />
+    </item>
+    <item name="CERT_FLAGS">
+      <value string="" />
+    </item>
+    <item name="CERT_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="CERT_SERIALNUMBER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="CERT_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CERT_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="CONTENT_LENGTH">
+      <value string="0" />
+    </item>
+    <item name="CONTENT_TYPE">
+      <value string="" />
+    </item>
+    <item name="GATEWAY_INTERFACE">
+      <value string="CGI/1.1" />
+    </item>
+    <item name="HTTPS">
+      <value string="off" />
+    </item>
+    <item name="HTTPS_KEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SECRETKEYSIZE">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_ISSUER">
+      <value string="" />
+    </item>
+    <item name="HTTPS_SERVER_SUBJECT">
+      <value string="" />
+    </item>
+    <item name="INSTANCE_ID">
+      <value string="2" />
+    </item>
+    <item name="INSTANCE_META_PATH">
+      <value string="/LM/W3SVC/2" />
+    </item>
+    <item name="LOCAL_ADDR">
+      <value string="127.0.0.1" />
+    </item>
+    <item name="PATH_INFO">
+      <value string="/Customer/IndexSearch" />
+    </item>
+    <item name="PATH_TRANSLATED">
+      <value string="D:\Projects\TRANGHA.Warehouse\4.Source\ERP_TRANGHA\src\Erp.BackOffice\Customer\IndexSearch" />
+    </item>
+    <item name="QUERY_STRING">
+      <value string="IsPopup=true&amp;jsCallback=selectItem_CustomerId&amp;Phone=&amp;txtCode=&amp;txtCusName=&amp;CardCode=KH8000018&amp;ProvinceId=&amp;DistrictId=&amp;WardId=&amp;search=Search" />
+    </item>
+    <item name="REMOTE_ADDR">
+      <value string="127.0.0.1" />
+    </item>
+    <item name="REMOTE_HOST">
+      <value string="127.0.0.1" />
+    </item>
+    <item name="REMOTE_PORT">
+      <value string="6047" />
+    </item>
+    <item name="REQUEST_METHOD">
+      <value string="GET" />
+    </item>
+    <item name="SCRIPT_NAME">
+      <value string="/Customer/IndexSearch" />
+    </item>
+    <item name="SERVER_NAME">
+      <value string="localhost" />
+    </item>
+    <item name="SERVER_PORT">
+      <value string="53200" />
+    </item>
+    <item name="SERVER_PORT_SECURE">
+      <value string="0" />
+    </item>
+    <item name="SERVER_PROTOCOL">
+      <value string="HTTP/1.1" />
+    </item>
+    <item name="SERVER_SOFTWARE">
+      <value string="Microsoft-IIS/10.0" />
+    </item>
+    <item name="URL">
+      <value string="/Customer/IndexSearch" />
+    </item>
+    <item name="HTTP_CONNECTION">
+      <value string="keep-alive" />
+    </item>
+    <item name="HTTP_ACCEPT">
+      <value string="text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8" />
+    </item>
+    <item name="HTTP_ACCEPT_ENCODING">
+      <value string="gzip, deflate" />
+    </item>
+    <item name="HTTP_ACCEPT_LANGUAGE">
+      <value string="en-US,en;q=0.5" />
+    </item>
+    <item name="HTTP_COOKIE">
+      <value string="_ga=GA1.1.174067613.1563788129; _fbp=fb.0.1563850201706.449722836; _hjid=24ab1a2c-99a5-431b-bdc7-e6449aba677e; ASP.NET_SessionId=ikjx1dykstdwyasbu3l0t3u2; __RequestVerificationToken=6Cd3QJY5lAUPf-T6GbYkl9Z2uUb66JUBi3k1PlPak-3O1mR_AOA6hfzyrfO57zG7uzcfwELYSxya5ywKYK6PQXI8v166e0sbYhrW-XaALtU1; BO=58611BF160282FD9154343E069809850BEB136AC2B3B06EE3D1D3F2DE688C8FED3499FDD8BCB9EB4EE6CC45D300E85E60D69E16218FEE996CE4A25BA667E2D0415FC3ADE5AF6AC656E69795EB18D2744B199D91B214DD41DA2D367C67E80D302" />
+    </item>
+    <item name="HTTP_HOST">
+      <value string="localhost:53200" />
+    </item>
+    <item name="HTTP_REFERER">
+      <value string="http://localhost:53200/Customer/IndexSearch?IsPopup=true&amp;module_list=&amp;jsCallback=selectItem_CustomerId" />
+    </item>
+    <item name="HTTP_USER_AGENT">
+      <value string="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0" />
+    </item>
+    <item name="HTTP_UPGRADE_INSECURE_REQUESTS">
+      <value string="1" />
+    </item>
+  </serverVariables>
+  <queryString>
+    <item name="IsPopup">
+      <value string="true" />
+    </item>
+    <item name="jsCallback">
+      <value string="selectItem_CustomerId" />
+    </item>
+    <item name="Phone">
+      <value string="" />
+    </item>
+    <item name="txtCode">
+      <value string="" />
+    </item>
+    <item name="txtCusName">
+      <value string="" />
+    </item>
+    <item name="CardCode">
+      <value string="KH8000018" />
+    </item>
+    <item name="ProvinceId">
+      <value string="" />
+    </item>
+    <item name="DistrictId">
+      <value string="" />
+    </item>
+    <item name="WardId">
+      <value string="" />
+    </item>
+    <item name="search">
+      <value string="Search" />
+    </item>
+  </queryString>
+  <cookies>
+    <item name="_ga">
+      <value string="GA1.1.174067613.1563788129" />
+    </item>
+    <item name="_fbp">
+      <value string="fb.0.1563850201706.449722836" />
+    </item>
+    <item name="_hjid">
+      <value string="24ab1a2c-99a5-431b-bdc7-e6449aba677e" />
+    </item>
+    <item name="ASP.NET_SessionId">
+      <value string="ikjx1dykstdwyasbu3l0t3u2" />
+    </item>
+    <item name="__RequestVerificationToken">
+      <value string="6Cd3QJY5lAUPf-T6GbYkl9Z2uUb66JUBi3k1PlPak-3O1mR_AOA6hfzyrfO57zG7uzcfwELYSxya5ywKYK6PQXI8v166e0sbYhrW-XaALtU1" />
+    </item>
+    <item name="BO">
+      <value string="58611BF160282FD9154343E069809850BEB136AC2B3B06EE3D1D3F2DE688C8FED3499FDD8BCB9EB4EE6CC45D300E85E60D69E16218FEE996CE4A25BA667E2D0415FC3ADE5AF6AC656E69795EB18D2744B199D91B214DD41DA2D367C67E80D302" />
+    </item>
+  </cookies>
+</error>

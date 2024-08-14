@@ -1,0 +1,928 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.Domain.Entities
+@using Erp.Domain.Staff.Entities
+
+@{
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    var toDay = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+    //Tuần này
+
+    var firstDayOfWeek = toDay;
+    if (firstDayOfWeek.DayOfWeek.ToString() != "Monday")
+    {
+        firstDayOfWeek = firstDayOfWeek.AddDays(-(int)(firstDayOfWeek.DayOfWeek - 1));
+    }
+    var lastDayOfWeek = firstDayOfWeek.AddDays(6);
+
+    //Tuần trước
+    var temp_firstDayOfLastWeek = firstDayOfWeek.AddDays(-6);
+    if (temp_firstDayOfLastWeek.DayOfWeek.ToString() != "Monday")
+    {
+        temp_firstDayOfLastWeek = temp_firstDayOfLastWeek.AddDays(-(int)(temp_firstDayOfLastWeek.DayOfWeek - 1));
+    }
+    var firstDayOfLastWeek = temp_firstDayOfLastWeek;
+    var lastDayOfLastWeek = firstDayOfLastWeek.AddDays(6);
+
+    //Tháng này
+    var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+    //Tháng trước
+    var firstDayOfLastMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month == 1 ? 12 : (DateTime.Now.Month - 1), 1);
+    var lastDayOfLastMonth = firstDayOfLastMonth.AddMonths(1).AddDays(-1);
+
+    //Quý này
+    var firstDayOfQuarterVar = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); // Đổi tên biến này thành firstDayOfQuarterVar
+
+
+    //quarter
+    //Quý trước
+    var firstDayOfLastQuarter = firstDayOfQuarterVar.AddMonths(-3);
+    //var user = ViewBag.user as IEnumerable<User>;
+
+    // Chuỗi format ngày để hiển thị trên giao diện
+    var dateFormat = "yyyy-MM-dd";
+    var branches = ViewBag.branches as IEnumerable<Branch>;
+    var bps = ViewBag.bps as IEnumerable<UserType_kd>;
+
+}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>
+
+
+<style>
+    #TableKPICongViec > div {
+        overflow: unset !important;
+    }
+
+    .page-content {
+        overflow-y: scroll;
+        height: 100vh;
+    }
+
+    thead {
+        position: sticky;
+        top: 0;
+    }
+
+    .table > thead > tr > td {
+        border: 1px solid black;
+    }
+
+    .table > thead > tr {
+        color: #123d8c;
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        background: #fff;
+    }
+
+    /*.table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+        border: unset;
+    }*/
+
+    /*.table > thead > tr > th {
+        border: unset;
+    }*/
+
+    /* .table-bordered > thead > tr > th {
+        border: unset;
+    }*/
+
+    .nav-pills > li.active > a {
+        background-color: #00ace6 !important;
+    }
+
+    .tab-content {
+        border: unset !important;
+    }
+
+    .checkbox-inline > input {
+        margin-top: 0;
+        /*padding: 0px 4px 6px;*/
+    }
+
+    .btn-group + .btn, .btn-group > .btn, .checkbox-inline > input {
+        border: 1px solid #809dc9 !important;
+    }
+
+    label {
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        font-size: 15px !important;
+        color: #262f58;
+    }
+
+    #cuoiThang, #dauThang {
+        width: 100%
+    }
+
+    body {
+        /*margin-top: 20px;*/
+        color: #1a202c;
+        text-align: left;
+        background-color: #e2e8f0;
+    }
+
+    .main-body {
+        padding: 15px;
+    }
+
+    .card {
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+    }
+
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0 solid rgba(0,0,0,.125);
+        border-radius: .25rem;
+    }
+
+    .selectpicker {
+        background-color: #fff !important;
+        color: #333 !important;
+    }
+
+    .dropdown-toggle:hover {
+        background-color: #fff !important;
+    }
+
+    .btn.dropdown-toggle:active, .open {
+        background-color: #ffffff !important;
+        border-color: #bfc1c2;
+        border: 1px solid #bfc1c2 !important;
+    }
+
+    .btn-default, .btn-default.focus, .btn-default:focus, .btn.focus, .btn:focus {
+        background-color: #fff;
+    }
+
+    .btn-group > .btn > .caret {
+        border-top-color: #080808;
+    }
+
+    .gutters-sm {
+        margin-right: -8px;
+        margin-left: -8px;
+    }
+
+        .gutters-sm > .col, .gutters-sm > [class*=col-] {
+            padding-right: 8px;
+            padding-left: 8px;
+        }
+
+    .modal, .modal-backdrop {
+        right: 0;
+        bottom: auto;
+        left: 0;
+    }
+
+    .mb-3, .my-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    .bg-gray-300 {
+        background-color: #e2e8f0;
+    }
+    /*
+    .h-100 {
+        height: 100% !important;
+    }*/
+
+    .custom-color-td {
+        text-align: left;
+    }
+
+    .ht_1sao {
+        text-align: right;
+    }
+
+    .custom-th1 {
+        text-align: center;
+    }
+
+    .custom-tbody {
+        text-align: right;
+        border-top: 1px solid #649ff0;
+    }
+
+    .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+        width: 100%;
+    }
+
+    .nav-list > li > a > .menu-icon {
+        filter: brightness(0) !important;
+        vertical-align: top;
+    }
+
+    .table-bordered {
+        border: 1px solid #004a9f;
+    }
+
+    .btn-statistical {
+        padding: .7rem 1.5rem;
+        border-radius: 3px;
+        border: none;
+        outline: none;
+        margin-top: 20px !important;
+        background: #499ce4 !important;
+    }
+
+        .btn-statistical:hover {
+            transition: .3s linear;
+        }
+
+    .btn-custom {
+        padding: .4rem 1.5rem !important;
+        margin: 0 1rem;
+    }
+
+        .btn-custom:nth-child(1) {
+            margin-left: 0
+        }
+
+    .btnchart {
+        padding: .6rem 1.5rem !important;
+        text-decoration: underline;
+    }
+
+    /*    canvas#soluong_chart {
+        height: 500px !important;
+        width: 500px !important;
+    }
+
+    canvas#value_chart {
+        width: 500px !important;
+        margin: auto;
+        height: 500px !important;
+    }*/
+
+    /* ----- chart & table----------- */
+    .table > thead > tr {
+        color: #333;
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        background: #fff;
+        text-transform: capitalize;
+    }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 9px 12px;
+        }
+
+    table {
+        margin-bottom: 0 !important;
+    }
+
+    .table-bordered {
+        border: none;
+    }
+
+
+
+    .table > thead > tr > td {
+        border: 1px solid #dbdbdb;
+    }
+
+    div#pills-tuannay {
+        display: flex;
+    }
+
+    /*--------------*/
+
+    .btn-seeMore {
+        display: flex;
+        margin: 2rem auto !important;
+        width: 12.3rem
+    }
+
+    .checkbox-inline, .radio-inline {
+        margin-top: -4px;
+    }
+
+    ol, ul {
+        color: #131010;
+        list-style: none !important;
+        padding: 0;
+        margin: 0 0 10px 17px !important;
+    }
+</style>
+<!-- Button trigger modal -->
+<button type="button" style="display:none" id="btn_myModal" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModalImprove">
+    Launch demo modal
+</button>
+<div class="modal fade" id="myModalImprove" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Chi tiết Biểu đồ</h4>
+            </div>
+            <div class="modal-body">
+                <div class="tab-content">
+                    <div class="tab-pane fade active in" id="pills-tuannay" role="tabpanel" aria-labelledby="pills-bieudo-tab">
+                        <div style="overflow-x: auto; border: 1px solid #dbdbdb; max-height: 500px;width: 100%; margin-bottom: 30PX;">
+                            <table id="tblBarChart" class="table table-hover table-bordered table-responsive">
+                                <thead>
+                                    <tr style="font-weight: bold; text-align: center; background-color: #ececec">
+                                        <td> Tên Lead</td>
+                                        <td> Phone</td>
+                                        <td> Status</td>
+                                        <td> Total Due</td>
+                                        <td> Người chịu trách nhiệm</td>
+                                        <td> Chi nhánh</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<div class="card">
+    <h5 class="card-title" style="background-color: white; color: #262f58; font-weight: bolder; margin-left: 1%"> <i class="menu-icon fa fa-bar-chart"></i>Chỉ số TBĐH ảo</h5>
+    <div class="card-body">
+
+        <div class="container">
+            <div class="row">
+
+                @*//2*@
+                <div style="margin-left:-5%" class="col-md-12">
+
+                    @{
+                        // Lấy ngày hiện tại
+                        var currentDate = DateTime.Now;
+
+                        // Xác định quý hiện tại
+                        int quarter = (currentDate.Month - 1) / 3 + 1;
+
+                        // Xác định ngày đầu tiên của quý
+                        var firstDayOfQuarter = new DateTime(currentDate.Year, (quarter - 1) * 3 + 1, 1);
+
+                        // Xác định ngày cuối cùng của quý
+                        var lastDayOfQuarter = firstDayOfQuarter.AddMonths(3).AddDays(-1);
+                    }
+                    <div class="col-sm-2 form-group">
+                        <label></label>
+                        <select class="selectpicker" data-live-search="true" name="idsource" id="idsource">
+                            <option class="dropdown-item" value="">--Nguồn dữ liệu--</option>
+                            <option class="dropdown-item" value="1">Lead</option>
+                            <option class="dropdown-item" value="0">Contact</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2 form-group">
+                        <label class="checkbox-inline">
+                            Từ ngày:
+                            <input type="date" value="@firstDayOfWeek.ToString(dateFormat)" id="dauThang" class="change-icon" />
+                        </label>
+                    </div>
+                    <div class="col-sm-2 form-group">
+                        <label class="checkbox-inline">
+                            Đến ngày:
+                            <input type="date" value="@lastDayOfWeek.ToString(dateFormat)" id="cuoiThang" class="change-icon" />
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2 form-group">
+                        <button id="btn_thongKe" class="btn-statistical btn-primary" style="margin-top: 27px;"><i class="fa fa-search" style="padding-right:5px; filter:brightness(3);"></i> Thống kê</button>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+
+            @*//c3*@
+
+            <li class="nav-item active">
+                <a class="nav-link btn-custom" id="pills-tuannay" onclick="changeWeek()" data-toggle="pill" href="#pills-tuannay" role="tab" aria-controls="pills-tuannay" aria-selected="false"> <i class="fa fa-calendar"></i> Tuần này</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-custom" id="pills-tuantruoc" onclick="changeLastWeek()" data-toggle="pill" href="#pills-tuantruoc" role="tab" aria-controls="pills-tuantruoc" aria-selected="true"> <i class="fa fa-calendar"></i> Tuần trước</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link btn-custom" id="pills-thangnay" onclick="changeMonth()" data-toggle="pill" href="#pills-thangnay" role="tab" aria-controls="pills-thangnay" aria-selected="true"> <i class="fa fa-calendar"></i> Tháng này</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-custom" id="pills-thangtruoc" onclick="changeLastMonth()" data-toggle="pill" href="#pills-thangtruoc" role="tab" aria-controls="pills-thangtruoc" aria-selected="true"> <i class="fa fa-calendar"></i> Tháng trước</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-custom" id="pills-quynay" onclick="changeQuarter()" data-toggle="pill" href="#pills-quynay" role="tab" aria-controls="pills-quynay" aria-selected="true"> <i class="fa fa-calendar"></i> Quý này</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-custom" id="pills-quytruoc" onclick="changeLastQuarter()" data-toggle="pill" href="#pills-quytruoc" role="tab" aria-controls="pills-quytruoc" aria-selected="true"> <i class="fa fa-calendar"></i> Quý trước</a>
+            </li>
+            @*<li class="nav-item">
+                    <a class="nav-link btn-custom" id="pills-thoigiankhac" onclick="" data-toggle="pill" href="#pills-thoigiankhac" role="tab" aria-controls="pills-thoigiankhac" aria-selected="true"> <i class="far fa-calendar-alt"></i> Thời gian khác</a>
+                </li>*@
+
+        </ul>
+        <ul class="nav nav-pills mb-3" role="tablist">
+            <li>
+                <label for="datechart">Chọn loại thời gian</label>
+                <select name="datechart" id="datechart" style=" margin-left: 1rem; width: 10rem; border-radius: 5px;">
+                    <option selected value="0">Ngày</option>
+                    <option value="1">Tuần</option>
+                    <option value="2">Tháng</option>
+                </select>
+            </li>
+        </ul>
+        <div class="tab-content soluong_chart" id="pills-tabContent" style="display: flex;flex-direction:column">
+            <div class="tab-pane fade active in" id="pills-tuannay" role="tabpanel" aria-labelledby="pills-bieudo-tab" style="margin: auto;">
+                <div style="overflow-x: auto;  max-height: 600px;width: 100vw; margin-bottom:30PX;">
+                    <canvas id="soluong_chart"></canvas>
+                </div>
+            </div>
+            <button id="btn_detail" class="btn-statistical btn-primary btn-seeMore"><i class="fa fa-search" style="padding-right:5px; filter:brightness(3)"></i>Xem thêm</button>
+
+        </div>
+        <div hidden id="detailmore" class="container">
+            <div class="row">
+                <div style="text-align: center; display: flex;" class="col-md-12">
+                    <div class="col-sm-4 form-group" style="margin: auto">
+                        <label for="idbranch">Chọn Chi nhánh</label>
+                        <select class="selectpicker" data-live-search="true" name="idbranch" id="idbranch">
+                            <option class="dropdown-item" value="">--TẤT CẢ--</option>
+                            @if (branches != null)
+                            {
+                                foreach (var item in branches)
+                                {
+                                    <option class="dropdown-item" value="@item.Id">@item.Name</option>
+                                }
+                            }
+                        </select>
+                        <label style="margin-top: 2rem;" for="datechart2">Chọn loại thời gian</label>
+                        <select name="datechart2" id="datechart2" style=" margin-left: 1rem; width: 10rem; border-radius: 5px;">
+                            <option selected value="0">Ngày</option>
+                            <option value="1">Tuần</option>
+                            <option value="2">Tháng</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content value_chart" id="value-tabContent">
+            <div class="tab-pane fade active in" id="pills-tuannay" role="tabpanel" aria-labelledby="pills-bieudo-tab">
+                <div style="overflow-x: auto;width:100vw;  max-height: 600px; margin-bottom:30PX; margin: auto;">
+                    <canvas id="value_chart"></canvas>
+                </div>
+            </div>
+            <button id="btn_bps" hidden class="btn-statistical btn-primary btn-seeMore"><i class="fa fa-search" style="padding-right:5px; filter:brightness(3)"></i>Xem thêm</button>
+        </div>
+        <div hidden id="bpmore" class="container">
+            <div class="row">
+                <div style="text-align:center; display:flex;" class="col-md-12">
+                    <div class="col-sm-4 form-group" style="margin: auto">
+                        <label for="idbp">Chọn Bộ phận</label>
+                        <select class="selectpicker" data-live-search="true" name="idbp" id="idbp">
+                            <option class="dropdown-item" value="">--TẤT CẢ--</option>
+                            @if (bps != null)
+                            {
+                                foreach (var item in bps)
+                                {
+                                    <option class="dropdown-item" value="@item.Id">@item.Name</option>
+                                }
+                            }
+                        </select>
+                        <label style="margin-top: 2rem;" for="datechart3">Chọn loại thời gian</label>
+                        <select name="datechart3" id="datechart3" style=" margin-left: 1rem; width: 10rem; border-radius: 5px;">
+                            <option selected value="0">Ngày</option>
+                            <option value="1">Tuần</option>
+                            <option value="2">Tháng</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="tab-content value_chart" id="user-tabContent">
+            <div class="tab-pane fade active in" id="pills-tuannay" role="tabpanel" aria-labelledby="pills-bieudo-tab">
+                <div style="overflow-x: auto;  max-height: 600px;width:100vw; margin-bottom:30PX; margin: auto;">
+                    <canvas id="user_chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+<div style="display: none">
+
+    @*//c4*@
+    <input id="firstDayOfWeek" value="@firstDayOfWeek.ToString("yyyy-MM-dd")" />
+    <input id="lastDayOfWeek" value="@lastDayOfWeek.ToString("yyyy-MM-dd")" />
+
+    <input id="firstDayOfLastWeek" value="@firstDayOfLastWeek.ToString("yyyy-MM-dd")" />
+    <input id="lastDayOfLastWeek" value="@lastDayOfLastWeek.ToString("yyyy-MM-dd")" />
+
+    <input id="firstDayOfMonth" value="@firstDayOfMonth.ToString("yyyy-MM-dd")" />
+    <input id="lastDayOfMonth" value="@lastDayOfMonth.ToString("yyyy-MM-dd")" />
+
+    <input id="firstDayOfLastMonth" value="@firstDayOfLastMonth.ToString("yyyy-MM-dd")" />
+    <input id="lastDayOfLastMonth" value="@lastDayOfLastMonth.ToString("yyyy-MM-dd")" />
+
+    <input id="firstDayOfQuarter" value="@firstDayOfQuarter.ToString("yyyy-MM-dd")" />
+    <input id="lastDayOfQuarter" value="@lastDayOfQuarter.ToString("yyyy-MM-dd")" />
+
+    <input id="firstDayOfLastQuarter" value="@firstDayOfLastQuarter.ToString("yyyy-MM-dd")" />
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script>
+    Chart.register(ChartDataLabels);
+    var charts = [];
+
+    function DrawBarChart(i, data, labels, backgroundColor, extraid) {
+        const ctx = document.getElementById(i);
+        let datasets = [];
+        for (let i = 0; i < data.length; i++) {
+            let obj = {
+                label: data[i].key.Name,
+                data: data[i].SL,
+                fill: false,
+                borderColor: backgroundColor[i],
+                tension: 0.1
+            };
+            datasets.push(obj);
+        }
+        charts.push({
+            i: i, chart: new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets,
+                    customData: extraid
+                },
+                options: {
+                    plugins: {
+                        datalabels: {
+                            color: 'black',
+                            anchor: 'end',
+                            align: 'top',
+                            font: {
+                                size: 11,
+                                weight: 'normal'
+                            },
+                            formatter: function (value, context) {
+                                return context.chart.data.labels[context.dataIndex] + ': ' + value.toLocaleString(); 
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function (value, index, values) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            })
+        });
+    }
+</script>
+
+
+
+@section Scripts {
+    <script>
+        // function to calculate the first and last day of the previous quarter
+        function calculatePreviousQuarter() {
+            var currentDate = new Date(); // Ngày hiện tại
+            var currentMonth = currentDate.getMonth() + 1; // Tháng hiện tại (1-12)
+            var currentYear = currentDate.getFullYear(); // Năm hiện tại
+            var quarters = [1, 4, 7, 10]; // Tháng đầu tiên của các quý
+            var currentQuarter;
+
+            // Xác định quý hiện tại
+            for (var i = 0; i < quarters.length; i++) {
+                if (currentMonth < quarters[i]) {
+                    currentQuarter = i;
+                    break;
+                }
+            }
+            if (currentQuarter === undefined) {
+                currentQuarter = 4; // Nếu tháng hiện tại lớn hơn 10 (tháng cuối cùng của quý 4)
+            }
+
+            var previousQuarter = currentQuarter === 1 ? 4 : currentQuarter - 1; // Quý trước đó
+            var firstMonthOfPreviousQuarter = quarters[previousQuarter - 1]; // Tháng đầu tiên của quý trước
+            var lastMonthOfPreviousQuarter = quarters[currentQuarter - 1] - 1; // Tháng cuối cùng của quý trước
+
+            var firstDayOfPreviousQuarter = new Date(currentYear, firstMonthOfPreviousQuarter - 1, 1); // Ngày đầu tiên của quý trước
+            var lastDayOfPreviousQuarter = new Date(currentYear, lastMonthOfPreviousQuarter, 0); // Ngày cuối cùng của quý trước
+
+            return {
+                firstDay: formatDate(firstDayOfPreviousQuarter),
+                lastDay: formatDate(lastDayOfPreviousQuarter)
+            };
+        }
+
+        // Hàm chuyển đổi ngày thành chuỗi yyyy-mm-dd
+        function formatDate(date) {
+            var year = date.getFullYear();
+            var month = (date.getMonth() + 1).toString().padStart(2, '0');
+            var day = date.getDate().toString().padStart(2, '0');
+            return year + '-' + month + '-' + day;
+        }
+
+        // Gắn sự kiện cho nút "Quý trước"
+        document.getElementById('pills-quytruoc').addEventListener('click', function () {
+            var previousQuarterDates = calculatePreviousQuarter();
+            // Cập nhật giá trị của input ẩn chứa ngày đầu tiên và ngày cuối cùng của quý trước
+            document.getElementById('dauThang').value = previousQuarterDates.firstDay;
+            document.getElementById('cuoiThang').value = previousQuarterDates.lastDay;
+        });
+
+    </script>
+
+    <script>
+
+        var btnThongKe = document.getElementById("btn_thongKe");
+        var btndatechart = document.getElementById("datechart");
+        var btnDetail = document.getElementById("btn_detail");
+        var btnBps = document.getElementById("btn_bps");
+        var btnThongKeBD = document.getElementById("btn_thongKeBD");
+        var dauThang = document.getElementById("dauThang");
+        var cuoiThang = document.getElementById("cuoiThang");
+        var year = document.getElementById("year");
+        $("#dauThang").datepicker({
+            showOn: "off"
+        });
+
+        $("#cuoiThang").datepicker({
+            showOn: "off"
+        });
+
+        //Tuần
+        function changeWeek() {
+            $("#dauThang").val($("#firstDayOfWeek").val());
+            $("#cuoiThang").val($("#lastDayOfWeek").val());
+        }
+        function changeLastWeek() {
+            $("#dauThang").val($("#firstDayOfLastWeek").val());
+            $("#cuoiThang").val($("#lastDayOfLastWeek").val());
+        }
+
+        //Tháng
+        function changeMonth() {
+            $("#dauThang").val($("#firstDayOfMonth").val());
+            $("#cuoiThang").val($("#lastDayOfMonth").val());
+        }
+        function changeLastMonth() {
+            $("#dauThang").val($("#firstDayOfLastMonth").val());
+            $("#cuoiThang").val($("#lastDayOfLastMonth").val());
+        }
+        //Quý
+        function changeQuarter() {
+            $("#dauThang").val($("#firstDayOfQuarter").val());
+            $("#cuoiThang").val($("#lastDayOfQuarter").val());
+        }
+        function changeLastQuarter() {
+            $("#dauThang").val($("#firstDayOfLastQuarter").val());
+            $("#cuoiThang").val($("#lastDayOfLastQuarter").val());
+        }
+
+        function getFromToDate() {
+            var result = true;
+            var strFromDate = "";
+            var strToDate = "";
+
+            if ($("#dauThang").val() > $("#cuoiThang").val()) {
+                alert("Không thể lấy dữ liệu.\nNgày bắt đầu không được lớn hơn ngày kết thúc.");
+                return false;
+            }
+            strFromDate = $("#dauThang").datepicker({ dateFormat: 'yyyy-mm-dd' }).val();
+            strToDate = $("#cuoiThang").datepicker({ dateFormat: 'yyyy-mm-dd' }).val();
+            //strFromDate = document.getElementById("dauThang")
+            //strToDate = document.getElementById("cuoiThang");
+
+            return {
+                result: result,
+                strFromDate: strFromDate,
+                strToDate: strToDate,
+            };
+        }
+        function editItem(idbranch) {
+            $("#idbranch").val(idbranch).change();
+        }
+        function AddExtTheEnd(inn, outt) {
+            let data = [...outt]
+            for (let i = 0; i < inn.length; i++) {
+                data[i] = data[i] + `(${inn[i]}%)`
+            }
+            return data
+        }
+        function convert(n) {
+            var sign = +n < 0 ? "-" : "",
+                toStr = n.toString();
+            if (!/e/i.test(toStr)) {
+                return n;
+            }
+            var [lead, decimal, pow] = n.toString()
+                .replace(/^-/, "")
+                .replace(/^([0-9]+)(e.*)/, "$1.$2")
+                .split(/e|\./);
+            return +pow < 0 ?
+                sign + "0." + "0".repeat(Math.max(Math.abs(pow) - 1 || 0, 0)) + lead + decimal :
+                sign + lead + (+pow >= decimal.length ? (decimal + "0".repeat(Math.max(+pow - decimal.length || 0, 0))) : (decimal.slice(0, +pow) + "." + decimal.slice(+pow)))
+        }
+        function btntke() {
+            debugger
+            var returnValue = getFromToDate();
+            if (!returnValue.result) return;
+            var idbranch = $("#idbranch option:selected").val();
+            var datechart = $("#datechart option:selected").val();
+            var idsource = $("#idsource option:selected").val();
+
+            ShowLoading();
+            //Thống kê công việc
+            $.ajax({
+                url: "/AdviseCard/GetTBDHALeadReport",
+                data: { idBranch: idbranch, strFromDate: returnValue.strFromDate, strToDate: returnValue.strToDate, datechart: datechart, idsource: idsource },
+                method: 'get',
+                dataType: 'json',
+                success: function (chart) {
+                    debugger
+                    if (charts.find(x => x.i == 'soluong_chart') != undefined) {
+                        let f = charts.find(x => x.i == 'soluong_chart')
+                        f.chart.destroy()
+                        const index = charts.indexOf(f);
+                        if (index > -1) {
+                            charts.splice(index, 1); // Remove one item at the specified index
+                        }
+                    }
+                    DrawBarChart('soluong_chart', chart.data, chart.labels, chart.backgroundColor, chart.extraid)
+                    HideLoading();
+                },
+                error: function () {
+                    HideLoading();
+                    alert("Lỗi.\nKhông thể lấy dữ liệu báo cáo (1).");
+                }
+            });
+
+        }
+        btnThongKe.addEventListener('click', btntke)
+        btndatechart.addEventListener('change', btntke)
+        btnDetail.addEventListener('click', function () {
+            $('#detailmore').attr('hidden', false)
+            $('#btn_bps').attr('hidden', false)
+            $('#value-tabContent').attr('hidden', false)
+            $('#idbranch').change()
+        });
+        btnBps.addEventListener('click', function () {
+            $('#bpmore').attr('hidden', false)
+            $('#user-tabContent').attr('hidden', false)
+            $('#idbp').change()
+        });
+        $('#idbranch,#datechart2').change(function () {
+            debugger
+            var returnValue = getFromToDate();
+            if (!returnValue.result) return;
+            var idbranch = $("#idbranch option:selected").val();
+            var datechart = $("#datechart2 option:selected").val();
+            var idsource = $("#idsource option:selected").val();
+
+            ShowLoading();
+            //Thống kê công việc
+            $.ajax({
+                url: "/AdviseCard/GetBPTBDHALeadReport",
+                data: { idBranch: idbranch, strFromDate: returnValue.strFromDate, strToDate: returnValue.strToDate, datechart: datechart, idsource: idsource },
+                method: 'get',
+                dataType: 'json',
+                success: function (chart) {
+                    debugger
+                    if (charts.find(x => x.i == 'value_chart') != undefined) {
+                        let f = charts.find(x => x.i == 'value_chart')
+                        f.chart.destroy()
+                        const index = charts.indexOf(f);
+                        if (index > -1) {
+                            charts.splice(index, 1); // Remove one item at the specified index
+                        }
+                    }
+                    DrawBarChart('value_chart', chart.data, chart.labels, chart.backgroundColor, chart.extraid)
+                    HideLoading();
+                },
+                error: function () {
+                    HideLoading();
+                    alert("Lỗi.\nKhông thể lấy dữ liệu báo cáo (1).");
+                }
+            });
+        })
+        $('#idbp,#datechart3').change(function () {
+            debugger
+            var returnValue = getFromToDate();
+            if (!returnValue.result) return;
+            var idbranch = $("#idbp option:selected").val();
+            var datechart = $("#datechart3 option:selected").val();
+            var idsource = $("#idsource option:selected").val();
+
+            ShowLoading();
+            //Thống kê công việc
+            $.ajax({
+                url: "/AdviseCard/GetUsrTBDHALeadReport",
+                data: { idBranch: idbranch, strFromDate: returnValue.strFromDate, strToDate: returnValue.strToDate, datechart: datechart, idsource: idsource },
+                method: 'get',
+                dataType: 'json',
+                success: function (chart) {
+                    debugger
+                    if (charts.find(x => x.i == 'user_chart') != undefined) {
+                        let f = charts.find(x => x.i == 'user_chart')
+                        f.chart.destroy()
+                        const index = charts.indexOf(f);
+                        if (index > -1) {
+                            charts.splice(index, 1); // Remove one item at the specified index
+                        }
+                    }
+                    DrawBarChart('user_chart', chart.data, chart.labels, chart.backgroundColor, chart.extraid)
+
+                    HideLoading();
+                },
+                error: function () {
+                    HideLoading();
+                    alert("Lỗi.\nKhông thể lấy dữ liệu báo cáo (1).");
+                }
+            });
+        })
+                    //function OpenPopupTbl(id, type, idcha) {
+                    //    debugger
+                    //    var returnValue = getFromToDate();
+                    //    if (!returnValue.result) return;
+                    //    var idbranch = id;
+                    //    ShowLoading();
+                    //    //Thống kê công việc
+                    //    $.ajax({
+                    //        url: "/AdviseCard/GetDtCBTblLeadReport",
+                    //        data: { idBranch: idbranch, strFromDate: returnValue.strFromDate, strToDate: returnValue.strToDate, type: type, idcha: idcha },
+                    //        method: 'get',
+                    //        dataType: 'json',
+                    //        success: function (data) {
+                    //            debugger
+                    //            let trs = ''
+                    //            data.forEach(x => {
+                    //                trs += `<tr><td>${x.LeadName == null ? '' : x.LeadName}</td><td>${x.Mobile == null ? '' : x.Mobile}</td><td>${x.Status == null ? '' : x.Status}</td>
+                    //                 <td style='text-align:right'>${BigInt(convert(x.Totalmoney)).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td><td>${x.FullName == null ? '' : x.FullName}</td>
+                    //                                                   <td>${x.BranchName == null ? '' : x.BranchName}</td></tr>`
+                    //            })
+                    //            $('#tblBarChart tbody').html(trs)
+                    //            $('#btn_myModal').trigger('click')
+                    //            HideLoading();
+                    //        },
+                    //        error: function () {
+                    //            HideLoading();
+                    //            alert("Lỗi.\nKhông thể lấy dữ liệu báo cáo (1).");
+                    //        }
+                    //    });
+                    //}
+                    //$("#user_chart,#value_chart,#soluong_chart").click(
+                    //    function (evt) {
+                    //        debugger
+                    //        let myChart = charts.find(x => x.i == $(this).attr('id')) != undefined ? charts.find(x => x.i == $(this).attr('id')).chart : ''
+                    //        var points = myChart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+
+                    //        if (points.length) {
+                    //            const firstPoint = points[0];
+                    //            const label = myChart.data.labels[firstPoint.index];
+                    //            const value = myChart.data.datasets[firstPoint.datasetIndex].data[firstPoint.index];
+                    //            const id = myChart.data.customData[firstPoint.index].id;
+                    //            if ($(this).is('#user_chart')) {
+                    //                OpenPopupTbl(id, 2, $('#idbp').val())
+                    //            } else if ($(this).is('#value_chart')) {
+                    //                OpenPopupTbl(id, 0, $('#idbranch').val())
+                    //            } else {
+                    //                OpenPopupTbl(id, 1)
+                    //            }
+                    //        }
+                    //    }
+                    //);
+    </script>
+}
+
+
+

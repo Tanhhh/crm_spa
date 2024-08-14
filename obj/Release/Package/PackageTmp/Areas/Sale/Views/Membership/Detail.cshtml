@@ -1,0 +1,157 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model MembershipViewModel
+
+@{
+    ViewBag.Title = Wording.PageDetail_Membership;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Membership",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@helper GridColumnStatusName(string status)
+{
+    switch (status)
+    {
+        case "pending":
+            <span class="label label-info arrowed-in-right">@Wording.Membership_Pending</span>
+            break;
+        case "tranfer":
+        <span class="label label-warning arrowed-in-right">@Wording.Membership_Tranfer</span>
+            break;
+        case "complete":
+        <span class="label label-success arrowed-in-right">@Wording.Membership_Complete</span>
+            break;
+        case "expired":
+        <span class="label label-default arrowed-in-right">@Wording.Membership_Expired</span>
+            break;
+        case "inprocess":
+        <span class="label label-warning arrowed-in-right">@Wording.Membership_Inprocess</span>
+            break;
+
+    }
+}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title"><i class="ace-icon fa fa-info-circle"></i> Thông tin chi tiết phiếu MBS</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="detail-view">
+                        <div class="row control-group">
+                            <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+                            @Html.DetailViewItemFor2(model => model.Code, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItem(GridColumnStatusName(Model.Status), "Status", Wording.Status, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.TargetCode, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CustomerCode, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CustomerName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.ProductName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.ProductCode, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemDateTimeFor(model => model.CreatedDate, true, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemDateTimeFor(model => model.ExpiryDate, true, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.ManagerName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CreatedUserName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p></p>
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title"><i class="ace-icon fa fa-image"></i> Ảnh</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <p>
+                        <a class="btn btn-primary btn-mini" onclick="OpenPopup('@Url.Action("Create", "Image", new { area = "Crm", TargetId = Model.Id, TargetModule = "Membership" })', 'Thêm hình ảnh', 0, 500)">
+                            <i class="ace-icon fa fa-image"></i>
+                            Thêm ảnh
+                        </a>
+                    </p>
+                    @Html.Action("Detail", "Image", new { area = "Crm", TargetId = Model.Id, TargetModule = "Membership" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    @*if (Model.Status == "pending")
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "Membership", "Sale"))
+        {
+            <a class="btn btn-mini btn-primary" onclick="OpenPopup('@Url.Action("Create", "Membership", new { area = "Sale", TargetId = Model.Id, TargetModule = "Membership",IsPopup=true })', 'Chuyển đổi khách hàng sử dụng', 0, 500)">
+                <i class="ace-icon fa fa-refresh"></i>
+                Chuyển đổi khách hàng
+            </a>
+        }
+    }*@
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteAll-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+    </script>
+}

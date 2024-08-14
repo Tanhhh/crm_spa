@@ -1,0 +1,482 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.Domain.Entities
+@using Erp.Domain.Staff.Entities
+@using Erp.BackOffice.Crm.Models
+@using Newtonsoft.Json;
+@using Erp.BackOffice.Filters;
+@{
+    ViewBag.Title = "Đánh giá Topic";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    var Branchs = ViewBag.Branchs as IEnumerable<BranchVModel>;
+}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<style>
+    #TableKPICongViec > div {
+        overflow: unset !important;
+    }
+
+    .page-content {
+        overflow-y: scroll;
+        height: 100vh;
+    }
+
+    thead {
+        position: sticky;
+        top: 0;
+    }
+
+    .table > thead > tr {
+        color: #123d8c;
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        background: #fff;
+    }
+
+    .nav-pills > li.active > a {
+        background-color: #00ace6 !important;
+    }
+
+    .tab-content {
+        border: unset !important;
+    }
+
+    .checkbox-inline > input {
+        /*        margin-top: 5px;*/
+        padding: 0px 4px 6px;
+    }
+
+    .btn-group + .btn, .btn-group > .btn, .checkbox-inline > input {
+        border: 1px solid #809dc9 !important;
+    }
+
+    label {
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        font-size: 15px !important;
+        color: #262f58;
+    }
+
+    #iDay, #ituNgaytk, #idenNgaytk, #iDatetk {
+        width: 100%
+    }
+
+    body {
+        /*margin-top: 20px;*/
+        color: #1a202c;
+        text-align: left;
+        background-color: #e2e8f0;
+    }
+
+    .main-body {
+        padding: 15px;
+    }
+
+    .card {
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+    }
+
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0 solid rgba(0,0,0,.125);
+        border-radius: .25rem;
+    }
+
+    .selectpicker {
+        background-color: #fff !important;
+        color: #333 !important;
+    }
+
+    .dropdown-toggle:hover {
+        background-color: #fff !important;
+    }
+
+    .btn.dropdown-toggle:active, .open {
+        background-color: #ffffff !important;
+        border-color: #bfc1c2;
+        border: 1px solid #bfc1c2 !important;
+    }
+
+    .btn-default, .btn-default.focus, .btn-default:focus, .btn.focus, .btn:focus {
+        background-color: #fff;
+    }
+
+    .btn-group > .btn > .caret {
+        border-top-color: #080808;
+    }
+
+    .gutters-sm {
+        margin-right: -8px;
+        margin-left: -8px;
+    }
+
+        .gutters-sm > .col, .gutters-sm > [class*=col-] {
+            padding-right: 8px;
+            padding-left: 8px;
+        }
+
+    .modal, .modal-backdrop {
+        right: 0;
+        bottom: auto;
+        left: 0;
+    }
+
+    .mb-3, .my-3 {
+        margin: 1rem 1rem !important;
+    }
+
+    .bg-gray-300 {
+        background-color: #e2e8f0;
+    }
+    /*
+    .h-100 {
+        height: 100% !important;
+    }*/
+
+    .custom-color-td {
+        text-align: left;
+    }
+
+    .ht_1sao {
+        text-align: right;
+    }
+
+    .custom-th1 {
+        text-align: center;
+    }
+
+    .custom-tbody {
+        text-align: right;
+        border-top: 1px solid #649ff0;
+    }
+
+    .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+        width: 100%;
+    }
+
+    .nav-list > li > a > .menu-icon {
+        filter: brightness(0) !important;
+        vertical-align: top;
+    }
+
+    .table-bordered {
+        border: 1px solid #004a9f;
+    }
+
+    .btn-statistical {
+        padding: .6rem 1.5rem;
+        border-radius: 3px;
+        border: none;
+        outline: none;
+        background: #499ce4 !important;
+    }
+
+        .btn-statistical:hover {
+            transition: .3s linear;
+        }
+
+    .btn-custom {
+        padding: .4rem 1.5rem !important;
+        margin: 0 1rem;
+    }
+
+        .btn-custom:nth-child(1) {
+            margin-left: 0
+        }
+
+    .btnchart {
+        padding: .6rem 1.5rem !important;
+        text-decoration: underline;
+    }
+
+
+    /* ----- chart & table----------- */
+    .table > thead > tr {
+        color: #333;
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        background: #fff;
+        text-transform: capitalize;
+    }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 9px 12px;
+        }
+
+    table {
+        margin-bottom: 0 !important;
+    }
+
+    .webkit::-webkit-scrollbar {
+        background: #dbdbdb;
+        border-radius: 10px;
+        display: none;
+    }
+
+    .webkit::-webkit-scrollbar-button {
+        width: 3px !important;
+    }
+
+    .webkit::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background: #999;
+    }
+
+    .table-bordered {
+        border: none;
+    }
+
+    #ibranch, #ibophan {
+        border: 1px solid #809dc9 !important;
+    }
+
+    .select2-container .select2-selection--single {
+        border: 1px solid #809dc9 !important;
+        background-color: white;
+        height: 30px;
+        width: 100%;
+    }
+        /*/// table*/
+        .table > caption + thead > tr:first-child > td, .table > caption + thead > tr:first-child > th, .table > colgroup + thead > tr:first-child > td, .table > colgroup + thead > tr:first-child > th, .table > thead:first-child > tr:first-child > td, .table > thead:first-child > tr:first-child > th {
+        border-top: 0;
+        border-right: 0;
+        text-align: center;
+    }
+    .table > thead > tr > th {
+        border-left-color: #F1F1F1;
+        border-right: 0;
+    }
+
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+        border-right: none;
+    }
+
+
+    /* ----------- #itbDAS -----------*/
+    #itbDAS .tab-colorLine1 {
+        background: #56c437;
+        color: #fff;
+    }
+
+    #itbDAS .line2 {
+        background: #5dbc68;
+        color: #fff;
+    }
+
+    #itbDAS .info {
+        background: #89c08f;
+        color: #fff;
+    }
+
+    /* -------- #itbHe ------------ */
+    #itbHen .tab-colorLine1 {
+        background: #de8b0e;
+        color: #fff;
+    }
+
+    #itbHen .line2 {
+        background: #ffc652;
+        color: #fff;
+    }
+
+    #itbHen .info {
+        background: #e1c095;
+        color: #fff;
+    }
+
+
+    /* ---------  #itbpercenTopic -------------- */
+    #itbpercenTopic .tab-colorLine1 {
+        background: #0d5baf;
+        color: #fff;
+    }
+
+    #itbpercenTopic .line2 {
+        background: #448acc;
+        color: #fff;
+    }
+
+    #itbpercenTopic .info {
+        background: #86aed4;
+        color: #fff;
+    }
+
+
+
+</style>
+<div class="card">
+    <h5 class="card-title" style="background-color: white; color: #262f58; font-weight: bolder; margin-left: 1%;"> <i class="menu-icon fa fa-bar-chart" style="margin-right: 10px"></i>ĐÁNH GIÁ TOPIC</h5>
+    <div class="card-body">
+        <div style="margin-left: 60px; width:90%">
+            <div class="row">
+                <div style="margin-left:-5%" class="col-md-12">
+                    <label class="checkbox-inline">
+                        Xem đánh giá theo:
+                    </label>
+                </div>
+                <div style="margin-left:-5%" class="col-md-12">
+                    <div class="col-sm-2 form-group" id="idoptionNam">
+                        <label class="checkbox-inline" style="width:100%" style="padding-right: 0px;">
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="iYear" name="iYear" style="height: 30px;width:90%">
+                                @for (int i = DateTime.Now.Year - 10; i <= DateTime.Now.Year; i++)
+                                {
+                                    <option value="@i" @(i == DateTime.Now.Year ? "selected" : "")>Năm @i</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-2 form-group" id="idoptionThang" style="padding-right: 0px;">
+                        <label class="checkbox-inline" style="width:100%">
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="iMonth" name="iMonth" style="height: 30px;width:90%">
+                                @for (int i = 1; i < 13; i++)
+                                {
+                                    <option value="@i" @(i == DateTime.Now.Month ? "selected" : "")>Tháng @i</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-2 form-group" id="ibranchdiv" style="padding-right: 0px;">
+                        <label class="checkbox-inline" style="width:100%">
+                            <select data-val="true" data-val-required="Bắt buộc nhập" id="iBranch" name="iBranch" style="height: 30px;width:90%">
+                                <option value="-1">Chi nhánh</option>
+                                @foreach (var item in Branchs)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-2 form-group" style="padding-right: 0px;">
+                        <label class="checkbox-inline" style="width:100%">
+                            <select data-val="true" id="ileadct" name="ileadct" style="width: 90%; border: 1px solid #809dc9 !important; height: 30px; margin-top: 5px; padding: 0px 4px 6px;">
+                                <option value="-1">Nguồn dữ liệu</option>
+                                <option value="1">Lead</option>
+                                <option value="0">Contact</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-2 form-group">
+                        <button id="btn_thongKe" class=" btn-primary btn-statistical"><i class="fa fa-search" style="filter:brightness(3);"></i> Thống kê</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12" style=" display: flex; justify-content: space-between;">
+                <div class="col-sm-6" style="width: 48% !important">
+                    <table id="itbDAS" class="table">
+
+                    </table>
+                </div>
+                <div class="col-sm-6"  style="width: 48% !important">
+                    <table id="itbHen" class="table">
+
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-12" id="detailitem_chart" style="margin-top: 3.5rem;">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <table id="itbpercenTopic" class="table">
+                    </table>
+                </div>
+                <div class="col-sm-3"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#iYear').select2();
+        $('#iMonth').select2();
+        $('#iBranch').select2();
+        $('#ileadct').select2();     
+    });
+    var btnThongKe = document.getElementById("btn_thongKe");
+    btnThongKe.addEventListener('click', function () {
+        debugger
+        var iyear = $('#iYear').val();
+        var imonth = $('#iMonth').val();
+        var ibranch = $('#iBranch').val();
+        var islead = $('#ileadct').val();
+        ShowLoading();
+        $.ajax({
+            url: "/Appointment/GetRatingTopicReport",
+            data: { year: iyear, month: imonth, branch: ibranch, isLead: islead },
+            method: 'get',
+            dataType: 'json',
+            success: function (rs) {
+                if (rs.Success) {
+                    debugger
+                    var titletbDSA = "Top các topic có doanh số ảo tốt nhất theo chi nhánh";
+                    var titletbHen = "Top các topic có số lượng Meeting nhiều nhất theo chi nhánh";
+                    var titletbpercenTopic = "Top các topic có tỷ lệ lên tiềm năm tốt nhất theo chi nhánh";
+                    var tgDSA = "Doanh số";
+                    var tgHen = "Lượng hẹn";
+                    var tgpercen = "Tỷ lệ";
+                    createTableItems("itbDAS", titletbDSA, tgDSA, rs.dataDSAo);
+                    createTableItems("itbHen", titletbHen, tgHen, rs.dataHen);
+                    createTableItems("itbpercenTopic", titletbpercenTopic, tgpercen, rs.dataPerent);
+                    HideLoading();
+                }
+                else {
+                    HideLoading();
+                    alert("Lỗi.\nKhông thể lấy dữ liệu báo cáo (Quá 1 tháng!).");
+                }
+            },
+            error: function () {
+                HideLoading();
+                alert("Lỗi.\nKhông thể lấy dữ liệu báo cáo (1).");
+            }
+        });
+    });
+    function createTableItems(i, titleheader, target, dataTableReport) {
+        const ctx = $("#" + i); 
+        ctx.empty();  
+        var thead = `
+        <thead>
+            <tr>
+                <th colspan="3" class="tab-colorLine1">${titleheader}</th>
+            </tr>
+            <tr class="line2">
+                <th width='33%'>Chi nhánh</th>
+                <th width='33%'>Topic</th>
+                <th width='34%'>${target}</th>
+            </tr>
+        </thead>`;
+        var tbody = '';
+        var trele = '';
+
+        dataTableReport.forEach(function (x) {
+            var tdele = '';
+            tdele += `<td>${x.BranchName}</td>`;
+            tdele += `<td>${x.Topic}</td>`;
+            tdele += `<td>${x.Total}</td>`;
+            trele += `<tr>${tdele}</tr>`;
+        });
+        tbody = `<tbody class="info">${trele}</tbody>`;
+
+        ctx.append(thead);
+        ctx.append(tbody);
+    }
+
+</script>

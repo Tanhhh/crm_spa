@@ -1,0 +1,178 @@
+﻿@using Erp.BackOffice.Sale.Controllers
+@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Filters;
+@{
+    Layout = null;
+    var datalist = ViewBag.DataList as IEnumerable<LeadQuotationIndex>;
+    var i = 0;
+    var leadId = ViewBag.LeadId;
+    var isPartial = ViewBag.IsPartial;
+}
+<style>
+    .table > tbody > tr > td, .table > thead > tr > th {
+        border-right: unset !important;
+        border-left: unset !important;
+        color:black !important;
+    }
+
+    .table > thead > tr > th {
+        border-top: 1px solid #ddd !important;
+    }
+    .table > thead > tr > td {
+        padding: 8px !important;
+    }
+    .item_Code {
+        color: #576297 !important;
+        text-decoration: none;
+        cursor: pointer;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+        .item_Code:hover {
+            text-decoration: underline;
+        }
+    .item_ReceptionStaffName {
+        color: #152cad !important
+    }
+
+    a {
+        text-decoration: none !important;
+    }
+
+    .btn-addNewQuote {
+        font-size: 1.3rem;
+        padding: 2px 10px;
+        font-size: 1.4rem;
+    }
+
+        .btn-addNewQuote:hover {
+            text-decoration: none !important;
+            text-transform: capitalize;
+            font-size: 1.3rem;
+            padding: 3px 10px;
+            border-radius: 3px;
+            background: #7a7df9;
+            color: #fff;
+            transition: .3s linear;
+        }
+
+    .btn-printQuote {
+        font-size: 1.3rem;
+        padding: 2px 10px;
+        font-size: 1.4rem;
+    }
+
+        .btn-printQuote:hover {
+            text-decoration: none !important;
+            text-transform: capitalize;
+            font-size: 1.3rem;
+            padding: 3px 10px;
+            border-radius: 3px;
+            background: #20be6d;
+            color: #fff;
+            transition: .3s linear;
+        }
+
+    #myModal .modal-header {
+        padding: 8px 38px !important;
+        background: #438EB9;
+        border: none;
+    }
+    #myModal .modal-header h4 {
+        padding: 0 !important;
+    }
+
+    div#idleadquota {
+        padding: 0 0px 5px 50px !important;
+        width: 100%;
+        overflow: auto;
+    }
+
+    table#leadquotationtable {
+        margin: 0;
+    }
+
+    tr > th {
+        text-align: left;
+    }
+</style>
+<div style="padding: 0 50px 40px 50px; width: 100%" id="idleadquota" data-id="@ViewBag.LeadId">
+
+    <div style="text-align: end; padding: 10px 0px; ">
+        @{
+            var urladdbg= "";
+            var urlinbg = "";
+            var urldetailbg = "";
+            if (isPartial == 1)
+            {
+                urladdbg = "/AdviseCard/TabLeadQuotationAddNew?id=" + leadId + "&isPartial=" + isPartial;
+                urlinbg = "/AdviseCard/SelectQuotationForm?id=" + leadId + "&isPartial=" + isPartial;
+                urldetailbg = "/AdviseCard/TabLeadQuotationDetail?id=" + leadId + "&isPartial=" + isPartial;
+            } else
+            {
+                urladdbg = "/AdviseCard/TabLeadQuotationAddNew?id=" + leadId;
+                urlinbg = "/AdviseCard/SelectQuotationForm?id=" + leadId ;
+                urldetailbg = "/AdviseCard/TabLeadQuotationDetail?id=" + leadId;
+            }
+
+        }
+        
+        <div class="position" style=" position: fixed; width: 23rem; right: 4%;">
+            <a href="javascript:;" onclick="OpenPopup('@urladdbg', 'Thêm mới báo giá',0, 420)">
+                <span style="font-size: medium; color: #3F51B5; "><span class="btn-addNewQuote" style="margin-left: 6px; text-transform: uppercase; text-decoration: none;">Thêm báo giá</span></span>
+            </a>
+            <a href="javascript:;" onclick="OpenPopup('@urlinbg', 'In báo giá',100, 250)">
+                <span style="font-size: medium; color: #3F51B5; "><span class="btn-printQuote" style="margin-left: 6px; text-transform: uppercase; text-decoration: none" ;>In báo giá</span></span>
+            </a>
+        </div>
+        </div>
+    <div id="listleadquotationDetail" class="table-responsive " style=" margin-top: 2rem; padding: 10px 7px; background: white; border-radius: 5px; width: 146rem; margin-left: -4rem; ">
+        <table class="table" id="leadquotationtable">
+            <thead>
+                <tr>
+                    <th class="grid-header">Số báo giá</th>
+                    <th class="grid-header">Ngày báo giá</th>
+                    <th class="grid-header">Hiệu lực đến ngày</th>
+                    <th class="grid-header">Liên hệ </th>
+                    <th class="grid-header">Tổng tiền</th>
+                    <th class="grid-header">Tình trạng</th>
+                    <th class="grid-header">Mô tả</th>
+                </tr>
+            </thead>
+            <tbody class="quotationleadtbdList">
+                @foreach (var itemlq in datalist)
+                {
+                    <tr id="@(i+1)">
+                        <td>
+                            <input class="item_id" type="hidden" value="@itemlq.Id" />
+                            <span class="item_Code" onclick="OpenPopup('@isPartial' === '1' ? '/AdviseCard/TabLeadQuotationDetail?id=' + @itemlq.Id + '&isPartial=' + '@isPartial' : '/AdviseCard/TabLeadQuotationDetail?id=' + @itemlq.Id, 'Chi tiết báo giá', 0, 420)">@(itemlq.Code ?? "")</span>
+                        </td>
+                        <td>
+                            <span class="item_CreateDate">@(itemlq.CreatedDate.ToString("dd/MM/yyyy"))</span>
+                        </td>
+                        <td>
+                            <span class="item_UntilDate">@(itemlq.UntilDateValue.ToString("dd/MM/yyyy"))</span>
+                        </td>
+                        <td>
+                            <span class="item_ReceptionStaffName">@(itemlq.ReceptionStaffName ?? "")</span>
+                        </td>
+                        <td>
+                            <span class="item_TotalAmount">@FormatNumber.FormatNumberv(itemlq.TotalAmount)</span>
+                        </td>
+                        <td>
+                            <span class="item_Status">@itemlq.Status</span>
+                        </td>
+                        <td>
+                            <span class="item_Note">@itemlq.Note</span>
+                        </td>
+                        <td style="display:none">
+                            @(i++)
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+    </div>
+</div>

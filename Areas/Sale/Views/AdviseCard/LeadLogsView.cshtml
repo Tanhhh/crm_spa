@@ -1,0 +1,465 @@
+﻿@using Erp.BackOffice.Sale.Controllers
+@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@using System.IO
+@model IEnumerable<LeadLogsModel>
+
+
+    @{
+        Layout = null;
+        IEnumerable<StatusLeadModel> status = ViewBag.status as IEnumerable<StatusLeadModel>;
+    }
+    <style>
+        .top_box {
+            position: relative;
+            display: block;
+            width: 100%;
+            height: 2px;
+            text-align: center;
+            left: -20px;
+            top: -5px;
+        }
+
+        #LeadLogsShow > div:first-child {
+            margin-top: 20px !important;
+        }
+
+        .top_box::before, .top_box::after {
+            content: "";
+            height: 1px;
+            background-color: #00000014;
+            width: 37%;
+            margin-top: 6px;
+        }
+
+        .top_box::before {
+            float: left;
+            margin-left: 5px;
+        }
+
+        .top_box::after {
+            float: right;
+            margin-right: 5px;
+        }
+
+        input#checkboxId {
+            width: 1.5rem;
+        }
+
+        .img-dotThree {
+            width: 26px !important;
+            float: right;
+            padding: 7px;
+            cursor: pointer;
+        }
+
+        .icon-display {
+            width: 6rem;
+            height: 6rem;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+    </style>
+    @{ var dateTimes = Model.GroupBy(x => new { x.CreatedDate.Date }).ToList();
+        bool chknew = false;
+    }
+
+    @foreach (var item1 in dateTimes)
+    {
+        var data = Model.Where(x => x.CreatedDate.Date == item1.Key.Date);
+        foreach (var item in data)
+        {
+
+
+            <div style=" display: block; margin:0 5px; height: fit-content; width:100%">
+                @if (item.Action == "CHANGESTATUS")
+                {<img style="display: block; width: 28px !important; height: 28px !important; margin-left: 1px; border-radius: 50%; float: left; margin-top: 20px;" src="~/assets/img/thongBao.png" />}
+                else if (item.Action == "COMMENT")
+                {
+                    <img style="display: block; width: 32px !important; height: 32px !important; margin-left: 0; border-radius: 50%; float: left; margin-top: 20px; " src="~/assets/img/chatcoin-chat-logo.png" />
+
+                }
+                else if (item.Action == "LEADCREATE")
+                {
+                    <img style="display: block; width: 28px !important; height: 28px !important; margin-left: 1px; border-radius: 50%; float: left; margin-top: 20px;" src="~/assets/img/thongBao.png" />
+
+                }
+                else if (item.Action == "LEADCREATEFACEBOOK")
+                {
+                    <img style="display: block; width: 30px; height: 30px; border-radius: 50%; float: left; margin-top: 20px; " src="https://img.icons8.com/?size=256&id=118568&format=png" />
+
+                }
+                else if (item.Action == "MEETING")
+                {
+                    <img style="display: block; width: 40px !important; height: 40px !important; margin-left: -4px; border-radius: 50%; float: left; margin-top: 20px;" src="~/assets/img/meeting.png" />
+                }
+                else if (item.Action == "CALL")
+                {
+                    <img style="display: block; width: 37px !important; height: 37px !important; margin-left: -3px; border-radius: 50%; float: left; margin-top: 20px; " src="~/assets/img/call.png" />
+                }
+                else if (item.Action == "TASK")
+                {
+                    <img style="display: block; width: 35px !important; height: 35px !important; margin-left: -2px; border-radius: 50%; float: left; margin-top: 20px; " src="~/assets/img/task.png" />
+
+                }
+                else if (item.Action == "SENDEMAIL")
+                {
+                    <img style="display: block; width: 35px !important; height: 35px !important; margin-left: -2px; border-radius: 50%; float: left; margin-top: 20px; " src="~/assets/img/sendemail.png" />
+                }
+                else if (item.Action == "SMS")
+                {
+                    <img style="display: block; width: 40px !important; height: 40px !important; margin-left: -3px; border-radius: 20%; float: left; margin-top: 20px; " src="~/assets/img/sms1.png" />
+                }
+                else if (item.Action == "PREVIEWSMS")
+                {
+                    <img style="display: block; width: 34px !important; height: 34px !important; margin-left: -1px; border-radius: 50%; float: left; margin-top: 20px; " src="~/assets/img/vector-chat-icon.jpg" />
+
+                }
+                else if (item.Action == "SENDSMS")
+                {
+                    <img style="display: block; width: 34px !important; height: 34px !important; margin-left: -1px; border-radius: 50%; float: left; margin-top: 20px; " src="~/assets/img/sms1.png" />
+
+                }
+                else if (item.Action == "PREVIEWZL")
+                {
+                    <img style="display: block; width: 40px !important; height: 40px !important; margin-left: -3px; border-radius: 50%; float: left; margin-top: 20px; " src="~/assets/img/app-store-apple-google-play-zalo.jpg" />
+
+                }
+                else if (item.Action == "SENDZALO")
+                {
+                    <img style="display: block; width: 40px !important; height: 40px !important; margin-left: -3px; border-radius: 30%; float: left; margin-top: 20px; " src="~/assets/img/zalozns.png" />
+                }
+                else if (item.Action == "LEADCREATEZALO")
+                {
+
+                    <img style="display: block; width: 40px !important; height: 40px !important; margin-left: -3px; border-radius: 30%; float: left; margin-top: 20px; " src="~/assets/images/zalo-icon.png" />
+                }
+                @if (chknew == false)
+                {
+                    <div class="top_box">
+                        @if (item.CreatedDate.Date == DateTime.Now.Date)
+                        {
+                            <span class="bg-primary" style="border-radius: 10px; outline-color: gray; border: none; padding: 0px 30px;">Hôm nay</span>
+                        }
+                        else
+                        {
+                            <span style="background-color: gray; border-radius: 10px; outline-color: gray; border: none; padding: 0px 30px; color: #fff">@item.CreatedDate.ToShortDateString()</span>
+                        }
+                    </div>
+
+                }
+                <div style="display: block; margin-left: 15px; border-left: 1px solid #00000014; width: 100%; height: fit-content; padding: 7px 0; ">
+                    <div style="display: block; margin-left: 50px; margin-top: 0px; background-color: #fff; width: 90%; height: fit-content; padding:7px 20px; border-radius: 10px; word-wrap: break-word;">
+                        @if (item.Action == "MEETING")
+                        {
+                            <div style=" display: block; height: fit-content; width:100%">
+                                <div style="display: block; margin-left: 0px; margin-top: 0px; background-color: #fff; width: 100%; height: fit-content; padding: 1px; border-radius: 10px; word-wrap: break-word;">
+                                    <div class="flex-meeting" style=" display: flex; align-items: center; gap: .4rem; margin-bottom: 3px;">
+                                        <div style="display: flex; align-items: center; margin: 0 !important">
+                                            <div style="flex: 1 1 1rem">
+                                                <input type="checkbox" id="meetingCheckbox_@item.Id" style="float: left; background-color: blue !important; color: blue !important;" checked disabled />
+                                                <label for="meetingCheckbox_@item.Id" style="float: left; margin-top: 4px;"></label>
+                                            </div>
+                                            <div style="flex: 1 1 10.5rem">
+                                                <strong style="font-size: 13px;">Cuộc họp</strong>
+                                            </div>
+                                            <div style="width: 16rem">
+                                                <span style="margin-left:10px;opacity:0.5;">
+                                                    @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <p class="title-and-username"><strong>Chủ đề</strong>: @item.Content</p>
+                                    </div>
+                                    <p class="title-and-username" style="margin-bottom: 0px"><strong>Với</strong>: @item.Username</p>
+                                </div>
+                            </div>
+                        }
+                        @if (item.Action == "CALL")
+                        {
+                            <div style=" display: block; height: fit-content; width:100%">
+                                <div style="display: block; margin-left: 0px; margin-top: 0px; background-color: #fff; width: 100%; height: fit-content; padding: 1px; border-radius: 3px; word-wrap: break-word;">
+                                    <div class="flex-meeting" style=" display: flex; align-items: center; gap: .4rem; margin-bottom: 3px;">
+                                        <div style="display: flex; align-items: center;margin: 0 !important">
+                                            <div style="flex: 1 1 1rem">
+                                                <input type="checkbox" id="meetingCheckbox_@item.Id" style="float: left;  background-color: blue !important; color: blue !important;" checked disabled />
+                                                <label for="meetingCheckbox_@item.Id" style="float: left; margin-top: 4px;"></label>
+                                            </div>
+                                            <div style="flex: 1 1 10.5rem">
+                                                <strong style="font-size: 13px;">Cuộc gọi đi</strong>
+                                            </div>
+                                            <div style="width: 16rem">
+                                                <span style="margin-left:10px;opacity:0.5">
+                                                    @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <p class="title-and-username"><strong>Chủ đề</strong>: @item.Content</p>
+                                    </div>
+                                    <p class="title-and-username" style="margin-bottom: 0px"><strong>Với</strong>: @item.Username</p>
+                                </div>
+                            </div>
+                        }
+                        @if (item.Action == "TASK")
+                        {
+                            <div style=" display: block; height: fit-content; width:100%">
+                                <div style="display: block; margin-left: 0px; margin-top: 0px; background-color: #fff; width: 100%; height: fit-content; padding: 1px; border-radius: 10px; word-wrap: break-word;">
+                                    <div class="flex-meeting" style="display: flex; align-items: center; gap: .4rem; margin-bottom: 3px;">
+                                        <div style="display: flex; align-items: center; margin: 0 !important">
+                                            <div style="flex: 1 1 1rem">
+                                                <input type="checkbox" id="meetingCheckbox_@item.Id" style="float: left; background-color: blue !important; color: blue !important;" checked disabled />
+                                                <label for="meetingCheckbox_@item.Id" style="float: left; margin-top: 4px;"></label>
+                                            </div>
+                                            <div style="flex: 1 1 10.5rem">
+                                                <strong style="font-size: 13px;">Nhiệm vụ</strong>
+                                            </div>
+                                            <div style="width:16rem">
+                                                <span style="margin-left:10px;opacity:0.5">
+                                                    @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <p class="title-and-username"><strong>Chủ đề</strong>: @item.Content</p>
+                                    </div>
+                                    <p class="title-and-username" style="margin-bottom: 0px"><strong>Với</strong>: @item.Username</p>
+                                </div>
+                            </div>
+                        }
+                        @if (item.Action == "CHANGESTATUS")
+                        {
+                            <div style="margin: -5px 0 2px 0;">
+                                <strong style="font-size: 13px;">Trạng thái đã thay đổi</strong><span style="margin-left:10px;opacity:0.5">@((item.CreatedDate.Hour > 9 ? item.CreatedDate.Hour.ToString() : "0" + item.CreatedDate.Hour.ToString()) + ":" + (item.CreatedDate.Minute > 9 ? item.CreatedDate.Minute.ToString() : "0" + item.CreatedDate.Minute.ToString()))</span>
+                            </div>
+                        }
+                        @if (item.Action == "CHANGESTATUS")
+                        {
+                            if (item.Logs != null && item.Logs != "")
+                            {
+                                StatusLeadModel status1 = status.Where(x => x.Id == int.Parse(item.Logs.Split(',')[0] != "" ? item.Logs.Split(',')[0] : "0")).FirstOrDefault();
+                                StatusLeadModel status2 = status.Where(x => x.Id == int.Parse(item.Logs.Split(',')[1] != "" ? item.Logs.Split(',')[1] : "0")).FirstOrDefault();
+                                string StatusFromName = status1 != null ? status1.Name : "";
+                                string StatusToName = status2 != null ? status2.Name : "";
+                                <p class="title-and-username"><span style="background-color: #d9edf7; border-radius: 10px;font-size: 12px; padding: 0 10px;">@StatusFromName</span> <span style="color:gray">&#10141;</span> <span style="background-color: #d9edf7; border-radius: 10px; font-size: 12px; padding: 0 10px; padding: 0 5px;">@StatusToName</span></p>
+                            }
+
+                        }
+                        @if (item.Action == "LEADCREATE")
+                        {
+                            <div style="margin-top: -5px;">
+                                <strong style="font-size: 13px;">Tạo mới Lead</strong><span style="margin-left:10px;opacity:0.5">@((item.CreatedDate.Hour > 9 ? item.CreatedDate.Hour.ToString() : "0" + item.CreatedDate.Hour.ToString()) + ":" + (item.CreatedDate.Minute > 9 ? item.CreatedDate.Minute.ToString() : "0" + item.CreatedDate.Minute.ToString()))</span>
+                            </div>
+                        }
+                        @if (item.Action == "LEADCREATE")
+                        {
+                            <p class="title-and-username">@item.Username</p>
+                            <p class="title-and-username">Nguồn: <span>@item.Source</span></p>
+                            <p class="title-and-username"><a href="@item.Content" target="_blank">@item.Content</a></p>
+                        }
+                        @if (item.Action == "LEADCREATEFACEBOOK")
+                        {
+                            <strong style="font-size: 15px;">Tạo mới Lead</strong><span style="margin-left:10px;opacity:0.5">@((item.CreatedDate.Hour > 9 ? item.CreatedDate.Hour.ToString() : "0" + item.CreatedDate.Hour.ToString()) + ":" + (item.CreatedDate.Minute > 9 ? item.CreatedDate.Minute.ToString() : "0" + item.CreatedDate.Minute.ToString()))</span>
+                            <p>@item.Username</p>
+                            <p>Nội dung: @item.Logs</p>
+                            <p>Nguồn: <span>@item.Source</span></p>
+                            <p><a href="@item.Content" target="_blank">@item.Content</a></p>
+                        }
+                        @if (item.Action == "LEADCREATEZALO")
+                        {
+                            <strong style="font-size: 15px;">Tạo mới Lead</strong><span style="margin-left:10px;opacity:0.5">@((item.CreatedDate.Hour > 9 ? item.CreatedDate.Hour.ToString() : "0" + item.CreatedDate.Hour.ToString()) + ":" + (item.CreatedDate.Minute > 9 ? item.CreatedDate.Minute.ToString() : "0" + item.CreatedDate.Minute.ToString()))</span>
+
+                            <p class="title-and-username">@item.Username</p>
+                            <p class="title-and-username">Nội dung: @item.Logs</p>
+                            <p class="title-and-username">Nguồn: <span>@item.Source</span></p>
+                            <p class="title-and-username"><a href="@item.Content" target="_blank">@item.Content</a></p>
+                        }
+                        @if (item.Action == "COMMENT")
+                        {
+                            string fileLabel = "Bình luận";
+                            bool displayFileLabel = true;
+
+                            if (!string.IsNullOrEmpty(item.filepath))
+                            {
+                                string fileExtension = Path.GetExtension(item.filepath).ToLower();
+                                if (fileExtension == ".png" || fileExtension == ".jpg" || fileExtension == ".jpeg")
+                                {
+                                    fileLabel = "File Ảnh";
+                                }
+                                else if (fileExtension == ".pdf" || fileExtension == ".xls" || fileExtension == ".xlsx" || fileExtension == ".doc" || fileExtension == ".docx" || fileExtension == ".ppt" || fileExtension == ".pptx")
+                                {
+                                    displayFileLabel = false;
+                                }
+                            }
+
+                            if (displayFileLabel)
+                            {
+                                <strong style="font-size: 15px;">@fileLabel</strong>
+                            }
+
+                            if (!string.IsNullOrEmpty(item.filepath))
+                            {
+                                <a href="@("/Uploads/Lead/Cmt/" + item.filepath)" title="@item.filepath" download>
+                                    @if (fileLabel == "File Ảnh")
+                                    {
+                                        <img style="display:block" width="400" height="300" src="@("/Uploads/Lead/Cmt/" + item.filepath)" />
+                                    }
+                                    else if (Path.GetExtension(item.filepath).ToLower() == ".pdf")
+                                    {
+                                        <img class="icon-display" src="~/assets/img/PDF-FILE.png" alt="icon PDF" />
+                                    }
+                                    else if (Path.GetExtension(item.filepath).ToLower() == ".xls" || Path.GetExtension(item.filepath).ToLower() == ".xlsx")
+                                    {
+                                        <img class="icon-display" src="~/assets/img/excel-icon.png" alt="icon Excel" />
+                                    }
+                                    else if (Path.GetExtension(item.filepath).ToLower() == ".doc" || Path.GetExtension(item.filepath).ToLower() == ".docx")
+                                    {
+                                        <img class="icon-display" src="~/assets/img/word-icon.png" alt="icon Doc" />
+                                    }
+                                    else if (Path.GetExtension(item.filepath).ToLower() == ".ppt" || Path.GetExtension(item.filepath).ToLower() == ".pptx")
+                                    {
+                                        <img class="icon-display" src="~/assets/img/ppt-icon.png" alt="icon PDF" />
+                                    }
+                                    else
+                                    {
+                                        <i style="font-size: 100px; display: block" class="fa fa-file"></i>
+                                    }
+                                </a>
+                            }
+
+                            <span style="margin-left:10px;opacity:0.5">
+                                (
+                                @((item.CreatedDate.Hour > 9 ? item.CreatedDate.Hour.ToString() : "0" + item.CreatedDate.Hour.ToString()) + ":" + (item.CreatedDate.Minute > 9 ? item.CreatedDate.Minute.ToString() : "0" + item.CreatedDate.Minute.ToString()))
+                                )
+                            </span>
+                        }
+
+                        @if (item.Action == "COMMENT" && !string.IsNullOrEmpty(item.Content))
+                        {
+                            <p class="title-and-username">@item.Content</p>
+                        }
+
+
+                        @if (item.Action == "SENDSMS")
+                        {
+                            <div style=" display: block; height: fit-content; width:100%">
+                                <div style="display: block; margin-left: 0px; margin-top: 0px; background-color: #fff; width: 100%; height: fit-content; padding: 10px; border-radius: 10px; word-wrap: break-word;">
+                                    <p>
+                                        @*<label for="meetingCheckbox_@item.Id" style="float: left; margin-top: 4px;"></label>*@
+                                        <strong style="font-size: 15px;">Tin nhắn đi</strong>
+                                        <span style="margin-left:10px;opacity:0.5">
+                                            @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                                        </span>
+                                        <strong>Lead Created</strong>
+
+                                        <span style="margin-left:10px;opacity:0.5">
+                                            @item.Username - @item.Mobile
+                                        </span>
+                                        @if (item.Status)
+                                        {
+                                            <span style="margin-left:10px;opacity:0.5;color:green;">
+                                                Thành công
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span style="margin-left:10px;opacity:0.5;color:red;">
+                                                Thất bại
+                                            </span>
+                                        }
+                                    </p>
+                                    <p class="title-and-username"><strong>Nội dung</strong>: @item.Content</p>
+                                </div>
+                            </div>
+                        }
+
+                        @if (item.Action == "PREVIEWSMS" || item.Action == "PREVIEWZL")
+                        {
+                            <div style=" display: block; height: fit-content; width:100%">
+                                <div style="display: block; margin-left: 0px; margin-top: 0px; background-color: #fff; width: 100%; height: fit-content; padding: 10px; border-radius: 10px; word-wrap: break-word;">
+                                    <p>
+                                        @*<label for="meetingCheckbox_@item.Id" style="float: left; margin-top: 4px;"></label>*@
+                                        <strong style="font-size: 15px;">@(item.Action == "PREVIEWSMS"? "Xem trước SMS" : "Gửi tin nhắn Zalo" )</strong>
+                                        <span style="margin-left:10px;opacity:0.5">
+                                            @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                                        </span>
+                                        <span style="margin-left:10px;opacity:0.5">
+                                            @item.Username - @item.Mobile
+                                        </span>
+                                    </p>
+                                    <p class="title-and-username"><strong>Nội dung</strong>: @item.Content</p>
+                                </div>
+                            </div>
+                        }
+                        @if (item.Action == "SENDEMAIL")
+                        {
+                            <div style=" display: block; height: fit-content; width:100%">
+                                <div style="display: block; margin-left: 0px; margin-top: 0px; background-color: #fff; width: 100%; height: fit-content; padding:0; border-radius: 10px; word-wrap: break-word;">
+                                    <p>
+                                        @*<label for="meetingCheckbox_@item.Id" style="float: left; margin-top: 4px;"></label>*@
+                                        <strong style="font-size: 15px;">Gửi Email</strong>
+                                        <span style="margin-left:10px;opacity:0.5">
+                                            @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                                        </span>
+                                        <span style="margin-left:10px;opacity:0.5">
+                                            @item.Username - @item.Mobile
+                                        </span>
+                                    </p>
+                                    @{
+                                        var testItem = "";
+
+                                    }
+                                    <div class="flex-inline" style="display: flex; align-items: center; gap: .5rem;">
+                                        <p class="title-and-username" style="width: 9rem;"><strong>Nội dung</strong>: @testItem</p>
+                                        <div class="title-and-username" style="max-height:150px;overflow:auto; margin: 0">
+                                            @Html.Raw(item.Content)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        @if (item.Action == "SENDZALO")
+                        {
+                            <div style=" display: block; height: fit-content; width:100%">
+                                <div style="display: block; margin-left: 0px; margin-top: 0px; background-color: #fff; width: 100%; height: fit-content; padding: 10px; border-radius: 10px; word-wrap: break-word;">
+                                    <p>
+                                        <i class="fa fa-send-o" aria-hidden="true" style="margin-right: 5px"></i>
+                                        <strong style="font-size: 15px;">ZNS Zalo</strong>
+                                        <span style="margin-left:10px;opacity:0.5">
+                                            @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                                        </span>
+
+                                        @if (item.Status)
+                                        {
+                                            <span style="margin-left:10px;opacity:0.5;color:green;">
+                                                Thành công
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span style="margin-left:10px;opacity:0.5;color:red;">
+                                                Thất bại
+                                            </span>
+                                        }
+                                    </p>
+                                    <p class="title-and-username">
+                                        <strong style="font-size: 13px;">Khách hàng: </strong>@item.Username
+                                    </p>
+                                    <p class="title-and-username">
+                                        <strong style="font-size: 13px;">Điện thoại:</strong> @item.Mobile
+                                    </p>
+
+
+                                    <p class="title-and-username"><strong>Nội dung</strong>: @item.Content</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                        </div>
+                @{chknew = true;
+                }
+            </div>
+        }
+        chknew = false;
+    }

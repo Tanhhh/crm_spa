@@ -1,0 +1,43 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+@model Erp.BackOffice.Sale.Models.CommisionCustomerViewModel
+
+<tr data-id="@(Model.Index)">
+    <td class="orderNo">
+        @(Model.OrderNo + 1)
+    </td>
+    <td>@Model.ProductCode - @Model.ProductName</td>
+    <td class="text-right">@CommonSatic.ToCurrencyStr(Model.Price, null)</td>
+    <td>
+        <select class="control-value" name="DetailList[@(Model.Index)].Symbol" id="DetailList_@(Model.Index)__Symbol" style="width:50px;background: #F89406;color: white">
+            @foreach (var item in Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("SymbolDK", Model.Symbol, null))
+            {
+                <option @(item.Value == Model.Symbol ? "selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        @Html.TextBox("DetailList[" + Model.Index + "].Quantity", Model.Quantity, new { style = "width:50px; text-align:right; ", @class = "numberinput2", autocomplete = "off" })
+    </td>
+    <td>@Html.TextBox("DetailList[" + Model.Index + "].ExpiryMonth", Model.ExpiryMonth, new { style = "width:50px; text-align:right; ", @class = "numberinput2", autocomplete = "off" })</td>
+    <td>
+        @Html.Hidden("DetailList[" + Model.Index + "].Id", Model.Id)
+        @Html.Hidden("DetailList[" + Model.Index + "].ProductId", Model.ProductId)
+        @Html.Hidden("DetailList[" + Model.Index + "].Price", Model.Price)
+        @Html.Hidden("DetailList[" + Model.Index + "].Type", "discount")
+        @Html.TextBox("DetailList[" + Model.Index + "].CommissionValue", Model.CommissionValue, new { style = "width:85px; text-align:right; ", @class = "input-price numberinput2", autocomplete = "off" })
+        @Html.TextBox("DetailList[" + Model.Index + "].CommissionValueText", (Model.IsMoney != null && Model.IsMoney == true ? "VNĐ" : "%"), new { style = "width:40px; text-align:center", @readonly = "readonly" })
+    </td>
+    <td>
+        <label>
+            <input class="detail_item_check ace" type="checkbox" name="DetailList[@(Model.Index)].IsMoney" data-index="@(Model.Index)" id="DetailList_@(Model.Index)__IsMoney" value="@(Model.IsMoney != null && Model.IsMoney == true ? "true" : "false")" @(Model.IsMoney != null && Model.IsMoney == true ? "checked=\"checked\"" : "") />
+            <span class="lbl"></span>
+        </label>
+    </td>
+    <td class="text-center">
+        <a class="btn-delete-item">
+            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+        </a>
+    </td>
+
+</tr>

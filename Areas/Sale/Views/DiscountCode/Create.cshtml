@@ -1,0 +1,640 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Staff.Models
+@using Erp.BackOffice.Account.Models
+@model DiscountCodeViewModel
+
+@{
+    ViewBag.Title = "Thông tin chi tiết khuyến mãi";
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "DiscountCode",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    @*//IEnumerable<SelectListItem> CategoryList = Erp.BackOffice.Helpers.Common.GetSelectList_Category(Erp.BackOffice.Helpers.Common.CurrentUser.MA_DVIQLY,"product", null, "value");
+        IEnumerable<SelectListItem> typeList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category(Erp.BackOffice.Helpers.Common.CurrentUser.MA_DVIQLY, "TypeCommission", null, null);
+        IEnumerable<SelectListItem> BranchList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_BranchAllNew(Erp.BackOffice.Helpers.Common.CurrentUser.MA_DVIQLY, null, Wording.Empty);
+        List<ProductViewModel> Listproduct = (List<ProductViewModel>)ViewBag.productList;*@
+List<LoyaltyPointViewModel> loyaltypointList = (List<LoyaltyPointViewModel>)ViewBag.loyaltypointList;
+List<CustomerViewModel> CustomerList = (List<CustomerViewModel>)ViewBag.CustomerList;
+List<int> Vip = (List<int>)ViewBag.Vip;
+List<int> Cus = (List<int>)ViewBag.Cus;
+// List<DM_NHOMSANPHAMViewModel> nhomSP = (List<DM_NHOMSANPHAMViewModel>)ViewBag.nhomSP;
+}
+
+<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+<style>
+    #CustomerSelectList_chosen {
+        width: max-content !important;
+    }
+
+    .btnAdd_toggle {
+        margin-bottom: 3px;
+        border-radius: 5px;
+        border-radius: 500px;
+        width: 24px;
+        height: 24px;
+        padding: 4px 9px 0px 0px;
+    }
+</style>
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+
+
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+            {
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @Html.Raw(ViewBag.SuccessMessage)
+    </div>
+}
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+            {
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check red"></i>
+        @Html.Raw(ViewBag.FailedMessage)
+    </div>
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "CreateCommissionCus", @class = "form-horizontal" }))
+{
+    if (Model.Id > 0)
+    {
+        <input type="hidden" value="" id="ApplyForVip" name="ApplyForVip" />
+        <input type="hidden" value="" id="ForCustomer_hiden" name="ForCustomer_hiden" />
+    }
+    else
+    {
+        <input type="hidden" value="" id="ApplyForVip" name="ApplyForVip" />
+        <input type="hidden" value="" id="ForCustomer_hiden" name="ForCustomer_hiden" />
+    }
+    <div class="col-sm-5">
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.CreatedUserId)
+        @Html.HiddenFor(model => model.CreatedDate)
+        @Html.HiddenFor(model => model.IsDeleted)
+
+        @Html.CustomTextboxFor(model => model.Name, null, null)
+        @Html.CustomTextboxFor(model => model.Code, null, null)
+
+
+        <div class="control-group form-group">
+            <label class="control-label no-padding-right control-label col-lg-5 col-md-4 col-sm-4 type-Css" for="StartDate">Ngày bắt đầu</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="width: 240px;">
+                <div class="clearfix">
+
+                    <div class="input-group date" id="StartDateId">
+                        <input class="form-control" data-val="true" data-val-date="The field Ngày bắt đầu must be a date." data-val-required="Bắt buộc nhập" id="StartDate" name="StartDate" style="width:150px;border-radius:5px !important;" type="text" value="@Model.StartDate" aria-required="true" aria-describedby="StartDate-error" aria-invalid="false">
+                        <span class="input-group-addon Calendar-Css" style="border-radius:5px !important"><span class="glyphicon glyphicon-calendar"></span></span>
+
+                    </div>
+                    <p class="text-danger startDate" style="display:none ; margin-top: 0.5%;">thời gian đã có sự kiện khuyến mãi</p>
+                </div>
+                <div class="clearfix">
+                    <span class="help-inline field-validation-valid" data-valmsg-for="StartDate" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="control-group form-group">
+            <label class="control-label no-padding-right control-label col-lg-5 col-md-4 col-sm-4 type-Css" for="EndDate">Ngày kết thúc</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8" style="width: 240px">
+                <div class="clearfix">
+
+                    <div class="input-group date" id="EndDateId">
+                        <input class="form-control" data-val="true" data-val-date="The field Ngày bắt đầu must be a date." data-val-required="Bắt buộc nhập" id="EndDate" name="EndDate" style="width:150px;border-radius:5px !important;" type="text" value="@Model.EndDate" aria-required="true" aria-describedby="EndDate-error" aria-invalid="false">
+                        <span class="input-group-addon Calendar-Css" style="border-radius:5px !important"><span class="glyphicon glyphicon-calendar"></span></span>
+                    </div>
+                    <p class="text-danger endDate" style="display:none ; margin-top: 0.5%;">thời gian đã có sự kiện khuyến mãi</p>
+                </div>
+                <div class="clearfix">
+                    <span class="help-inline field-validation-valid" data-valmsg-for="EndDate" data-valmsg-replace="true"></span>
+                </div>
+            </div>
+        </div>
+
+        @Html.CustomTextAreaFor(model => model.Note, null, WidthType.span12)
+    </div>
+    <div class="col-sm-7">
+        <div class="control-group form-group">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4 txtName-POS" for="">Giảm</label>
+            <div class="clearfix">
+                <span>
+                    @*<label>Giảm %:</label>*@
+                    <input id="Discount" class="numberinput1" name="Discount" placeholder="%" type="number" value="@Model.Discount" />
+                </span>
+                <span>
+                    @*<label>Giảm tiền:</label>*@
+                    <input id="DiscountMoney" class="" name="DiscountMoney" placeholder="VND" type="text" value="@Model.DiscountMoney" />
+                </span>
+                <label class="typeCheck"><input id="giamtien" type="checkbox" value="2" class="group_choice ace" name="group_choice">  <span class="lbl">Giảm tiền</span></label>
+            </div>
+        </div>
+        <div class="control-group form-group">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4 txtName-POS">Áp dụng cho:</label>
+            <div style="margin-top: 8px;">
+                <label style="margin-right: 10px;margin-left: 10px !important;">
+                    <input type="radio" class="hidden-320 ace ng-valid ng-dirty" id="single1" @*data-toggle="tab" href="#tab1"*@ name="single" value="1">
+                    <span class="lbl ng-binding">Tất cả </span>
+                </label>
+                <label style="margin-right: 10px;margin-left: 10px !important;">
+                    <input type="radio" class="hidden-320 ace ng-valid ng-dirty" id="single2" @*data-toggle="tab" href="#tab2"*@ name="single" value="2">
+                    <span class="lbl ng-binding">Nhóm khách</span>
+                </label>
+                <label style="margin-right: 10px;margin-left: 10px !important;">
+                    <input type="radio" class="hidden-320 ace ng-valid ng-dirty" id="single3" @*data-toggle="tab" href="#tab3"*@ name="single" value="3">
+                    <span class="lbl ng-binding">Khách hàng</span>
+                </label>
+            </div>
+            @*<input class="ace" type="radio" data-toggle="tab" href="#tab1" id="tatca" name="ApplyFor" value="1" />
+                <input class="ace" type="radio" data-toggle="tab" href="#tab2" id="khachvip" name="ApplyFor" value="2" />
+                <input class="ace" type="radio" data-toggle="tab" href="#tab3" id="khachluachon" name="ApplyFor" value="3" />*@
+        </div>
+
+        <div>
+            <div @*class="tab-content" id="tab-toggle"*@>
+                <div class="tab-pane clearfix" id="tab1"></div>
+                @*tab 2-----------------------------------------------------------------------------------------------*@
+                <div class="tab-pane clearfix" id="tab2">
+                    <div class="widget-body">
+                        <div style="margin-top:10px">
+                            <h4><span>Chọn nhóm KH:</span></h4>
+                            <div class="vip-display" style="border-radius:5px;">
+                                @{ var ListVip = loyaltypointList.ToList();
+                                    var ListVip2 = new List<LoyaltyPointViewModel>(); }
+                                @if (Vip.Count > 0)
+                                {
+                                    foreach (var ii in Vip)
+                                    {
+                                        var removeitem = ListVip.Where(x => x.Id == ii).FirstOrDefault();
+                                        if (removeitem != null)
+                                        {
+                                            ListVip.Remove(removeitem);
+                                        }
+                                    }
+                                    for (int i = 0; i < ListVip.Count; i++)
+                                    {
+
+                                        <label class="vip-item" data-category="" style="border-radius:100px;">
+                                            <i class="fa fa-plus"></i>
+                                            <input type="checkbox" name="DisplayFor" class="" value="@ListVip[i].Id" />
+                                            <span class="">@ListVip[i].Name</span>
+                                        </label>
+                                    }
+
+                                }
+                                else
+                                {
+                                    for (int i = 0; i < ListVip.Count; i++)
+                                    {
+
+                                        <label class="vip-item" data-category="" style="border-radius:100px;">
+                                            <i class="fa fa-plus"></i>
+                                            <input type="checkbox" name="DisplayFor" class="" value="@ListVip[i].Id" />
+                                            <span class="">@ListVip[i].Name</span>
+                                        </label>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <div class="box box-height-max" style="margin-top:10px">
+                            <h4><span>Áp dụng nhóm KH:</span></h4>
+                            <div class="vip-chosen" style="border-radius:5px;">
+                                @foreach (var BranchItem in loyaltypointList)
+                                {
+                                    if (Vip.Count > 0)
+                                    {
+                                        foreach (var item in Vip)
+                                        {
+                                            if (BranchItem.Id == item)
+                                            {
+                                                <label class="vip-item" data-category="" style="border-radius:100px;">
+                                                    <i class="fa fa-minus"></i>
+                                                    <input type="checkbox" name="ApplyForVip" checked class="" value="@BranchItem.Id">
+                                                    <span class="">@BranchItem.Name</span>
+                                                </label>
+                                            }
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*--------------------------------------------------------------------------------------------------------------*@
+                <div class="tab-pane clearfix" id="tab3">
+                    <div class="widget-body">
+                        <div style="margin-top:10px">
+                            <h4><span style="float:left; ">Tìm KH:</span></h4>
+                            <div class="product-search-box">
+                                <input id="CustomerList" class="select2-input" placeholder="Nhập Khách hàng..." name="CustomerList" />
+
+                                @*<select class="chzn-select" id="CustomerSelectList" name="CustomerSelectList" style="width:360px;border-radius:5px;position:absolute;">
+                                    <option value="" data-id="">- Tìm Khách hàng -</option>
+                                    @if (CustomerList != null)
+                                    {
+                                        foreach (var item in CustomerList.OrderBy(x => x.CreatedDate).ToList())
+                                        {
+                                            <option value="@item.Id" data-selected="0" data-id="@item.Id" data-value="@item.Id | @(item.Code + " - " + item.FullName) | @item.Mobile" data-code="@item.Code">@item.FullName - @item.Mobile</option>
+                                        }
+                                    }
+                                </select>*@
+                                <a style="margin: 0px 0px 0px 0px" id="btnAdd_Customer" class="btn btn-primary btn-mini btnAdd_toggle"><i class="ace-icon fa fa-plus" style="position: absolute;"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="box box-height-max" style="margin-top:10px">
+                            <h4><span>Khách hàng được chọn:</span></h4>
+                            <div class="customer-chosen" style="border-radius:5px;">
+                                @if (CustomerList != null)
+                                {
+                                    if (Cus.Count > 0)
+                                    {
+                                        foreach (var i in Cus)
+                                        {
+                                            var item = CustomerList.Where(x => x.Id == i).FirstOrDefault();
+                                            if (item != null)
+                                            {
+                                                if (i == item.Id)
+                                                {
+                                                    <label class="customer-item">
+                                                        <i class="fa fa-minus"></i>
+                                                        <input type="checkbox" name="ApplyFor" checked class="" value="@item.Id">
+                                                        <span class="" style="border-radius:5px"><strong>@item.FullName - @item.Mobile</strong></span>
+                                                    </label>
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+                                    using (Html.BeginButtonContainer(pageSetting))
+                                    {
+
+                                        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save" style="border-radius:5px;">
+                                            <i class="ace-icon fa fa-save"></i>
+                                            @Wording.Save
+                                        </a>
+
+                                        }
+
+                                    }
+
+
+<link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+<script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-css/1.4.6/select2-bootstrap.min.css" />
+@*<script type="text/javascript" src='//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js"></script>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        initSelectsp2();
+        var discount = '@Model.DiscountMoney';
+        $("#tab2").hide();
+        $("#tab3").hide();
+        if (discount == '') {
+            $("#DiscountMoney").hide();
+            $("#Discount").show();
+        } else {
+            $("#DiscountMoney").show();
+            $("#Discount").hide();
+            $('#giamtien').attr('checked', 'checked');
+        }
+        $('#StartDateId').datetimepicker({
+
+            showTodayButton: true,
+            format: 'DD/MM/YYYY HH:mm:ss',
+            showClose: true,
+            showClear: true,
+            toolbarPlacement: 'top',
+            stepping: 15,
+            sideBySide: true,
+            useCurrent: false
+
+        });
+        $('#EndDateId').datetimepicker({
+
+            showTodayButton: true,
+            format: 'DD/MM/YYYY HH:mm:ss',
+            showClose: true,
+            showClear: true,
+            toolbarPlacement: 'top',
+            stepping: 15,
+            sideBySide: true,
+            useCurrent: false
+        });
+        $("#StartDateId").on("dp.change", function (e) {
+            $('#EndDateId').data("DateTimePicker").minDate(e.date);
+
+        });
+        $("#EndDateId").on("dp.change", function (e) {
+            $('#StartDateId').data("DateTimePicker").maxDate(e.date);
+        });
+
+        var apply = '@Model.ApplyFor';
+        if ((apply == '') || (apply == '1')) {
+            $('#single1').attr('checked', 'checked');
+            $("#tab1").show();
+            $("#tab2").hide();
+            $("#tab3").hide();
+
+        }
+        if (apply == '2') {
+            $('#single2').attr('checked', 'checked');
+            $("#tab2").show();
+            $("#tab1").hide();
+            $("#tab3").hide();
+        }
+        if (apply == '3') {
+            $('#single3').attr('checked', 'checked');
+            $("#tab3").show();
+            $("#tab2").hide();
+            $("#tab1").hide();
+        }
+    });
+
+    $('#CreateCommissionCus .vip-item input').change(function () {
+        var $this = $(this);
+        $parent = $this.closest('label');
+
+        if ($parent.find('i.fa-plus').length > 0) { //thêm
+            $parent.find('input').prop('checked', true);
+            $parent.find('input').attr('name', 'ApplyForVip')
+            $parent.find('i').removeClass('fa-plus').addClass('fa-minus');
+
+            $parent.prependTo('.vip-chosen');
+        } else { // xóa
+            $parent.find('input').prop('checked', false);
+            $parent.find('input').attr('name', 'DisplayForVip')
+            $parent.find('i').removeClass('fa-minus').addClass('fa-plus');
+
+
+            $parent.prependTo('.vip-display');
+        }
+    });
+
+    $('#btnAdd_Customer').on('click', function () {
+        debugger
+        var IdCustomer = $("#CustomerList").val();
+        var FullName = $("#CustomerList").select2("data").text;
+        // kiểm tra kiểu int
+        $("#CustomerList").select2("val", "");
+       
+        if (IdCustomer != "") {
+            $('#CustomerSelectList option:selected').remove();
+            var CustomerLabel = '<label class="customer-item">'
+                + '<i class="fa fa-minus"></i>'
+                + '<input type="checkbox"name="ApplyFor" class="" value="' + IdCustomer + '"/>'
+                + '<span class="" style="border-radius:5px"><strong>' + FullName + '</strong></span>'
+                + '</label>'
+
+            $('#Customer_' + IdCustomer).attr('name', 'ApplyForCustomer')
+            $('.customer-chosen').append(CustomerLabel);
+            $("#ForCustomer_hiden").val($("#ForCustomer_hiden").val() + ',' + IdCustomer);
+        }
+        else {
+            alert('Chưa chọn khách hàng!')
+        }
+    });
+
+    $(document).on('change', '#CreateCommissionCus .customer-item input', function () {
+        debugger
+        var $this = $(this);
+        $parent = $this.closest('label');
+        if ($parent.find('i.fa-minus').length > 0) { //thêm
+
+            var Id = $parent.find('input').val();
+            var FullName = $parent.find('span').text();
+            var option = '<option value="' + Id + '" >' + FullName + '</option>';
+            $('#CustomerSelectList').append(option);
+            // set lại hidden input
+            $('#Customer_' + Id).attr('name', 'DisplayForCustomer')
+            $parent.remove();
+        }
+    });
+
+</script>
+<script>
+    $('#CreateCommissionCus').delegate("#Save", 'click', function () {
+
+
+
+        ////validate
+        //if ($('#checkbox1').is(':checked') && $('.product-chosen').children().length == 0 && $('#Select_Type3').val() == 1) {
+        //    alert('Chưa chọn Cửa hàng. Xin vui lòng kiểm tra lại!')
+        //    return;
+        //}
+
+        ////if (d_check() == -1)
+        ////{
+        ////    alert('Thời gian kết thúc phải lớn hơn thời gian bắt đầu, xin vui lòng kiểm tra lại!')
+        ////    return;
+        ////}
+
+
+        //if ($('#checkbox2 ').is(':checked') && $('.vip-chosen').children().length == 0) {
+        //    alert('Chưa chọn nhóm vip. Xin vui lòng kiểm tra lại!')
+        //    return;
+        //}
+        //if ($('#checkbox3 ').is(':checked') && $('.customer-chosen').children().length == 0) {
+        //    alert('Chưa chọn khách hàng. Xin vui lòng kiểm tra lại!')
+        //    return;
+        //}
+        //if ($('#LoaiKM_1 ').is(':checked') && $('.detailList tr').length == 0) {
+        //    alert('Chưa chọn hàng hóa cần KM. Xin vui lòng kiểm tra lại!')
+        //    return
+        //}
+
+        ////begin hoapd check gia tri tren luoi
+        //var invalid = false;
+        //$("#tbllistOrderDetail1 TBODY TR").each(function () {
+        //    var row = $(this);
+
+        //    debugger;
+        //    var Pnumber = $(this).closest('tr').find("td:eq(4) input").val();
+        //    var Pnumber1 = $(this).closest('tr').find("td:eq(5) input").val();
+        //    if ((Pnumber == "") || (Pnumber == "0")) {
+        //        invalid = true;
+        //    }
+        //    //alert(Pnumber1);
+        //    if (((Pnumber1.localeCompare("true") == 0) == false) && ((Pnumber.localeCompare("100")) == 1)) {
+        //        invalid = true;
+        //    }
+
+        //});
+
+
+        ////if (invalid == true) {
+        ////    alert("Dữ liệu về chi tiết hàng hóa khuyến mãi không hợp lệ, vui lòng kiểm tra lại");
+        ////    return;
+        ////}
+
+
+        ////end hoapd check gia tri tren luoi
+
+
+
+
+
+
+
+
+
+        ShowLoading();
+        var CommissionCusId = $("#Id").val();
+        ClearFormatBeforeSubmit($("#CreateCommissionCus"));
+        $("#CreateCommissionCus").submit();
+        //HideLoading();
+    });
+</script>
+<script type="text/javascript">
+    var aasp1 = [];
+
+    $("#single1").change(function () {
+
+        $("#tab1").show();
+        $("#tab2").hide();
+        $("#tab3").hide();
+
+    });
+
+    $("#single2").change(function () {
+
+        $("#tab2").show();
+        $("#tab1").hide();
+        $("#tab3").hide();
+
+    });
+
+    $("#single3").change(function () {
+
+        $("#tab3").show();
+        $("#tab2").hide();
+        $("#tab1").hide();
+
+    });
+
+    $("#giamtien").change(function () {
+        debugger
+        if ($('#giamtien').is(':checked')) {
+            $("#DiscountMoney").show();
+            $("#Discount").hide();
+        } else {
+            $("#Discount").show();
+            $("#DiscountMoney").hide();
+        }
+
+    });
+
+    //lấy khách hàng
+    function initSelectsp2() {
+        (function () {
+            // initialize select2 dropdown
+            $('#CustomerList').select2({
+                placeholder: "Nhập Khách hàng...",
+                //minimumInputLength: 1,
+                data: dropdownData2(),
+                formatResult: function (item) {
+
+                    return '<pr style=font-size: 20px;>' + item.Name + ' - ' + item.Code + '</pr>';
+
+
+                },
+                multiple: false,
+                // creating query with pagination functionality.
+                query: function (data) {
+                    var pageSize,
+                            dataset,
+                            that = this;
+                    pageSize = 20; // Number of the option loads at a time
+                    results = [];
+                    if (data.term && data.term !== '') {
+                        // HEADS UP; for the _.filter function I use underscore (actually lo-dash) here
+                        results = _.filter(that.data, function (e) {
+                            return e.text.toUpperCase().indexOf(data.term.toUpperCase()) >= 0;
+                        });
+                    } else if (data.term === '') {
+                        results = that.data;
+                    }
+                    data.callback({
+                        results: results.slice((data.page - 1) * pageSize, data.page * pageSize),
+                        more: results.length >= data.page * pageSize,
+                    });
+                },
+            });
+        })();
+
+    }
+    //lấy khách hàng
+    function dropdownData2() {
+
+        //alert("da vao day co lay duoc id kho " + WarehouseSourceId);
+        $.ajax({
+
+            url: '/Membership/getCustomer',
+            dataType: "json",
+            type: "GET",
+            contentType: 'application/json; charset=utf-8',
+            async: false,
+            success: function (data) {
+
+                $.each(data, function (i, item) {
+                    aasp1.push(item);
+
+
+                });
+
+
+            },
+            error: function (xhr) {
+                alert('error' + xhr);
+            }
+        });
+
+        //alert(aasp1);
+
+        return aasp1;
+
+
+    }
+
+</script>
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy HH:mm:ss")
+}

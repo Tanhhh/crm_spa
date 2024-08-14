@@ -1,0 +1,407 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Crm.Models
+
+@model CrmTemplateViewModel
+
+@{
+    ViewBag.Title = Wording.PageCreate_TemplatePrint;
+
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CrmTemplate",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+<style>
+
+</style>
+
+@if (!isPopup)
+{
+
+    using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+    {
+        <div id="validateDiv" style="display:none;">
+            <small class="text-danger" id="validateMessage"></small>
+        </div>
+
+        <div style=" display: flex; margin: 5px 0; align-items: center; gap: .5rem">
+            <div style=" width: 50rem;">
+                @Html.DropDownListFor(model => model.TypeTemplate, SelectListHelper.GetSelectList_CrmTemplate())
+                @Html.ValidationMessageFor(model => model.TypeTemplate, "", new { @class = "text-danger" })
+            </div>
+            <div style=" width: 50rem;">
+                @Html.DropDownListFor(model => model.TypeLead, SelectListHelper.GetTypeLead_CrmTemplate())
+            </div>
+
+        </div>
+        <div id="contentEmailSection" style="display:none;">
+            @Html.CustomTextboxFor(model => model.TileEmail, null, null, WidthType.span12)
+
+            @Html.TextAreaFor(model => model.ContentEmail, new { @class = "ckeditor", rows = 3 })
+            @Html.ValidationMessageFor(model => model.ContentEmail, "", new { @class = "text-danger" })
+        </div>
+        <div id="contentRuleSection" style="display:none;">
+            @Html.LabelFor(model => model.ContentRule)
+            @Html.TextAreaFor(model => model.ContentRule, new { @class = "form-control", @rows = 10, style = "height: auto !important;" })
+            @Html.ValidationMessageFor(model => model.ContentRule, "", new { @class = "text-danger" })
+        </div>
+        <div id="ZnsId" style="display:none; margin-top: 1rem;">
+            @Html.LabelFor(model => model.ZNSId)
+            @Html.TextAreaFor(model => model.ZNSId, new { @class = "form-control", @rows = 1, style = "height: auto !important;" })
+        </div>
+        <div id="note" style="display: none; margin-top: 1rem;">
+            @Html.LabelFor(model => model.Note)
+            @Html.TextAreaFor(model => model.Note, new { @class = "form-control", rows = 3 })
+        </div>
+
+
+
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            @*<input class="btn btn-mini btn-primary" type="button" id="btnCreate" value=" @Wording.Save">*@
+            <button class="btn btn-mini btn-primary" id="btnEdit">
+                @Wording.Edit
+            </button>
+
+
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Index", "CrmTemplate", "Crm"))
+            {
+                <a class="btn btn-primary btn-mini" href="@Url.Action("Index", pageSetting.ModuleName)">
+                    @Wording.BackToList
+                </a>
+            }
+        }
+    }
+}
+else
+{
+    @*@Html.Grid(Model).Columns(columns =>
+        {
+            //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+            columns.Add().Titled(Html.DisplayNameFor(u => u.FirstOrDefault().ContentRule).ToString()).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.ContentRule, u.Id, isPopup));
+        }).WithPaging(10)*@
+}
+
+
+
+
+@section Scripts {
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    <script src="~/Scripts/textarea-caret-position/index.js"></script> >
+    <script>
+        $(document).ready(function () {
+            // Configure CKEditor with custom toolbar for email composition
+            CKEDITOR.replace('ContentEmail', {
+                toolbar: [
+                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                    { name: 'styles', items: ['Format', 'FontSize'] },
+                    { name: 'colors', items: ['TextColor', 'BGColor'] },
+                    { name: 'paragraph', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                    { name: 'links', items: ['Link', 'Unlink'] },
+                    { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] }
+                ],
+                // Remove unwanted plugins
+                removePlugins: 'elementspath',
+                // Set default CKEditor height
+                height: 300,
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Initial execution
+            handleDropdownChange();
+
+            // Event handler for dropdown change event
+            $('#TypeTemplate').change(handleDropdownChange);
+        });
+
+        function handleDropdownChange() {
+            var selectedValue = $('#TypeTemplate').val();
+
+            // Show/hide sections based on selected value
+            if (selectedValue == "3") {
+                $('#contentEmailSection').show();
+                $('#contentRuleSection').hide();
+                $('#note').show();
+            } else if (selectedValue == "1" || selectedValue == "2") {
+                $('#contentEmailSection').hide();
+                $('#contentRuleSection').show();
+                $('#note').show();
+            } else {
+                $('#contentEmailSection').hide();
+                $('#contentRuleSection').hide();
+                $('#note').hide();
+            }
+            if (selectedValue == "2") {
+                $('#ZnsId').show();
+            }
+            else {
+                $('#ZnsId').hide();
+            }
+        }
+
+    </script>
+
+    <script>
+    $(document).ready(function () {
+
+
+        $('#btnEdit').click(function (event) {
+            event.preventDefault();
+            EditRequest(); //gửi Post request vào controller
+        });
+
+
+    });
+
+        function EditRequest() {
+            var TypeTemplate = $('#TypeTemplate').val();
+            var TypeLead = $('#TypeLead').val();
+            if (TypeTemplate == 1 || TypeTemplate == 2) {
+                var ContentRule = $('#ContentRule').val();
+                var TileEmail = null;
+                var ContentEmail = null;
+            }
+            if (TypeTemplate == 3) {
+                var ContentRule = null;
+                var TileEmail = $('#TileEmail').val();
+                var ContentEmail = CKEDITOR.instances['ContentEmail'].getData();
+            }
+            var Note = $('#Note').val();
+            var ZnsId = $('#ZNSId').val();
+            console.log(ZnsId);
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Edit", "CrmTemplate")',
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify({
+                model: {
+                    Id: '@Model.Id',
+                    TypeTemplate: TypeTemplate, // Wrap model values with quotes
+                    ContentRule: ContentRule,
+                    TileEmail: TileEmail,
+                    ContentEmail: ContentEmail,
+                    Note: Note,
+                    TypeLead: TypeLead,
+                    ZNSId: ZnsId
+                }
+            }),
+            dataType: "json",
+            success: function (response) {
+                console.log(response);
+                if (response.success) {
+                    window.location.href = response.redirectToUrl;
+                }
+                else {
+                    $('#validateDiv').show();
+                    $('#validateMessage').text(response.errors);
+                }
+            }
+        });
+        }
+    </script>
+    <script>
+//Show dropdown susgestion
+       $(document).ready(function () {
+
+           var DropdownData = @Html.Raw(Json.Encode(ViewBag.dropdownData)); //đọc data từ view IEnumerable(CrmTemplateViewModel_DropdownData) rồi chuyển thành json object
+
+
+           var $textArea;
+           var $container;
+           var contentEmailEditor = CKEDITOR.instances['ContentEmail'];
+
+           $(document).keydown(function (event) {
+               var TypeTemplateValue = $('#TypeTemplate').val();
+            //   console.log(TypeTemplateValue);
+               if (TypeTemplateValue) {
+
+                   if (TypeTemplateValue == '1' || TypeTemplateValue == '2') {
+                       $textArea = $('#ContentRule');
+                       $container = $('#contentRuleSection');
+
+                       if ($textArea.is(":focus")) { //chỉ hiện ra drop down khi đang focus vào text area
+
+                           let caret = getCaretCoordinates($textArea[0], $textArea[0].selectionEnd); //lấy vị trí tương đổi của caret so với #ContentRule element
+                           if (event.keyCode === 32 && event.ctrlKey) { // detect tổ hợp ctrl + space
+
+                               let mouseX = $textArea[0].offsetLeft //vị trí tương đối ở trái + khoảng cách từ rìa trái div bọc ngoài cho tới rìa trái #ContentRule
+                                   - $textArea[0].scrollLeft // nếu có scroll qua thì + thêm phần scroll vào
+                                   + caret.left;
+
+                               if (mouseX > window.innerWidth - 450) { //nếu caret ở sát mép phải màn hình quá thì thục vào 450px
+                                   mouseX = window.innerWidth - 450
+                               }
+
+                               mouseX = mouseX + 'px';
+
+                               let mouseY = $textArea[0].offsetTop
+                                   - $textArea[0].scrollTop
+                                   + caret.top + 14
+                                   + 'px';
+
+                               $('#myDropdown').remove();
+
+                               // Create and style dropdown list
+                               let dropdown = $('<select>').addClass('dropdown').attr('id', 'myDropdown').attr('style','width:300px;')
+                                   .append(
+                                   $('<option>').val('').text('Please Select...'),
+
+                               );
+                               DropdownData.forEach(x => {
+                                   dropdown.append($('<option>').val(x).text(x));
+                               });
+
+
+                               dropdown.css({ left: mouseX, top: mouseY, position: 'absolute' });
+
+                               // Append dropdown to the document body
+                               $container.append(dropdown);
+                               $('#myDropdown').focus();
+                           }
+                       }
+                   }
+               }
+           });
+           $(document).on('change', '#myDropdown', function () { //chọn value nào thì thêm vào text area rồi remove
+               let selectedValue = $(this).val();
+               var startPos = $textArea[0].selectionStart;
+               var endPos = $textArea[0].selectionEnd;
+
+               $textArea.val($textArea.val().substring(0, startPos)
+                   + '{{' + selectedValue + '}}'
+                   + $textArea.val().substring(endPos, $textArea.val().length));
+               $textArea[0].selectionStart = startPos + selectedValue.length + 4;
+               $textArea[0].selectionEnd = startPos + selectedValue.length + 4;
+
+               $(this).remove();
+               $textArea.focus();
+           });
+           $(document).click(function (event) { // click bất kỳ đâu trừ drop down để remove dropdown
+               if (!$('#myDropdown').is(event.target)){
+                       $('#myDropdown').remove();
+               }
+           });
+
+
+           //xử lí cho CKEditor
+           var $secondGrandchild; //tạo biến global để dùng ở nhiều fn
+           contentEmailEditor.on('contentDom', function (event) {
+               var editor = event.editor;
+               var secondChild = editor.container.$.children[1];
+               var $secondChild = $(secondChild);
+               $secondGrandchild = $secondChild.children().eq(1);  //lấy ref tới div chứa content của CKeditor
+
+               contentEmailEditor.editable().attachListener(this.document,'keydown', function (event) {
+
+                   if (event.data.$.ctrlKey && event.data.$.keyCode === 32) {
+                      // console.log('Ctrl+space pressed');
+
+                   var dummyElement = editor.document.createElement('span',
+                       {
+                           attributes:
+                           {
+                               width: 0,
+                               height: 0
+                           }
+                       });
+
+                   editor.insertElement(dummyElement);
+
+                   var x = 0;
+                   var y = 0;
+
+                   var obj = dummyElement.$;
+
+                   while (obj.offsetParent) { //tính khoảng cách từ dummyElement tới outermost parent. Trong trường hợp này sẽ là body của CKeditor
+                       x += obj.offsetLeft;
+                       y += obj.offsetTop;
+
+                       obj = obj.offsetParent;
+                   }
+                   x += obj.offsetLeft;
+                   y += obj.offsetTop;
+
+
+                       dummyElement.remove();
+
+                       x += $secondGrandchild[0].offsetLeft;
+
+
+                       if (x > window.innerWidth - 450) {
+                           x = window.innerWidth - 450
+                       }
+
+
+                       y += $secondGrandchild[0].offsetTop + 12;
+
+
+
+                       let dropdown = $('<select>').addClass('dropdown').attr('id', 'myDropdownCKeditor').attr('style', 'width:300px;')
+                           .append(
+                               $('<option>').val('').text('Please Select...'),
+
+                           );
+                       DropdownData.forEach(x => {
+                           dropdown.append($('<option>').val(x).text(x));
+                       });
+
+                   // Set dropdown position based on mouse coordinates
+                   dropdown.css({ left: x, top: y, position: 'absolute' });
+                       $secondGrandchild.append(dropdown);
+                       $('#myDropdownCKeditor').focus();
+
+               }
+               });
+               contentEmailEditor.editable().attachListener(this.document, 'click', function (event) {//chọn value nào thì thêm vào text area rồi remove bên trong ckeditor
+                   if (!$('#myDropdownCKeditor').is(event.target)) {
+                       $('#myDropdownCKeditor').remove();
+                   }
+               });
+
+           })
+
+           $(document).on('change', '#myDropdownCKeditor', function () { //chọn value nào thì thêm vào CKeditor rồi remove
+               let selectedValue = $(this).val();
+               contentEmailEditor.insertText('{{' + selectedValue + '}}');
+               $(this).remove();
+           });
+           $(document).click(function (event) { // click bất kỳ đâu trừ drop down để remove dropdown bên ngoài CKeditor
+               if (!$('#myDropdownCKeditor').is(event.target)) {
+                   $('#myDropdownCKeditor').remove();
+               }
+           });
+       });
+    </script>
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

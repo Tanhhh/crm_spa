@@ -1,0 +1,145 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+@model List<ProductInvoiceViewModel>
+
+
+@{
+    ViewBag.Title = "Danh sách đơn thu nợ";
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        //ActionName = "Sale_DetailCustomerOfDay",
+        ActionName = "GetListThuNo",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = true,
+        DisplayBackButton = false,
+    };
+    int index = 1;
+    string GetDate = @ViewBag.GetDate;
+    string typeReport = @ViewBag.typeReport;
+}
+
+@section HeadOfPage {
+    <style type="text/css">
+        .cell-center {
+            text-align: center;
+        }
+
+        .tr-bold {
+            font-weight: 700;
+        }
+
+        .ctl {
+            position: relative;
+            /*float: left;*/
+            margin-right: 3px;
+        }
+
+            .ctl .error {
+                position: absolute;
+                background: #de2a2a;
+                left: 0px;
+                top: 28px;
+                padding: 2px 5px;
+                color: #fff;
+                z-index: 999;
+            }
+
+                .ctl .error:before {
+                    border-bottom: 7px solid #de2a2a;
+                    border-left: 7px solid transparent;
+                    border-right: 7px solid transparent;
+                    left: 9px;
+                    top: -6px;
+                    content: "";
+                    display: inline-block;
+                    position: absolute;
+                }
+
+        .icon-add {
+            margin-top: 0px !important;
+        }
+
+        .combojax {
+            display: inline-block;
+            position: initial !important;
+            float: none !important;
+        }
+    </style>
+
+}
+
+@Html.TextBox("typeReport", (string)ViewBag.typeReport, new { type = "hidden" })
+<div id="page_header" class="widget-box">
+    <div class="widget-header">
+        <h5 class="widget-title">
+            <i class="ace-icon fa fa-star orange"></i>
+            @ViewBag.Title
+        </h5>
+        <div class="widget-toolbar">
+            <a class="btn-search" href="#" data-action="collapse">
+                <i class="ace-icon fa fa-search blue"></i>
+            </a>
+            <a class="btn-setting"></a>
+        </div>
+    </div>
+
+    <div class="widget-body" style="display: block;">
+        <div class="widget-main">
+            <div class="search-view form-inline" id="SaleReport">
+                <table>
+                    <tr>
+                        <td width="20%">
+                            <label>
+                                Ngày
+                            </label>
+                        </td>
+                        <td>
+                            <span class="inline">
+                                @Html.TextBox("GetDate", (string)ViewBag.GetDate, new { @readonly = "readonly", placeholder = "Ngày" })
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="table-responsive" id="CTietTourKTV" style="margin-bottom:40px">
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="text-align:center">STT</th>
+                <th style="text-align:center">Mã đơn hàng</th>
+                <th style="text-align:center">Tên khách hàng</th>
+                <th style="text-align:center">Tổng tiền</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(index % 2 == 0 ? " alert-warning" : "" )">
+                    <td class="text-center">
+                        <span>@(index++)</span>
+                    </td>
+                    <td style="text-align:center"><a target="_blank" href="@Url.Action("Detail","ProductInvoice", new { Id = item.Id})">@item.Code</a></td>
+                    <td style="text-align:center">@item.CustomerName</td>
+                    <td style="text-align:center">@CommonSatic.ToCurrencyStr(item.TotalAmount, null)</td>
+                    
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    @Html.ScriptBottom_ChosenStyle()
+}

@@ -1,0 +1,181 @@
+﻿@model List<KH_TUONGTACViewModel>
+
+    @using Erp.BackOffice.Account.Models
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Areas.Cms.Models
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+    @using Erp.BackOffice.Administration.Models;
+    @{
+        ViewBag.Title = "Kế hoạch chăm sóc kỹ thuật";
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Plan",
+            ActionName = "TechnicalCarePlan",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int index = 1;
+        int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+        string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        List<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (List<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        // Cộng thêm 1 tháng và trừ đi một ngày.
+        DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    }
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    <style>
+        .popover {
+            width: 100% !important;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 10px;
+        }
+    </style>
+
+    @helper GridColumnName(int NGUOILAP_ID)
+        {
+                <a href="@Url.Action("Detail", "Plan", new { NGUOILAP_ID=NGUOILAP_ID})">Đã lập</a>
+        }
+
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+        <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+
+        <label>Tháng</label>
+        <select id="Month" name="Month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(Month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Năm</label>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+            {
+                <option @(Year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Người lập</label>
+        @Html.DropDownList("NGUOILAP", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_User(Request["NGUOILAP"], "Người lập"))
+
+    }
+
+    <div class="tab-content clear-fix">
+        <div id="tab1" class="tab-pane active" style="margin-left:20px">
+        </div>
+        <div id="" class="table-responsive top-10 ">
+            <table id="CTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">Stt</th>
+                        <th style="min-width:200px" class="text-center">Nhân viên lập</th>
+                        @for (DateTime dt = ViewBag.aDateTime; dt <= ViewBag.retDateTime; dt = dt.AddDays(1))
+                        {
+                            <th class="text-center" style="width:100px;">@dt.ToString("dd/MM/yyyy")</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in user.OrderBy(x => x.FullName))
+                    {
+                        <tr class="@(index%2==0?"alert-warning":"")">
+                            <td>
+                                <span>@(index++)</span>
+                            </td>
+                            <td>
+                                @item.FullName
+                            </td>
+                            @for (DateTime dt = ViewBag.aDateTime; dt <= ViewBag.retDateTime; dt = dt.AddDays(1))
+                            {
+                                var date = dt.ToString("dd/MM/yyyy");
+                                var list = Model.Where(x => x.NGUOILAP_ID == item.Id && x.NGAYLAP == dt.ToString("dd/MM/yyyy"));
+                                if (list.Count() > 0)
+                                {
+                            <td class="text-center">
+                                <a href="@Url.Action("Detail", "Plan",new {NGAYLAP = date, UserId= item.Id,FullName=item.FullName})">Đã lập</a>
+
+                            </td>
+                                }
+                                else
+                                {
+                            <td class="text-center">
+                                <a style="color:red" onclick="OpenPopup('@Url.Action("Create", "Plan", new { area = "Sale", IsPopup = true })', '', 0, 0)">Chưa lập</a>
+                            </td>
+                                }
+                            }
+                        </tr>
+                    }
+                </tbody>
+                <thead>
+                </thead>
+            </table>
+        </div>
+    </div>
+@using (Html.BeginForm("Delete", "Product", FormMethod.Post))
+{
+    <div class="table-responsive">
+    
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "Plan", "Sale"))
+        {
+            <a class="btn btn-mini btn-primary" href="@Url.Action("Create", pageSetting.ModuleName)">
+                <i class="ace-icon fa fa-plus"></i>
+                @Wording.CreateNew
+            </a>
+        }
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "Product", "Sale"))
+        {
+            <button class="btn btn-white btn-sm btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                <i class="ace-icon fa fa-trash"></i>
+                @Wording.Delete
+            </button>
+        }
+    }
+}

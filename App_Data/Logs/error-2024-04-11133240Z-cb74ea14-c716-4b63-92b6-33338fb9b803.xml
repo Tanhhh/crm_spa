@@ -1,0 +1,1 @@
+﻿<error errorId="cb74ea14-c716-4b63-92b6-33338fb9b803" application="Hangfire" type="Info" message="Execution DelayedJobScheduler recovered from the Faulted state after 00:00:20.0892767 and is in the Running state now" time="2024-04-11T13:32:40.2521088Z" />

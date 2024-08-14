@@ -1,0 +1,254 @@
+﻿@model IEnumerable<DiscountCodeViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+
+    @{
+        ViewBag.Title = "Danh sách mã giảm giá";
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        //string ApplyFor = ViewBag.ApplyFor;
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "DiscountCode",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+    }
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @Html.Raw(ViewBag.SuccessMessage)
+        </div>
+    }
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check red"></i>
+            @Html.Raw(ViewBag.FailedMessage)
+        </div>
+    }
+
+    @helper GridColumnCommand(int id)
+    {
+                        /**/
+        <p>
+
+            <div>
+                @*<a class="btn btn-mini btn-primary" title="Kích hoạt" id="check" onclick="oncheck()" href="@Url.Action("ActiveUser", "CommissionCus", new { userId = id })"><i class="ace-icon fa fa-play"></i> </a>*@
+                <a class="btn btn-mini btn-group" title="Thay đổi trạng thái" href="@Url.Action("ChangeStatus", "DiscountCode", new { userId = id })"><i class="ace-icon fa fa-refresh"></i> </a>
+            </div>
+        </p>
+    }
+
+    @helper GridColumnName(string name, int id, bool isPopup)
+    {
+                        /**/
+
+                        if (isPopup)
+                        {
+                            <a onclick="parent.selectBranchItem(@id)">@name</a>
+                        }
+                        else
+                        {
+                            name = string.IsNullOrEmpty(name) ? "No Title" : name;
+                            <a onclick="OpenPopup('/DiscountCode/Create/@id?IsPopup=True', '', 0, 0)" @*href="@Url.Action("Create", "DiscountCode" , new { Id= id })"*@>@name</a>
+                        }
+    }
+    @helper Status(int status)
+    {
+                        /**/
+
+                        if (status == 0)
+                        {
+                            <p class="text-primary">Khởi tạo</p>
+                        }
+                        else if (status == 1)
+                        {
+                            <p class="text-success">Kích hoạt</p>
+                        }
+                        else if (status == 2)
+                        {
+                            <span class="text-danger">Dừng</span>
+                        }
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <p>
+
+            @Html.TextBox("txtSearch", Request["txtSearch"], new { @class = "", autocomplete = "off", placeholder = "Tiêu Đề" })
+            @Html.TextBox("txtSearch2", Request["txtSearch2"], new { @class = "", autocomplete = "off", placeholder = "Mã giảm giá" })
+        </p>
+    }   
+
+    @helper GridColumnCategoryValue(string value, string code)
+    {
+                        /**/
+
+                        var attr = Common.GetCategoryByValueCodeOrId("value", value, code);
+                        <span>@(attr != null ? attr.Name : "")</span>
+    }
+
+    @helper CheckDeleteColumns(int Id)
+    {
+                        /**/
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper BuildCheckAll()
+    {
+                        /**/
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+                        /**/
+    }
+
+
+
+
+
+    @if (!isPopup)
+    {
+        using (Html.BeginForm("Delete", pageSetting.ModuleName, FormMethod.Post, new { id = "DiscounCode" }))
+        {
+            @Html.Grid(Model).Columns(columns =>
+       {
+           columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+           columns.Add().Titled(Wording.Name).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Name, u.Id, isPopup));
+           columns.Add(u => u.Code).Titled("Mã").SetWidth(100);
+           columns.Add(u => u.StartDate).Format("{0:dd/MM/yyyy HH:mm}").Titled(Wording.StartDate).SetWidth(100);
+           columns.Add(u => u.EndDate).Format("{0:dd/MM/yyyy HH:mm}").Titled(Wording.EndDate).SetWidth(100);
+           columns.Add(u => u.CreatedDate).Titled(Wording.CreatedDate).SetWidth(100);
+           columns.Add(u => u.Status).Titled("Trạng thái").SetWidth(50).Encoded(false).RenderValueAs(n => Status(n.Status.Value)).Css("text-center");
+           columns.Add(u => u.ModifiedDate).Titled(Wording.ModifiedDate).SetWidth(60).Sortable(true);
+           columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+       }).WithPaging(10)
+
+            using (Html.BeginButtonContainer(pageSetting))
+            {
+                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "DiscountCode", "Sale"))
+                {
+                    @Html.Button(Wording.CreateNew, ButtonType.aTag, ButtonColor.Primary, ButtonSize.Mini, true, IconType.Plus, IconSize.Default, false, new { onclick = "OpenPopup('" + Url.Action("Create", "DiscountCode", new { IsPopup = true }) + "', '', 0, 0)" })
+                }
+                <button class="btn btn-success btn-mini" type="button" value="Export" onclick="GetPrint(true)">
+                    <i class="ace-icon fa fa-file-excel-o"></i>
+                    Xuất excel
+                </button>
+                if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "DiscountCode", "Sale"))
+                {
+                    <button class="btn btn-mini btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                        <i class="ace-icon fa fa-trash"></i>
+                        @Wording.Delete
+                    </button>
+                }
+
+            }
+        }
+    }
+    else
+    {
+        @Html.Grid(Model).Columns(columns =>
+        {
+            //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+            columns.Add().Titled(Html.DisplayNameFor(u => u.FirstOrDefault().Name).ToString()).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Name, u.Id, isPopup));
+        }).WithPaging(10)
+    }
+
+    @section Scripts {
+        <script type="text/javascript">
+            function CheckIsval() {
+                debugger
+                if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                        return true;
+
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+            function GetPrint(type) {
+                var txtSearch = $('#txtSearch').val();
+                var txtSearch2 = $('#txtSearch2').val();
+
+                OpenPopup('/DiscountCode/ExportExcel?txtSearch=' + txtSearch + '&txtSearch2=' + txtSearch2 + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 200000);
+                HideLoading();
+            };
+            //$('[name="Delete"]').click(function () {
+            //    if (confirm('Bạn có chắc muốn xóa item ?')) {
+            //        $(this).closest('tr').children('td').each(function (i, e) {
+            //            $(this).find("input.class-delete-all").prop("checked", true);
+            //            return true;
+            //        })
+            //    }
+            //    else {
+            //        return false;
+            //    }
+
+            //})
+
+            function oncheck() {
+                debugger
+                var id = $(this).val();
+                console.log(id);
+                ShowLoading();
+                $.ajax({
+                    type: "POST",
+                    url: "/CommissionCus/CheckActive",
+                    data: JSON.stringify({ Id: id }),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (r) {
+                        HideLoading();
+                        if (r == "0") {
+
+                        }
+                        else {
+                            alert("Có Chương trình khuyến mãi khác đang chạy ");
+
+                        }
+                    }
+                })
+            }
+
+        </script>
+
+    }

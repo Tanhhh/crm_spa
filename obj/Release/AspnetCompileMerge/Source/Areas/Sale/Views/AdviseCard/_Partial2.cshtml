@@ -1,0 +1,49 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@model CategoryViewModel
+
+@{
+    Layout = null;
+}
+
+<div class="clearfix top-10">
+    @foreach (var question in Model.ListQuestion)
+    {
+
+        <div class="question">
+            <b>@question.Name</b>
+        @if (question.Type == "input")
+        {
+            <textarea class="" id="Content_@(question.Id)_0" data-question-id="@question.Id" data-target-id="0" data-target-module="Answer"></textarea>
+        }
+          @if (question.Type == "check")
+          {
+            <div class="answer top-5">
+                @foreach (var answer in question.DetailList)
+                {
+                    <label style="margin-right:30px !important">
+                        <input name="TargetId_@(question.Id)_@answer.Id" type="checkbox" class="ace" data-question-id="@question.Id" data-target-module="Answer" data-target-id="@answer.Id" value="@answer.Id" />
+                        <span class="lbl"> @answer.Content</span>
+                    </label>
+                }
+            </div>
+            }
+            @if (question.Type == "all")
+            {
+                <div class="answer top-5">
+                    @foreach (var answer in question.DetailList)
+                    {
+                        <label style="margin-right:30px !important">
+                            <input name="TargetId_@(question.Id)_@answer.Id" type="checkbox" class="ace" data-question-id="@question.Id" data-target-module="Answer" data-target-id="@answer.Id" value="@answer.Id" />
+                            <span class="lbl"> @answer.Content</span>
+                        </label>
+                        <textarea class="" id="Content_@(question.Id)_@answer.Id" data-question-id="@question.Id" data-answer-id="@answer.Id"></textarea>
+                    }
+                </div>
+            }
+        </div>
+        <p></p>
+    }
+</div>

@@ -1,0 +1,64 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@model  CategoryViewModel
+
+@{
+    Layout = null;
+    var data = Erp.BackOffice.Helpers.SelectListHelper.GetAllProductAndService();
+              
+}
+
+<table class="table table-responsive table-bordered">
+    <thead>
+        <tr>
+            <td style="width:5%"></td>
+            @foreach (var ii in Model.ListQuestion)
+            {
+                <td>@ii.Name</td>
+            }
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var i in data.GroupBy(x => x.CategoryCode))
+        {
+        <tr>
+            <td style="width:5%">@i.Key</td>
+            @foreach (var question in Model.ListQuestion)
+            {
+              if(question.Name=="SẢN PHẨM")
+              { 
+                    <td>
+                        <div class="answer">
+                            @foreach (var ii in data.Where(x => x.CategoryCode == i.Key&&x.Type=="product"))
+                            {
+                                <label style="margin-right:30px !important">
+                                    <input name="TargetId_@(question.Id)_@ii.Id" type="checkbox" class="ace" data-question-id="@question.Id" data-target-module="Product" data-target-id="@ii.Id" value="@ii.Id" />
+                                    <span class="lbl"> @ii.Name</span>
+                                    </label>
+                            }
+                        </div>
+                    </td>
+              }
+              if (question.Name == "DỊCH VỤ")
+              {
+                <td>
+                    <div class="answer">
+                        @foreach (var ii in data.Where(x => x.CategoryCode == i.Key && x.Type == "service"))
+                        {
+                            <label style="margin-right:30px !important">
+                                <input name="TargetId_@(question.Id)_@ii.Id" type="checkbox" class="ace" data-question-id="@question.Id" data-target-module="Product" data-target-id="@ii.Id" value="@ii.Id" />
+                                <span class="lbl"> @ii.Name</span>
+                            </label>
+                        }
+                    </div>
+                </td>
+              }
+            }
+        </tr>
+        }
+
+    </tbody>
+</table>

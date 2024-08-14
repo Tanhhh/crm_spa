@@ -1,0 +1,278 @@
+@model IEnumerable<MembershipViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = Wording.PageIndex_Membership;
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Membership",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    string type = (Request["type"] == null || Request["type"] == "SkinScan") ? "SkinScan" : "CheckingHair";
+    int rowNumber = 0;
+    int numberOfItem = 30;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"> </script>
+
+@helper GridColumnCommand(int id)
+{
+    <p>
+        @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Edit", "Membership", "Sale"))
+        {
+            <a class="btn btn-mini btn-success" onclick="OpenPopup('@Url.Action("Edit", "Membership", new { Id = id, IsPopup = true })', '@Wording.PageEdit_InquiryCard', 0, 0)"><i class="fa fa-edit"></i></a>
+        }
+        @if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "Membership", "Sale"))
+        {
+            <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+            </button>
+        }
+    </p>
+}
+
+@helper GridColumnName(string name, int id, bool isPopup = false, string jsCallback = null)
+{
+    if (isPopup)
+    {
+        <a onclick="parent.@(jsCallback)(@id, '@name')">@name</a>
+    }
+    else
+    {
+        name = string.IsNullOrEmpty(name) ? "No Title" : name;
+        <a onclick="OpenPopup('@Url.Action("Detail", "Membership", new { Id = id, IsPopup = true })', '@Wording.PageDetail_Membership', 0, 0)">@name</a>
+    }
+}
+
+@helper GridColumnCategoryValue(object value)
+{
+    var attr = Common.GetCategoryByValueOrId("value", value);
+    <span>@(attr != null ? attr.Name : "")</span>
+}
+
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+@helper GridColumnTypeName(string type)
+{
+    switch (type)
+    {
+        case "SkinScan":
+            <span class="label label-info">@Wording.AdviseType_SkinScan</span>
+            break;
+        case "CheckingHair":
+        <span class="label label-warning">@Wording.AdviseType_CheckingHair</span>
+            break;
+
+    }
+}
+@helper GridColumnStatusName(string status)
+{
+    switch (status)
+    {
+        case "pending":
+            <span class="label label-info">@Wording.Membership_Pending</span>
+            break;
+        case "tranfer":
+        <span class="label label-warning">@Wording.Membership_Tranfer</span>
+            break;
+        case "complete":
+        <span class="label label-success">@Wording.Membership_Complete</span>
+            break;
+        case "expired":
+        <span class="label label-default">@Wording.Membership_Expired</span>
+            break;
+
+    }
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+        <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+        <span class="input-daterange input-group">
+            @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : "", new { @class = "", autocomplete = "off", placeholder = "Từ ngày..." })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : "", new { @class = "", autocomplete = "off", placeholder = "Đến ngày..." })
+        </span>
+        @Html.TextBox("txtCode", Request["txtCode"], new { @class = "", autocomplete = "off", placeholder = "Mã phiếu MBS..." })
+        @Html.TextBox("txtCusCode", Request["txtCusCode"], new { @class = "", autocomplete = "off", placeholder = "Mã KH..." })
+        @Html.TextBox("txtCusName", Request["txtCusName"], new { @class = "", autocomplete = "off", placeholder = "Tên KH..." })
+        @Html.TextBox("TargetCode", Request["TargetCode"], new { @class = "", autocomplete = "off", placeholder = "Mã chứng từ liên quan..." })
+        @Html.TextBox("productCode", Request["productCode"], new { @class = "", autocomplete = "off", placeholder = "Mã liệu trình..." })
+    </p>
+    <p>
+        <select id="Status" name="Status">
+            <option value="pending" @(Request["Status"] == "pending" ? "selected" : "")>@Wording.Membership_Pending</option>
+            <option value="complete" @(Request["Status"] == "complete" ? "selected" : "")>@Wording.Membership_Complete</option>
+            <option value="tranfer" @(Request["Status"] == "tranfer" ? "selected" : "")>@Wording.Membership_Tranfer</option>
+            <option value="expired" @(Request["Status"] == "expired" ? "selected" : "")>@Wording.Membership_Expired</option>
+        </select>
+        @Html.DropDownList("type", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("TemplateListVote", type, null))
+        @Html.DropDownList("BranchId", SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"))
+        @Html.DropDownList("ManagerId", SelectListHelper.GetSelectList_User(Request["ManagerId"], "Người quản lý"))
+        @Html.DropDownList("CreateUserId", SelectListHelper.GetSelectList_User(Request["CreateUserId"], "Người lập phiếu"))
+    </p>
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@if (!isPopup)
+{
+    using (Html.BeginForm("Delete", pageSetting.ModuleName, FormMethod.Post))
+    {
+        <div class="table table-responsive">
+            @Html.Grid(Model).Columns(columns =>
+        {
+            columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+{
+    rowNumber++;
+
+    return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+});
+            columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+            columns.Add().Titled(Wording.InquiryType).SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnTypeName(u.Type));
+            columns.Add().Titled(Wording.Status).SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnStatusName(u.Status));
+            columns.Add().Titled(Wording.MembershipCode).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Id, isPopup));
+            columns.Add(u => u.TargetCode).Titled(Wording.MaChungTu).RenderValueAs(u => u.TargetCode);
+            columns.Add(u => u.CustomerCode).Titled(Wording.CustomerCode).RenderValueAs(u => u.CustomerCode);
+            columns.Add(u => u.CustomerName).Titled(Wording.CustomerName).RenderValueAs(u => u.CustomerName);
+            columns.Add(u => u.ManagerName).Titled(Wording.ManagerStaff).RenderValueAs(u => u.ManagerName);
+            columns.Add(u => u.CreatedUserName).Titled(Wording.CreateStaffName).RenderValueAs(u => u.CreatedUserName);
+            columns.Add(u => u.ExpiryDate).Titled(Wording.ExpiryDate).SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+            //columns.Add(u => u.CreatedDate).Titled(Wording.CreatedDate).SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+            //columns.Add(u => u.ModifiedUserId).Titled(Html.DisplayNameFor(u => u.FirstOrDefault().ModifiedUserId).ToString()).SetWidth(100).RenderValueAs(u => u.ModifiedUserName);
+            //columns.Add(u => u.ModifiedDate).Titled(Wording.ModifiedDate).SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+            //columns.Add(u => u.IsActived).Titled("Lập phiếu YC").Sanitized(false).Encoded(false).RenderValueAs(n => (n.IsActived ? "<span style=\"color:green\"><b>Đã lập phiếu YC</b></span>" : "<span style=\"color:red\"><b>Chưa lập phiếu YC</b></span>")).Sortable(true);
+            columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+        }).WithPaging(30)
+        </div>
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", pageSetting.ModuleName, "Sale"))
+            {
+                @Html.Button(Wording.CreateNew, ButtonType.aTag, ButtonColor.Primary, ButtonSize.Mini, true, IconType.Plus, IconSize.Default, false, new { onclick = "OpenPopup('" + Url.Action("Create", pageSetting.ModuleName, new { IsPopup = true }) + "', '', 0, 0)" })
+            }
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", pageSetting.ModuleName, "Sale"))
+            {
+                <button name="DeleteAll" value="DeleteAll" type="submit" class="btn btn-mini btn-danger" onclick="return CheckIsval();">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                    @Wording.Delete
+                </button>
+            }
+        }
+    }
+}
+else
+{
+    <div class="table table-responsive">
+        @Html.Grid(Model).Columns(columns =>
+        {
+            columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+{
+    rowNumber++;
+
+    return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+});
+            columns.Add().Titled(Wording.InquiryType).SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnTypeName(u.Type));
+            columns.Add().Titled(Wording.Status).SetWidth(100).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnStatusName(u.Status));
+            columns.Add().Titled(Html.DisplayNameFor(u => u.FirstOrDefault().Code).ToString()).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Id, true, jsCallback));
+            columns.Add(u => u.TargetCode).Titled(Wording.MaChungTu).RenderValueAs(u => u.TargetCode);
+            columns.Add(u => u.CustomerCode).Titled(Wording.CustomerCode).RenderValueAs(u => u.CustomerCode);
+            columns.Add(u => u.CustomerName).Titled(Wording.CustomerName).RenderValueAs(u => u.CustomerName);
+            columns.Add(u => u.ManagerName).Titled(Wording.ManagerStaff).RenderValueAs(u => u.ManagerName);
+            columns.Add(u => u.CreatedUserName).Titled(Wording.CreateStaffName).RenderValueAs(u => u.CreatedUserName);
+            columns.Add(u => u.ExpiryDate).Titled(Wording.ExpiryDate).SetWidth(100).Sortable(true).Format("{0:dd/MM/yyyy HH:mm}");
+        }).WithPaging(30)
+    </div>
+}
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+    </script>
+}

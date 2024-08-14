@@ -1,0 +1,149 @@
+﻿@model IEnumerable<ImportExeclModel>
+
+@using AutoMapper.Internal
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = Wording.PageIndex_Product;
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Product",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        AdvancedSearch = false,
+        SearchOjectAttr = ViewBag.ListOjectAttrSearch
+    };
+}
+@{
+    if (ViewBag.ErrorMesseage != null)
+    {
+        <script type="text/javascript">
+                $(document).ready(function () {
+                    alert("@ViewBag.ErrorMesseage");
+                });
+        </script>
+    }
+}
+@if (true)
+{
+    using (Html.BeginForm("ImportFile",
+        "Product",
+        FormMethod.Post,
+        new { enctype = "multipart/form-data" }))
+    {
+        <label for="file">Chọn File Excel</label>
+        <input type="file" name="file" id="file" />
+        <input class="btn btn-mini btn-black" type="submit" value="Xem trước" name="submitBtn" />
+    }
+
+}<br />
+@if (ViewBag.FileName != null)
+{
+    using (Html.BeginForm("SaveFileExcel",
+        "Product",
+        FormMethod.Post))
+    {
+        <input type="hidden" name="currentFile" value="@ViewBag.FileName" />
+        <input class="btn btn-mini btn-black" type="submit" value="Lưu lại" name="Save" />
+    }
+
+}
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+@using (Html.BeginForm("ImportFileExcel", "Product", FormMethod.Post))
+{
+    <div class="table-responsive">
+        @Html.Grid(Model).Columns(columns =>
+   {
+       columns.Add(u => u.LoaiHang).Titled("Loại hàng").SetWidth(100);
+       columns.Add(u => u.NhomHang).Titled("Nhóm hàng").SetWidth(100);
+       columns.Add(u => u.MaHang).Titled("Mã hàng").SetWidth(100);
+       columns.Add(u => u.TenHangHoa).Titled("Tên hàng hóa").SetWidth(100);
+       columns.Add(u => u.GiaBan).Titled("Giá bán").SetWidth(100);
+       columns.Add(u => u.GiaVon).Titled("Gía vốn").SetWidth(100);
+       columns.Add(u => u.TonKho).Titled("Tồn kho").SetWidth(100);
+       columns.Add(u => u.KHDat).Titled("KH đặt").SetWidth(100);
+       columns.Add(u => u.TonNhoNhat).Titled("Tồn kho nhỏ nhất").SetWidth(100);
+       columns.Add(u => u.TonLonNhat).Titled("Tồn kho lớn nhất").SetWidth(100);
+       columns.Add(u => u.ThuocTinh).Titled("Thuộc tính").SetWidth(100);
+       columns.Add(u => u.MaHHLienQuan).Titled("Mã HH liên quan").SetWidth(100);
+       columns.Add(u => u.TrongLuong).Titled("Trọng lượng").SetWidth(100);
+       columns.Add(u => u.DangKinhDoanh).Titled("Đang kinh doanh").SetWidth(100);
+       columns.Add(u => u.BanTrucTiep).Titled("Được bán trục tiếp").SetWidth(100);
+
+   }).WithPaging(30)
+    </div>
+    @*using (Html.BeginButtonContainer(pageSetting))
+        {
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "Product", "Sale"))
+            {
+                <a class="btn btn-mini btn-primary" href="@Url.Action("Create", pageSetting.ModuleName)">
+                    <i class="ace-icon fa fa-plus"></i>
+                    @Wording.CreateNew
+                </a>
+            }
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "Product", "Sale"))
+            {
+                <button class="btn btn-white btn-sm btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                    <i class="ace-icon fa fa-trash"></i>
+                    @Wording.Delete
+                </button>
+            }
+        }*@
+}
+
+@section Scripts {
+
+    
+
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+    </script>
+}
+

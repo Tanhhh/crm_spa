@@ -1,0 +1,33 @@
+﻿@{
+    var errorMessage = ViewBag.errorMessage;
+    Layout = null;
+}
+
+                                                                          <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseEmailModal"></div>
+                                                                          <div class="modal-dialog modal-sm" role="document">
+                                                                              <div class="modal-content">
+                                                                                  <div class="modal-header">
+                                                                                      <button type="button" class="close btnCloseEmailModal" aria-hidden="true">×</button>
+                                                                                      <h5 class="modal-title">Lỗi cài đặt Email</h5>
+                                                                                  </div>
+                                                                                  <div class="modal-body text-danger">
+                                                                                      @errorMessage
+                                                                                  </div>
+                                                                                  <div class="modal-footer text-center">
+                                                                                      <button class="btn btn-primary btnCloseEmailModal" style="margin-right:0%;" type="button">Đóng</button>
+                                                                                  </div>
+                                                                              </div>
+                                                                          </div>
+                                                                      
+  
+<script>
+
+    $(document).ready(function () {
+
+        $('.btnCloseEmailModal').click(CloseEmailModal);
+
+    });
+    function CloseEmailModal() {
+        $("#EmailModal").modal("hide");
+    }
+</script>

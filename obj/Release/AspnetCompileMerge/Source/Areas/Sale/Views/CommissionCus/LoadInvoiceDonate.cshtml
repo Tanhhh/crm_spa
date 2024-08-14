@@ -1,0 +1,141 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+@model Erp.BackOffice.Sale.Models.CommisionInvoiceViewModel
+
+<tr data-id="@(Model.Index)">
+    <td class="orderNo">
+
+        @(Model.OrderNo + 1)
+    </td>
+    <td>
+        @Html.Hidden("InvoiceDetailList[" + Model.Index + "].Id", Model.Id)
+        @Html.Hidden("InvoiceDetailList[" + Model.Index + "].Type", "donate")
+        <p class="show-invoice-details-btn" data-target="@Model.Index" onclick="ShowDetailBtnInvoice(@Model.Index)">
+            <a class="green bigger-140" title="Xem chi tiết">
+                <i class="ace-icon fa fa-angle-double-down"></i>
+            </a>
+        </p>
+    </td>
+    <td>
+        @Html.TextBox("InvoiceDetailList[" + Model.Index + "].StartAmount", Model.StartAmount, new { style = "width:150px; text-align:right", placeholder = "Min", @class = "numberinput2", autocomplete = "off" })
+        <select name="InvoiceDetailList[@(Model.Index)].StartSymbol" id="InvoiceDetailList_@(Model.Index)__StartSymbol" style="width:50px;float: none!important;padding: 0px;margin-top: -1px;background: #F89406;color: white;margin-left: -5px;">
+            @foreach (var item in Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("SymbolDKMin", Model.StartSymbol, null))
+            {
+                <option @(item.Value == Model.StartSymbol ? "selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+
+        <span><i class="fa fa-exchange"></i></span>
+        <select name="InvoiceDetailList[@(Model.Index)].EndSymbol" id="InvoiceDetailList_@(Model.Index)__EndSymbol" style="width:50px;float: none!important;padding: 0px;margin-top: -1px;background: #F89406;color: white;margin-right: -5px;">
+            @foreach (var item in Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("SymbolDKMin", Model.EndSymbol, null))
+            {
+                <option @(item.Value == Model.EndSymbol ? "selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        @Html.TextBox("InvoiceDetailList[" + Model.Index + "].EndAmount", Model.EndAmount, new { style = "width:150px; text-align:right;", placeholder = "Max", @class = "numberinput2", autocomplete = "off" })
+    </td>
+    <td class="text-center">
+        <a class="btn-delete-item">
+            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+        </a>
+    </td>
+</tr>
+<tr>
+    <td colspan="4" class="cell-has-table">
+        <div id="table-invoice-detail-@Model.Index" class="table-detail">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title">Danh sách sản phẩm/dịch vụ tặng</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <span class="ctl">
+                            @Html.TextBox("InvoiceProductName_" + Model.Index, "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "off", style = "width:300px; margin-right:3px;margin-bottom:5px" })
+                        </span>
+                        <div class="grid-mvc">
+                            <div class="grid-wrap">
+                                <table class="table table-striped grid-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="grid-header" width="30">STT</th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Mã SP/DV</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Tên SP/DV</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Đơn giá</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Số lượng</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Tổng SL hàng tặng</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">HSD (tháng)</div>
+                                            </th>
+                                        </tr>
+
+                                    </thead>
+                                    <tbody class="InvoiceDonateDetailList_@Model.Index">
+                                        @if (Model.DonateDetailList.Count > 0)
+                                        {
+                                            var index = 0;
+                                            foreach (var item in Model.DonateDetailList)
+                                            {
+                                                item.OrderNo = index;
+                                                @Html.Partial("LoadDonateItembyInvoice", item);
+                                                index++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </td>
+</tr>
+<script>
+    $(function () {
+        $("#InvoiceProductName_@(Model.Index)").combojax({
+            url: "/CommissionCus/GetListJsonAll",
+            onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+                //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+            },
+            onSelected: function (obj) {
+                console.log(obj);
+                if (obj) {
+                    var OrderNo = $(".InvoiceDonateDetailList_@(Model.Index)").find("tr").length;
+                    var ParentOrderNo=@(Model.Index);
+                    var ProductId = obj.Id;
+                    var ProductName = obj.Name;
+                    var ProductCode = obj.Code;
+                    var Price = obj.Price;
+                    var formdata = {
+                        OrderNo: OrderNo,
+                        ProductCode: ProductCode,
+                        ProductName: ProductName,
+                        ProductId: ProductId,
+                        Price: Price,
+                        ParentOrderNo:ParentOrderNo
+                    };
+                    ClickEventHandler(true, "/CommissionCus/LoadDonateItembyInvoice", ".InvoiceDonateDetailList_@(Model.Index)", formdata, function () {
+                        LoadNumberInput();
+                    });
+                }
+            }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+            , onShowImage: true                  //hiển thị hình ảnh
+            , onSearchSaveSelectedItem: false    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+            , onRemoveSelected: true  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+        });
+    });
+</script>

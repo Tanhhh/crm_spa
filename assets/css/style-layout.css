@@ -1,0 +1,1728 @@
+﻿/*************************************** header/menu **************************************/
+.navbar-fixed-top + .main-container {
+    padding-top: 30px;
+}
+
+.header {
+    margin-bottom: 0px;
+    margin-top: 0px;
+    background: #fff;
+    padding: 20px 0px;
+}
+
+.navbar {
+    min-height: 0px !important;
+    background: #428BCA !important;
+}
+
+.ace-nav {
+    padding: 0px;
+}
+
+.navbar .ace-nav > li {
+    height: 30px;
+    line-height: 30px;
+}
+
+.navbar .navbar-nav > li > a {
+    height: 30px;
+    line-height: 30px;
+    padding: 0 12px;
+    font-size: 12px;
+}
+
+.nav-list > li .submenu > li > a {
+    font-size: 12px;
+    padding: 4px 0 4px 37px;
+}
+
+.nav-list > li > .submenu > li:before {
+    top: 13px;
+}
+
+.nav-list > li .submenu > li a > .menu-icon {
+    top: 7px;
+}
+
+.nav-list > li li.active > a:after {
+    top: -1px;
+}
+
+h1.site-name {
+    font-family: 'Times New Roman';
+    font-size: 26px;
+    color: #0093d7;
+    text-transform: uppercase;
+    font-weight: normal;
+    text-align: center;
+    letter-spacing: 1px;
+    margin: 0px;
+    padding-top: 12px;
+}
+
+.user-info {
+    text-overflow: inherit;
+    max-width: none;
+}
+
+.tab-content {
+    border-left: 1px solid #c5d0dc;
+    border-right: 1px solid #c5d0dc;
+    border-bottom: 1px solid #c5d0dc;
+}
+
+.btn-scroll-up.display {
+    z-index: 9999;
+    bottom: 32px;
+    opacity: 1;
+}
+
+.nav-list {
+    padding-bottom: 20px;
+}
+
+#sidebar-collapse {
+    margin-top: -10px;
+}
+
+.ace-nav > li.light-blue > a {
+    font-size: 12px;
+}
+
+.fixed-content {
+    top: 10px;
+    bottom: 10px;
+    position: fixed;
+}
+
+.scrollable {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding-right: 15px;
+}
+
+.no-label .control-label {
+    display: none;
+}
+
+table.grid-table {
+    border: 1px solid #ddd;
+}
+
+.page-content {
+    padding: 8px 12px 90px;
+}
+
+.table .action-buttons p {
+    margin: 0px;
+}
+
+.table label {
+    margin: 0px;
+}
+
+.main-content-popup #page_toolbar {
+    bottom: 0px;
+}
+
+.table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+    padding: 5px;
+}
+
+.grid-footer {
+    margin-top: 5px;
+}
+
+/********************************** widget ************************************/
+.widget-box {
+    margin: 0px;
+}
+
+.widget-header {
+    height: 24px;
+    background: #f9f9f9;
+    min-height: 0px;
+}
+
+    .widget-header .widget-title {
+        color: #333;
+        font-weight: bold;
+        line-height: 24px;
+        font-size: 13px;
+    }
+
+    .widget-header .widget-toolbar {
+        line-height: inherit;
+    }
+
+/************************************ css cái top menu *********************************/
+.navbar .navbar-nav > li > a.active {
+    background-color: rgba(0,0,0,0.2) !important;
+    color: #FFF !important;
+}
+
+#topmenu .dropdown-menu li {
+    border-bottom: 1px solid #eee;
+}
+
+    #topmenu .dropdown-menu li a {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+
+    #topmenu .dropdown-menu li:last-child {
+        border-bottom: none;
+    }
+
+/***************************** popup modal ******************************/
+/***************************** popup modal ******************************/
+.modal-full .modal-dialog {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 10px 10px 60px 10px;
+}
+
+.modal-full .modal-content {
+    height: 100%;
+    min-height: 100%;
+    border-radius: 0;
+}
+
+.modal-full .modal-body {
+    height: 100% !important;
+}
+
+.modal.in .modal-dialog {
+    z-index: 1111;
+}
+
+.modal {
+    width: auto !important;
+}
+
+#myModal .modal-header {
+    /*padding: 4px 8px;*/
+    background: #438EB9;
+    border: none;
+}
+
+    #myModal .modal-header .close {
+        font-size: 25px;
+        margin-top: 0px;
+        color: #fff;
+        text-shadow: none;
+        opacity: 1;
+    }
+
+    #myModal .modal-header .modal-title {
+        font-size: 14px;
+        color: #fff;
+        line-height: 24px;
+    }
+
+#myModal iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+#myModal .modal-body {
+    padding: 0px !important;
+}
+
+/***************************** loading ******************************/
+.img-loading-wrap {
+    background: rgba(255,255,255,0.8);
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    display: none;
+}
+
+/*    .img-loading-wrap .outer {
+        display: table;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+    }
+
+    .img-loading-wrap .middle {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+.img-loading {
+    background: url('../img/img-loading.gif') no-repeat center;
+    width: 200px;
+    height: 90px;
+    text-align: center;
+    padding-top: 10px;
+    font-weight: bold;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+Loading*/
+.overlay__Loading {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    background: rgba(225,225,225,0.3);
+}
+
+.overlay__Loading_inner {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+}
+
+.overlay__Loading_content {
+    padding: 15px 50px;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+}
+
+.spinner_Loading {
+    width: 75px;
+    height: 75px;
+    display: inline-block;
+    border-width: 2px;
+    border-color: rgb(0, 0, 0);
+    border-top-color: #fff;
+    animation: spin 1s infinite linear;
+    border-radius: 100%;
+    border-style: solid;
+    z-index: 9999;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+/************************** logo **************************/
+.logo {
+    text-align: center;
+}
+
+#navbar-container .logo-big {
+    width: 187px;
+    padding: 0px 10px;
+    height: 30px;
+    line-height: 22px;
+    display: block;
+}
+
+    #navbar-container .logo-big small {
+        font-size: 60%;
+    }
+
+#navbar-container .logo-small {
+    width: 40px;
+    padding: 0px 0px;
+}
+
+#navbar-container .logo-small {
+    overflow: hidden;
+    height: 25px;
+}
+
+/************************* footer ***************************/
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #545454;
+    z-index: 1111;
+    padding: 5px 15px;
+    line-height: 11px;
+    font-size: 11px;
+}
+
+    footer .user-login-box {
+        margin-left: 27px;
+        float: left !important;
+    }
+
+    footer .ace-nav > li {
+        height: 25px;
+        line-height: 30px;
+    }
+
+    footer .dropdown-menu.dropdown-close.dropdown-menu-right {
+        left: -1px;
+        right: auto;
+    }
+
+    footer .dropup > .dropdown-menu.dropdown-caret:before, .navbar-fixed-bottom .dropdown > .dropdown-menu.dropdown-caret:before {
+        left: 7px;
+        right: auto;
+    }
+
+    footer .dropup > .dropdown-menu.dropdown-caret:after, .navbar-fixed-bottom .dropdown > .dropdown-menu.dropdown-caret:after {
+        left: 7px;
+        right: auto;
+    }
+
+    footer a {
+        color: #fff;
+        font-size: 11px;
+    }
+
+        footer a:hover {
+            color: #fff;
+        }
+
+/*********************** detail-view *********************/
+.detail-view {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+    .detail-view .row:first-child {
+        border-top: 1px solid #dedede;
+    }
+
+    .detail-view, .detail-view .row .control-group:first-child {
+        border-left: 1px solid #dedede;
+    }
+
+.edit-view .detail-view, .edit-view .detail-view .row .control-group:first-child {
+    border-left: none;
+}
+
+.detail-view .control-group {
+    border-bottom: 1px solid #dedede;
+    border-right: 1px solid #dedede;
+    padding: 0px;
+}
+
+    .detail-view .control-group .col-sm-6 {
+        padding: 0px;
+    }
+
+.detail-view .control-value input[type=checkbox] {
+    opacity: inherit;
+}
+
+.detail-view .control-value {
+    background: #fff;
+    margin-bottom: 0px;
+    font-weight: bold;
+    line-height: 26px;
+}
+
+.detail-view .control-label {
+    background: #f7f7f7;
+    margin-bottom: 0px;
+    padding: 0px;
+    padding-right: 5px;
+    line-height: 26px;
+    text-align: right;
+}
+
+    .detail-view .control-label label {
+        font-size: inherit;
+        font-weight: normal;
+        margin: 0px;
+    }
+
+/*********************** edit-view *********************/
+.edit-view-full {
+    max-width: 760px;
+}
+
+.edit-view-2col {
+    max-width: 570px;
+}
+
+.edit-view .control-group, .edit-view .form-group {
+    border-bottom: 1px solid #dedede !important;
+    border-left: 1px solid #dedede !important;
+    border-right: 1px solid #dedede !important;
+    padding: 0px;
+}
+
+    .edit-view .control-group:first-of-type, .edit-view .form-group:first-of-type {
+        border-top: 1px solid #dedede !important;
+    }
+
+    .edit-view .control-group.form-group, .edit-view .form-group {
+        margin: 0px;
+    }
+
+        .edit-view .control-group .col-sm-6, .edit-view .form-group .col-sm-6 {
+            padding: 0px;
+        }
+
+.edit-view .control-value input[type=checkbox] {
+    opacity: inherit;
+}
+
+.edit-view .control-value {
+    background: #fff;
+    margin-bottom: 0px;
+    padding: 4px 5px;
+    width: 200px;
+    float: left;
+}
+
+.edit-view .full-w {
+    width: 100% !important;
+}
+
+.edit-view .control-label {
+    margin-bottom: 0px;
+    padding: 0px;
+    padding-right: 10px !important;
+    line-height: 34px;
+    font-size: 13px;
+    padding-left: 10px;
+    width: 46%;
+    float: left;
+    background: none;
+    text-align:left;
+}
+
+.edit-view .control-label-textarea {
+    height: 72px;
+}
+
+@media only screen and (min-width: 1024px) {
+}
+
+.edit-view .control-label label {
+    font-size: inherit;
+    font-weight: normal;
+    margin: 0px;
+}
+
+.edit-view label {
+    margin: 0px !important;
+}
+
+.edit-view .chosen-single, .edit-view input, .edit-view select {
+    height: 26px !important;
+    max-width: 100%;
+    width: 100%;
+}
+
+.edit-view .chosen-single, .edit-view input, .edit-view select, .edit-view textarea {
+    font-size: 13px !important;
+}
+
+.edit-view select {
+    padding: 0px
+}
+
+.edit-view textarea {
+    height: 64px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+#group-description .control-value {
+    width: 100% !important;
+}
+
+.edit-view .input-group {
+    width: 100%;
+}
+
+    .edit-view .input-group .input-group-addon {
+        font-size: 12px
+    }
+
+.edit-view input {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
+
+/************************* search-view ***************************/
+.search-view p {
+    margin-bottom: 5px;
+}
+
+.search-view .chosen-single, .search-view input, .search-view .input-group, .search-view select {
+    height: 28px !important;
+    font-size: 12px !important;
+    /*margin-bottom: 5px;*/
+    vertical-align: inherit !important;
+    margin-bottom: 4px;
+}
+
+.search-view input {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
+
+.search-view .input-group input {
+    margin-bottom: 0px !important;
+}
+
+.search-view .input-group-addon {
+    font-size: 12px;
+}
+
+.search-view .btn-mini {
+    line-height: 1.6;
+    /*margin-bottom: 5px;*/
+}
+
+/*************************  edit-view-item ***************************/
+.edit-view-item .control-value {
+    background: #fff;
+    margin-bottom: 0px;
+    padding-top: 7px;
+    font-size: 14px;
+    font-weight: bold;
+    padding-left: 8px;
+}
+
+.edit-view-item .control-label {
+    padding-right: 0px;
+}
+/*************************  style Tabbed ***************************/
+.widget-header-small > .widget-toolbar > .nav-tabs > li > a {
+    padding-bottom: 0px !important;
+    padding-top: 0px !important;
+    line-height: 20px !important;
+}
+
+.widget-toolbar > .nav-tabs {
+    margin-top: 0px !important;
+}
+/*************************  style image tròn 2 dòng ***************************/
+.itemdiv > .body > .text {
+    padding-bottom: 0px !important;
+}
+
+.itemdiv {
+    padding-right: 3px;
+    /*min-height: 10px;*/
+    border-bottom: 1px solid #E4ECF3;
+}
+.itemdiv:last-child{
+    border-bottom:none;
+}
+
+    .itemdiv > .user > img {
+        width: 40px;
+        height: 40px;
+    }
+
+.nav.navbar-nav li {
+    background: #428bca;
+}
+
+@media screen and (max-width: auto) {
+    .nav.navbar-nav li {
+        width: 143px;
+    }
+}
+
+@media screen and (max-width : 320px) {
+    #navbar, div#PIDetail .widget-header {
+        height: 45px !important;
+    }
+
+    div#PIDetail .widget-toolbar #myTab li {
+        width: 33.3% !important;
+    }
+
+    #page_toolbar div#popup_archive {
+        bottom: 0 !important;
+        width: 300px;
+        height: auto !important;
+    }
+
+    #page_toolbar #popup_archive_coc, #page_toolbar #popup_huy {
+        width: 300px;
+        left: auto !important;
+        bottom: 60px !important;
+        height: auto !important;
+    }
+
+        #page_toolbar #popup_archive_coc .NextPaymentDate-container {
+            height: auto !important;
+        }
+
+    #page_toolbar a.btn.btn-primary.btn-mini {
+        margin-top: 5px;
+    }
+
+    #page_toolbar a.btn.btn-primary.btn-white.btn-sm {
+        margin-bottom: 0;
+    }
+
+    ul.nav.navbar-nav {
+        margin: 0 !important;
+        margin-left: -15px !important;
+        width: 142px !important;
+    }
+
+    li.light-blue.dropdown-modal {
+        position: absolute !important;
+        top: 7px !important;
+        right: 12px !important;
+        left: 62% !important;
+        border: none;
+    }
+
+    li.notification {
+        position: absolute !important;
+        top: 7px !important;
+        left: 50% !important;
+        float: right !important;
+    }
+
+    .ace-nav > li.dropdown-modal > .dropdown-menu {
+        position: absolute;
+        z-index: 1052;
+        width: 185px;
+        left: auto;
+        right: -2px !important;
+        top: 28px;
+    }
+
+    ul.user-menu.dropdown-menu-right.dropdown-menu.dropdown-yellow.dropdown-caret.dropdown-close {
+        padding-top: 5px !important;
+    }
+
+    .ace-nav > li:nth-last-child(2) > .dropdown-menu.dropdown-menu-right {
+        left: auto !important;
+        right: -120px !important;
+        width: 315px !important;
+        overflow-y: scroll !important;
+    }
+
+    .dropdown-navbar .msg-photo {
+        max-width: 35px !important;
+        max-height: 35px !important;
+    }
+
+    .ace-nav > li:nth-last-child(2) > .dropdown-menu.dropdown-menu-right:after {
+        left: 55% !important;
+        right: auto !important;
+        top: 0px !important;
+    }
+
+    .widget-toolbar.no-border {
+        left: -5px;
+    }
+
+    div#tab_List_Task_1, div#tab_List_Task_2 {
+        margin-top: 15px;
+        margin-bottom: -10px;
+    }
+
+    .nav-wrap-up.pos-rel {
+        overflow-y: scroll !important;
+        overflow-x: hidden;
+    }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+            .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb:hover {
+                background: #545454;
+            }
+
+    form#Customer input#Phone, input#txtCusInfo, input#txtCode, select#Status, select#type, input#TargetCode,
+    input#productCode, input#txtCusName, input#txtCusCode, select#warehouseDestinationId, input#txtProductCode,
+    input#txtPurchaseOrder, select#warehouseSourceId, select.chzn-select, .chosen-container.chosen-container-single {
+        width: 49.3% !important;
+        float: none !important;
+    }
+
+    form#Create input#Phone, form#Create input#Birthday, input#Product, #cTable
+    select#SalerId, #AdviseCard select#CounselorId, #AdviseCard select#CreateUserId,
+    span.input-group, input#startDate, input#endDate, input#txtMinAmount, input#txtMaxAmount {
+        width: 100% !important;
+    }
+
+    /*#cTable, #cTable thead, #cTable tbody, #cTable tfoot, #cTable tr {
+        width: 296px !important;
+    }*/
+
+    div#combojax_Product {
+        width: 88.5% !important;
+    }
+
+    form#Create .col-sm-7 {
+        margin-bottom: 15px;
+    }
+
+    .widget-header .widget-title {
+        font-size: 11px !important;
+    }
+
+    ul.tab-color-blue > li {
+        text-align: center;
+        width: 50%;
+        font-size: 12px;
+        float: left;
+        padding: 0px;
+        margin-bottom: 5px;
+    }
+
+    #tranferManager {
+        float: none !important;
+    }
+
+    #page_toolbar a.btn.btn-primary.btn-mini, #page_toolbar a#Save, #page_toolbar button.btn.btn-mini.btn-danger,
+    a.btn.btn-sm.btn-primary.btn-white {
+        margin-bottom: 5px;
+    }
+
+    .input-group-addon {
+        width: auto;
+        min-width: 16px;
+        padding: 4px 5px;
+        font-weight: 400;
+        line-height: 1.428571429;
+        text-align: center;
+        text-shadow: 0 1px 0 #fff;
+        vertical-align: middle;
+        background-color: #eee;
+        border: solid #ccc;
+        border-width: 1px 0;
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+
+    #page_toolbar {
+        position: fixed;
+        margin-left: -13px;
+        padding-top: 15px;
+        padding-bottom: 20px;
+        padding-left: 12px;
+        border-top: 3px double #E5E5E5;
+        background: #F5F5F5;
+    }
+
+    div#popup_archive {
+        position: absolute;
+        bottom: 45px;
+        left: -240px;
+        max-width: inherit;
+        top: inherit;
+    }
+
+    .control-value.col-lg-7.col-md-8.col-sm-8 {
+        width: 150px !important;
+    }
+
+    .NextPaymentDate-container {
+        height: 245px;
+    }
+
+    div#myModal {
+        width: 320px !important;
+    }
+
+    #SHDetail .widget-header.widget-header-small {
+        height: 47px !important;
+        width: 100% !important;
+    }
+
+    #SHDetail #myTab {
+        height: 45px !important;
+    }
+
+        #SHDetail #myTab li {
+            width: 50% !important;
+        }
+
+    #SHDetail .tab-content {
+        overflow: auto;
+    }
+
+    #ChartInboundAndOutbound #ChartInAndOut {
+        margin-right: 0px !important;
+    }
+
+        #ChartInboundAndOutbound #ChartInAndOut .col-sm-12 {
+            max-height: 450px;
+            overflow: auto;
+        }
+
+    #RequestInbound .infobox {
+        display: flex;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    #CreateProductInBound .col-md-7, #CreateProductInBound .col-md-5,
+    #CreateProductOutBound .col-md-7, #CreateProductOutBound .col-md-5,
+    #CreateRequestInbound .col-md-7, #CreateRequestInbound .col-md-5 {
+        width: 100% !important;
+        padding: 0 !important;
+    }
+
+    #InBoundCreate, #OutboundCreate, #RICreate {
+        margin-left: 0 !important;
+    }
+
+    #chitiet {
+        left: 67% !important;
+    }
+
+    #mauexcel {
+        padding: 5px !important;
+        margin-bottom: 10px;
+    }
+
+    #scrolltable {
+        height: auto !important;
+        max-height: 250px !important;
+    }
+
+    #popup_archive2 {
+        left: 3% !important;
+        width: 90% !important;
+        height: auto !important;
+        bottom: 0 !important;
+    }
+
+    #InBoundCreate input#product_barcode, #RICreate input#product_barcode {
+        width: 56% !important;
+    }
+
+    #PIndex {
+        height: 400px;
+    }
+}
+
+@media screen and (max-width : 425px) and (min-width : 321px) {
+    #navbar, div#PIDetail .widget-header {
+        height: 45px !important;
+    }
+
+    div#PIDetail .widget-toolbar.no-border.pull-left {
+        width: 100% !important;
+    }
+
+    div#PIDetail .widget-toolbar #myTab li {
+        width: 33.3% !important;
+    }
+
+    #page_toolbar div#popup_archive, #page_toolbar #popup_archive_coc {
+        bottom: 60px !important;
+        min-width: 300px;
+        width: auto !important;
+        left: auto !important;
+        height: auto !important;
+    }
+
+    #page_toolbar #popup_huy {
+        bottom: 60px !important;
+        left: auto;
+        width: 300px !important;
+    }
+
+    #page_toolbar #popup_archive_coc .NextPaymentDate-container {
+        height: auto !important;
+    }
+
+    #page_toolbar a.btn.btn-white.btn-success.btn-sm, #page_toolbar a.btn.btn-mini.btn-success,
+    #page_toolbar a.btn.btn-primary.btn-white.btn-sm, #page_toolbar a.btn.btn-primary.btn-mini {
+        margin-bottom: 5px;
+    }
+
+    ul.nav.navbar-nav {
+        margin: 0 !important;
+        margin-left: -15px !important;
+        width: 160px !important;
+    }
+
+    li.light-blue.dropdown-modal {
+        position: absolute !important;
+        top: 7px !important;
+        right: 12px !important;
+        left: 65% !important;
+        border: none;
+    }
+
+    li.notification {
+        position: absolute !important;
+        top: 7px !important;
+        left: 54% !important;
+    }
+
+    .ace-nav > li.dropdown-modal > .dropdown-menu {
+        position: absolute;
+        z-index: 1052;
+        width: 185px;
+        left: auto;
+        right: -2px !important;
+        top: 28px;
+    }
+
+    ul.user-menu.dropdown-menu-right.dropdown-menu.dropdown-yellow.dropdown-caret.dropdown-close {
+        padding-top: 5px !important;
+    }
+
+    .ace-nav > li:nth-last-child(2) > .dropdown-menu.dropdown-menu-right {
+        left: auto !important;
+        right: -120px !important;
+        width: 315px !important;
+        overflow-y: scroll !important;
+    }
+
+    .dropdown-navbar .msg-photo {
+        max-width: 35px !important;
+        max-height: 35px !important;
+    }
+
+    .ace-nav > li:nth-last-child(2) > .dropdown-menu.dropdown-menu-right:after {
+        left: 55% !important;
+        right: auto !important;
+        top: 0px !important;
+    }
+
+    select#BRANCH_ID {
+        width: 160px;
+    }
+
+    .nav-wrap-up.pos-rel {
+        overflow-y: scroll !important;
+        overflow-x: hidden;
+    }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+            .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb:hover {
+                background: #545454;
+            }
+
+    span.input-daterange.input-group, span.input-group, input#txtMinAmount, input#txtMaxAmount,
+    input#startDate, input#endDate, div#combojax_Product, .table-responsive .table {
+        width: 100%;
+    }
+
+    input#Phone, input#txtCusInfo, input#txtCode, select#Status, select#type, input#TargetCode,
+    input#productCode, input#txtCusName, input#txtCusCode, select.chzn-select, .chosen-container.chosen-container-single {
+        width: 49.3% !important;
+        float: none !important;
+    }
+
+    .input-group-addon {
+        width: 27px;
+        padding: 4px 5px;
+        border-width: 1px 0;
+    }
+
+    select#item_origin, select#CountForBrand {
+        width: 48% !important;
+    }
+
+    div#combojax_Product {
+        width: 75%;
+    }
+
+    #PIndex {
+        height: 400px;
+    }
+}
+
+@media screen and (max-width : 502px) and (min-width : 426px) {
+    #navbar {
+        height: 45px !important;
+    }
+
+    #page_toolbar div#popup_archive, #page_toolbar #popup_archive_coc, #page_toolbar #popup_huy {
+        bottom: 60px !important;
+        left: auto !important;
+    }
+
+    ul.nav.navbar-nav {
+        margin: 0 !important;
+        margin-left: -15px !important;
+        width: 180px !important;
+    }
+
+    li.light-blue.dropdown-modal {
+        position: absolute !important;
+        top: 7px !important;
+        right: 12px !important;
+        left: 72% !important;
+        border: none;
+    }
+
+    li.notification {
+        position: absolute !important;
+        top: 7px !important;
+        left: 64% !important;
+    }
+
+    #page_header {
+        margin-top: 10px !important;
+    }
+
+    ul.nav.nav-list {
+        margin-top: 15px;
+    }
+
+    .ace-nav > li.dropdown-modal > .dropdown-menu {
+        position: absolute;
+        z-index: 1052;
+        width: 185px;
+        left: auto;
+        right: -2px !important;
+        top: 28px;
+    }
+
+    ul.user-menu.dropdown-menu-right.dropdown-menu.dropdown-yellow.dropdown-caret.dropdown-close {
+        padding-top: 5px !important;
+    }
+
+    .ace-nav > li:nth-last-child(2) > .dropdown-menu.dropdown-menu-right {
+        left: auto !important;
+        right: -92px !important;
+        width: 400px !important;
+        overflow-y: scroll !important;
+    }
+
+    .dropdown-navbar .msg-photo {
+        max-width: 35px !important;
+        max-height: 35px !important;
+    }
+
+    .ace-nav > li:nth-last-child(2) > .dropdown-menu.dropdown-menu-right:after {
+        left: 71% !important;
+        right: auto !important;
+        top: 0px !important;
+    }
+
+    select#BRANCH_ID {
+        width: 180px;
+    }
+
+    .nav-wrap-up.pos-rel {
+        overflow-y: scroll !important;
+        overflow-x: hidden;
+    }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+            .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb:hover {
+                background: #545454;
+            }
+
+    input#startDate, input#endDate, form#Create input#Phone, input#txtMinAmount, input#txtMaxAmount,
+    .table-responsive .table, span.input-daterange.input-group, span.input-group {
+        width: 100%;
+    }
+
+    form#Customer input#Phone, input#txtCusInfo, input#txtCode, select#Status, select#type, input#txtCusCode,
+    select#CounselorId, select#CreateUserId, input#TargetCode, input#productCode, input#txtCusName, select.chzn-select {
+        width: 49.5% !important;
+        float: none !important;
+    }
+    /*#InquiryCard p {
+        height: 60px;
+        margin: 0px;
+        width: 30%;
+        float: right;
+        margin-top: -17%;
+    }*/
+    #InquiryCard a.btn.btn-mini.btn-black {
+        width: 84px;
+    }
+
+    div#combojax_Product {
+        width: 70% !important;
+    }
+
+    select#CountForBrand {
+        width: 125px !important;
+        /*float: none !important;*/
+    }
+
+    .input-group-addon {
+        width: auto;
+        padding: 4px 5px;
+        border-width: 1px 0;
+    }
+
+    #PIndex {
+        height: 400px;
+    }
+}
+
+@media screen and (max-width : 540px) and (min-width : 503px) {
+    #navbar {
+        height: 45px !important;
+    }
+
+    #page_toolbar div#popup_archive, #page_toolbar #popup_archive_coc, #page_toolbar #popup_huy {
+        bottom: 60px !important;
+        left: auto !important;
+    }
+
+    ul.nav.navbar-nav {
+        margin: 0 !important;
+        margin-left: -15px !important;
+        width: 180px !important;
+    }
+
+    li.light-blue.dropdown-modal {
+        position: absolute !important;
+        top: 7px !important;
+        right: 12px !important;
+        left: 75% !important;
+        border: none;
+    }
+
+    li.notification {
+        position: absolute !important;
+        top: 7px !important;
+        left: 67% !important;
+    }
+
+    #page_header {
+        margin-top: 10px !important;
+    }
+
+    ul.nav.nav-list {
+        margin-top: 15px;
+    }
+
+    .ace-nav > li.dropdown-modal > .dropdown-menu {
+        position: absolute;
+        z-index: 1052;
+        width: 185px;
+        left: auto;
+        right: -2px !important;
+        top: 28px;
+    }
+
+    ul.user-menu.dropdown-menu-right.dropdown-menu.dropdown-yellow.dropdown-caret.dropdown-close {
+        padding-top: 5px !important;
+    }
+
+    .ace-nav > li:nth-last-child(2) > .dropdown-menu.dropdown-menu-right {
+        left: auto !important;
+        right: -92px !important;
+        width: 400px !important;
+        overflow-y: scroll !important;
+    }
+
+    .dropdown-navbar .msg-photo {
+        max-width: 35px !important;
+        max-height: 35px !important;
+    }
+
+    .ace-nav > li:nth-last-child(2) > .dropdown-menu.dropdown-menu-right:after {
+        left: 71% !important;
+        right: auto !important;
+        top: 0px !important;
+    }
+
+    select#BRANCH_ID {
+        width: 180px;
+    }
+
+    .nav-wrap-up.pos-rel {
+        overflow-y: scroll !important;
+        overflow-x: hidden;
+    }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+            .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb:hover {
+                background: #545454;
+            }
+
+    input#startDate, input#endDate, form#Create input#Phone, input#txtMinAmount, input#txtMaxAmount,
+    .table-responsive .table, span.input-daterange.input-group, span.input-group {
+        width: 100%;
+    }
+
+    form#Customer input#Phone, input#txtCusInfo, input#txtCode, select#Status, select#type, input#txtCusCode,
+    select#CounselorId, select#CreateUserId, input#TargetCode, input#productCode, input#txtCusName, select.chzn-select {
+        width: 49.5% !important;
+        float: none !important;
+    }
+    /*#InquiryCard p {
+        height: 60px;
+        margin: 0px;
+        width: 30%;
+        float: right;
+        margin-top: -17%;
+    }*/
+    #InquiryCard a.btn.btn-mini.btn-black {
+        width: 84px;
+    }
+
+    div#combojax_Product {
+        width: 70% !important;
+    }
+
+    /*select#item_origin {
+        float: none !important;
+    }*/
+
+    .input-group-addon {
+        width: auto;
+        padding: 4px 5px;
+        border-width: 1px 0;
+    }
+
+    #PIndex {
+        height: 400px;
+    }
+}
+
+@media screen and (max-width : 768px) and (min-width : 541px) {
+    #navbar {
+        height: 45px !important;
+    }
+
+    #page_toolbar div#popup_archive, #page_toolbar #popup_archive_coc, #page_toolbar #popup_huy {
+        left: auto !important;
+        bottom: 60px !important;
+    }
+
+    ul.nav.navbar-nav {
+        margin: 0 !important;
+        margin-left: -15px !important;
+        width: 200px !important;
+    }
+
+    select#BRANCH_ID {
+        width: 200px;
+    }
+
+    li.light-blue.dropdown-modal {
+        position: absolute !important;
+        top: 7px !important;
+        right: 12px !important;
+        left: 78% !important;
+        border: none;
+    }
+
+    li.notification {
+        position: absolute !important;
+        top: 7px !important;
+        left: 71% !important;
+    }
+
+    #page_header {
+        margin-top: 10px !important;
+    }
+
+    ul.nav.nav-list {
+        margin-top: 15px !important;
+    }
+
+    .ace-nav > li.dropdown-modal > .dropdown-menu {
+        position: absolute;
+        z-index: 1052;
+        width: 185px;
+        left: auto;
+        right: -2px !important;
+        top: 28px;
+    }
+
+    ul.user-menu.dropdown-menu-right.dropdown-menu.dropdown-yellow.dropdown-caret.dropdown-close {
+        padding-top: 5px !important;
+    }
+
+    .widget-toolbar.no-border {
+        border: 1px solid !important;
+        left: -13px !important;
+    }
+
+    div#tab_List_Task_1,
+    div#tab_List_Task_2 {
+        margin-top: 15px;
+        margin-bottom: -10px;
+    }
+
+    .nav-wrap-up.pos-rel {
+        overflow-y: scroll !important;
+        overflow-x: hidden;
+    }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+            .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb:hover {
+                background: #545454;
+            }
+
+    div#combojax_Product {
+        width: 60% !important;
+    }
+
+    input#Product, .table-responsive .table {
+        width: 100% !important;
+    }
+
+    .input-group-addon {
+        width: auto;
+        padding: 4px 5px;
+        border-width: 1px 0;
+    }
+
+    #PIndex {
+        height: 450px;
+    }
+}
+
+@media screen and (max-width : 991px) and (min-width : 769px) {
+    #navbar {
+        height: 45px !important;
+    }
+
+    #page_toolbar #popup_huy {
+        left: auto !important;
+    }
+
+    ul.nav.navbar-nav {
+        margin: 0 !important;
+        margin-left: -15px !important;
+        width: 200px !important;
+    }
+
+    select#BRANCH_ID {
+        width: 200px;
+    }
+
+    li.light-blue.dropdown-modal {
+        position: absolute !important;
+        top: 7px !important;
+        right: 12px !important;
+        left: 85% !important;
+        border: none;
+    }
+
+    li.notification {
+        position: absolute !important;
+        top: 7px !important;
+        left: 80% !important;
+    }
+
+    #page_header {
+        margin-top: 10px !important;
+    }
+
+    ul.nav.nav-list {
+        margin-top: 15px !important;
+    }
+
+    .ace-nav > li.dropdown-modal > .dropdown-menu {
+        position: absolute;
+        z-index: 1052;
+        width: 185px;
+        left: auto;
+        right: -2px !important;
+        top: 28px;
+    }
+
+    ul.user-menu.dropdown-menu-right.dropdown-menu.dropdown-yellow.dropdown-caret.dropdown-close {
+        padding-top: 5px !important;
+    }
+
+    .widget-toolbar.no-border {
+        left: -10px;
+        width: 275px;
+        border: 1px solid;
+    }
+
+    div#tab_List_Task_1,
+    div#tab_List_Task_2 {
+        margin-top: 15px;
+        margin-bottom: -10px;
+    }
+
+    .nav-wrap-up.pos-rel {
+        overflow-y: scroll !important;
+        overflow-x: hidden;
+    }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+            .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb:hover {
+                background: #545454;
+            }
+
+    div#combojax_Product {
+        width: 70% !important;
+    }
+
+    input#Product, .table-responsive .table {
+        width: 100% !important;
+    }
+
+    .input-group-addon {
+        width: auto;
+        padding: 4px 5px;
+        border-width: 1px 0;
+    }
+
+    #PIndex {
+        height: 550px;
+    }
+}
+
+@media screen and (max-width : 1024px) and (min-width : 992px) {
+    div#topmenu {
+        margin-left: -10px !important;
+        padding-left: 0;
+    }
+
+    #page_toolbar #popup_huy {
+        left: -365px !important;
+    }
+
+    .navbar .navbar-nav > li > a {
+        height: 30px;
+        line-height: 30px;
+        padding: 0 10px;
+        font-size: 12px;
+    }
+
+    select#BRANCH_ID {
+        width: 110px !important;
+    }
+
+    li.light-blue.dropdown-modal {
+        width: 90px !important;
+    }
+
+    ul.user-menu.dropdown-menu-right.dropdown-menu.dropdown-yellow.dropdown-caret.dropdown-close {
+        width: 180px;
+        position: absolute;
+    }
+
+    .widget-toolbar.no-border {
+        left: -10px;
+        width: 300px;
+        border: 1px solid;
+    }
+
+    div#tab_List_Task_1,
+    div#tab_List_Task_2 {
+        margin-top: 15px;
+        margin-bottom: -10px;
+    }
+
+    .nav-wrap-up.pos-rel {
+        overflow-y: scroll !important;
+        overflow-x: hidden;
+    }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb {
+            background: #888;
+        }
+
+            .nav-wrap-up.pos-rel::-webkit-scrollbar-thumb:hover {
+                background: #545454;
+            }
+
+    div#combojax_Product {
+        width: 70% !important;
+    }
+
+    select.chzn-select {
+        width: 170px !important;
+    }
+
+    input#Product, .table-responsive .table {
+        width: 100% !important;
+    }
+
+    select#item_origin, select#CountForBrand {
+        width: 150px !important;
+    }
+
+    .input-group-addon {
+        width: auto;
+        padding: 4px 5px;
+        border-width: 1px 0;
+    }
+
+    #PIndex {
+        height: 550px;
+    }
+}
+
+@media screen and (max-width : 1440px) and (min-width : 1025px) {
+    div#topmenu {
+        margin-left: -23px !important;
+        padding-left: 0;
+    }
+
+    #page_toolbar #popup_huy {
+        left: -156px !important;
+    }
+
+    li.light-blue.dropdown-modal {
+        width: 107px !important;
+    }
+
+    .input-group-addon {
+        width: auto;
+        padding: 4px 5px;
+        border-width: 1px 0;
+    }
+
+    div#combojax_Product {
+        width: 65% !important;
+    }
+
+    input#Product, .table-responsive .table {
+        width: 100% !important;
+    }
+
+    select#item_origin, select#CountForBrand {
+        width: 150px !important;
+    }
+
+    #PIndex {
+        height: 600px;
+    }
+}
+
+@media screen and (min-width : 541px) {
+    #PIDetail span.pull-right.red {
+        float: none !important;
+    }
+}
+
+/*Thang begin*/
+li.dropdown-content.ace-scroll {
+    overflow-y: scroll !important;
+}
+
+/*.widget-toolbar {
+    display: none !important;
+}*/
+/*Thang end*/
+
+#page_toolbar {
+    width: 100% !important;
+}
+
+a.btn.btn-mini.btn-primary,
+button.btn.btn-mini.btn-primary {
+    margin-right: 0 !important
+}
+
+button.btn.btn-mini.btn-primary,
+a.btn.btn-mini.btn-black {
+    margin-top: 0px;
+}
+
+button.btn.btn-white.btn-success.btn-sm {
+    margin-left: 0 !important;
+}
+
+.grid-wrap {
+    overflow: auto;
+}
+
+select.chzn-select {
+    float: none !important;
+}
+
+div#main-container {
+    overflow: hidden !important;
+}
+
+@media screen and (max-width : 424px) {
+    ul .dropdown-menu-right.dropdown-navbar.navbar-pink.dropdown-menu.dropdown-caret.dropdown-close {
+        overflow-y: visible !important;
+    }
+
+    ul#notifications_list > li, li.dropdown-content.ace-scroll {
+        width: 313px;
+    }
+}
+
+@media screen and (max-width : 767px) {
+    .table-responsive > .table > thead > tr > th {
+        white-space: unset !important;
+    }
+}
+

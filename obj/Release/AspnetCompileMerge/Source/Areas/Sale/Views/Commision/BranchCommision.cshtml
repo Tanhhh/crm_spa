@@ -1,0 +1,508 @@
+﻿@model IEnumerable<HoaHongChiNhanhViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Staff.Models
+@using GridMvc.Html
+
+
+@{
+    ViewBag.Title = "Tỷ lệ đạt doanh thu chi nhánh";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Commision",
+        ActionName = "BranchCommision",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    // string branchId = Request["branchId"] != null ? Request["branchId"] :
+
+    List<BranchViewModel> branchList = (List<BranchViewModel>)ViewBag.branchList;
+    List<ProductInvoiceViewModel> total = (List<ProductInvoiceViewModel>)ViewBag.TotalList;
+    List<ProductInvoiceViewModel> Orlane = (List<ProductInvoiceViewModel>)ViewBag.Orlane;
+    List<ProductInvoiceViewModel> Annayake = (List<ProductInvoiceViewModel>)ViewBag.Annayake;
+    List<ProductInvoiceViewModel> LennorGreyl = (List<ProductInvoiceViewModel>)ViewBag.LennorGreyl;
+    List<ProductInvoiceViewModel> NewOrlane = (List<ProductInvoiceViewModel>)ViewBag.newOrlane;
+    List<ProductInvoiceViewModel> OldOrlane = (List<ProductInvoiceViewModel>)ViewBag.oldOrlane;
+    //List<string> ListTargetName = (List<string>)ViewBag.ListTargetName;
+    int index = 0;
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"> </script>
+
+<style>
+    #cTable table tbody, #cTable table thead {
+        display: block !important;
+    }
+
+    #cTable table tbody {
+        overflow: auto;
+        height: calc(100vh - 360px) !important;
+    }
+
+    #cTable table {
+        width: 1520px !important; /* can be dynamic */
+    }
+
+    #cTable th {
+        width: 100px;
+    }
+
+    #cTable td {
+        width: 100px;
+    }
+
+    #cTable > thead > tr > th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+
+    #cTable > tbody > tr > td {
+        vertical-align: middle;
+        /*text-align: center;*/
+    }
+</style>
+
+@helper GridColumnCommand(int id)
+{
+    <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+        <p>
+            <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+            </button>
+        </p>
+    </div>
+}
+
+@helper GridColumnName(string name, int id)
+{
+if (string.IsNullOrEmpty(name))
+{
+        <a href="@Url.Action("Edit", "Commision", new { Id = id })">No Title</a>
+}
+else
+{
+        <a href="@Url.Action("Edit", "Commision", new { Id = id })">@name</a>
+}
+}
+
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+
+
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+    <p style="height:50px">
+        <label>Chi nhánh</label>
+        @Html.DropDownList("BranchId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"))
+        <label>Tháng</label>
+        <select id="month" name="month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(Month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Năm</label>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= DateTime.Now.Year; i++)
+            {
+                <option @(Year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+
+    </p>
+}
+
+
+
+
+<div class="table-responsive" id="table">
+    <table id="cTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th style="text-align:center;width:100px">Chi Nhánh</th>
+                <th style="text-align:center;width:200px">Chỉ Tiêu</th>
+                <th style="text-align:center">Target (VND)</th>
+                <th style="width:100px;text-align:center">Thực Tế (VND)</th>
+                <th style="text-align:center;width:100px">DS Hỗ Trợ (VND)</th>
+                <th style="text-align:center;width:100px">DS Tính Hoa Hồng (VND)</th>
+                <th style="text-align:center">Đạt (%)</th>
+            </tr>
+        </thead>
+        @*<tr>
+            @foreach (var a in ListTargetName)
+            {
+                <th class="text-center" style="width:100px;">@a</th>
+            }
+            @foreach (var a in ListTargetName)
+            {
+                <th class="text-center" style="width:100px;">@a</th>
+            }
+            @foreach (var a in ListTargetName)
+            {
+                <th class="text-center" style="width:100px;">@a</th>
+            }*@
+
+
+        <tbody>
+            @foreach (var i in Model)
+            {
+                var Total = total.Where(x => x.BranchId == i.BranchId);
+                var orlane = Orlane.Where(x => x.BranchId == i.BranchId);
+                var oldorlane = OldOrlane.Where(x => x.BranchId == i.BranchId);
+                var neworlane = NewOrlane.Where(x => x.BranchId == i.BranchId);
+                var anna = Annayake.Where(x => x.BranchId == i.BranchId);
+                var lennor = LennorGreyl.Where(x => x.BranchId == i.BranchId);
+                index++;
+
+                <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+                    <td rowspan="6">@(index)</td>
+                    @foreach (var item in branchList)
+                    {
+                        if (i.BranchId == item.Id)
+                        {
+                            <td rowspan="6"><a href="@Url.Action("StaffCommision", "Commision", new { month = Month, year = Year, branchId = @i.BranchId })">@item.Name</a></td>
+                        }
+                    }
+                   
+                    <td>TỔNG</td>
+                    <td>@CommonSatic.ToCurrencyStr(i.Total, null) </td>
+                    <td id="thuctetong_@i.BranchId">@CommonSatic.ToCurrencyStr(Total.Sum(x => x.TotalAmount), null)</td>
+                    <td><input type="text" id="total_@i.BranchId" disabled/></td>
+                    <td class="tonghh"><input type="text" id="totalhh_@i.BranchId" value="@CommonSatic.ToCurrencyStr(Total.Sum(x => x.TotalAmount), null)" disabled/></td>
+                    <td>@(Math.Round((decimal)(Total.Sum(x => x.TotalAmount) / i.Total) * 100, 1))</td>
+
+                </tr>
+
+                    <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+                        <td>TỔNG ORLANE</td>
+                        <td> @CommonSatic.ToCurrencyStr(i.Orlane, null) </td>
+                        <td id="thuctetongOrlane_@i.BranchId">@CommonSatic.ToCurrencyStr(orlane.Sum(x => x.TotalAmount), null)</td>
+                        <td><input type="text" id="orlane_@i.BranchId" disabled /></td>
+                        <td class="tongOrlane"><input type="text" id="hhorlane_@i.BranchId" value="@CommonSatic.ToCurrencyStr(orlane.Sum(x => x.TotalAmount), null)" disabled/></td>
+                        <td>@(Math.Round((decimal)(orlane.Sum(x => x.TotalAmount) / i.Orlane) * 100, 1))</td>
+
+                    </tr>
+                 
+                    <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+                        <td>DS MỚI ORLANE</td>
+                        <td> @CommonSatic.ToCurrencyStr(i.NewOrlane, null) </td>
+                        <td class="thucte">@CommonSatic.ToCurrencyStr(neworlane.Sum(x => x.TotalAmount), null)</td>
+                        <td><input type="text" id="new_@i.BranchId" value=""/></td>
+                        <td class="newhh"><input type="text" id="newhh_@i.BranchId" value="@CommonSatic.ToCurrencyStr(neworlane.Sum(x => x.TotalAmount), null)" disabled/></td>
+                        <td>@(Math.Round((decimal)(neworlane.Sum(x => x.TotalAmount) / i.NewOrlane) * 100, 1))</td>
+
+
+
+
+
+
+
+                    </tr>
+                    <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+                        <td>DS CŨ ORLANE</td>
+                        <td> @CommonSatic.ToCurrencyStr(i.OldOrlane, null) </td>
+                        <td class="thucte">@CommonSatic.ToCurrencyStr(oldorlane.Sum(x => x.TotalAmount), null)</td>
+                        <td ><input type="text" id="old_@i.BranchId" value="" /></td>
+                        <td class="newhh"><input type="text" id="oldhh_@i.BranchId" value="@CommonSatic.ToCurrencyStr(oldorlane.Sum(x => x.TotalAmount), null)" disabled/></td>
+                        <td>@(Math.Round((decimal)(oldorlane.Sum(x => x.TotalAmount) / i.OldOrlane) * 100, 1))</td>
+                    </tr>
+                    <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+                        <td>DS ANNAYAKE</td>
+                        <td> @CommonSatic.ToCurrencyStr(i.Annayake, null) </td>
+                        <td class="thucte">@CommonSatic.ToCurrencyStr(anna.Sum(x => x.TotalAmount), null)</td>
+                        <td><input type="text" id="anna_@i.BranchId" value=""/></td>
+                        <td class="newhh"><input type="text" id="annahh_@i.BranchId" value="@CommonSatic.ToCurrencyStr(anna.Sum(x => x.TotalAmount), null)" disabled/></td>
+                        <td>@(Math.Round((decimal)(anna.Sum(x => x.TotalAmount) / i.Annayake) * 100, 1))</td>
+
+                    </tr>
+                    <tr class="@(index % 2 == 0 ? "alert-warning" : "")">
+                        <td>DS LEONOR GREYL</td>
+                        <td> @CommonSatic.ToCurrencyStr(i.LennorGreyl, null) </td>
+                        <td class="thucte">@CommonSatic.ToCurrencyStr(lennor.Sum(x => x.TotalAmount), null)</td>
+                        <td><input type="text" id="lennor_@i.BranchId" value=""/></td>
+                        <td class="newhh"><input type="text" id="lennorhh_@i.BranchId" value="@CommonSatic.ToCurrencyStr(lennor.Sum(x => x.TotalAmount), null)" disabled/></td>
+                        <td>@(Math.Round((decimal)(lennor.Sum(x => x.TotalAmount) / i.LennorGreyl) * 100, 1))</td>
+                    </tr>
+
+            }
+
+        </tbody>
+        <thead>
+            <tr class="">
+                <td class="text-center" style="font-weight:bold;text-align:center" rowspan="6" colspan="2">TỔNG</td>
+                <td class="" style="font-weight:bold">TỔNG</td>
+
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Total), null))</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(total.Sum(x => x.TotalAmount), null))</td>
+                <td><input type="text" id="" disabled /></td>
+                <td><input type="text" id="tongCacChiNhanh" disabled value="@(CommonSatic.ToCurrencyStr(total.Sum(x => x.TotalAmount), null))"/></td>
+                <td class="text-center" style="font-weight:bold"></td>
+
+                @*<td class="text-right" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Annayake.Sum(x => x.TotalAmount), null))</td>*@
+
+            </tr>
+            <tr>
+                <td class="" style="font-weight:bold">TỔNG ORLANE</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Orlane), null))</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Orlane.Sum(x => x.TotalAmount), null))</td>
+                <td><input type="text" id="" disabled /></td>
+                <td><input type="text" id="tongOrlaneCacChiNhanh" disabled value="@(CommonSatic.ToCurrencyStr(Orlane.Sum(x => x.TotalAmount), null))"/></td>
+                <td class="" style="font-weight:bold"></td>
+            </tr>
+            <tr>
+                <td class="" style="font-weight:bold">DS MỚI ORLANE</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.NewOrlane), null))</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(NewOrlane.Sum(x => x.TotalAmount), null))</td>
+                <td><input type="text" id="" disabled /></td>
+                <td><input type="text" id="tongMoi" disabled value="@(CommonSatic.ToCurrencyStr(NewOrlane.Sum(x => x.TotalAmount), null))"/></td>
+                <td class="" style="font-weight:bold"></td>
+            </tr>
+            <tr>
+                <td class="" style="font-weight:bold">DS CŨ ORLANE</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.OldOrlane), null))</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(OldOrlane.Sum(x => x.TotalAmount), null))</td>
+                <td><input type="text" id="" disabled /></td>
+                <td><input type="text" id="tongCu" disabled value="@(CommonSatic.ToCurrencyStr(OldOrlane.Sum(x => x.TotalAmount), null))"/></td>
+                <td class="" style="font-weight:bold"></td>
+            </tr>
+            <tr>
+                <td class="" style="font-weight:bold">DS ANNAYAKE</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.Annayake), null))</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Annayake.Sum(x => x.TotalAmount), null))</td>
+                <td><input type="text" id="" disabled /></td>
+                <td><input type="text" id="tongANNAYAKE" disabled value="@(CommonSatic.ToCurrencyStr(Annayake.Sum(x => x.TotalAmount), null))"/></td>
+                <td class="" style="font-weight:bold"></td>
+            </tr>
+            <tr>
+                <td class="" style="font-weight:bold">DS LEONOR GREYL</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.LennorGreyl), null))</td>
+                <td class="" style="font-weight:bold">@(CommonSatic.ToCurrencyStr(LennorGreyl.Sum(x => x.TotalAmount), null))</td>
+                <td><input type="text" id="" disabled /></td>
+                <td><input type="text" id="tongLEONORGREYL" disabled value="@(CommonSatic.ToCurrencyStr(LennorGreyl.Sum(x => x.TotalAmount), null))"/></td>
+                <td class="" style="font-weight:bold"></td>
+            </tr>
+            
+               
+
+        </thead>
+    </table>
+
+</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            $()
+        });
+
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+        function currencyFormatDE(num) {
+            return (
+                num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+            ) // use . as a separator
+        }
+
+        //setup before functions
+        var typingTimer;//timer identifier
+        var $getInputId;
+        var doneTypingInterval = 1; 
+
+        var $input = $('input').on('input', function () {
+            // focus vào ô đang nhập
+            $getInputId= $(this)
+            return $(this);
+        });
+
+        //on keyup, start the countdown
+        $input.on('keyup', function () {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(doneTyping, doneTypingInterval);
+        });
+
+        //on keydown, clear the countdown 
+        $input.on('keydown', function () {
+            clearTimeout(typingTimer);
+        });
+
+        //user is "finished typing," do something
+        function doneTyping() {
+            var InputId = $getInputId.attr('id')
+            //lấy chi nhánh dựa trên ký tự cuối của Id
+            var getBranchId = InputId.substr(InputId.length - 1);
+            var getBrand = InputId.substr(0, InputId.length - 2);
+
+            // lấy giá trị cột thực tế
+            var thucte_value = $getInputId.closest('tr').find('.thucte').text();
+            var thuctetong = $("#thuctetong_" + getBranchId).text();
+            var thuctetongOrlane = $("#thuctetongOrlane_" + getBranchId).text();
+
+            //giá trị cột tổng
+            var totalhhId = '#totalhh_' + getBranchId;
+            var hhorlaneId = '#hhorlane_' + getBranchId;
+            var GiatriThucteTongBanDau = $(totalhhId).val();
+            var TongOrLaneBanDau = $(hhorlaneId).val();
+            
+            //giá trị cột nhập
+            var num = $getInputId.val();
+            
+
+            // nếu giá trị nhập bằng rỗng
+            if (num == "")
+            {
+                var $GiatriHHtrenDong = $getInputId.closest('tr').find('.newhh').children()
+                var tonghh = parseFloat(removeComma(GiatriThucteTongBanDau))-(parseFloat(removeComma($GiatriHHtrenDong.val())) - parseFloat(removeComma(thucte_value)));                
+                $(totalhhId).val(currencyFormatDE(tonghh));
+                if (getBrand == "old" || getBrand == "new")
+                {
+                    var tongOrlaneHH = parseFloat(removeComma(TongOrLaneBanDau)) - (parseFloat(removeComma($GiatriHHtrenDong.val())) - parseFloat(removeComma(thucte_value)));
+                    var tonghotroOrlane = tongOrlaneHH - parseFloat(removeComma(thuctetongOrlane))
+                    //cập nhật tổng Orlane
+                    $(hhorlaneId).val(currencyFormatDE(tongOrlaneHH))
+                    //cập nhật hỗ trợ Orlane
+                    $("#orlane_" + getBranchId).val(currencyFormatDE(tonghotroOrlane))                  
+                }
+                var tonghotro = tonghh - parseFloat(removeComma(thuctetong))
+                $("#total_" + getBranchId).val(currencyFormatDE(tonghotro))
+                $GiatriHHtrenDong.val(thucte_value)
+                //----------------------------------------------------------------------------------------------------------------------------------------
+                //Tính Tổng cả các chi nhánh
+                var tongCacChiNhanh = parseFloat(removeComma($("#totalhh_1").val())) + parseFloat(removeComma($("#totalhh_2").val()))
+                var tongOrlaneCacChiNhanh = parseFloat(removeComma($("#hhorlane_1").val())) + parseFloat(removeComma($("#hhorlane_2").val()))
+                var tongMoi = parseFloat(removeComma($("#newhh_1").val())) + parseFloat(removeComma($("#newhh_2").val()))
+                var tongCu = parseFloat(removeComma($("#oldhh_1").val())) + parseFloat(removeComma($("#oldhh_2").val()))
+                var tongANNAYAKE = parseFloat(removeComma($("#annahh_1").val())) + parseFloat(removeComma($("#annahh_2").val()))
+                var tongLEONORGREYL = parseFloat(removeComma($("#lennorhh_1").val())) + parseFloat(removeComma($("#lennorhh_2").val()))
+                //cập nhật Tổng cả các chi nhánh
+                $("#tongCacChiNhanh").val(currencyFormatDE(tongCacChiNhanh))
+                $("#tongOrlaneCacChiNhanh").val(currencyFormatDE(tongOrlaneCacChiNhanh))
+                $("#tongMoi").val(currencyFormatDE(tongMoi))
+                $("#tongCu").val(currencyFormatDE(tongCu))
+                $("#tongANNAYAKE").val(currencyFormatDE(tongANNAYAKE))
+                $("#tongLEONORGREYL").val(currencyFormatDE(tongLEONORGREYL))
+                return
+            }
+            num = removeComma(num);
+
+            //kiểm tra xem có phải ký tự số
+            if (/^\d+$/.test(num)) {
+                //tính hoa hồng               
+                var GiaTriNhap = parseFloat(removeComma(num));
+                var hh_result = parseFloat(removeComma(thucte_value)) + GiaTriNhap
+                var $GiatriHHtrenDong = $getInputId.closest('tr').find('.newhh').children()
+                var tonghh = parseFloat(removeComma(GiatriThucteTongBanDau)) - (parseFloat(removeComma($GiatriHHtrenDong.val())) - parseFloat(removeComma(thucte_value))) + GiaTriNhap;
+                //gán vào cột hoa hồng
+                $getInputId.closest('tr').find('.newhh').children().val(currencyFormatDE(hh_result));
+                $(totalhhId).val(currencyFormatDE(tonghh));
+                //tổng Orlane
+                if (getBrand == "old" || getBrand == "new") {
+                    var orlaneMoi = parseFloat(removeComma($("#newhh_" + getBranchId).val()))
+                    var orlaneCu = parseFloat(removeComma($("#oldhh_" + getBranchId).val()))
+                    var tongOrlaneHH = orlaneCu + orlaneMoi
+                    var tonghotroOrlane = tongOrlaneHH - parseFloat(removeComma(thuctetongOrlane))
+                     //cập nhật tổng Orlane
+                    $(hhorlaneId).val(currencyFormatDE(tongOrlaneHH))
+                    //cập nhật hỗ trợ Orlane
+                    $("#orlane_" + getBranchId).val(currencyFormatDE(tonghotroOrlane))
+                }
+                //set format tiền tệ cho cột đang nhập
+                $getInputId.val(currencyFormatDE(num));
+                //cập nhật tổng hỗ trợ
+                var tonghotro = tonghh - parseFloat(removeComma(thuctetong))
+                $("#total_" + getBranchId).val(currencyFormatDE(tonghotro))
+
+                //----------------------------------------------------------------------------------------------------------------------------------------
+                //tính Tổng cả các chi nhánh
+                var tongCacChiNhanh = parseFloat(removeComma($("#totalhh_1").val())) + parseFloat(removeComma($("#totalhh_2").val()))
+                var tongOrlaneCacChiNhanh = parseFloat(removeComma($("#hhorlane_1").val())) + parseFloat(removeComma($("#hhorlane_2").val()))
+                var tongMoi = parseFloat(removeComma($("#newhh_1").val())) + parseFloat(removeComma($("#newhh_2").val()))
+                var tongCu = parseFloat(removeComma($("#oldhh_1").val())) + parseFloat(removeComma($("#oldhh_2").val()))
+                var tongANNAYAKE = parseFloat(removeComma($("#annahh_1").val())) + parseFloat(removeComma($("#annahh_2").val()))
+                var tongLEONORGREYL = parseFloat(removeComma($("#lennorhh_1").val())) + parseFloat(removeComma($("#lennorhh_2").val()))
+
+                //cập nhật Tổng cả các chi nhánh
+                $("#tongCacChiNhanh").val(currencyFormatDE(tongCacChiNhanh))
+                $("#tongOrlaneCacChiNhanh").val(currencyFormatDE(tongOrlaneCacChiNhanh))
+                $("#tongMoi").val(currencyFormatDE(tongMoi))
+                $("#tongCu").val(currencyFormatDE(tongCu))
+                $("#tongANNAYAKE").val(currencyFormatDE(tongANNAYAKE))
+                $("#tongLEONORGREYL").val(currencyFormatDE(tongLEONORGREYL))
+            }
+        }
+    </script>
+}

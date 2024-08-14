@@ -1,0 +1,255 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model ProductInvoiceViewModel
+
+@{
+    ViewBag.Title = "Thêm khuyến mãi";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+
+    IEnumerable<SelectListItem> categoryList = (IEnumerable<SelectListItem>)ViewBag.categoryList;
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "ProductInvoice",
+        ActionName = "AddPromotion",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    IEnumerable<InventoryViewModel> productList = (IEnumerable<InventoryViewModel>)ViewBag.productList;
+    IEnumerable<SelectListItem> BranchList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Model.BranchId, Wording.Empty);
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <style type="text/css">
+        .mini-popup {
+            position: relative;
+            display: inline;
+        }
+
+        #popup_archive {
+            position: absolute;
+            bottom: 34px;
+            left: -154px;
+            width: 410px;
+            height: 235px;
+            max-width: inherit;
+            top: inherit;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+    </style>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "AddPromotion", "ProductInvoice", null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.HiddenFor(model => model.Code)
+    @Html.HiddenFor(model => model.Status)
+    @Html.HiddenFor(model => model.Type)
+    <div class="row">
+        <div class="col-sm-7 ">
+            <div class="listsearch">
+                <div id="listOrderDetail" class="table-responsive top-10 ">
+                    <table class="table table-bordered grid-table bottom-5">
+                        <thead>
+                            <tr>
+                                <th class="grid-header" width="30">STT</th>
+                                <th class="grid-header">Tên SP/DV</th>
+                                <th class="grid-header" width="50">SL</th>
+                                <th class="grid-header" width="90">Đơn giá</th>
+                                <th class="grid-header" width="90">Thành tiền</th>
+                                <th class="grid-header" width="150">Giảm giá</th>
+                                <th class="grid-header" width="90">Tổng tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody class="productInvoiceList">
+                            @for (int i = 0; i < Model.InvoiceList.Count(); i++)
+                            {
+                                var thanh_tien = Model.InvoiceList[i].Price * Model.InvoiceList[i].Quantity-Model.InvoiceList[i].DiscountAmount;
+                                <tr role="@(i)" class="@(Model.InvoiceList[i].ProductType=="product"?"alert-warning":"")">
+                                    <td class="text-center">
+                                        @(i + 1)
+                                    </td>
+                                    <td>
+                                        <input class="item_id" type="hidden" id="InvoiceList_@(i)__Id" name="InvoiceList[@(i)].Id" value="@Model.InvoiceList[i].Id" />
+
+                                        <p class="item_product_name" title="tên sản phẩm/dịch vụ"><i class="fa fa-cubes"></i> @Model.InvoiceList[i].ProductName</p>
+
+                                        @if (!string.IsNullOrEmpty(Model.InvoiceList[i].LoCode))
+                                        {
+                                            <p class="item_locode" title="số lô"><i class="fa fa-thumb-tack"></i> @Model.InvoiceList[i].LoCode</p>
+                                        }
+                                        @if (Model.InvoiceList[i].ExpiryDate.HasValue)
+                                        {
+                                            <p class="item_expiry_date" title="hạn sử dụng"><i class="fa fa-calendar-minus-o"></i> @(Model.InvoiceList[i].ExpiryDate.HasValue ? Model.InvoiceList[i].ExpiryDate.Value.ToString("dd/MM/yyyy") : "")</p>
+                                        }
+                                    </td>
+                                    <td align="right"><span class="item_quantity" align="right">@(Common.PhanCachHangNgan2(Model.InvoiceList[i].Quantity))</span></td>
+                                    <td align="right"><span class="item_price" align="right">@(Common.PhanCachHangNgan2(Model.InvoiceList[i].Price))</span></td>
+                                    <td align="right"><span class="item_total1" align="right">@(thanh_tien.ToCurrencyStr(null))</span></td>
+                                    <td>
+
+                                        <div class="product-search-box clearfix " style="margin-bottom:5px">
+                                            <span class="ctl">
+                                                <input class="item_discount numberinput2 text-right" type="text" id="InvoiceList_@(i)__Discount" name="InvoiceList[@(i)].Discount" value="@Model.InvoiceList[i].Discount" style="width:84%" />
+                                            </span>
+                                            <span class="label label-warning" style="padding: 6px; float: right; height: 26px; margin-right: 0px;">%</span>
+
+                                        </div>
+                                        <div class="product-search-box clearfix ">
+                                            <span class="ctl">
+                                                <input class="item_discount_amount numberinput2 text-right" type="text" id="InvoiceList_@(i)__DiscountAmount" name="InvoiceList[@(i)].DiscountAmount" value="@Model.InvoiceList[i].DiscountAmount" style="width:73%" />
+                                            </span>
+                                            <span class="label label-warning" style="padding: 6px; float: right; height: 26px; margin-right: 0px;">VNĐ</span>
+
+                                        </div>
+                                    </td>
+                                    <td align="right"><span class="item_total2" align="right">@(thanh_tien.ToCurrencyStr(null))</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+
+                                <td colspan="2" class="red"><span id="status"></span></td>
+                                <td class="productInvoiceList_SL" align="right" style="font-weight:bold"></td>
+                                <td></td>
+                                <td class="productInvoiceList_Amount" align="right" style="font-weight:bold"></td>
+                                <td></td>
+                                <td class="productInvoiceList_Amount2" align="right" style="font-weight:bold"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                </div>
+
+
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-spinner"></i> Tổng quan</a>
+                                </li>
+
+                                <li class="">
+                                    <a data-toggle="tab" href="#profile" aria-expanded="false"><i class="fa fa-tasks"></i> Danh sách khuyến mãi</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane active">
+                                    <div class="detail-view">
+                                        <div class="row control-group">
+                                            @Html.DetailViewItemFor2(model => model.BranchName, null, null, "col-xs-4", "col-xs-8")
+                                        </div>
+                                        <div class="row control-group">
+                                            @Html.DetailViewItemFor2(model => model.Code, null, null, "col-xs-4", "col-xs-8")
+                                        </div>
+                                        <div class="row control-group">
+                                            @Html.DetailViewItemFor2(model => model.CustomerCode, null, null, "col-xs-4", "col-xs-8")
+                                        </div>
+                                        <div class="row control-group">
+                                            @Html.DetailViewItem(Model.CustomerName, "CustomerName", Wording.Customer, null, null, "col-xs-4", "col-xs-8")
+                                        </div>
+
+                                        <div class="row control-group">
+                                            @Html.DetailViewItemFor2(model => model.StaffCreateName, null, null, "col-xs-4", "col-xs-8")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="profile" class="tab-pane">
+                                    @Html.Partial("PartialPromotion", Model)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p></p>
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title"><i class="fa fa-cc-paypal"></i> Thông tin thanh toán</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        @Html.CustomTextboxFor(model => model.TotalAmount, null, null, WidthType.span12, false, new Dictionary<string, object> { { "class", "text-right numberinput1" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.Discount, null, null, WidthType.span12, false, new Dictionary<string, object> { { "class", "text-right numberinput1" } })
+                        @Html.CustomTextboxFor(model => model.DiscountAmount, null, null, WidthType.span12, false, new Dictionary<string, object> { { "class", "text-right numberinput1" } })
+                        @Html.CustomTextboxFor(model => model.TaxFee, null, null, WidthType.span12, false, new Dictionary<string, object> { { "class", "text-right numberinput1" }, { "readonly", "readonly" } })
+                        @Html.CustomTextboxFor(model => model.TongTienSauVAT, null, null, WidthType.span12, false, new Dictionary<string, object> { { "class", "text-right numberinput1" }, { "readonly", "readonly" } })
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" onclick="Check();">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+
+@section Scripts {
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script src="/Scripts/combojax.js?=vs1.01211"></script>
+
+    <script type="text/javascript">
+
+        function Check() {
+            ShowLoading();
+            ClearFormatBeforeSubmit($("#SaleOrder"));
+            $("#SaleOrder").submit();
+        }
+        function ClosePopupAndInsertLog(optionSelect) {
+            ClosePopup(false);
+            HideLoading();
+            var aaa = $(optionSelect).val();
+            console.log(aaa);
+        }
+    </script>
+    <script src="~/Scripts/area_sale/AddPromotion.js?vs=1.011"></script>
+
+}

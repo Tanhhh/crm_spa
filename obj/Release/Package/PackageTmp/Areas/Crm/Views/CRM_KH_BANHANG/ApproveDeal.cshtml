@@ -1,0 +1,330 @@
+﻿@model List<CRM_KH_BANHANG_CTIETViewModel>
+
+
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.App_GlobalResources
+
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = "Duyệt deal bổ sung";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CRM_KH_BANHANG",
+        ActionName = "ApproveDeal",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    string month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+
+
+    IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;    //IEnumerable<SelectListItem> Origin = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin", null, "value");
+
+
+    IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user2 = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;    //IEnumerable<SelectListItem> Origin = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin", null, "value");
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.Origin;
+}
+<style>
+    .page-content {
+        padding: 8px 12px 100% !important;
+    }
+</style>
+
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+    <p>
+        <input type="text" placeholder="Khách hàng..." value="@Request["txtCode"]" id="txtCode" name="txtCode" />
+        <label>Tháng</label>
+        <select id="month" name="month">
+            @for (int i = 1; i <= 12; i++)
+                {
+                <option @(month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Năm</label>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1) + 1; i++)
+                {
+                <option @(year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Nhân viên quản lý</label>
+        <select id="NguoiLap" name="NguoiLap" style="width:200px">
+            <option>-Người quản lý</option>
+            @foreach (var item in user2.OrderBy(x => x.FullName))
+                {
+                <option value="@item.Id" @(Request["NguoiLap"] == item.Id.ToString() ? "Selected" : "") data-selected="0">@item.FullName</option>
+            }
+        </select>
+        <label>Nhãn hàng</label>
+        <select id="CountForBrand" name="CountForBrand" style="width:200px">
+            <option value="" data-selected="">Nhãn hàng</option>
+            @foreach (var item in origin)
+                {
+
+                <option value="@item.Value" @(Request["CountForBrand"] == item.Value ? "selected" : "") data-selected="">@item.Name</option>
+            }
+        </select>
+        <label>
+            <input type="radio" class="hidden-320 ace ng-pristine ng-valid" id="single2" @(ViewBag.Approve == -1 ? "checked" : "") name="Approve" value="-1">
+            <span class="lbl ng-binding">Không được duyệt</span>
+        </label>
+        <label>
+            <input type="radio" class="hidden-320 ace ng-valid ng-dirty" id="single1" @(ViewBag.Approve == 0 ? "checked" : "") name="Approve" value="0">
+            <span class="lbl ng-binding">Chưa duyệt </span>
+        </label>
+        <label>
+            <input type="radio" class="hidden-320 ace ng-pristine ng-valid" id="single2" @(ViewBag.Approve == 1 ? "checked" : "") name="Approve" value="1">
+            <span class="lbl ng-binding">Quản lý duyệt</span>
+        </label>
+        <label>
+            <input type="radio" class="hidden-320 ace ng-pristine ng-valid" id="single2" @(ViewBag.Approve == 2 ? "checked" : "") name="Approve" value="2">
+            <span class="lbl ng-binding">Giám đốc duyệt</span>
+        </label>
+    </p>
+
+
+}
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper GridColumnName(decimal? name, int? id)
+{
+
+    <a onclick="OpenPopup('@Url.Action("DetailProductInvoice", "CRM_KH_BANHANG",new { area="Crm",Id=id})','',0,0)">@CommonSatic.ToCurrencyStr(name, null)</a>
+
+
+}
+
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll1" id="checkAll1" />
+        <span class="lbl"></span>
+    </label>
+}
+
+@helper GridColumnCommand(int id, int? isApprove, string UserApprove)
+{
+if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("ApproveDeal", "CRM_KH_BANHANG", "Crm"))
+{
+    if (isApprove == 1)
+    {
+            @*<div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+                    <button type="submit" name="Delete" value="@id" style="padding: 0 !important;" class="btn btn-success">Duyệt</button>
+
+                </div>*@
+            <span>Quản lý @UserApprove đã duyệt</span>
+
+    }
+    else if (isApprove == 2)
+    {
+            <span>Đã duyệt</span>
+    }
+    else if (isApprove == -1)
+    {
+            <span>Từ chối duyệt</span>
+    }
+}
+}
+
+@helper GridColumnCommand2(int id, int? isApprove, string UserApprove)
+{
+if (isApprove != 2 && isApprove != -1)
+{
+        <a class="btn btn-mini btn-danger" data-toggle="collapse" data-target="#popup_archive_@id" title="Từ chối duyệt"><i class="ace-icon fa fa-trash"></i>Từ chối duyệt</a>
+        <div id="popup_archive_@id" style="right: 0px !important; left: auto;top:auto;bottom:auto;height:200px;width:auto" class="popover fade bottom">
+            <div class="arrow" style="left: 50%;"></div>
+            <h3 class="popover-title"></h3>
+            <div class="popover-content">
+
+                <input type="hidden" class="KHID" value="@id" />
+                <div class="control-group form-group">
+                    <label class="control-label no-padding-right col-lg-5 col-md-4 col-sm-4" for="ReceiptViewModel_Amount">Lí do từ chối</label>
+                    <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                        <textarea style="width:100%" type="text" class="tuchoiNote"></textarea>
+                    </div>
+                </div>
+
+
+
+
+
+                <div>
+                    <p class="top-10">
+                        <button type="button" class="btn btn-mini btn-primary Success" data-toggle="collapse" value="Success" data-target="#popup_archive_@id">
+                            Đồng ý
+                        </button>
+                        <a class="btn btn-white btn-sm no-border close" data-toggle="collapse" data-target="#popup_archive_@id">Đóng</a>
+                    </p>
+                </div>
+
+
+            </div>
+        </div>
+}
+}
+
+
+@using (Html.BeginForm("ApproveDeal", "CRM_KH_BANHANG", FormMethod.Post, new { month = month, year = year }))
+{
+
+    <div id="" class="table-responsive top-10 ">
+        @Html.Grid(Model).Columns(columns =>
+   {
+       columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(40).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.KH_BANHANG_CTIET_ID));
+       columns.Add(u => u.Code).Titled("Mã KH").SetWidth(130);
+       columns.Add(u => u.CompanyName).Titled("Khách hàng").SetWidth(130);
+       columns.Add(u => u.Phone).Titled("Điện thoại").SetWidth(130);
+       columns.Add(u => u.TYLE_THANHCONG).Titled("Tỷ lệ thành công").SetWidth(130);
+       columns.Add(u => u.TotalAmount).Titled("Đơn dự kiến").Sanitized(false).Encoded(false).SetWidth(130).RenderValueAs(x => GridColumnName(x.TotalAmount, x.ProductInvoiceId));
+       columns.Add(u => u.GHI_CHU).Titled("Ghi chú").SetWidth(130);
+       columns.Add(u => u.KH_BANHANG_CTIET_ID).Titled("Trạng thái").Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.KH_BANHANG_CTIET_ID, u.IsApprove, u.UserApproveName)).SetWidth(85);
+       columns.Add().Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand2(u.KH_BANHANG_CTIET_ID, u.IsApprove, u.UserApproveName)).SetWidth(85);
+
+   }).WithPaging(50)
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-white btn-sm btn-success" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+
+            Duyệt
+        </button>
+    }
+}
+
+<script src="~/Scripts/jquery.floatThead.js"></script>
+<script>
+    $(document).ready(function () {
+        $(".grid-table").floatThead({ top: 30 });
+    });
+</script>
+
+@section Scripts {
+
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 deal.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn duyệt các deal đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+
+        }
+
+        $('.Success').click(function () {
+            var $row = $(this).closest("td");
+            var KHID = $row.find(".KHID").val();
+            var Note = $row.find(".tuchoiNote").val();
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("AbortDeal", "CRM_KH_BANHANG")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ KHID: KHID, Note: Note }),
+                dataType: "json",
+                success: function (result) {
+                    //alert(result);
+                    if (result == 1) {
+                        // $row.find(".close").click();
+                        $row.closest("tr").remove();
+                        alert("Từ chối duyệt thành công !");
+
+                    } else {
+                        alert("Từ chối không thành công !");
+                    }
+                }
+            });
+        });
+
+
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn duyệt deal ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    //  $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+        $('.grid-header').mouseover(function () {
+            $('.grid-header')[0].title = "Chọn tất cả";
+        });
+
+        $('.class-delete-all').on('click', function () {
+            debugger
+            if ($('.class-delete-all:checked').length == $('.class-delete-all').length) {
+                $('#checkAll1').prop('checked', true);
+            } else {
+                $('#checkAll1').prop('checked', false);
+            }
+        });
+        $("#checkAll1").change(function () {
+            $(".class-delete-all").prop('checked', $(this).prop("checked"));
+        });
+
+        $("#checkUseAll").change(function () {
+            $(".class-notuse-all").prop('checked', $(this).prop("checked"));
+        });
+    </script>
+
+}

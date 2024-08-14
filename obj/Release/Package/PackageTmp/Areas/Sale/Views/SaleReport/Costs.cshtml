@@ -1,0 +1,219 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using GridMvc.Html
+
+@model IEnumerable<ProductInvoiceViewModel>
+@{
+    ViewBag.Title = "Báo cáo phí vận chuyển";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "SaleReport",
+        ActionName = "Costs",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false,
+        SearchButtonText = "Xem báo cáo"
+    };
+    IEnumerable<SelectListItem> NguonKhach = Erp.BackOffice.Helpers.Common.GetSelectList_Category("NguonKhach", null, "value");
+    DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    // Cộng thêm 1 tháng và trừ đi một ngày.
+    DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+
+    int rowNumber = 0;
+    int numberOfItem = 100;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+}
+
+@section HeadOfPage {
+    <style type="text/css">
+        .cell-center {
+            text-align: center;
+        }
+
+        .tr-bold {
+            font-weight: 700;
+        }
+
+        .ctl {
+            position: relative;
+            /*float: left;*/
+            margin-right: 3px;
+        }
+
+            .ctl .error {
+                position: absolute;
+                background: #de2a2a;
+                left: 0px;
+                top: 28px;
+                padding: 2px 5px;
+                color: #fff;
+                z-index: 999;
+            }
+
+                .ctl .error:before {
+                    border-bottom: 7px solid #de2a2a;
+                    border-left: 7px solid transparent;
+                    border-right: 7px solid transparent;
+                    left: 9px;
+                    top: -6px;
+                    content: "";
+                    display: inline-block;
+                    position: absolute;
+                }
+
+        .icon-add {
+            margin-top: 0px !important;
+        }
+
+        .combojax {
+            display: inline-block;
+            position: initial !important;
+            float: none !important;
+        }
+    </style>
+
+}
+
+@helper GridColumnStatusName(string status)
+{
+switch (status)
+{
+    case "pending":
+            <span class="label label-info">@Wording.OrderStatusDisplay_pending</span>
+        break;
+    case "inprogress":
+            <span class="label label-warning">@Wording.OrderStatusDisplay_inprogress</span>
+        break;
+    case "shipping":
+            <span class="label label-warning">@Wording.OrderStatusDisplay_shipping</span>
+        break;
+    case "complete":
+            <span class="label label-success">@Wording.OrderStatusDisplay_complete</span>
+        break;
+    case "delete":
+            <span class="label label-guide-search">Hủy chuyển</span>
+        break;
+    case "Đặt cọc":
+            <span class="label label-warning">Đặt cọc</span>
+        break;
+    case "dachot":
+            <span class="label label-danger">Đã chốt</span>
+        break;
+
+}
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <p>
+       
+        <span class="input-daterange input-group">
+            @Html.TextBox("StartDate", Request["StartDate"] != null ? Request["StartDate"] : aDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Từ ngày" })
+            <span class="input-group-addon">
+                <i class="fa fa-exchange"></i>
+            </span>
+            @Html.TextBox("EndDate", Request["EndDate"] != null ? Request["EndDate"] : retDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Đến ngày" })
+        </span>
+       
+        
+        
+
+
+        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+        <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+    </p>
+}
+
+<div class="row" style="padding-top: 5px;">
+    <div class="col-xs-12">
+        <div class="table-responsive" id="BCNV" style="margin-bottom:40px">
+            @Html.Grid(Model).Columns(columns =>
+       {
+
+       columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+       {
+       rowNumber++;
+
+       return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+       });
+           columns.Add(u => u.Code).Titled("Mã đơn hàng").Sortable(false).Sanitized(false);
+           columns.Add(u => u.CustomerCode).Titled("Mã KH").Sortable(false).Sanitized(false);
+           columns.Add(u => u.CustomerName).Titled("Khách hàng").Sortable(false).Sanitized(false);
+           columns.Add().Titled("Phí vận chuyển").RenderValueAs(x => CommonSatic.ToCurrencyStr(x.PHISHIP, null));
+           columns.Add().Titled("Trạng thái").Sanitized(false).Encoded(false).RenderValueAs(x => GridColumnStatusName(x.Status));
+       }).WithPaging(25)
+        </div>
+    </div>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(true)">
+        <i class="ace-icon fa fa-file-excel-o"></i>
+        Xuất excel
+    </button>
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(false)">
+            <i class="ace-icon fa fa-print"></i>
+            In báo cáo
+        </button>
+}
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+    <script src="/Scripts/combojax.js"></script>
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <script>
+
+            $(function () {
+               // searchreact();
+               
+            });
+            function searchreact() {
+                GetDatatable('/SaleReport/_GetListSale_BC_ChiSoNhanVien');
+            };
+            function GetDatatable(url) {
+                var StartdDate = $('#startDate').val();
+                var EndDate = $('#endDate').val();
+                var ManagerStaffId = $('#ManagerStaffId').val();
+                var NguonKhach = $('#NK').val();
+                //var ProductGroup = $('#ProductGroup').val();
+                //var CategoryCode = $('#CategoryCode').val();
+                //var Manufacturer = $('#Manufacturer').val();
+                //var WarehouseId = $('#WarehouseId').val();
+                //var txtOrId = $('#txtOrId').val();
+                var formdata = {
+                    startDate: StartdDate,
+                    endDate: EndDate,
+                    ManagerStaffId: ManagerStaffId,
+                    NguonKhach: NguonKhach
+                    //ProductGroup: ProductGroup,
+                    //CategoryCode: CategoryCode,
+                    //Manufacturer: Manufacturer,
+                    //WarehouseId: WarehouseId,
+                    //txtOrId: txtOrId
+                };
+                //$("#react_report").html("");
+                ClickEventHandlerHTML(true, url, '#BCNV', formdata, function () {
+                });
+            };
+            function GetPrint(type) {
+                var StartdDate = $('#StartdDate').val();
+                var EndDate = $('#EndDate').val();
+                var ProductGroup = $('#ProductGroup').val();
+                var CategoryCode = $('#CategoryCode').val();
+
+                OpenPopup('/SaleReport/PrintSale_BC_ChiSoNhanVien?StartdDate=' + StartdDate + '&EndDate=' + EndDate + '&ProductGroup=' + ProductGroup + '&CategoryCode=' + CategoryCode + '&ExportExcel=' + type + '&IsPopup=true', '', 0, 900);
+
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 2000);
+                HideLoading();
+            };
+    </script>
+}

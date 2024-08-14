@@ -1,0 +1,426 @@
+﻿@model IEnumerable<CRM_KH_BANHANGViewModel>
+
+
+    @using PagedList;
+    @using PagedList.Mvc;
+    @using Erp.BackOffice.Account.Models
+    @using Erp.BackOffice.Crm.Models
+    @using Erp.BackOffice.Areas.Cms.Models
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+
+    @{
+        ViewBag.Title = "Kế hoạch bán hàng";
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        }
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "CRM_KH_BANHANG",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+        string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        int index = 1;
+        int index1 = 1;
+        IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;    //IEnumerable<SelectListItem> Origin = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin", null, "value");
+        IEnumerable<CategoryViewModel> Origin = (IEnumerable<CategoryViewModel>)ViewBag.Origin;
+        List<CRM_KH_BANHANGViewModel> productInvoice = (List<CRM_KH_BANHANGViewModel>)ViewBag.productInvoice;
+        List<CRM_KH_BANHANG_CTIETViewModel> CrmProductInvoice = (List<CRM_KH_BANHANG_CTIETViewModel>)ViewBag.CrmProductInvoice;
+
+    }
+
+    <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    <style>
+        .popover {
+            width: 100% !important;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 10px;
+        }
+    </style>
+    @helper CheckDeleteColumns(int? KH_GIOITHIEU_ID)
+        {
+                            /**/
+            <label>
+                <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_GIOITHIEU_ID">
+                <span class="lbl"></span>
+            </label>
+    }
+    @helper BuildCheckAll()
+        {
+                            /**/
+            <label>
+                <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+                <span class="lbl"></span>
+            </label>
+                            /**/
+    }
+
+    @helper GridColumnCommand(int? id)
+        {
+                            /**/
+            <p>
+                <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                    <i class="ace-icon fa fa-trash bigger-120"></i>
+                </button>
+            </p>
+                            /**/
+    }
+
+    @helper GridColumnName(int? KH_GIOITHIEU_ID, string name, bool isPopup = true, string jsCallback = null)
+        {
+                            /**/
+            @*<a href="@Url.Action("Create", "KH_GIOITHIEU", new { KH_GIOITHIEU_ID = KH_GIOITHIEU_ID,onclick = "OpenPopup('" + Url.Action("Create","KH_GIOITHIEU", new { IsPopup = true }) + "', '', 0, 0)"  })">@name</a>*@
+                            /**/
+            <a onclick="OpenPopup('@Url.Action("Create", "KH_GIOITHIEU", new { area = "Crm", KH_GIOITHIEU_ID = KH_GIOITHIEU_ID, IsPopup = true })', '', 0, 0)">@name</a>
+    }
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+        <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+        <p>
+            <label>Chi nhánh</label>
+            @Html.DropDownList("branchId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Request["branchId"], "Chi nhánh"))
+            <label>Tháng</label>
+            <select id="Month" name="Month">
+                @for (int i = 1; i <= 12; i++)
+                {
+                    <option @(Month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+                }
+            </select>
+            <label>Nam</label>
+            <select id="year" name="year">
+                @for (int i = 2016; i <= DateTime.Now.Year; i++)
+                {
+                    <option @(Year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+                }
+            </select>
+            <label>Người quản lý</label>
+            <select id="NGUOILAP" name="NGUOILAP" style="width:200px">
+                <option>-Người quản lý</option>
+                @foreach (var item in user)
+                {
+                    <option value="@item.Id">@item.FullName</option>
+                }
+            </select>
+        </p>
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", pageSetting.ModuleName, "Crm"))
+            {
+                <a class="btn btn-mini btn-primary" onclick="OpenPopup('@Url.Action("CreateKH_BANHANG", "CRM_KH_BANHANG",new { id=@ViewBag.NGUOILAP,month=Month,year=Year})','',0,0)">
+                        <i class="ace-icon fa fa-plus"></i>
+                            Lập kế hoạch mới
+                    </a>
+                @*<a class="btn btn-mini btn-primary" href="@Url.Action("CreateKH_BANHANG", "CRM_KH_BANHANG",new {area="Crm", id=@ViewBag.NGUOILAP,month=Month,year=Year})">
+                        <i class="ace-icon fa fa-plus"></i>
+                            Lập kế hoạch mới
+                </a>*@
+                @*<a href="@Url.Action("Create", "CRM_KH_BANHANG",new {area="Crm", id=@ViewBag.NGUOILAP,month=Month,year=Year})">Lập kế hoạch mới</a>*@
+            }
+        }
+    }
+    <div class="tabbable" style="margin-bottom:50px;">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab" style="height:30px">
+            <li>Kế hoạch bán hàng</li>
+        </ul>
+
+        <div class="tab-content clear-fix">
+            <div id="tab1" class="tab-pane active" style="margin-left:20px">
+            </div>
+            <div id="" class="table-responsive top-10 ">
+                <table id="CTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                            <th rowspan="2" style="text-align:center;width:400px">Nhân viên lập</th>
+                            <th colspan="5" style="text-align:center">Target </th>
+                            <th colspan="5" style="width:100px;text-align:center">Thực tế</th>
+                            <th colspan="5" style="text-align:center">Kế hoạch(%)</th>
+                            <th colspan="5" style="text-align:center">Tiến độ(%)</th>
+                        </tr>
+
+                        <tr>
+                            @foreach (var a in Origin)
+                            {
+                                <th class="text-center" style="width:100px;">@a.Name</th>
+                            }
+                            @foreach (var a in Origin)
+                            {
+                                <th class="text-center" style="width:100px;">@a.Name</th>
+                            }
+                            @foreach (var a in Origin)
+                            {
+                                <th class="text-center" style="width:100px;">@a.Name</th>
+                            }
+                            @foreach (var a in Origin)
+                            {
+                                <th class="text-center" style="width:100px;">@a.Name</th>
+                            }
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        @if(Model.Count() > 0)
+                        {
+                            foreach (var item in user.OrderBy(x => x.FullName))         
+                            {
+                                <tr class="@(index%2==0?"alert-warning":"")" id="@(index1++)">
+                                    <td>
+                                        <span>@(index++)</span>
+                                    </td>
+
+                                    <td><a href="@Url.Action("Create", "CRM_KH_BANHANG",new {area="Crm", id=item.Id,month=Month,year=Year})">@item.FullName</a></td>
+                                    @foreach (var a in Origin)
+                                    {
+                                        var list = Model.Where(x => x.CountForBrand == a.Value && x.NGUOILAP_ID == item.Id && x.THANG.ToString() == Month);
+
+                                        if (list.Count() > 0)
+                                        {
+                                            <td id="Taget-@(index1-1)-@a.Value.Replace(" ", "")" class="text-right">
+                                                <a>
+                                                    @(CommonSatic.ToCurrencyStr(list.Sum(b => b.TARGET_BRAND), null))
+                                                </a>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td id="Taget-@(index1-1)-@a.Value.Replace(" ", "")" class="text-right"><a>0</a></td>
+                                        }
+
+                                    }
+                                    @foreach (var a in Origin)
+                                    {
+                                        var list = productInvoice.Where(x => x.CountForBrand == a.Value && x.NGUOILAP_ID == item.Id );
+
+                                            if (list.Count() > 0)
+                                            {
+                                                <td id="THT-@(index1-1)-@a.Value.Replace(" ", "")" class="text-right">
+                                                    <a>
+
+                                                        @(CommonSatic.ToCurrencyStr(list.Sum(b => b.TotalAmount), null))
+                                                    </a>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td id="THT-@(index1-1)-@a.Value.Replace(" ", "")" class="text-right"><a>0</a></td>
+                                            }
+                                    }
+                                    @foreach (var a in Origin)
+                                    {
+                                        var list = CrmProductInvoice.Where(x => x.CountForBrand == a.Value && x.NGUOILAP_ID == item.Id).ToList();
+
+                                            if (list.Count() > 0)
+                                            {
+                                                <td  hidden id="KH-@(index1-1)-@a.Value.Replace(" ", "")" class="text-right">
+                                                    <a>
+                                                        @(CommonSatic.ToCurrencyStr(list.Sum(b => b.TotalAmount), null))
+                                                    </a>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td hidden id="KH-@(index1-1)-@a.Value.Replace(" ", "")" class="text-right"><a>0</a></td>
+                                            }
+                                    }
+                                    @foreach (var a in Origin)
+                                    {
+                                        <td class="text-right" id="TT-@(index1-1)-@a.Value.Replace(" ", "")">
+                                            <a>
+                                            </a>
+                                        </td>
+                                    }
+                                    @foreach (var a in Origin)
+                                    {
+                                        <td class="text-right" id="TD-@(index1-1)-@a.Value.Replace(" ", "")">
+                                            <a>
+                                            </a>
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+        <script type="text/javascript">
+        //function ignoreSpaces(string) {
+        //    var temp = "";
+        //    string = '' + string;
+        //    splitstring = string.split(" ");
+        //    for (i = 0; i < splitstring.length; i++)
+        //    temp += splitstring[i];
+        //    return temp;
+        // }
+            function CheckIsval() {
+                if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+
+            $('[name="Delete"]').click(function () {
+                if (confirm('Bạn có chắc muốn xóa item ?')) {
+                    $(this).closest('tr').children('td').each(function (i, e) {
+                        $(this).find("input.class-delete-all").prop("checked", true);
+                        return true;
+                    })
+                }
+                else {
+                    return false;
+                }
+
+            })
+
+        $(document).ready(function () {
+            var i;
+            for (i = 1; i < '@user.Count()' + 1; ++i) {
+
+                var num1 = parseFloat(removeComma($('#Taget-'+i+'-ANNAYAKE').text()));
+                var num2 = parseFloat(removeComma($('#THT-' + i + '-ANNAYAKE').text()));
+                var num3 = parseFloat(removeComma($('#Taget-' + i + '-ORLANEPARIS').text()));
+                var num4 = parseFloat(removeComma($('#THT-' + i + '-ORLANEPARIS').text()));
+                var num5 = parseFloat(removeComma($('#Taget-' + i + '-LEONORGREYL').text()));
+                var num6 = parseFloat(removeComma($('#THT-' + i + '-LEONORGREYL').text()));
+                var num7 = parseFloat(removeComma($('#Taget-' + i + '-DICHVU').text()));
+                var num8 = parseFloat(removeComma($('#THT-' + i + '-DICHVU').text()));
+                var num9 = parseFloat(removeComma($('#Taget-' + i + '-CONGNGHECAO').text()));
+                var num10 = parseFloat(removeComma($('#THT-' + i + '-CONGNGHECAO').text()));
+
+                
+                var numKH = parseFloat(removeComma($('#KH-' + i + '-ANNAYAKE').text()));
+                var numKH1 = parseFloat(removeComma($('#KH-' + i + '-ORLANEPARIS').text()));
+                var numKH2 = parseFloat(removeComma($('#KH-' + i + '-LEONORGREYL').text()));
+                var numKH3 = parseFloat(removeComma($('#KH-' + i + '-DICHVU').text()));
+                var numKH4 = parseFloat(removeComma($('#KH-' + i + '-CONGNGHECAO').text()));
+                //alert(numKH);
+                
+
+                var totalKH = parseFloat((numKH / num1) * 100);
+                (numKH > num1 ? $('#TT-' + i + '-ANNAYAKE').text(100) : $('#TT-' + i + '-ANNAYAKE').text(totalKH.toFixed(1)));
+                (numKH == 0 && num1 == 0 ? $('#TT-' + i + '-ANNAYAKE').text(0) : 0);
+                (num1 == 0 ? $('#TT-' + i + '-ANNAYAKE').text(0) : 0);
+
+                var totalKH1 = parseFloat((numKH1 / num3) * 100);
+                (numKH1 > num3 ? $('#TT-' + i + '-ORLANEPARIS').text(100) : $('#TT-' + i + '-ORLANEPARIS').text(totalKH1.toFixed(1)));
+                (numKH1 == 0 && num3 == 0 ? $('#TT-' + i + '-ORLANEPARIS').text(0) : 0);
+                (num3 == 0 ? $('#TT-' + i + '-ORLANEPARIS').text(0) : 0);
+
+
+                var totalKH2 = parseFloat((numKH2 / num5) * 100);
+                (numKH2 > num5 ? $('#TT-' + i + '-LEONORGREYL').text(100) : $('#TT-' + i + '-LEONORGREYL').text(totalKH2.toFixed(1)));
+                (numKH2 == 0 && num5 == 0 ? $('#TT-' + i + '-LEONORGREYL').text(0) : 0);
+                (num5 == 0 ? $('#TT-' + i + '-LEONORGREYL').text(0) : 0);
+
+                var totalKH3 = parseFloat((numKH3 / num7) * 100);
+                (numKH3 > num7 ? $('#TT-' + i + '-DICHVU').text(100) : $('#TT-' + i + '-DICHVU').text(totalKH3.toFixed(1)));
+                (numKH3 == 0 && num7 == 0 ? $('#TT-' + i + '-DICHVU').text(0) : 0);
+                (num7 == 0 ? $('#TT-' + i + '-DICHVU').text(0) : 0);
+
+
+                var totalKH4 = parseFloat((numKH4 / num9) * 100);
+                (numKH4 > num7 ? $('#TT-' + i + '-CONGNGHECAO').text(100) : $('#TT-' + i + '-CONGNGHECAO').text(totalKH4.toFixed(1)));
+                (numKH4 == 0 && num7 == 0 ? $('#TT-' + i + '-CONGNGHECAO').text(0) : 0);
+                (num7 == 0 ? $('#TT-' + i + '-CONGNGHECAO').text(0) : 0);
+
+                ///Tiến độ
+                var total = parseFloat((num2 / num1) * 100);
+                (num2 > num1 ? $('#TD-' + i + '-ANNAYAKE').text(total.toFixed(1)) : $('#TD-' + i + '-ANNAYAKE').text(total.toFixed(1)));
+                (num2 == 0 && num1 == 0 ? $('#TD-' + i + '-ANNAYAKE').text(0) : 0);
+                (num1 == 0 ? $('#TD-' + i + '-ANNAYAKE').text(0) : 0);
+
+
+                var total1 = parseFloat((num4 / num3) * 100);
+                (num4 > num3 ? $('#TD-' + i + '-ORLANEPARIS').text(total1.toFixed(1)) : $('#TD-' + i + '-ORLANEPARIS').text(total1.toFixed(1)));
+                (num4 == 0 && num3 == 0 ? $('#TD-' + i + '-ORLANEPARIS').text(0) : 0);
+                (num3 == 0 ? $('#TD-' + i + '-ORLANEPARIS').text(0) : 0);
+
+                var total2 = parseFloat((num6 / num5) * 100);
+                (num6 > num5 ? $('#TD-' + i + '-LEONORGREYL').text(total2.toFixed(1)) : $('#TD-' + i + '-LEONORGREYL').text(total2.toFixed(1)));
+                (num6 == 0 && num5 == 0 ? $('#TD-' + i + '-LEONORGREYL').text(0) : 0);
+                (num5 == 0 ? $('#TD-' + i + '-LEONORGREYL').text(0) : 0);
+
+                var total3 = parseFloat((num8 / num7) * 100);
+                (num8 > num7 ? $('#TD-' + i + '-DICHVU').text(total3.toFixed(1)) : $('#TD-' + i + '-DICHVU').text(total3.toFixed(1)));
+                (num8 == 0 && num7 == 0 ? $('#TD-' + i + '-DICHVU').text(0) : 0);
+                (num7 == 0 ? $('#TD-' + i + '-DICHVU').text(0) : 0);
+
+
+                var total4 = parseFloat((num10 / num9) * 100);
+                (num10 > num9 ? $('#TD-' + i + '-CONGNGHECAO').text(total4.toFixed(1)) : $('#TD-' + i + '-CONGNGHECAO').text(total4.toFixed(1)));
+                (num10 == 0 && num9 == 0 ? $('#TD-' + i + '-CONGNGHECAO').text(0) : 0);
+                (num9 == 0 ? $('#TD-' + i + '-CONGNGHECAO').text(0) : 0);
+
+
+                //var total1 = parseFloat((num4 / num3) * 100);
+                //(num4 > num3 ? $('#DICHVU-TD-' + i).text(100) : $('#DICHVU-TD-' + i).text(total1.toFixed(1)));
+                //(num4 == 0 && num3 == 0 ? $('#DICHVU-TD-' + i).text(0) : 0);
+
+
+            }
+
+        });
+        </script>
+    }

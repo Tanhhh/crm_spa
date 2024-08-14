@@ -1,0 +1,166 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Sale.Controllers
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@using Erp.BackOffice.Sale.Models
+@using System.ComponentModel
+
+@{
+    ViewBag.Title = "Lead";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "AdviseCard",
+        ActionName = "LeadIndex",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+
+}
+<style>
+    /* Định dạng cho bảng */
+    .parameter-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /* Định dạng cho các tiêu đề */
+    .parameter-header-id {
+        background-color: #f2f2f2;
+        color: #333333;
+        font-weight: bold;
+        text-align: left;
+        padding: 8px;
+    }
+
+    .parameter-header-name {
+        background-color: #f2f2f2;
+        color: #333333;
+        font-weight: bold;
+        text-align: left;
+        padding: 8px;
+    }
+
+    .parameter-header-module {
+        background-color: #f2f2f2;
+        color: #333333;
+        font-weight: bold;
+        text-align: left;
+        padding: 8px;
+    }
+
+    /* Định dạng cho các hàng */
+    .parameter-row:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    /* Định dạng cho các ô */
+    .parameter-cell-id {
+        padding: 8px;
+    }
+
+    .parameter-cell-name {
+        padding: 8px;
+    }
+
+    .parameter-cell-module {
+        padding: 8px;
+    }
+
+    /* Hiệu ứng khi di chuột qua hàng */
+    .parameter-row:hover {
+        background-color: #dddddd;
+    }
+
+    /* Hiệu ứng khi di chuột qua tiêu đề */
+    .parameter-header-id:hover,
+    .parameter-header-name:hover,
+    .parameter-header-module:hover {
+        background-color: #cccccc;
+    }
+    /* Định dạng cho nút xuất Excel */
+    .export-excel-button {
+        border: 1px solid #4cae4c;
+        color: #fff;
+        padding: 2px 7px;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        float: left;
+        font-size: 13px;
+        margin-top: 20px;
+        margin-right: 20px;
+    }
+
+        .export-excel-button:hover {
+            background-color: #4cae4c;
+            border-color: #398439;
+            color: #fff;
+        }
+
+        .export-excel-button:focus {
+            outline: none;
+        }
+
+        .export-excel-button:active {
+            background-color: #47a447;
+            border-color: #398439;
+            color: #fff;
+        }
+
+    tr {
+        border-top: .1rem solid #dbdbdb;
+    }
+
+    tr > th {
+        text-transform: uppercase;
+    }
+
+</style>
+@model IEnumerable<Erp.BackOffice.Models.SystemParameter>
+
+    <table class="parameter-table">
+        <tr>
+            <th class="parameter-header-id">STT</th>
+            <th class="parameter-header-name">Tên</th>
+            <th class="parameter-header-module">Module</th>
+        </tr>
+        @{
+            int stt = 1; // Khởi tạo biến đếm
+        }
+        @foreach (var parameter in Model)
+        {
+            <tr class="parameter-row" data-id="@parameter.Id">
+                <td class="parameter-cell-id">@stt</td> <!-- Hiển thị giá trị của biến đếm -->
+                <td class="parameter-cell-name">@parameter.Name</td>
+                <td class="parameter-cell-module">@parameter.Module</td>
+            </tr>
+            {
+                stt++; // Tăng giá trị của biến đếm sau mỗi lần lặp
+            }
+        }
+    </table>
+    <div>
+        <a href="@Url.Action("ExportToExcelParameter", "LeadMeeting")" class="btn btn-success export-excel-button">
+            <i class="fa fa-download"></i> Xuất Excel
+        </a>
+    </div>
+
+
+

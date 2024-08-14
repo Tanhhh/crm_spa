@@ -1,0 +1,46 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_Get_Membership_StatusExpiredViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+
+    <table id="CTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="width:40px;text-align:center">STT</th>
+                <th class="text-center">Ngày tạo phiếu</th>
+                <th class="text-center">Mã phiếu</th>
+                <th class="text-center">Tên khách hàng</th>
+                <th class="text-center">Mã khách hàng</th>
+                <th class="text-center">Người quản lý</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+                <td>@item.CreatedDate.Value.ToString("dd/MM/yyyy")</td>
+                <td>@item.Code</td>
+                <td>@item.CustomerName</td>
+                <td>@item.CustomerCode</td>
+                <td>@item.ManagerName</td>
+            </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>

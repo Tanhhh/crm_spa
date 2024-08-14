@@ -1,0 +1,167 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+@model Erp.BackOffice.Sale.Models.CommisionCustomerViewModel
+
+<tr data-id="@(Model.Index)">
+    <td class="orderNo">
+
+        @(Model.OrderNo + 1)
+    </td>
+    <td>
+        <p class="show-details-btn" data-target="@Model.Index" onclick="ShowDetailBtn(@Model.Index)">
+            <a class="green bigger-140" title="Xem chi tiết">
+                <i class="ace-icon fa fa-angle-double-down"></i>
+            </a>
+            @Model.ProductCode - @Model.ProductName
+        </p>
+
+    </td>
+    <td class="text-right">@CommonSatic.ToCurrencyStr(Model.Price, null)</td>
+    <td>
+        @Html.Hidden("DetailList[" + Model.Index + "].Id", Model.Id)
+        @Html.Hidden("DetailList[" + Model.Index + "].ProductId", Model.ProductId)
+        @Html.Hidden("DetailList[" + Model.Index + "].Price", Model.Price)
+        @Html.Hidden("DetailList[" + Model.Index + "].Type", "donate")
+        <select class="control-value" name="DetailList[@(Model.Index)].Symbol" id="DetailList_@(Model.Index)__Symbol" style="width:50px;background: #F89406;color: white">
+            @foreach (var item in Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("SymbolDK", Model.Symbol, null))
+            {
+                <option @(item.Value == Model.Symbol ? "selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        @Html.TextBox("DetailList[" + Model.Index + "].Quantity", Model.Quantity, new { style = "width:50px; text-align:right; ", @class = "numberinput2", autocomplete = "off" })
+    </td>
+    <td>@Html.TextBox("DetailList[" + Model.Index + "].ExpiryMonth", Model.ExpiryMonth, new { style = "width:50px; text-align:right; ", @class = "numberinput2", autocomplete = "off" })</td>
+    <td class="text-center">
+        <a class="btn-delete-item">
+            <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+        </a>
+    </td>
+</tr>
+<tr>
+    <td colspan="6" class="cell-has-table">
+        <div id="table-detail-@Model.Index" class="table-detail">
+            <div class="widget-box">
+                <div class="widget-header">
+                    <h5 class="widget-title">Danh sách sản phẩm/dịch vụ tặng</h5>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main">
+                        <span class="ctl">
+                            @Html.TextBox("ProductName_" + Model.Index, "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "off", style = "width:300px; margin-right:3px;margin-bottom:5px" })
+                        </span>
+                        <div class="grid-mvc">
+                            <div class="grid-wrap">
+                                <table class="table table-striped grid-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="grid-header" width="30">STT</th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Mã SP/DV</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Tên SP/DV</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Đơn giá</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Số lượng</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">Tổng SL hàng tặng</div>
+                                            </th>
+                                            <th class="grid-header">
+                                                <div class="grid-header-title">HSD (tháng)</div>
+                                            </th>
+                                        </tr>
+
+                                    </thead>
+                                    <tbody class="DonateDetailList_@Model.Index">
+                                        @if (Model.DonateDetailList.Count > 0)
+                                        {
+                                            var index = 0;
+                                            foreach (var item in Model.DonateDetailList)
+                                            {
+                                                item.OrderNo = index;
+                                                @Html.Partial("LoadDonateItembyProduct", item);
+                                                index++;
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </td>
+  
+</tr>
+<script>
+    $(function () {
+        $("#ProductName_@(Model.Index)").combojax({
+            url: "/CommissionCus/GetListJsonAll",
+            onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+                //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+            },
+            onSelected: function (obj) {
+                console.log(obj);
+                if (obj) {
+                    var OrderNo = $(".DonateDetailList_@(Model.Index)").find("tr").length;
+                    var ParentOrderNo=@(Model.Index);
+                    var ProductId = obj.Id;
+                    var ProductName = obj.Name;
+                    var ProductCode = obj.Code;
+                    var Price = obj.Price;
+                    var formdata = {
+                        OrderNo: OrderNo,
+                        ProductCode: ProductCode,
+                        ProductName: ProductName,
+                        ProductId: ProductId,
+                        Price: Price,
+                        ParentOrderNo:ParentOrderNo
+                    };
+                    ClickEventHandler(true, "/CommissionCus/LoadDonateItembyProduct", ".DonateDetailList_@(Model.Index)", formdata, function () {
+                        LoadNumberInput();
+                    });
+                }
+            }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+            , onShowImage: true                  //hiển thị hình ảnh
+            , onSearchSaveSelectedItem: false    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+            , onRemoveSelected: true  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+        });
+        $('#donate').on('click', '.btn-delete-item', function () {
+            //$(this).closest('tr').next('tr.template_location').remove();
+            $(this).closest('tr').remove();
+
+            var countItem = $('.detailList tr').length;
+            $('#ProductItemCount').val(countItem);
+
+            if (countItem == 0) {
+                $('#ProductItemCount').val('');
+                $('#TongSoLuong').text('');
+                $('#TongThanhTien').text('');
+            }
+            calcTotalAmount();
+
+            $('.detailList tr').each(function (index, tr) {
+                $(tr).attr('role', index).attr("id", "product_item_" + index).data("id", index);
+                $(tr).find('td:first-child').text(index + 1);
+
+                $(tr).find('.detail_item_id input').attr('name', 'DetailList[' + index + '].ProductId').attr('id', 'DetailList_' + index + '__ProductId');
+                $(tr).find('.numberinput2').attr('name', 'DetailList[' + index + '].Quantity').attr('id', 'DetailList_' + index + '__Quantity');
+                $(tr).find('.numberinput2').attr('name', 'DetailList[' + index + '].ExpiryMonth').attr('id', 'DetailList_' + index + '__ExpiryMonth');
+                $(tr).find('.input-price numberinput2').attr('name', 'DetailList[' + index + '].CommissionValue').attr('id', 'DetailList_' + index + '__CommissionValue');
+                $(tr).find('.detail_item_price').last().attr('name', 'DetailList[' + index + '].Price').attr('id', 'DetailList_' + index + '__Price');
+                $(tr).find('.detail_item_price').first().attr('id', 'mask-DetailList_' + index + '__Price');
+                $(tr).find('.detail_item_discount').attr('name', 'DetailList[' + index + '].DisCount').attr('id', 'DetailList_' + index + '__DisCount');
+                $(tr).find('.detail_item_discount_amount').attr('name', 'DetailList[' + index + '].DisCountAmount1').attr('id', 'DetailList_' + index + '__DisCountAmount1');
+            });
+        });
+    });
+</script>

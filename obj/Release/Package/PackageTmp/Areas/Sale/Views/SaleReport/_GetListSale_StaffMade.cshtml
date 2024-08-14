@@ -1,0 +1,39 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_StaffMadeViewModel>
+@{
+    Layout = null;
+    int index = 1;
+}
+
+<table id="CTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th style="width:40px;text-align:center">STT</th>
+            <th class="text-center">Mã người dùng</th>
+            <th class="text-center">Tên kỹ thuật viên</th>
+            <th class="text-center">Thời gian</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+                <td>@item.UserCode</td>
+                <td>@item.FullName</td>
+                <td> @item.TotalDayHourMinute</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3" style="text-align:right"><b>Tổng</b></td>
+            @*<td class="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalMinute), null))</td>*@
+            <td>@ViewBag.SumToalMinute</td>
+        </tr>
+    </tfoot>
+</table>

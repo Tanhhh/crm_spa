@@ -1,0 +1,277 @@
+﻿@model IQueryable<ReceiptViewModel>
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@{
+    ViewBag.Title = Wording.PageIndex_Receipt;
+    string noptienId = Request["noptienId"] != null ? Request["noptienId"] : "0";
+
+    var Test = Request["Test"];
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Receipt",
+        ActionName = "IndexThemphieuthu",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    if (Test != null)
+    {
+        if (noptienId != "0")
+        {
+            <script>
+                parent.ClosePopup(true);
+            </script>
+
+        }
+        else
+        {
+            <script>
+                parent.ClosePopupPhieuthu();
+            </script>
+        }
+    }
+}
+
+
+
+
+<style type="text/css">
+    .product-invoice-isdeleted {
+        text-decoration: line-through;
+    }
+</style>
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+@helper GridColumnCommand(int id)
+{
+    @*<div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+        <p>
+            <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+            </button>
+            <a href="@Url.Action("Print", new { Id = id })" target="_blank" class="btn btn-primary btn-xs"><i class="fa fa-print"></i></a>
+        </p>
+        </div>*@
+
+
+    <div class="hidden-phone visible-desktop action-buttons" style="display: inline-block; float: left;">
+        <p>
+
+        </p>
+    </div>
+}
+
+
+
+@helper GridColumnName(string name, int id, ReceiptViewModel data, bool isPopup = false, string jsCallback = null)
+{
+if (isPopup)
+{
+        @name
+}
+else
+{
+    name = string.IsNullOrEmpty(name) ? "No Title" : name;
+        <a href="@Url.Action("Detail", "Receipt", new { Id = id })">@name</a>
+}
+}
+
+
+@helper GridColumnChungTuGoc(string MaChungTuGoc, string LoaiChungTuGoc, bool isPopup)
+{
+if (isPopup)
+{
+        @MaChungTuGoc
+}
+else
+{
+    switch (LoaiChungTuGoc)
+    {
+        case "ProductInvoice":
+                <a href="@Url.Action("Detail", "ProductInvoice", new { area = "Sale", TransactionCode = MaChungTuGoc })">@MaChungTuGoc</a>
+            break;
+        case "SalesReturns":
+                <a href="@Url.Action("Detail", "SalesReturns", new { area = "Sale", TransactionCode = MaChungTuGoc })">@MaChungTuGoc</a>
+            break;
+        default:
+            break;
+    }
+}
+}
+@helper GridColumnCategoryValue(object value)
+{
+var attr = Erp.BackOffice.Helpers.Common.GetCategoryByValueOrId("value", value);
+    <span>@(attr != null ? attr.Name : "")</span>
+}
+@helper CheckDeleteColumns(int Id)
+{
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+        <span class="lbl"></span>
+    </label>
+}
+@helper BuildCheckAll()
+{
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <input type="hidden" value="@Request["noptienId"]" id="noptienId" name="noptienId" />
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+    @Html.TextBox("Code", Request["Code"], new { autocomplete = "off", placeholder = "Mã chứng từ..." })
+    @Html.TextBox("MaChungTuGoc", Request["MaChungTuGoc"], new { autocomplete = "off", placeholder = "chứng từ gốc..." })
+    <span class="input-daterange input-group">
+        @Html.TextBox("startDate", Request["startDate"] != null ? Request["startDate"] : "", new { autocomplete = "off", placeholder = "Ngày ghi sổ từ..." })
+        <span class="input-group-addon">
+            <i class="fa fa-exchange"></i>
+        </span>
+        @Html.TextBox("endDate", Request["endDate"] != null ? Request["endDate"] : "", new { autocomplete = "off", placeholder = "đến ngày..." })
+    </span>
+    <span class="input-daterange input-group">
+        @Html.TextBox("start", Request["start"] != null ? Request["start"] : "", new { autocomplete = "off", placeholder = "Ngày chứng từ từ..." })
+        <span class="input-group-addon">
+            <i class="fa fa-exchange"></i>
+        </span>
+        @Html.TextBox("end", Request["end"] != null ? Request["end"] : "", new { autocomplete = "off", placeholder = "đến ngày..." })
+    </span>
+    <select class="form-control" name="SalerId">
+        <option value="">- Nhân viên QL -</option>
+        @foreach (var item in SelectListHelper.GetSelectList_FullUserName(null, null))
+        {
+            <option @(Request["SalerId"] == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+        }
+    </select>
+
+    @Html.TextBox("CustomerCode", Request["CustomerCode"], new { autocomplete = "off", placeholder = "Mã khách hàng..." })
+    @Html.TextBox("CompanyName", Request["CompanyName"], new { autocomplete = "off", placeholder = "Tên khách hàng..." })
+
+}
+@using (Html.BeginForm(pageSetting))
+{
+    <input type="hidden" value="@Request["noptienId"]" id="noptienId" name="noptienId" />
+    <div style="overflow: auto">
+        @if (!isPopup)
+        {
+            @Html.Grid(Model).Columns(columns =>
+   {
+       columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+       columns.Add(u => u.CreatedDate).Titled("Ngày ghi sổ").SetWidth(100).Format("{0:dd/MM/yyyy HH:mm}").Sortable(true);
+       columns.Add(u => u.VoucherDate).Titled("Ngày chứng từ").Format("{0:dd/MM/yyyy}").Sortable(true).SetWidth(100);
+       columns.Add().Titled("Mã chứng từ").Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Id, u, false)).SetWidth(100);
+       columns.Add().Titled("Chứng từ gốc").Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnChungTuGoc(u.MaChungTuGoc, u.LoaiChungTuGoc, isPopup)).SetWidth(100);
+       columns.Add(u => u.CompanyName).Titled("Khách hàng");
+       columns.Add(u => u.CustomerCode).Titled("Mã khách hàng");
+       columns.Add(u => u.Name).Titled("Lý do");
+       columns.Add(u => u.Note).Titled("Ghi chú");
+       columns.Add(u => u.Amount).Titled("Số tiền (VNĐ)").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(u.Amount, null));
+       columns.Add(u => u.IsArchive).Titled("TT ghi sổ").Sanitized(false).Encoded(false).RenderValueAs(n => (n.IsArchive ? "<span style=\"color:green\"><b>Đã ghi sổ</b></span>" : "<span style=\"color:red\"><b>Chưa ghi sổ</b></span>")).SetWidth(90).Sortable(true);
+       //columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+
+   }).WithPaging(10)
+        }
+        else
+        {
+            @Html.Grid(Model).Columns(columns =>
+{
+    columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckDeleteColumns(n.Id));
+    columns.Add(u => u.CreatedDate).Titled("Ngày ghi sổ").SetWidth(100).Format("{0:dd/MM/yyyy HH:mm}").Sortable(true);
+    columns.Add(u => u.VoucherDate).Titled("Ngày chứng từ").Format("{0:dd/MM/yyyy}").Sortable(true).SetWidth(100);
+    columns.Add().Titled("Mã chứng từ").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.Code, u.Id, u, isPopup)).SetWidth(100);
+    columns.Add().Titled("Chứng từ gốc").Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnChungTuGoc(u.MaChungTuGoc, u.LoaiChungTuGoc, isPopup)).SetWidth(100);
+    columns.Add(u => u.CompanyName).Titled("Người nộp");
+    columns.Add(u => u.Name).Titled("Lý do");
+    columns.Add(u => u.Amount).Titled("Số tiền (VNĐ)").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(u.Amount, null));
+    columns.Add(u => u.IsArchive).Titled("TT ghi sổ").Sanitized(false).Encoded(false).RenderValueAs(n => (n.IsArchive ? "<span style=\"color:green\"><b>Đã ghi sổ</b></span>" : "<span style=\"color:red\"><b>Chưa ghi sổ</b></span>")).SetWidth(90).Sortable(true);
+    //columns.Add(u => u.Id).Titled(Wording.Action).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnCommand(u.Id)).SetWidth(20);
+
+}).WithPaging(10)
+        }
+
+        <div style="overflow: auto">
+            <button class="btn btn-mini btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                Chọn
+            </button>
+        </div>
+    </div>
+
+
+}
+
+
+@section Scripts {
+    <script type="text/javascript">
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    alert("da chon");
+                })
+                return true;
+
+            }
+        };
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    alert("OK");
+                })
+            }
+            else {
+                return false;
+            }
+
+        });
+
+
+    </script>
+
+
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/mm/yyyy")
+    @Html.ScriptBottom_ChosenStyle()
+}

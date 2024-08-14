@@ -1,0 +1,67 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+
+@{
+    ViewBag.Title = "Kết nối Zalo Official Account";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Answer",
+        ActionName = "IndexZaloOA",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+}
+
+<style>
+    /* Style cho tiêu đề */
+    h2 {
+        color: darkblue; 
+        text-align: center;
+        margin-bottom: 20px; 
+        font-size:35px;
+        font-weight:bold;
+    }
+
+
+    .center-image {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 60%; 
+    }
+
+  
+    .connect-button {
+        margin-bottom: 20px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        background-color: blue; 
+        color: white; 
+        border: none; 
+        padding: 10px 20px; 
+        text-align: center; 
+        font-size: 16px; 
+        cursor: pointer; 
+        border-radius: 5px; 
+        margin-top: 20px; 
+    }
+</style>
+
+<h2>Zalo Official Account</h2>
+
+<button type="button" onclick="window.location.href = '@Url.Action("GetAuthorizationCode", "Answer")'" class="connect-button">Kết nối</button>
+
+@* Hình ảnh *@
+<img src="https://stc-oa.zdn.vn/resources/zoa-landing/images/thumbnail.jpg" alt="Zalo Logo" class="center-image" />

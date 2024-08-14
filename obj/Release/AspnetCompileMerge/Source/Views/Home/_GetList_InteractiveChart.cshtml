@@ -1,0 +1,84 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+
+
+
+    <div id="example">
+        <div class="demo-section k-content wide">
+            <div id="chart" style="background: center no-repeat url('../content/shared/styles/world-map.png');"></div>
+        </div>
+        <script>
+        function set(value) {
+            return value;
+        }
+            //var stocksDataSource = [{ "Target": 5600, "SoTuongTacTong": 5000, "SoTuongTacThanhCong": 15000, "NgayTuongTac": "01/02/2015" }, { "Target": 15300, "SoTuongTacTong": 7000, "SoTuongTacThanhCong": 15000, "NgayTuongTac": "01/01/2015"}]
+             var stocksDataSource = function() { return @Html.Raw(Json.Encode(Model)); }();
+            @*var stocksDataSource = function() { return set(@Json.Encode(Model)); }();*@
+            function createChart() {
+                $("#chart").kendoChart({
+                    dataSource: {
+                        data: stocksDataSource,
+                        schema: {
+                            model: {
+                                fields: {
+                                    NgayTuongTac: {
+                                        type: "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: {
+                        text: "Biểu đồ tương tác Khách Hàng với  hình thức @ViewBag.hinhthuctuongtac"
+                    },
+                    legend: {
+                        position: "bottom",
+                    },
+                    seriesDefaults: {
+                        type: "column"
+                    },
+                    series: [{
+                        field: "Target",
+                        categoryField: "NgayTuongTac",
+                        name: "Target"
+
+                    }, { field: "SoTuongTacTong", categoryField: "NgayTuongTac", name: "Tổng số tương tác" }, { field: "SoTuongTacThanhCong", categoryField: "NgayTuongTac", name: "Số tương tác thành công" }],
+                    valueAxis: {
+                        //max: 60000,
+                        //line: {
+                        //    visible: false
+                        //},
+                        //minorGridLines: {
+                        //    visible: true
+                        //},
+                        //labels: {
+                        //    rotation: "auto",
+
+                        //}
+                        majorUnit: 1
+                    },
+                    categoryAxis:
+                    {
+                        field: "NgayTuongTac",
+                        //crosshair: {
+                        //    visible: true
+                        //},
+                        // type: "date",
+                        labels: {
+                            //rotation: "auto",
+                            //format: "dd/MM"  
+                        }
+                        //baseUnit: "days"
+                    },
+                    tooltip: {
+                        visible: true,
+                        template: "#= series.name #: #= value #"
+                    }
+                });
+            }
+
+            $(document).ready(createChart);
+            $(document).bind("kendo:skinChange", createChart);
+        </script>
+    </div>

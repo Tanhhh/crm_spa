@@ -1,0 +1,121 @@
+﻿.badge, .badge-red.label {
+    font-weight: 400;
+    background-color: #fa3e3e;
+    text-shadow: none;
+    position: absolute !important;
+    right: 0px;
+    font-size: 10px;
+    padding: 1px;
+}
+
+.button__badgeStaff {
+    background-color: #fa3e3e;
+    border-radius: 2px;
+    color: white;
+    padding: 1px 3px;
+    font-size: 10px;
+    position: absolute; /* Position the badge within the relatively positioned button */
+    top: 5px;
+    right: 10px;
+    height: 17px;
+    line-height: 15px;
+}
+
+select#BRANCH_ID {
+    height: 30px;
+    position: sticky;
+    right: 22px;
+    background-color: aliceblue;
+}
+
+/* Chỉnh sửa css cho thông báo SignalR */
+.notification-content {
+    display: flex;
+    align-items: center;
+}
+
+#notificationMessage {
+    margin: 0px;
+}
+
+.close {
+    text-align: left;
+    font-size: 37px;
+    padding: 10px;
+    position: absolute;
+    top: 2px;
+    right: 11px;
+    z-index: 9999;
+    opacity: unset !important;
+    color: #fd7676;
+}
+
+.modal-header-nofications {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* flex-direction: column; */
+    position: relative;
+    padding: 15px;
+    border-radius: 7px;
+    border: 0px !important;
+    box-shadow: 0 0 20px 10px rgba(0, 0, 0, 0.5);
+    background-color: #ebffef;
+}
+
+.avatar-wrapper {
+    margin-bottom: 0px; /* Khoảng cách giữa hình ảnh và tiêu đề */
+}
+
+.user-avatar {
+    width: 70px;
+    height: 70px;
+}
+
+.text-wrapper {
+    height: 100%;
+    margin-left: 10px;
+    overflow: auto;
+    width: 100%;
+}
+
+.notification-message {
+    font-size: 16px;
+    color: #333; /* Màu chữ của thông báo */
+}
+
+.modal-title-nofications {
+    font-size: 20px;
+    font-weight: bolder;
+}
+
+.modal-dialog-nofications {
+    top: 40px;
+    position: relative;
+    width: 390px;
+    float: right;
+    right: 10px;
+}
+
+.notification {
+    margin: auto;
+    font-size: 16px;
+    color: #333;
+}
+
+.modal-content-nofications {
+    border: 0px !important;
+}
+
+
+.zalo-modal-right {
+    position: fixed;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+    .zalo-modal-right .modal-content {
+        width: 300px; /* Độ rộng của modal */
+        max-width: 100%; /* Độ rộng tối đa không vượt quá màn hình */
+    }

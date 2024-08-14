@@ -1,0 +1,99 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Crm.Models;
+@{
+    ViewBag.Title = "Tải File Mẫu";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CrmTemplateFile",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    var datasl = ViewBag.Data as IEnumerable<DataSelectItem>;
+}
+<div>
+    <div>
+        <label class="form-label" style="font-weight:bold">Mô-đun</label>
+        <select data-val="true" class="form-control" id="iModule" name="iModule" style="margin-left: 20px; height: 30px; width: 300px">
+            @if (datasl != null)
+            {
+                foreach (var area in datasl)
+                {
+                    <option value="@area.Key">@area.Value</option>
+                }
+            }
+
+        </select>
+    </div>
+    <div>
+        <label for="formFileSm" class="form-label" style="font-weight:bold">Chọn file (*.xls, *.xlsx)</label>
+        <input class="form-control form-control-sm" id="formFileSm" type="file" style="margin-left:20px;width:80%">
+    </div>
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    <a class="btn btn-info btn-mini" href="#" onclick="onClickSave()">
+        <i class="ace-icon fa fa-plus"></i>
+        @Wording.Save
+    </a>
+}
+<link href="~/assets/toastr/toastr.min.css" rel="stylesheet" />
+<script src="~/assets/toastr/toastr.min.js"></script>
+<script>
+    var fileInput = $("#formFileSm");
+    var imodule = $('#iModule');
+    function onClickSave() {
+        var allowedExtensions = [".xls", ".xlsx"];
+        var filePath = fileInput.val();
+        var modules = imodule.val();
+        if (modules) {
+            if (filePath) {
+                var fileExtension = filePath.substr(filePath.lastIndexOf(".")).toLowerCase();
+                if (!allowedExtensions.includes(fileExtension)) {
+                    toastr.warning("Vui lòng chọn tệp có phần mở rộng .xls hoặc .xlsx!", "Thông báo");
+                    fileInput.val("");
+                } else {
+                    var formData = new FormData();
+                    var file = fileInput[0].files[0];
+
+                    if (file == null) {
+                        toastr.warning('Chưa chọn file, vui lòng chọn file!', 'Thông báo');
+                    } else {
+                        formData.append('pexcelFile', file);
+                        formData.append('pmodule', modules)
+                        callAjaxCreateTF(formData);
+                    }
+                }
+            } else {
+                toastr.warning('Chưa chọn file, vui lòng chọn file!', 'Thông báo');
+            }
+        } else {
+            toastr.warning("Vui lòng chọn Mô-đun", "Thông báo");
+        }
+    }
+    function callAjaxCreateTF(formData) {
+        $.ajax({
+            url: '/CrmTemplateFile/CreateTF',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            success: function (rs) {
+                if (rs.Success) {
+                    window.parent.postMessage('createTFSuccess', '*');
+                    window.parent.ClosePopup();
+                }
+            },
+            error: function (xhr, status, error) {
+                // Xử lý lỗi
+                console.log('Import thất bại: ' + error);
+            }
+        });
+    }
+</script>

@@ -1,0 +1,156 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@model List<KHCDS_KHBH_ViewModel>
+    @{
+        ViewBag.Title = "Báo cáo kế hoạch bán hàng hoặc kế hoạch chạy doanh số";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "BC_KHBH_KHCSD",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false,
+            SearchButtonText = "Xem báo cáo"
+        };
+        IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user2 = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user2;
+        var nguoilapid = Request["NGUOILAP"] != null ? Request["NGUOILAP"] : user2.FirstOrDefault().Id.ToString();
+        var month = Request["month"] == null ? DateTime.Now.Month.ToString() : Request["month"];
+        var year = Request["year"] == null ? DateTime.Now.Year.ToString() : Request["year"];
+
+    }
+    @section HeadOfPage {
+        <style type="text/css">
+            .cell-center {
+                text-align: center;
+            }
+
+            .tr-bold {
+                font-weight: 700;
+            }
+
+            .ctl {
+                position: relative;
+                /*float: left;*/
+                margin-right: 3px;
+            }
+
+                .ctl .error {
+                    position: absolute;
+                    background: #de2a2a;
+                    left: 0px;
+                    top: 28px;
+                    padding: 2px 5px;
+                    color: #fff;
+                    z-index: 999;
+                }
+
+                    .ctl .error:before {
+                        border-bottom: 7px solid #de2a2a;
+                        border-left: 7px solid transparent;
+                        border-right: 7px solid transparent;
+                        left: 9px;
+                        top: -6px;
+                        content: "";
+                        display: inline-block;
+                        position: absolute;
+                    }
+
+            .icon-add {
+                margin-top: 0px !important;
+            }
+
+            .combojax {
+                display: inline-block;
+                position: initial !important;
+                float: none !important;
+            }
+        </style>
+
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+
+        <select id="month" name="month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option value="@i" @(month == i.ToString() ? "Selected" : "")>Tháng @i</option>
+            }
+
+        </select>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+            {
+                <option value="@i" @(year == i.ToString() ? "Selected" : "")>Năm @i</option>
+            }
+
+        </select>
+        <label>Người Lập</label>
+        <select id="NGUOILAP" name="NGUOILAP">
+            <option value="0">Tất cả</option>
+            @foreach (var item in user2.OrderBy(x => x.FullName))
+            {
+                <option value="@item.Id" @(nguoilapid == item.Id.ToString() ? "Selected" : "")>@item.FullName</option>
+            }
+        </select>
+        <label>
+            <input id="checkKHCDS" name="checkKHCDS" type="checkbox" class="ace" value="1" @(Request["checkKHCDS"] == "1" ? "checked=checked" : "")>
+            <span class="lbl"> Kế hoạch chạy doanh số</span>
+        </label>
+    }
+    <div class="table-responsive" id="BC_KHBH_KHCDS" style="margin-bottom:40px">
+        <table id="bc_chisogiacactuantrongthang" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="min-width:100px;text-align:center">TỶ LỆ @(Request["checkKHCDS"] == "1" ? "CHẠY DOANH SỐ" : "BÁN HÀNG")</th>
+                    <th style="min-width:100px;text-align:center">ORLANE PARIS</th>
+                    <th style="min-width:100px;text-align:center">ANNAYAKE</th>
+                    <th style="min-width:100px;text-align:center">LEONOR GREYL</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Tyle</td>
+                        <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.OrLane)</td>
+                        <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.ANALYKE)</td>
+                        <td>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(item.LeoNor)</td>
+                    </tr>
+
+                }
+
+            </tbody>
+            <thead>
+
+            </thead>
+        </table>
+
+    </div>
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="tableToExcel('BC_KHBH_KHCDS','TyLeBanHang_ChayDoanhSo')">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    }
+    @section Scripts {
+        <script type="text/javascript">
+
+            var tableToExcel = (function () {
+                var uri = 'data:application/vnd.ms-excel;base64,'
+                    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                    , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                    , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+
+                return function (table, name) {
+                    if (!table.nodeType) table = document.getElementById(table)
+                    var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+                    window.location.href = uri + base64(format(template, ctx))
+                }
+            })()
+        </script>
+    }

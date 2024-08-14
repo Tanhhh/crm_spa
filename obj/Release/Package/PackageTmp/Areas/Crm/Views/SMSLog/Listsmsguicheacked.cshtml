@@ -1,0 +1,386 @@
+﻿@model IEnumerable<CustomerViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Account.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Crm.Models
+    @*@model CustomerViewModel*@
+
+    @{
+        ViewBag.Title = Wording.PageIndex_Customer;
+        bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+        if (isPopup)
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+        else
+        {
+            Layout = "~/Views/Shared/_PopupLayout.cshtml";
+        }
+
+        var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SMSLog",
+            ActionName = "IndexSearch",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        var path = Erp.BackOffice.Helpers.Common.GetSetting("Customer");
+        IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.User;
+    }
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    <style>
+        .popover {
+            width: 100% !important;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 10px;
+        }
+    </style>
+    @helper GridColumnAdviseCard(int Id, string name, bool IsPopup)
+    {
+        <a name="Id" value="Id" onclick="OpenPopup('@Url.Action("Create", "AdviseCard",new { area="Sale",Id=Id,name=name, IsPopup =false})','',0,0)">Lập phiếu tư vấn</a>
+
+    }
+    @helper GridColumnEconomicStatus(int Id, bool IsPopup)
+    {
+        <a name="Id" value="Id" onclick="OpenPopup('@Url.Action("EditNT", "Customer",new { area="Account",Id=Id, IsPopup =false})','',0,0)">Đánh giá KH</a>
+
+    }
+
+    @helper GridColumnAction(int? Id, string TargetModule, string TargetCode, string TargetName, bool isPopup)
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("LiabilitiesDetail", "TransactionLiabilities", "Account"))
+        {
+            <a class="btn btn-white btn-danger btn-minier" onclick="OpenPopup('@Url.Action("LiabilitiesDetail", "TransactionLiabilities", new { TargetModule = TargetModule, TargetCode = TargetCode, TargetName = TargetName, popup = true })', 'Chi tiết công nợ', 0, 500)">
+                <i class="ace-icon fa fa-money"></i> Công nợ
+            </a>
+        }
+        @*if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", "CommisionCustomer", "Sale"))
+            {
+                <a class="btn btn-white btn-success btn-minier" onclick="OpenPopup('@Url.Action("Create", "CommisionCustomer", new { area = "Sale", CustomerId = Id, popup = true })', 'Cài đặt chiết khấu', 500, 700)">
+                    <i class="ace-icon fa fa-cog"></i>
+                    Chiết khấu
+                </a>
+            }*@
+    }
+
+    @helper GridColumnAction2(int CustomerId, bool isPopup)
+    {
+
+    }
+
+    @*@helper GridColumnBranch(int? Id)
+        {
+        }*@
+    @helper GridColumnschedule(int id)
+    {
+        <a href="@Url.Action("DetailSearch", "Customer", new { Id = id })">Xem lịch hẹn</a>
+    }
+
+    @helper GridColumnName(string name, string code, int id, string note, string Image, int? pluspoint, string phone, bool isPopup = false, string jsCallback = null)
+    {
+
+        name = string.IsNullOrEmpty(name) == false ? name : "No Title";
+        <div class="itemdiv commentdiv">
+            <div class="user">
+                <div class="ace-thumbnails">
+                    <a href="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image,"Customer","user"))" title="@name" data-rel="colorbox" class="cboxElement">
+                        <img id="myImg" alt="@name" src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Image, "Customer", "user"))">
+                    </a>
+                </div>
+            </div>
+            <div class="body">
+                <div class="name" data-toggle="tooltip" title="Tên khách hàng">
+                    @if (!isPopup)
+                    {
+                        <a href="@Url.Action("Detail", "Customer", new { Id = id })">@name</a>
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(jsCallback))
+                        {
+                            <a onclick="parent.selectItem_Customer(@id,'@code','@name','@pluspoint')">@name</a>
+                        }
+                        else
+                        {
+                            <a onclick="parent.@(jsCallback)(@id, '@name','@pluspoint','@code','@phone')">@name</a>
+                        }
+                    }
+                    @if (!string.IsNullOrEmpty(note))
+                    {
+                        <span class="help-button" data-rel="tooltip" data-placement="bottom" data-original-title="@note">?</span>
+                    }
+                </div>
+                <div class="text" data-toggle="tooltip" title="Mã khách hàng">
+                    @code
+                </div>
+            </div>
+        </div>
+    }
+    @helper GridColumnNameAddress(string DistrictName, string WardName, string ProvinceName, string Address)
+    {
+        <p data-toggle="tooltip" title="Địa chỉ - Phường/Xã">
+            <i class="fa fa-map-marker"></i> @(Address == null ? "chưa có" : Address) - @(WardName == null ? "chưa có" : WardName)
+        </p>
+        <span data-toggle="tooltip" title="Quận/huyện - Thành phố/Tỉnh">
+            <i class="fa fa-globe"></i> @(DistrictName == null ? "chưa có" : DistrictName) - @(ProvinceName == null ? "chưa có" : ProvinceName)
+        </span>
+
+    }
+
+    @helper GridColumnContact(string Phone, string Email)
+    {
+        <p data-toggle="tooltip" title="Số điện thoại">
+            <i class="fa fa-mobile-phone"></i> @(Phone == null ? "chưa có" : Phone)
+        </p>
+        <span data-toggle="tooltip" title="Email">
+            <i class="fa fa-envelope"></i> @(Email == null ? "chưa có" : Email)
+        </span>
+
+    }
+    @helper GridColumnDateName(DateTime? CreateDate, DateTime? DateOfIssue)
+    {
+        <p data-toggle="tooltip" title="Ngày tạo">
+            <i class="fa fa-calendar-plus-o"></i> @CreateDate.Value.ToString("dd/MM/yyyy HH:mm")
+        </p>
+        <span data-toggle="tooltip" title="Ngày cập nhật"><i class="fa fa-calendar-check-o"></i> @(DateOfIssue.HasValue ? DateOfIssue.Value.ToString("dd/MM/yyyy HH:mm") : "chưa có")</span>
+    }
+    @helper CheckKHsmsColumns(int Id)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="listKHsms-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+    }
+
+
+
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>s
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+
+    @if (ViewBag.AdviseTypeError != null && ViewBag.AdviseTypeError != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.AdviseTypeError
+        </div>
+    }
+
+    @if (!isPopup)
+    {
+
+        if (Model != null)
+        {
+            <p>Tổng số: <b>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(Model.Count())</b></p>
+
+            if (Model.Count() > 0)
+            {
+                @Html.Grid(Model).Columns(columns =>
+           {
+               //columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(20).Sanitized(false).Encoded(false).RenderValueAs(n => CheckKHsmsColumns(n.Id));
+               columns.Add(model => model.BranchName).Titled(Wording.BranchName).Sortable(false).Sanitized(false).Encoded(false);
+
+               columns.Add().Titled(Wording.CustomerName).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.CompanyName, u.Code, u.Id, u.Note, u.Image, u.PlusPoint, u.Phone));
+               columns.Add().Titled("Lập phiếu tư vấn").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(x => GridColumnAdviseCard(x.Id, x.CompanyName, isPopup));
+               columns.Add().Titled("Xem lịch hẹn").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(x => GridColumnschedule(x.Id));
+
+               columns.Add().Titled("Đánh giá KH").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(x => GridColumnEconomicStatus(x.Id, isPopup));
+
+               columns.Add().Titled(Wording.ContactId).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnContact(u.Phone, u.Email));
+               columns.Add().Titled(Wording.Address).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnNameAddress(u.DistrictName, u.WardName, u.ProvinceName, u.Address));
+
+
+
+               columns.Add(model => model.CustomerType).Titled(Wording.CustomerType).Sortable(false).Sanitized(false).Encoded(false);
+               columns.Add(model => model.ManagerUserName).Titled(Wording.ManagerStaffName).Sortable(false).Sanitized(false).Encoded(false);
+
+               columns.Add().Titled("Thời gian").Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnDateName(u.CreatedDate, u.ModifiedDate));
+               columns.Add().Titled("Hoạt động").Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnAction(u.Id, "Customer", u.Code, u.CompanyName, isPopup)).SetWidth(80);
+           }).WithPaging(10);
+            }
+        }
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+            //if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("CreateNT", "Customer", "Account"))
+            //{
+            // <a class="btn btn-primary btn-mini" onclick="OpenPopup('@Url.Action("CreateNT", "Customer", new { IsPopup = true, Phone = Request["Phone"] })', 'Thêm mới khách hàng', 500, 500);">
+            //  <i class="ace-icon fa fa-plus"></i>
+            <p>Gửi</p>
+            // @Resources.Wording.CreateNew
+            // </a>
+            //   }
+        }
+
+    }
+
+    @section Scripts {
+        <script type="text/javascript">
+
+            function CheckIsval() {
+                if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+            function CheckIslistkhval() {
+                if ($('[name="listKHsms-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 Khách hàng để gửi SMS.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn lấy nhưng khách hàng này ?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+
+            $('[name="Delete"]').click(function () {
+                if (confirm('Bạn có chắc muốn xóa item ?')) {
+                    $(this).closest('tr').children('td').each(function (i, e) {
+                        $(this).find("input.class-delete-all").prop("checked", true);
+                        return true;
+                    })
+                }
+                else {
+                    return false;
+                }
+            })
+
+            $(function () {
+                $("#Phone").focus().select();
+                $('[data-rel=tooltip]').tooltip({ container: 'body' });
+                $("#Phone").click(function () {
+                    $("#Phone").select();
+                });
+            });
+
+            var url = '/api/BackOfficeServiceAPI/FetchLocation';
+            var districts = $("#DistrictId"); // cache it
+            var ward = $("#WardId");
+
+            $("#ProvinceId").change(function () {
+                ShowLoading();
+                var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+                $.getJSON(url, { parentId: id }, function (response) {
+                    districts.empty(); // remove any existing options
+                    ward.empty();
+                    $(document.createElement('option'))
+                        .attr('value', '')
+                        .text('- Rỗng -')
+                        .appendTo(ward).trigger('chosen:updated');
+                    $(response).each(function () {
+                        $(document.createElement('option'))
+                            .attr('value', this.Id)
+                            .text(capitalizeFirstAllWords(this.Name.toLowerCase().replace('huyện', '').replace('quận', '')))
+                            .appendTo(districts).trigger('chosen:updated');
+                        HideLoading();
+                    });
+                });
+            });
+
+            $('[name="chonkhguisms"]').click(function () {
+                if (confirm('Bạn có chắc muốn chọn những khách hàng này?')) {
+                    $(this).closest('tr').children('td').each(function (i, e) {
+                        $(this).find("input.class-delete-all").prop("checked", true);
+                        return true;
+                    })
+                }
+                else {
+                    return false;
+                }
+
+            })
+
+            $("#DistrictId").change(function () {
+                ShowLoading();
+                var id = $(this).val(); // Use $(this) so you don't traverse the DOM again
+                $.getJSON(url, { parentId: id }, function (response) {
+                    ward.empty(); // remove any existing options
+                    $(response).each(function () {
+                        $(document.createElement('option'))
+                            .attr('value', this.Id)
+                            .text(capitalizeFirstAllWords(this.Name.toLowerCase()))
+                            .appendTo(ward).trigger('chosen:updated');
+                        HideLoading();
+                    });
+                });
+            });
+            $('.popover-dismiss').popover({
+                trigger: 'focus'
+            })
+            $(document).ready(function () {
+                $('[data-rel=popover]').popover({ html: true });
+            });
+
+
+
+            $(document).click(function () {
+                $("#tabCustomer").tabs({ active: 2 });
+                $("#action").on("click", function () { });
+            });
+
+
+
+        </script>
+
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    }

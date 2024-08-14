@@ -1,0 +1,303 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Đăng nhập Facebook</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f6f7f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .loginFB-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+
+            .loginFB-box h2 {
+                margin-top: 0;
+                margin-bottom: 20px;
+                color: #1877f2;
+            }
+
+        .loginFB-btn {
+            background-color: #1877f2;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .loginFB-btn:hover {
+                background-color: #0e62d6;
+            }
+        .modal {
+            display: none; /* Ẩn modal ban đầu */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4); /* Màu nền đen, có độ mờ */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto; /* Đưa modal ra giữa màn hình */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%; /* Chiều rộng của modal */
+            border-radius: 5px;
+        }
+
+        /* CSS cho nút đóng modal */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+            .close:hover,
+            .close:focus {
+                color: black;
+                text-decoration: none;
+                cursor: pointer;
+            }
+        .button-fanpage {
+            background-color: #1877f2;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 10px; /* Khoảng cách giữa các nút */
+            transition: background-color 0.3s;
+        }
+
+            .button-fanpage:hover {
+                background-color: #0e62d6;
+            }
+        .backToHomeButton {
+            background-color: #4CAF50; /* Màu nền */
+            color: white; /* Màu chữ */
+            padding: 10px 20px; /* Kích thước lề nút */
+            text-align: center; /* Căn giữa văn bản */
+            text-decoration: none; /* Không có gạch chân */
+            display: inline-block; /* Hiển thị là khối */
+            font-size: 16px; /* Kích thước chữ */
+            margin-top: 10px; /* Khoảng cách từ trên xuống */
+            cursor: pointer; /* Con trỏ chuột khi di chuyển vào */
+            border-radius: 5px; /* Bo tròn góc */
+        }
+
+            .backToHomeButton a {
+                color: white; /* Màu chữ cho thẻ a bên trong */
+                text-decoration: none; /* Không có gạch chân cho thẻ a bên trong */
+            }
+
+            .backToHomeButton:hover {
+                background-color: #45a049; /* Màu nền khi di chuột vào */
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loginFB-box">
+            <h2>Đăng nhập vào Facebook</h2>
+            <button class="loginFB-btn" onclick="loginFB()">Đăng nhập với Facebook</button>
+            <div id="backToHomeContainer"></div>
+
+        </div>
+    </div>
+
+    <div id="FBidData" data-FBidData="@System.Configuration.ConfigurationManager.AppSettings["Facebook:AppId"]" style="display: none;"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    @*cho facebook*@
+    <script>
+        window.onload = function () {
+            var accessToken = localStorage.getItem('accessToken_User');
+            if (!accessToken) {
+                // Nếu không có accessToken_User trong localStorage, tạo nút "Trở về trang chủ"
+                var backButton = document.createElement('div');
+                backButton.innerHTML = '<a href="/Home">Trở về trang chủ</a>';
+                backButton.className = 'backToHomeButton'; // Thêm class cho nút
+                document.getElementById('backToHomeContainer').appendChild(backButton); // Thêm nút vào container
+            }
+        }
+        var fBidData = document.getElementById('FBidData').getAttribute('data-FBidData');
+
+        var fanpageSelected = false;
+        window.fbAsyncInit = function () {
+            FB.init({
+                appId: fBidData,
+                xfbml: true,
+                version: 'v19.0'
+            });
+            FB.AppEvents.logPageView();
+        };
+
+        (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) { return; }
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+
+        function loginFB() {
+            FB.login(function (loginResponse) {
+                if (loginResponse.authResponse) {
+                    console.log(loginResponse);
+                    var accessToken = loginResponse.authResponse.accessToken;
+                    var userId_FB = loginResponse.authResponse.userID;
+                    //var expirationTimeInSeconds = Math.floor(loginResponse.authResponse.expiresIn);
+                    //var expirationTimeInMinutes = expirationTimeInSeconds / 60;
+                    //console.log(expirationTimeInMinutes);
+                    //var currentDate = new Date(); // Ngày hiện tại
+                    //console.log(currentDate);
+                    //var expirationDate = addMinutesToDate(currentDate, expirationTimeInMinutes);
+                    //console.log(expirationDate);
+                    console.log(accessToken);
+                    convertToLongLivedToken(accessToken);
+                    // Lưu accessToken và thời gian hết hạn vào localStorage
+
+                    localStorage.setItem('userId_FB', userId_FB);
+                    //localStorage.setItem('expirationTime_UserFB', expirationDate);
+
+                    getFanPages(accessToken);
+                    window.location.href = '/Home'; // Chuyển hướng về trang chủ
+                } else {
+                    // Người dùng không đăng nhập hoặc hủy cấp quyền
+                    alert('Đăng nhập không thành công hoặc đã hủy bỏ quyền truy cập.');
+                }
+            }, { scope: 'pages_show_list, pages_messaging, pages_read_user_content, pages_manage_engagement, pages_manage_cta, read_page_mailboxes, pages_manage_metadata' });
+
+        }
+        function convertToLongLivedToken(shortAccessToken) {
+            $.ajax({
+                url: '/Home/ConvertToLongLivedTokenFacebook',
+                type: 'POST',
+                data: { shortAccessToken: shortAccessToken },
+                success: function (data) {
+                    console.log(data);
+                    localStorage.setItem('accessToken_User', data);
+                    console.log('lưu thành công LongLivedToken');
+                },
+                error: function (xhr, status, error) {
+                    // Xử lý lỗi nếu có
+                    console.error('Error converting to long-lived token:', error);
+                }
+            });
+        }
+        var fanpageInfoMap = {}; // Đối tượng để lưu trữ thông tin về fanpage
+
+        function getFanPages(accessToken) {
+            // Gửi yêu cầu lấy thông tin các fanpage sử dụng accessToken
+            FB.api(
+                '/me/accounts',
+                'GET',
+                { access_token: accessToken, fields: 'id,name,access_token' },
+                function (response) {
+                    console.log(response);
+                    // Kiểm tra xem có dữ liệu trả về hay không
+                    if (response && response.data) {
+                        // Lặp qua mỗi fanpage trong dữ liệu trả về
+                        response.data.forEach(function (fanpage) {
+                            // Lưu thông tin fanpage vào đối tượng fanpageInfoMap
+                            fanpageInfoMap[fanpage.id] = {
+                                id: fanpage.id,
+                                name: fanpage.name,
+                                accessToken: fanpage.access_token
+                            };
+                            console.log(fanpage.access_token);
+                            subscribeWebhook(fanpage.id, fanpage.access_token);
+                        });
+                        localStorage.setItem('fanpageInfoMap', JSON.stringify(fanpageInfoMap));
+                    } else {
+                        // Hiển thị thông báo nếu không có dữ liệu trả về
+                        console.log('Không có dữ liệu về các fanpage.');
+                    }
+                }
+            );
+        }
+
+        function subscribeWebhook(fanpageId, fanpageAccessToken) {
+            // Đường dẫn của API để đăng ký webhook
+            var subscribedFields = [
+                "feed",
+                "messages",
+                "message_reactions",
+                "messaging_customer_information",
+                "message_deliveries",
+                "message_echoes",
+                "message_edits",
+                "message_reads",
+                "messaging_optins",
+                "messaging_policy_enforcement",
+                "messaging_postbacks"
+            ];
+
+            var webhookUrl = 'https://graph.facebook.com/' + fanpageId + '/subscribed_apps?subscribed_fields=' + subscribedFields.join(',') + '&access_token=' + fanpageAccessToken;
+
+
+            // Gọi AJAX để đăng ký webhook
+            $.ajax({
+                url: webhookUrl,
+                type: 'POST',
+                success: function (response) {
+                    console.log('Đăng ký webhook thành công');
+                },
+                error: function (xhr, status, error) {
+                    console.error('Lỗi khi đăng ký webhook:', error);
+                }
+            });
+        }
+        //function addMinutesToDate(date, minutes) {
+        //    // Tạo một bản sao của đối tượng date
+        //    var newDate = new Date(date);
+
+        //    // Thêm số phút vào đối tượng date
+        //    newDate.setMinutes(newDate.getMinutes() + minutes);
+
+        //    // Lấy thông tin ngày, tháng, năm, giờ, phút, giây
+        //    var year = newDate.getFullYear();
+        //    var month = ('0' + (newDate.getMonth() + 1)).slice(-2); // Tháng tính từ 0 đến 11, nên cần cộng thêm 1
+        //    var day = ('0' + newDate.getDate()).slice(-2);
+        //    var hours = ('0' + newDate.getHours()).slice(-2);
+        //    var minutes = ('0' + newDate.getMinutes()).slice(-2);
+        //    var seconds = ('0' + newDate.getSeconds()).slice(-2);
+
+        //    // Trả về chuỗi theo định dạng "YYYY-MM-DD HH:MM:SS"
+        //    return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+        //}
+    </script>
+</body>
+</html>

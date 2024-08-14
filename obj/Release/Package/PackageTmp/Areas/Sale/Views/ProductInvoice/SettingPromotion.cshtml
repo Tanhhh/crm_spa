@@ -1,0 +1,187 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Account.Models
+
+@model LogPromotionViewModel
+
+@{
+    ViewBag.Title = "Thêm khuyến mãi";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "ProductInvoice",
+        ActionName = "SettingPromotion",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = true,
+        DisplayBackButton = false
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <link href="/assets/css/combojax.css" rel="stylesheet" />
+    <style>
+        .box {
+            padding-top: 0px !important;
+            padding-bottom: 0px !important;
+            margin-top: 0px !important;
+        }
+
+        .popover {
+            width: 100% !important;
+        }
+
+        .itemdiv > .body > .text {
+            padding-bottom: 0px !important;
+            /* padding-left: 7px; */
+            /* font-size: 13px; */
+        }
+
+        .itemdiv {
+            padding-right: 3px;
+            min-height: 42px;
+        }
+
+            .itemdiv > .body > .name {
+                color: black;
+            }
+    </style>
+
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "SettingPromotion", "ProductInvoice", null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.HiddenFor(model => model.Type)
+    @Html.HiddenFor(model => model.Category)
+
+    if (Model.Type == "product_donate")
+    {
+        <div id="" class="control-group form-group">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4">Sản phẩm/Dịch vụ hóa đơn</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                <div class="clearfix">
+                    @Html.TextBox("ProductName", "", new { autocomplete = "off", style = "width:400px;" })
+                </div>
+            </div>
+        </div>
+        @*<div id="" class="control-group form-group">
+            <label class="control-label col-lg-5 col-md-4 col-sm-4">Sản phẩm/Dịch vụ tặng</label>
+            <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                <div class="clearfix">
+                    @Html.TextBox("GiftProductName", "", new { autocomplete = "off", style = "width:400px;" })
+                </div>
+            </div>
+        </div>
+        @Html.HiddenFor(model => model.GiftProductId)*@
+        @*@Html.HiddenFor(model => model.GiftProductName)*@
+        @*@Html.HiddenFor(model => model.ProductName)*@
+        @Html.HiddenFor(model => model.ProductId)
+        @Html.HiddenFor(model => model.ProductSymbolQuantity)
+        @Html.HiddenFor(model => model.ProductQuantity)
+    }
+    if (Model.Type == "product_discount")
+    {
+        @Html.HiddenFor(model => model.CommissionValue)
+        @Html.HiddenFor(model => model.IsMoney)
+        @Html.HiddenFor(model => model.ProductName)
+        @Html.HiddenFor(model => model.ProductId)
+        @Html.HiddenFor(model => model.ProductSymbolQuantity)
+        @Html.HiddenFor(model => model.ProductQuantity)
+
+    }
+    if (Model.Type == "invoice_donate")
+    {
+        @Html.HiddenFor(model => model.StartAmount)
+        @Html.HiddenFor(model => model.StartSymbol)
+        @Html.HiddenFor(model => model.EndSymbol)
+        @Html.HiddenFor(model => model.EndAmount)
+        @Html.HiddenFor(model => model.GiftProductName)
+        @Html.HiddenFor(model => model.GiftProductId)
+    }
+    if (Model.Type == "invoice_discount")
+    {
+        @Html.HiddenFor(model => model.StartAmount)
+        @Html.HiddenFor(model => model.StartSymbol)
+        @Html.HiddenFor(model => model.EndSymbol)
+        @Html.HiddenFor(model => model.EndAmount)
+        @Html.HiddenFor(model => model.CommissionValue)
+        @Html.HiddenFor(model => model.IsMoney)
+    }
+    @Html.ModuleSearchProductFor(m => m.GiftProductId,false,false,null,null)
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" onclick="Check();">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+
+@section Scripts {
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script src="/Scripts/combojax.js?=vs1.01211"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("#ProductName").combojax({
+                url: "/ProductInvoice/GetDetailJsonByInvoiceId?id="+@(Model.TargetID) ,
+                onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+                    //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+                },
+                onSelected: function (obj) {
+                    console.log(obj);
+                    if (obj) {
+                        $("#ProductId").val(obj.ProductId);
+                    }
+                }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+            , onShowImage: true                  //hiển thị hình ảnh
+            , onSearchSaveSelectedItem: true    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+            , onRemoveSelected: false  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+            });
+        });
+
+        //$(function () {
+        //    $("#GiftProductName").combojax({
+        //        url: "/Product/GetListProductInventoryAndServiceKM" ,
+        //        onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+        //            //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+        //        },
+        //        onSelected: function (obj) {
+        //            console.log(obj);
+        //            if (obj) {
+        //                $("#GiftProductId").val(obj.ProductId);
+        //            }
+        //        }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+        //    , onShowImage: true                  //hiển thị hình ảnh
+        //    , onSearchSaveSelectedItem: true    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+        //    , onRemoveSelected: false  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+        //    });
+        //});
+
+        function Check() {
+            ShowLoading();
+            var type = $("#Type").val();
+            var option = '<option value="' + type + '" ></option>';
+            //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+            window.parent.ClosePopupAndInsertLog(option);
+        }
+    </script>
+}

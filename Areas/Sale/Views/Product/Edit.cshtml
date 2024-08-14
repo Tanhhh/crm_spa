@@ -1,0 +1,575 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.Domain.Sale.Entities
+
+@model ProductViewModel
+
+@{
+    ViewBag.Title = Wording.PageEdit_Product;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Product",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    List<Supplier> supplier_List = (List<Supplier>)ViewBag.supplierList;
+    IEnumerable<SelectListItem> ManufacturerList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("manufacturerList", null, "value");
+    IEnumerable<SelectListItem> CategoryList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("product", null, "value");
+    IEnumerable<SelectListItem> productUnitList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("productUnit", null, "value");
+    IEnumerable<SelectListItem> productGroupList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("ProductGroup", null, "value");
+    IEnumerable<SelectListItem> productLinkIdList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Product("product",null,Wording.Empty);
+    IEnumerable<SelectListItem> OriginList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("Origin", null, Wording.Empty);
+    IEnumerable<SelectListItem> productASList = Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_NhomSP("ProductASList", null);
+    List<ProductInSkinCareViewModel> productSkincare = (List<ProductInSkinCareViewModel>)ViewBag.productSkincare;
+}
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.css" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-css/1.4.6/select2-bootstrap.min.css" />
+<style>
+    #NHOMSANPHAM_ID_chosen {
+        width: 150px !important;
+    }
+</style>
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+<div class="text-danger">@ViewBag.errors</div>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Edit", "Product", null, FormMethod.Post, new { id = "EditProduct", @class = "form-horizontal clearfix", enctype = "multipart/form-data" }))
+{
+    @Html.ValidationSummary(true)
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+    @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.CreatedUserId)
+    @Html.HiddenFor(model => model.CreatedDate)
+    @Html.HiddenFor(model => model.IsDeleted)
+    @Html.HiddenFor(model => model.Image_Name)
+    @Html.HiddenFor(model => model.List_Image)
+    @Html.HiddenFor(model => model.Type)
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                <li class="active">
+                                    <a data-toggle="tab" href="#home" aria-expanded="true"><i class="fa fa-info-circle"></i> Tổng quan</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#image" aria-expanded="false"><i class="fa fa-image"></i> Ảnh minh họa</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#profile" aria-expanded="false"><i class="fa fa-comment-o"></i> Mô tả</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#webclient" aria-expanded="false"><i class="fa fa-comment-o"></i>Quản lý E-co</a>
+                                </li>
+                                <li class="">
+                                    <a data-toggle="tab" href="#image2" aria-expanded="false"><i class="fa fa-image"></i> Ảnh E-Co</a>
+                                </li>
+                                <li id="tab_li_cbcsd">
+                                    <a data-toggle="tab" href="#CBCSD" aria-expanded="false">Các bước CSD</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="home" class="tab-pane active">
+                                    @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span12)
+                                    @Html.CustomTextboxFor(model => model.Code, null, null, WidthType.span12)
+                                    @*@Html.CustomTextboxFor(model => model.Origin, null, null, WidthType.span12)*@
+                                    @Html.CustomDropDownListFor(model => model.Origin, OriginList.Where(x => x.Value == "ORLANE PARIS" || x.Value == "LEONOR GREYL" || x.Value == "ANNAYAKE"), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                                    @Html.CustomDropDownListFor(model => model.Manufacturer, ManufacturerList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                                    @Html.CustomDropDownListFor(model => model.CategoryCode, CategoryList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                                    @Html.CustomDropDownListFor(model => model.ProductGroup, productGroupList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                                    @Html.CustomDropDownListFor(model => model.Unit, productUnitList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleDefault)
+                                    @Html.CustomDropDownListFor(model => model.ProductLinkId, productLinkIdList, WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)
+                                    @Html.CustomTextboxFor(model => model.Size, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-sm-12 text-right" } })
+                                    <div id="" class="control-group form-group">
+                                        <label class="control-label col-lg-5 col-md-4 col-sm-4">Giá nhập</label>
+                                        <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                            <div class="clearfix">
+                                                <input class="numberinput2 col-sm-12 text-right" id="PriceInbound" name="PriceInbound" type="text" value="@Model.PriceInbound">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="" class="control-group form-group">
+                                        <label class="control-label col-lg-5 col-md-4 col-sm-4">Giá xuất</label>
+                                        <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                            <div class="clearfix">
+                                                <input class="numberinput2 col-sm-12 text-right" id="PriceOutbound" name="PriceOutbound" type="text" value="@Model.PriceOutbound">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @Html.CustomTextboxFor(model => model.MinInventory, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-sm-12 text-right" } })
+                                    @Html.CustomTextboxFor(model => model.QuantityDayUsed, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-sm-12 text-right" } })
+                                    @Html.CustomTextboxFor(model => model.QuantityDayNotify, null, null, WidthType.span12, true, new Dictionary<string, object> { { "class", "col-sm-12 text-right" } })
+                                    @Html.CustomSwitchesFor(model => model.NotUse, SwitchesStyle.CheckboxStyle, true)               
+                                 </div>
+                                <div id="image" class="tab-pane">
+                                    <div class="wrap-btn-upload">
+                                        <a class="btn btn-primary btn-sm btn-white"><i class="fa fa-upload"></i><span>Tải hình mới</span></a>
+                                        <input type="file" id="file-image" name="file-image" class="file-image" accept="image/*" onchange="previewFileImage(event, '#display-image img')" />
+                                    </div>
+                                    <div class="text-center" id="display-image">
+                                        <img src="@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.Image_Name, "product-image-folder", "product"))" title="@Model.Name" id="imgAvt" style="max-height:250px" />
+                                    </div>
+                                </div>
+                                <div id="profile" class="tab-pane">
+                                    <textarea class="ckeditor" cols="20" id="Description" name="Description" placeholder="" rows="2">@Model.Description</textarea>
+
+                                    <div id="group-supplier" class="control-group form-group top-20">
+                                        <label class="col-sm-12">Được cung cấp bởi:</label>
+                                        <div class="col-sm-12">
+                                            @if (supplier_List.Count() > 0)
+                                        {
+                                            foreach (var item in supplier_List)
+                                            {
+                                        <a class="label label-info" href="@Url.Action("Edit","Supplier", new { id = item.Id })">@item.Name</a>
+                                            }
+                                        }
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div id="webclient" class="tab-pane">
+                                    @Html.CustomSwitchesFor(model => model.is_display, SwitchesStyle.CheckboxStyle, true)
+                                    @Html.CustomDropDownListFor(model => model.NHOMSANPHAM_ID, productASList, WidthType.span6, true, null, DropdownListStyle.DropdownListStyleChosen)
+
+
+                                    <span style="font-size:14px">Mô tả ngắn:</span>
+                                    <textarea class="ckeditor" cols="20" id="Description_brief" name="Description_brief" placeholder="Mô tả ngắn" rows="2">@Model.Description_brief</textarea>
+                                    <span style="font-size:14px">Công dụng:</span>
+                                    <textarea class="ckeditor" cols="20" id="CONGDUNG" name="CONGDUNG" placeholder="Mô tả ngắn" rows="2">@Model.CONGDUNG</textarea>
+                                    <span style="font-size:14px">Thành phần:</span>
+                                    <textarea class="ckeditor" cols="20" id="THANH_PHAN" name="THANH_PHAN" placeholder="Mô tả ngắn" rows="2">@Model.THANH_PHAN</textarea>
+                                    <span style="font-size:14px">HDSD:</span>
+                                    <textarea class="ckeditor" cols="20" id="HDSD" name="HDSD" placeholder="Mô tả ngắn" rows="2">@Model.HDSD</textarea>
+                                    <label class="control-label col-lg-5 col-md-4 col-sm-4">Url slug</label>
+                                    <div class="control-value col-lg-7 col-md-8 col-sm-8">
+                                        <input class="" id="URL_SLUG" name="URL_SLUG" type="text" value="@Model.URL_SLUG">
+                                    </div>
+                                </div>
+                                <div id="image2" class="tab-pane">
+                                    <p></p>
+                                    <div class="widget-box">
+                                        <div class="widget-header">
+                                            <h5 class="widget-title"><i class="ace-icon fa fa-image"></i> Ảnh</h5>
+                                        </div>
+                                        <div class="widget-body">
+                                            <div class="widget-main">
+                                                <p>
+                                                    <a class="btn btn-primary btn-mini" onclick="OpenPopup('@Url.Action("Create", "Image", new { area = "Crm",TargetId=Model.Id,TargetModule="Product" })', 'Thêm hình ảnh', 0, 500)">
+                                                        <i class="ace-icon fa fa-image"></i>
+                                                        Thêm ảnh
+                                                    </a>
+                                                </p>
+                                                @Html.Action("Detail", "Image", new { area = "Crm", TargetId = Model.Id, TargetModule = "Product" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                 
+
+                                </div>
+                                <div id="CBCSD" class="tab-pane clearfix" style="width:100%">
+                                    <div class="table-responsive">
+                                        @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span12)
+                                        <br />
+                                        <input id="productSelectList" class="select2-input" placeholder="Nhập mã hoặc tên sản phẩm" name="productSelectList" style="width:100%" />
+
+
+
+
+                                        <div id="listOrderDetail" class="table-responsive top-10" style="max-height: 70%;margin-top: 0.4%; z-index: 2">
+
+                                            <table id="listOrderDetail1" class="table table-bordered Testing">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width:10%">STT<p id="ProductItemCount" value="0" readonly></th>
+
+
+                                                        <th style="width:35%">Mã sản phẩm</th>
+                                                        <th style="width:50%">Nội dung</th>
+
+
+                                                        <th style="width:5%;"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="detailList_1">
+                                                    @if (productSkincare.Count() > 0)
+                                                    {
+                                                        foreach (var item in productSkincare)
+                                                        {
+                                                            @Html.Partial("LoadProductItem2", item);
+                                                        }
+                                                    }
+                                                </tbody>
+
+                                            </table>
+                                            <span style="color:red" class="field-validation-valid help-inline" data-valmsg-for="ProductItemCount" data-valmsg-replace="true"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+@section Scripts {
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.15.0/lodash.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/3.5.4/select2.min.js"></script>
+
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+
+<script type="text/javascript">
+        var aasp = [];
+        $(document).ready(function () {
+            (function () {
+                // initialize select2 dropdown
+                $('#productSelectList').select2({
+                    placeholder: "Nhập mã hoặc tên sản phẩm",
+                    //minimumInputLength: 1,
+                    data: dropdownData(),
+                    formatResult: function (item) {
+                        return '<pr style=font-size: 20px;>' + item.code + ' - ' + item.ProductName + ' <pr> ';
+
+                    },
+                    multiple: false,
+                    // creating query with pagination functionality.
+                    query: function (data) {
+                        var pageSize,
+                                dataset,
+                                that = this;
+                        pageSize = 20; // Number of the option loads at a time
+                        results = [];
+                        if (data.term && data.term !== '') {
+                            // HEADS UP; for the _.filter function I use underscore (actually lo-dash) here
+                            results = _.filter(that.data, function (e) {
+                                return e.text.toUpperCase().indexOf(data.term.toUpperCase()) >= 0;
+                            });
+                        } else if (data.term === '') {
+                            results = that.data;
+                        }
+                        data.callback({
+                            results: results.slice((data.page - 1) * pageSize, data.page * pageSize),
+                            more: results.length >= data.page * pageSize,
+                        });
+                    },
+                });
+            })();
+
+
+
+
+            LoadNumberInput();
+        });
+
+
+        function dropdownData() {
+            $.ajax({
+
+                url: '/Product/SearchServiceJson',
+                dataType: "json",
+                type: "GET",
+                contentType: 'application/json; charset=utf-8',
+                async: false,
+
+                success: function (data) {
+                    //debugger;
+                    $.each(data, function (i, item) {
+                        aasp.push(item);
+
+
+                    });
+
+
+                },
+                error: function (xhr) {
+                    //alert('error' + xhr);
+                }
+            });
+
+            // alert(aasp);
+
+            return aasp;
+        }
+
+        $('#productSelectList').on('change', function () {
+            debugger
+            var selected = $("#productSelectList").select2("data");
+            if (selected == null)
+                return;
+
+            var OrderNo = $('.detailList_1 tr').length;
+            var ProductId = selected.product_id;
+            var ProductName = selected.ProductName;
+            var ProductCode = selected.code;
+            var ProductIdCha = @Model.Id;
+            var formdata = {
+                OrderNo: OrderNo,
+                ProductId: ProductId,
+                ProductName: ProductName,
+                ProductCode: ProductCode,
+                ProductIdCha : ProductIdCha
+            };
+
+            $("#listOrderDetail1 TBODY TR").each(function () {
+                debugger
+                var row = $(this);
+                var w = $(window);
+                $(this).removeClass('selected_grey').addClass("text_data");
+
+                var ProductCode1 = $(this).closest('tr').find("td:eq(1) input:nth-child(2)").val();
+
+                // alert($('#product_barcode3').val());
+
+                if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                    //alert(ProductCode);
+                    $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val(parseInt($(this).closest('tr').find("td:eq(2) input:nth-child(2)").val()) + 1);
+                    $(this).closest('tr').find("td:eq(2) input:nth-child(2)").trigger('change');
+                    $(this).addClass('selected_grey');
+                    var body = $("html,#listOrderDetail");
+                    body.stop().animate({ scrollTop: row.offset().top - (w.height() / 1.6) }, 500, 'swing', function () {
+                        row.addClass('scrollCode');
+                    });
+                    formdata = {};
+                    return;
+                } else {
+                    $(this).removeClass("scrollCode");
+                }
+                //alert(ProductCode);
+
+            });
+            //Thêm dòng mới
+            ClickEventHandler(true, "/Product/LoadProductItem2", ".detailList_1", formdata, function () {
+                $('#ProductItemCount').val($('#listOrderDetail .detailList_1 tr').length);
+                $.mask.definitions['~'] = '[+-]';
+                $('.input-mask-date').mask('99/99/9999');
+                calcTotalAmount();
+                $("#DetailList_" + formdata.OrderNo + "_Quantity").focus().select();
+
+            });
+
+            $("#productSelectList").select2("val", "");
+
+            HideLoading();
+        });
+
+        // xóa sản phẩm
+        $('#listOrderDetail').on('click', '.btn-delete-item', function () {
+
+            var $this = $(this);
+            var Id = $this.closest('tr').find('td:eq(1) input:nth-child(1)').val();
+
+            ShowLoading();
+            var url = "/Product/DeleteProductInSkinCare";
+            $.post(url, {Id:Id }, function (res) {
+                if (res == 'error') {
+                    alertPopup('Lỗi!', 'Xóa thất bại!', 'error');
+                }
+
+                $(".detailList_1").html(res);
+                HideLoading();
+            });
+        });
+
+        $('#listOrderDetail').on('change', '.noidung', function () {
+
+            //alert("Vao day r");
+            var $this = $(this);
+            var Id = $this.closest('tr').find('td:eq(1) input:nth-child(1)').val();
+            var Name = $this.closest('tr').find('td:eq(2) input').val();
+            ShowLoading();
+            var url = "/Product/SaveUpload";
+            $.post(url, {Id:Id,Name:Name  }, function (res) {
+                if (res != 'success') {
+                    alertPopup('Lỗi!', 'Lưu thất bại!', 'error');
+                }
+                HideLoading();
+            });
+        });
+
+</script>
+    <script>
+    $(document).ready(function () {
+        LoadNumberInput();
+        //$('#PriceInbound').numberFormat();
+        //$('#PriceOutbound').numberFormat();
+        $('#MinInventory').numberFormat();
+        //$("#IsMoneyDiscount").on('change', function () {
+        //    if ($("#IsMoneyDiscount").is(':checked')) {
+        //        $("#IsMoneyDiscount").val("true");
+        //        $("#lb_IsCheck").text("VNĐ");
+        //    }
+        //    else {
+        //        $("#IsMoneyDiscount").val("false");
+        //        $("#lb_IsCheck").text("%");
+        //    }
+        //});
+        $('#CategoryCode').change(function () {
+            var $this = $(this);
+            $('.list-attr-by-category').html('');
+            $.get('/ObjectAttribute/GetListByModuleCategory', { category: $this.val(), objectId: @Model.Id, column:'col-sm-6' }, function (res) {
+                if(res.replace(/\s+/,'') != ''){
+                    $('.list-attr-by-category').html(res);
+                    initDataTypeInput($('.list-attr-by-category input'));
+                    $('.box-attr').show();
+                }
+            });
+        });
+
+        // resetLableRequired('#EditProduct');
+        //parseValidatorForm('#ProductInBound');
+        $('#Save').click(function () {
+            ShowLoading();
+            ClearFormatBeforeSubmit($("#EditProduct"));
+            $("#EditProduct").submit();
+            // HideLoading();
+            //return false;
+        });
+
+        //init
+        $('#CategoryCode').trigger('change');
+
+        $("#Code").change(function () {
+            $.get('/Product/CheckCodeExsist/' + $(this).val(), function (rs) {
+                if(rs != '')
+                {
+                    alert(rs);
+                }
+            });
+        });
+    });
+
+    function initCkeditor() {
+        $('.ckeditor').ckeditor({
+            "extraPlugins": 'imagebrowser',
+            "imageBrowser_listUrl": "@Url.Action("ListJson","Images")",
+            // Define the toolbar groups as it is a more accessible solution.
+            toolbarGroups: [
+                { "name": "document", "groups": ["mode", "document", "doctools"] },
+                { "name": "editing", "groups": ["find", "selection", "spellchecker"] },
+                { "name": "forms" },
+                { "name": "tools" },
+                { "name": "basicstyles", "groups": ["basicstyles", "cleanup"] },
+                { "name": "clipboard", "groups": ["clipboar", "undo"] },
+                { "name": "links", "groups": ["links"] },
+                { "name": "paragraph", "groups": ["list", "blocks"] },
+                { "name": "insert", "groups": ["insert"] },
+                { "name": "styles", "groups": ["styles"] },
+                //{ "name": "about", "groups": ["about"] },
+                { "name": "styles" },
+                { "name": "colors" },
+                { "name": "align", "groups": ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] }
+
+            ],
+            // Remove the redundant buttons from toolbar groups defined above.
+            removeButtons: 'Underline,Strike,Subscript,Superscript,Anchor,Styles,Specialchar'
+        });
+    }
+    var $tr_template = $('#detailList tr:first-child');
+    //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+    var closePopup = '@ViewBag.closePopup';
+    $(document).ready(function () {
+        //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+        if (closePopup != '') {
+            var option = '<option value="@Model.Id" >@Model.Name</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+
+        });
+        //upload file image
+        $(document).ready(function () {
+            $('[type="file"]').change(function () {
+                var fileInput = $(this);
+                if (fileInput.length && fileInput[0].files && fileInput[0].files.length) {
+                    var url = window.URL || window.webkitURL;
+                    var image = new Image();
+                    image.onerror = function () {
+                        alert("File tải lên bắt buộc phải là hình ảnh (.png, .jpg, .jpeg,...)");
+                        $("#imgAvt").attr("src", "@(Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(Model.Image_Name, "product-image-folder", "product"))");
+                    };
+                    image.src = url.createObjectURL(fileInput[0].files[0]);
+                }
+            });
+        });
+        $('#QuantityDayUsed').change(function () {
+            $(this).val($(this).val().replace(/\-/g, ''));
+            $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+            var ralVal = numeral($(this).val());
+            if (ralVal <= 0) {
+                $(this).val(0);
+            }
+        });
+        $('#QuantityDayNotify').change(function () {
+            $(this).val($(this).val().replace(/\-/g, ''));
+            $(this).val($(this).val().replace(/[^0-9.,]/g, ''));
+            var ralVal = numeral($(this).val());
+            if (ralVal <= 0) {
+                $(this).val(0);
+            }
+        });
+        $("#Name").keyup(function () {
+            var Text = $(this).val();
+            Text = to_slug(Text);
+
+            $("#URL_SLUG").val(Text);
+        });
+
+        function to_slug(str) {
+            // Chuyển hết sang chữ thường
+            str = str.toLowerCase();
+
+            // xóa dấu
+            str = str.replace(/(à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ)/g, 'a');
+            str = str.replace(/(è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ)/g, 'e');
+            str = str.replace(/(ì|í|ị|ỉ|ĩ)/g, 'i');
+            str = str.replace(/(ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ)/g, 'o');
+            str = str.replace(/(ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ)/g, 'u');
+            str = str.replace(/(ỳ|ý|ỵ|ỷ|ỹ)/g, 'y');
+            str = str.replace(/(đ)/g, 'd');
+
+            // Xóa ký tự đặc biệt
+            str = str.replace(/([^0-9a-z-\s])/g, '');
+
+            // Xóa khoảng trắng thay bằng ký tự -
+            str = str.replace(/(\s+)/g, '-');
+
+            // xóa phần dự - ở đầu
+            str = str.replace(/^-+/g, '');
+
+            // xóa phần dư - ở cuối
+            str = str.replace(/-+$/g, '');
+
+            // return
+            return str;
+        }
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

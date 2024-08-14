@@ -1,0 +1,250 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model InquiryCardViewModel
+
+@{
+    ViewBag.Title = Wording.PageDetail_InquiryCard;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "InquiryCard",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    var index = 1;
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@Html.HiddenFor(model => model.TargetModule)
+<div class="row">
+    <div class="col-sm-7">
+        <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+            <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                <div class="widget-header widget-header-small">
+                    <div class="widget-toolbar no-border pull-left">
+                        <ul class="nav nav-tabs" id="myTab">
+
+                            <li class="active">
+                                <a data-toggle="tab" href="#discount" aria-expanded="true"><i class="fa fa-users"></i> Các bước trong liệu trình</a>
+                            </li>
+                            <li class="">
+                                <a data-toggle="tab" href="#donate" aria-expanded="false"><i class="fa fa-cubes"></i> Danh sách nguyên vật liệu của liệu trình</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+                <div class="widget-body">
+                    <div class="widget-main padding-6">
+                        <div class="tab-content">
+                            <div id="discount" class="tab-pane active table-responsive clearfix">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered grid-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="grid-header" width="50">#</th>
+                                                <th class="grid-header" width="50">STT</th>
+                                                <th class="grid-header">Hạng mục</th>
+                                                <th class="grid-header">Thời gian làm (phút)</th>
+                                                <th class="grid-header">Ghi chú</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="detailList">
+                                            @foreach (var qq in Model.DetailList)
+                                            {
+                                            <tr data-type="" data-id="">
+                                                <td>
+                                                    @if (qq.IsActived)
+                                                        {
+                                                        <i class="fa fa-check green"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                        <i class="fa fa-remove red"></i>
+                                                        }
+                                                </td>
+                                                <td class="text-center">@(index++)</td>
+                                                <td class="has-error">
+                                                    @(qq.Name)
+                                                </td>
+                                                <td>@qq.TotalMinute</td>
+                                                <td>@qq.Note</td>
+
+                                            </tr>
+                                            }
+                                        </tbody>
+
+                                    </table>
+                                </div>
+
+                            </div>
+                            <div id="donate" class="tab-pane">
+                                <table class="table table-bordered table-responsive grid-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="grid-header" style="width:70px">STT</th>
+                                            <th class="grid-header" style="width:100px">Mã vật tư</th>
+                                            <th class="grid-header">Tên vật tư</th>
+                                            <th class="grid-header" style="width:100px">Số lượng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.DetailServiceList.Any())
+                                        {
+                                            for (int i = 0; i < Model.DetailServiceList.Count; i++)
+                                            {
+                                                <tr class="alert-warning">
+                                                    <td>@(i + 1)</td>
+                                                    <td colspan="3">@Model.DetailServiceList[i].ProductCode - @Model.DetailServiceList[i].ProductName (SL: @Model.DetailServiceList[i].Quantity)</td>
+                                                </tr>
+                                                if (Model.DetailServiceList[i].ProductDetailList.Any())
+                                                {
+                                                    for (int ii = 0; ii < Model.DetailServiceList[i].ProductDetailList.Count; ii++)
+                                                    {
+
+                                                        <tr>
+                                                            <td style="padding-left:15px">@(i + 1).@(ii + 1)</td>
+                                                            <td>@Model.DetailServiceList[i].ProductDetailList[ii].MaterialCode</td>
+                                                            <td>@Model.DetailServiceList[i].ProductDetailList[ii].MaterialName</td>
+                                                            <td>@Model.DetailServiceList[i].ProductDetailList[ii].Quantity</td>
+                                                        </tr>
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-sm-5">
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title"><i class="ace-icon fa fa-info-circle"></i> Thông tin yêu cầu</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <div class="detail-view">
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Code, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItem(Model.TargetCode, "TargetCode", (Model.TargetModule == "AdviseCard" ? "Mã phiếu tư vấn" : "Mã phiếu Membership"), null, null, "col-xs-4", "col-xs-8")
+                            @*@Html.DetailViewItemFor2(model => model.TargetCode, null, null, "col-xs-4", "col-xs-8")*@
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CustomerCode, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CustomerName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.ProductCode, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.ProductName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.TotalMinute, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemDateTimeFor(model => model.WorkDay, true, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.ManagerName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CreateUserName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.CounselorName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.SkinscanUserName, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                        <div class="row control-group">
+                            @Html.DetailViewItemFor2(model => model.Note, null, null, "col-xs-4", "col-xs-8")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p></p>
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title"><i class="fa fa-cubes"></i> Nhóm trang thiết bị sử dụng</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main clearfix">
+                    <div class="col-sm-12">
+                        @foreach (var item in Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Category("EquimentGroup", null, null).Where(x => ("," + Model.EquimentGroup + ",").Contains("," + x.Value + ",") == true).ToList())
+                        {
+                            <a class="label label-info" style="margin-bottom:3px!important;margin-right:0px!important">@item.Text</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p></p>
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title">Chứng từ</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    @{Html.RenderAction("Relationship", "Transaction", new { area = "Account", TransactionCode = Model.Code });}
+                </div>
+            </div>
+        </div>
+        <p></p>
+        <div class="widget-box">
+            <div class="widget-header">
+                <h5 class="widget-title"><i class="ace-icon fa fa-image"></i> Ảnh</h5>
+            </div>
+            <div class="widget-body">
+                <div class="widget-main">
+                    <p>
+                        <a class="btn btn-primary btn-mini" onclick="OpenPopup('@Url.Action("Create", "Image", new { area = "Crm", TargetId = Model.Id, TargetModule = "InquiryCard" })', 'Thêm hình ảnh', 0, 500)">
+                            <i class="ace-icon fa fa-image"></i>
+                            Thêm ảnh
+                        </a>
+                    </p>
+                    @Html.Action("Detail", "Image", new { area = "Crm", TargetId = Model.Id, TargetModule = "InquiryCard" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@using (Html.BeginButtonContainer(pageSetting))
+{
+    @*<a class="btn btn-mini btn-primary" href="@Url.Action("Edit", pageSetting.ModuleName, new { Id = Model.Id })">
+            <i class="ace-icon fa fa-edit"></i>
+            @Wording.Edit
+        </a>*@
+}
+
+@section Scripts {
+    <script type="text/javascript">
+
+    </script>
+}

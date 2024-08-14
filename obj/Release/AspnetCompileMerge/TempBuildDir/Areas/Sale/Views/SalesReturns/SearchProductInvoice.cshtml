@@ -1,0 +1,48 @@
+﻿
+    <div class="product-search-box clearfix " style="margin-bottom:10px">
+        <span class="label label-warning" style="padding: 6px; float: left; height: 26px; margin-left: 0px;">[F2]</span>
+        <div id="product_search_control">
+            <span class="ctl">
+                @Html.TextBox("ProductInvoice", "", new { placeholder = "Sản phẩm/Dịch vụ...", autocomplete = "on", style = "width:400px;" })
+            </span>
+        </div>
+    </div>
+<script>
+    var $tr_template = $('.detailList tr:first-child');
+    $(function () {
+        $("#ProductInvoice").combojax({
+            url: "/ProductInvoice/GetDetailJsonByInvoiceId?id="+@(Model.Id) ,
+            onNotFound: function (p) {  //khi tìm ko thấy dữ liệu thì sẽ hiển thị khung thêm mới dữ liệu
+                //OpenPopup('/Customer/Create?IsPopup=true&Phone=' + p, 'Thêm mới', 500, 250);
+            },
+            onSelected: function (obj) {
+                if (obj) {
+                    var len = $('.detailList tr').length;
+                    var tr_new = $tr_template.clone()[0].outerHTML;
+                    tr_new = tr_new.replace(/\[0\]/g, "[" + len + "]");
+                    tr_new = tr_new.replace(/\_0\__/g, "_" + len + "__");
+                    var $tr_new = $(tr_new);
+                    $tr_new.attr('role', len);
+                    $tr_new.find('td:first-child').text(len);
+                    $tr_new.find('.item_product_id').val(obj.ProductId);
+                    $tr_new.find('.item_id').val(0);
+                    $tr_new.find('.item_quantity').val(obj.Quantity);
+                    $tr_new.find('.item_price').val(obj.Price);
+                    $tr_new.find('.item_unit').val(obj.Unit);
+                    $tr_new.find('.item_total').text(obj.Amount);
+                    $tr_new.find('.item_product_name').text(obj.Name);
+                    $tr_new.find('.item_locode').val(obj.LoCode);
+                    $tr_new.find('.item_expiry_date').val(obj.ExpiryDate);
+                    $('.detailList').append($tr_new);
+                    var $tr_after_append = $('.detailList tr[role="' + len + '"]');
+                    $tr_after_append.removeAttr("hidden", "hidden");
+                    $.mask.definitions['~'] = '[+-]';
+                    $('.input-mask-date').mask('99/99/9999');
+                }
+            }       //chỗ xử lý khi chọn 1 dòng dữ liệu ngoài việc lưu vào textbox tìm kiếm
+        , onShowImage: true                  //hiển thị hình ảnh
+        , onSearchSaveSelectedItem: true    //lưu dòng dữ liệu đã chọn vào ô textbox tìm kiếm, mặc định lưu giá trị value trong hàm get data
+        , onRemoveSelected: true  //những dòng đã chọn rồi thì sẽ ko hiển thị ở lần chọn tiếp theo
+        });
+    });
+</script>

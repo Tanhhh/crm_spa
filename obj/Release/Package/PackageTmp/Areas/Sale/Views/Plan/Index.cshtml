@@ -1,0 +1,207 @@
+﻿@model IEnumerable<KH_TUONGTACViewModel>
+
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+    @using PagedList;
+    @using PagedList.Mvc;
+    @{
+        ViewBag.Title = "Kế hoạch chăm sóc kỹ thuật";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "Plan",
+            ActionName = "Index",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false,
+            AdvancedSearch = false,
+            //SearchOjectAttr = ViewBag.ListOjectAttrSearch
+        };
+        int index = 1;
+        int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+        string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        // Cộng thêm 1 tháng và trừ đi một ngày.
+        DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+
+        List<KH_TUONGTACViewModel> Customer = (List<KH_TUONGTACViewModel>)ViewBag.Customer;
+        IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user2 = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user2;    //IEnumerable<SelectListItem> Origin = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin", null, "value");
+
+    }
+    @helper GridColumnName(int NGUOILAP_ID)
+        {
+            <a href="@Url.Action("Detail", "Plan", new { NGUOILAP_ID=NGUOILAP_ID})">Đã lập</a>
+}
+
+    @if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+    {
+        <div class="alert alert-block alert-success">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-check green"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+    @if (TempData["Seccess"] != null && TempData["Seccess"] != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @TempData["Seccess"]
+        </div>
+    }
+    @if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+    {
+        <div class="alert alert-block alert-danger">
+            <button class="close" data-dismiss="alert" type="button">
+                <i class="ace-icon fa fa-times"></i>
+            </button>
+            <i class="ace-icon fa fa-warning red"></i>
+            @ViewBag.FailedMessage
+        </div>
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+        <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+
+        @*<label>Chi nhánh</label>
+        @Html.DropDownList("BranchId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"))*@
+        <label>Tháng</label>
+        <select id="Month" name="Month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(Month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Năm</label>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1) + 1; i++)
+            {
+                <option @(Year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Người quản lý</label>
+        <select id="NGUOILAP" name="NGUOILAP">
+            <option value="">- Người quản lý -</option>
+            @foreach (var item in user2.OrderBy(x => x.FullName))
+            {
+                <option value="@item.Id" data-selected="0">@item.FullName</option>
+            }
+        </select>
+
+    }
+
+    <div class="tab-content clear-fix">
+        
+        <div id="" class="table-responsive top-10 ">
+            <table id="CTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">Stt</th>
+                        <th style="min-width:200px" class="text-center">Nhân viên lập</th>
+                        @for (DateTime dt = ViewBag.aDateTime; dt <= ViewBag.retDateTime; dt = dt.AddDays(1))
+                        {
+                            <th class="text-center" style="width:100px;">@dt.ToString("dd/MM/yyyy")</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in user.OrderBy(x => x.FullName))
+                    {
+                        <tr class="@(index%2==0?"alert-warning":"")">
+                            <td>
+                                <span>@(index++)</span>
+                            </td>
+                            <td>
+                                @item.FullName
+                            </td>
+                            @for (DateTime dt = ViewBag.aDateTime; dt <= ViewBag.retDateTime; dt = dt.AddDays(1))
+                                        {
+                                            var date = dt.ToString("dd/MM/yyyy");
+                                            var list = Model.Where(x => x.NGUOILAP_ID == item.Id && x.NGAYLAP == dt.ToString("dd/MM/yyyy"));
+
+                                            float list1 = Customer.Where(x => x.NGUOILAP_ID == item.Id && x.NGAYLAP == date).Count(x=>x.KETQUA_SAUTUONGTAC!=null);
+                                            float list2 = Customer.Where(x => x.NGUOILAP_ID == item.Id && x.NGAYLAP == date).Count(x => x.KH_TUONGTAC_ID != 0);
+                                            float count=0;
+                                            if(list2==0)
+                                            {
+                                                count = 0;
+                                            }
+                                            else
+                                            {
+                                                count = ((list1 / list2)*100);
+                                            }
+                                            var n=Math.Round(count, 1);
+                                            if (list.Count() > 0)
+                                            {
+                                    <td class="text-center">
+                                        <a target="_blank" href="@Url.Action("Detail", "Plan",new {NGAYLAP = date, NGUOILAP_ID= item.Id,FullName=item.FullName})">Đã lập (@n%)</a>
+                                        
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="text-center">
+                                        <a target="_blank" style="color:red" href="@Url.Action("Create", pageSetting.ModuleName,new {NGAYLAP=date,NGUOILAP_ID=item.Id})">
+                                            Chưa lập
+                                        </a>
+                                    </td>
+                                }
+                            }
+                        </tr>
+                    }
+                </tbody>
+                <thead>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <div class="col-md=12 text-left">
+        @*Page @ViewBag.PageNumber of @ViewBag.TotalPages*@
+        @*@Html.PagedListPager((IPagedList)ViewBag.user, page => Url.Action("Index", new { page }))*@
+        @*Page @(user.PageCount < user.PageNumber ? 0 : user.PageNumber) of @Model.PageCount
+            @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))*@
+    </div>
+
+@section Scripts {
+    <link href="/Scripts/ckeditor/contents.css" rel="stylesheet" />
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @*@Html.ScriptBottom_DatePicker("dd/MM/yyyy HH:mm")*@
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+
+    <script type="text/javascript">
+
+                 $("#NGAYLAP").click(function () {
+                     var startDay = new Date();
+                     startDay = document.getElementById("NGAYLAP").value;
+
+                     var today = new Date();
+                     var date = today.getDate() + '/' + (today.getMonth() + 1) + '/' + today.getFullYear();
+                     var time = today.getHours() + ":" + today.getMinutes();
+                     var dateTime = date + ' ' + time;
+
+
+                    if ((startDay < dateTime)) {
+                             alert("Ngày lập phải lớn hơn hoặc bằng ngày hiện tại");
+                             //document.getElementById("NGAYTUONGTAC_TIEP").value = "";
+                             return false;
+                         }
+
+                     return true;
+                 });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+}

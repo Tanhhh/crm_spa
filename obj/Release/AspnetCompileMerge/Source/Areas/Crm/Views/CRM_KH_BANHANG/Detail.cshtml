@@ -1,0 +1,393 @@
+﻿@*@model IEnumerable<CRM_KH_BANHANGViewModel>*@
+
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@model CRM_KH_BANHANGViewModel
+
+@{
+    ViewBag.Title = "Lập Kế hoạch mới";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CRM_KH_BANHANG",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    int rowNumber = 0;
+    int numberOfItem = 30;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    //string Month = Request["month"] != null ? Request["month"] : DateTime.Now.ToString("MM/yyyy");
+    //string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    int index = 0;
+    IEnumerable<SelectListItem> BrandList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin", null, "value");
+    IEnumerable<CRM_KH_BANHANGViewModel> CRM_KH_BANHANG = (IEnumerable<CRM_KH_BANHANGViewModel>)ViewBag.CRM_KH_BANHANG;
+
+
+}
+
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+<style>
+    .popover {
+        width: 100% !important;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 10px;
+    }
+</style>
+@helper CheckDeleteColumns(int? KH_GIOITHIEU_ID)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_GIOITHIEU_ID">
+            <span class="lbl"></span>
+        </label>
+}
+@helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+}
+
+@helper GridColumnCommand(int? id)
+    {
+        <p>
+            <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+            </button>
+        </p>
+}
+
+@helper GridColumnName(int? KH_GIOITHIEU_ID, string name, bool isPopup = true, string jsCallback = null)
+    {
+        @*<a href="@Url.Action("Create", "KH_GIOITHIEU", new { KH_GIOITHIEU_ID = KH_GIOITHIEU_ID,onclick = "OpenPopup('" + Url.Action("Create","KH_GIOITHIEU", new { IsPopup = true }) + "', '', 0, 0)"  })">@name</a>*@
+        <a onclick="OpenPopup('@Url.Action("Create", "KH_GIOITHIEU", new { area = "Crm", KH_GIOITHIEU_ID = KH_GIOITHIEU_ID, IsPopup = true })', '', 0, 0)">@name</a>
+}
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @*@Html.HiddenFor(model => model.BranchId)
+        @Html.HiddenFor(model => model.CustomerId)*@
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+    <div class="tabbable">
+        <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab" style="height:30px">
+            <li>Kế hoạch bán hàng</li>
+        </ul>
+
+        <div class="tab-content clear-fix">
+            <p>
+                <label>Tháng/năm</label>
+                @Html.TextBox("month", Request["month"] != null ? Request["month"] : new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).ToString("MM/yyyy"), new { autocomplete = "off", style = "width:110px" })
+                @*<select style="width:40px">
+                        @for (int i = 1; i <= 12; i++)
+                        {
+                            <option @(Month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+                        }
+                    </select>
+                    <label>Năm</label>
+                    <select id="year" name="year" style="width:70px">
+                        @for (int i = 2016; i <= DateTime.Now.Year; i++)
+                        {
+                            <option @(Year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+                        }
+                    </select>*@
+                <label>Người lập</label>
+                @Html.TextBox("NGUOILAP_ID", Request["NGUOILAP_ID"], new { @class = "hidden", autocomplete = "off", placeholder = "Người lập", style = "width:110px" })
+
+                @*@Html.DropDownList("NGUOILAP_ID", SelectListHelper.GetSelectList_User(Request["NGUOILAP_ID"], "Nhân viên" ),new { style = "width:110px" })*@
+
+
+                @Html.TextBox("FullName", Request["FullName"], new { @class = "", autocomplete = "off", placeholder = "Người lập", style = "width:110px" })
+
+                <label>Nhãn hàng</label>
+                @Html.DropDownList("CountForBrand", BrandList, new { style = "width:200px" })
+            </p>
+            <p>
+                <label>Taget(VNĐ)</label>
+                @Html.TextBox("TARGET_BRAND", Request["TARGET_BRAND"], new { @class = "numberinput2", autocomplete = "off", placeholder = "TARGET", style = "width:110px" })
+                @*@Html.CustomTextboxFor(model => model.f, null, null, WidthType.span12, true)*@
+                <label>GHI CHU</label>
+                @Html.TextBox("GHI_CHU", Request["GHI_CHU"], new { @class = "", autocomplete = "off", placeholder = "Ghi chu", style = "width:200px" })
+                <label>Đạt (%)</label>
+                @Html.TextBox("DAT", Request["TYLE_THANHCONG"], new { @class = "", autocomplete = "off", placeholder = "Đạt (%)", style = "width:110px" })
+            </p>
+            <p>
+                <label>Kế hoạch đã lập</label>
+                @Html.TextBox("TotalAmount", Request["TotalAmount"], new { @class = "", autocomplete = "off", placeholder = "Kế hoạch đã lập", style = "width:200px" })
+
+
+            </p>
+            @*<div id="tab1" class="tab-pane active" style="margin-left:20px">
+                </div>*@
+            <div id="listOrderDetail" class="table-responsive top-10 ">
+                <table id="CTable" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                            <th rowspan="2" style="text-align:center"> Tên khách hàng</th>
+                            <th rowspan="2" style="text-align:center">Mã KH</th>
+                            <th rowspan="2" style="text-align:center">Diện thoại </th>
+                            <th rowspan="2" style="width:100px;text-align:center">Thông tin lưu ý</th>
+                            <th rowspan="2" style="text-align:center">Tỷ lệ thành công(%)</th>
+                            <th rowspan="2" style="text-align:center">Ghi chú</th>
+                            <th rowspan="2" style="text-align:center">Có đơn hàng</th>
+                            <th rowspan="2" style="text-align:center">Đánh giá lại</th>
+                            <th rowspan="2" style="text-align:center">Đơn hàng dự kiến</th>
+                            <td></td>
+                        </tr>
+
+
+                    </thead>
+                    <tbody class="productInvoiceList">
+                        @if (Model.CRM_KH_BANHANG_CTIETList.Count > 0)
+                        {
+                            @Html.Partial("LoadDetail", Model);
+                        }
+
+                        @*@foreach (var item in Model.CRM_KH_BANHANG_CTIETList)
+                            {
+                                <tr>
+                                    <td>@(index += 1)</td>
+                                    <td>@item.CompanyName</td>
+                                    @*<td@>item.Code </td@>
+                                    <td>@item.Phone</td>
+                                    <td>@item.NOIDUNG</td>
+                                    <td id="abc">@item.TYLE_THANHCONG
+
+                                    <button id="Tang_@(item.KH_BANHANG_CTIET_ID)_Q"  class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+                                    <i class="action-buttons"></i>+</button>
+                                     <button id="Giam" class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+                                     <i class="action-buttons"></i>-</button>
+                                    </td>
+                                    <td>@item.GHI_CHU</td>
+
+
+
+
+                                </tr>
+                            }*@
+                    </tbody>
+                    <thead>
+
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+
+        @*<div id="tab2" class="tab-pane">
+                <div class="">
+
+                </div>
+            </div>
+
+            <div id="tab3" class="tab-pane">
+
+
+            </div>
+
+            <div id="tab4" class="tab-pane">
+
+
+            </div>*@
+    </div>
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" onclick="Check();">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </a>
+    }
+}
+
+
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script type="text/javascript">
+        $('#month').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+        $('#listOrderDetail').on('click', '.btn-delete-item', function () {
+            $(this).closest('tr').remove();
+            $('.productInvoiceList tr').each(function (index, tr) {
+                $(tr).attr('role', index);
+                $(tr).find('td:first-child').text(index);
+                $(tr).find('.id').attr('name', 'CRM_KH_BANHANG_CTIETList[' + index + '].Id').attr('id', 'CRM_KH_BANHANG_CTIETList_' + index + '__Id');
+                $(tr).find('.code').attr('name', 'CRM_KH_BANHANG_CTIETList[' + index + '].Code').attr('id', 'CRM_KH_BANHANG_CTIETList_' + index + '__Code');
+                $(tr).find('.phone').attr('name', 'CRM_KH_BANHANG_CTIETList[' + index + '].Phone').attr('id', 'CRM_KH_BANHANG_CTIETList_' + index + '__Phone');
+                $(tr).find('.item_price').attr('name', 'InvoiceList[' + index + '].Price').attr('id', 'InvoiceList_' + index + '__Price');
+                $(tr).find('.item_locode').attr('name', 'InvoiceList[' + index + '].LoCode').attr('id', 'InvoiceList_' + index + '__LoCode');
+            });
+        });
+        $('#listOrderDetail').on('click', '.btn-CONG', function () {
+            var $row = $(this).closest("tr");    // Find the row
+            var $text = $row.find(".nr").val(); // Find the text
+            var w = parseFloat($text);
+            if (w < 0) {
+                w = -1;
+            }
+            if (w > 0) {
+                w += 10;
+            } if (w == 0) {
+                w += 10;
+            }
+            if (w == -1) {
+                w = 0;
+            }
+            if (w > 100) {
+                w = 100;
+                alert('Tỷ lệ thành công không được quá 100%');
+            }
+            $row.find(".nr").val(w);
+        });
+        $('#listOrderDetail').on('click', '.btn-TRU', function () {
+            var $row = $(this).closest("tr");    // Find the row
+            var $text = $row.find(".nr").val(); // Find the text
+            var w = parseFloat($text);
+            if (w == 0) {
+                w = -1;
+            }
+            if (w < 0) {
+                w = -1;
+            } if (w == -1) {
+                w = -1;
+            } if (w > 0) {
+                w += -10;
+            }
+            $row.find(".nr").val(w);
+        });
+        $('#listOrderDetail').on('click', '.btn-CONG-REVIEW', function () {
+            var $row = $(this).closest("tr");    // Find the row
+            var $text = $row.find(".nr_REVIEW").val(); // Find the text
+            var w = parseFloat($text);
+            if (w < 0) {
+                w = -1;
+            }
+            if (w > 0) {
+                w += 10;
+            } if (w == 0) {
+                w += 10;
+            }
+            if (w == -1) {
+                w = 0;
+            }
+            if (w > 100) {
+                w = 100;
+                alert('Tỷ lệ thành công không được quá 100%');
+            }
+            $row.find(".nr_REVIEW").val(w);
+        });
+        $('#listOrderDetail').on('click', '.btn-TRU-REVIEW', function () {
+            var $row = $(this).closest("tr");    // Find the row
+            var $text = $row.find(".nr_REVIEW").val(); // Find the text
+            var w = parseFloat($text);
+            if (w == 0) {
+                w = -1;
+            }
+            if (w < 0) {
+                w = -1;
+            } if (w == -1) {
+                w = -1;
+            } if (w > 0) {
+                w += -10;
+            }
+            $row.find(".nr_REVIEW").val(w);
+        });
+
+        function Check() {
+            ShowLoading();
+            var TARGET_BRAND = $("#TARGET_BRAND").val();
+            var CountForBrand = $("#CountForBrand").val()
+            var messagge = "";
+            if (TARGET_BRAND == '') {
+                messagge += "Chưa nhập Taget<br>";
+            } if (CountForBrand == '') {
+                messagge += "Chưa chọn nhãn hàng";
+            }
+            if (messagge != '') {
+                alertPopup('Lỗi!', messagge, 'error');
+                HideLoading();
+            } else {
+                ClearFormatBeforeSubmit($("#SaleOrder"));
+                $("#SaleOrder").submit();
+            }
+        }
+    </script>
+}

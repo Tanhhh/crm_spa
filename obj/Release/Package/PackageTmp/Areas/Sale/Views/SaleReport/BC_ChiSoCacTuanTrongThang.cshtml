@@ -1,0 +1,283 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers;
+@using Erp.BackOffice.Account.Models;
+@using System.Globalization;
+@using Erp.BackOffice.Areas.Sale.Models;
+@model List<IndexViewModel>
+    @{
+        Layout = null;
+        ViewBag.Title = "So sánh số lượng khách và danh sách khách theo tuần";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "BC_ChiSoCacTuanTrongThang",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false,
+            SearchButtonText = "Xem báo cáo"
+        };
+
+
+        //DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        //// Cộng thêm 1 tháng và trừ đi một ngày.
+        //DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+
+
+        int? nk = Request["nKHCU"] == null ? 1 : int.Parse(Request["nKHCU"]);
+        string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+        string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+        string ManagerStaffid = Request["ManagerStaffId"] != null ? Request["ManagerStaffId"] : SelectListHelper.GetSelectList_FullUserNameKD(null, null).FirstOrDefault().Value.ToString();
+
+    }
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <select id="month" name="month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(Month == i.ToString() ? "Selected" : "") value="@i">Tháng @i</option>
+            }
+        </select>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+            {
+                <option @(Year == i.ToString() ? "Selected" : "") value="@i">Năm @i</option>
+            }
+        </select>
+        <select class="chzn-select" style="width:250px; float:left" id="ManagerStaffId" name="ManagerStaffId">
+            <option value="">- Nhân viên QL -</option>
+            @foreach (var item in SelectListHelper.GetSelectList_FullUserNameKD(null, null))
+            {
+                <option @(ManagerStaffid == item.Value ? "Selected" : "") value="@item.Value">@item.Text</option>
+            }
+        </select>
+        <label>
+            <input id="single4" name="nKHCU" type="checkbox" class="ace" value="0" @(Request["nKHCU"] == "0" ? "checked=checked" : "")>
+            <span class="lbl"> Khách hàng cũ</span>
+        </label>
+        <input type="hidden" id="KHC" value="@Request["nKHCU"]" />
+
+    }
+    <div class="table-responsive" id="BC_ChiSoCacTuanTrongThang" style="margin-bottom:40px">
+        <table id="cTable" class="table table-bordered">
+            <thead>
+                <tr class="">
+                    <th class="" colspan="11" style="text-align:center"><h4>BÁO CÁO CHỈ SỐ CÁC TUẦN TRONG THÁNG @Month</h4></th>
+                </tr>
+                <tr>
+                    <th style="width:400px;text-align:center">#</th>
+                    <th style="min-width:100px;text-align:center">TUẦN 1</th>
+                    <th style="min-width:100px;text-align:center">TUẦN 2</th>
+                    <th style="min-width:100px;text-align:center">TUẦN 3</th>
+                    <th style="text-align:center">TUẦN 4</th>
+                    <th style="text-align:center">TỔNG THÁNG</th>
+
+                </tr>
+            </thead>
+            <tbody>
+
+
+                <tr>
+                    <td>
+                        SL TƯƠNG TÁC @(nk == 0 ? "Cũ" : "MỚI")
+                    </td>
+                    @foreach (var tt in Model)
+                    {
+                        <td>@tt.TT</td>
+                    }
+                    <td>@Model.Sum(b => b.TT)</td>
+                </tr>
+                <tr>
+                    <td>SL HẸN @(nk == 0 ? "Cũ" : "MỚI")</td>
+                    @foreach (var h in Model)
+                    {
+                        <td>@h.Hen</td>
+                    }
+                    <td>@Model.Sum(b => b.Hen)</td>
+                </tr>
+                <tr>
+                    <td>
+                        SỐ LƯỢNG KHÁCH @(nk == 0 ? "Cũ" : "MỚI") LÊN
+                    </td>
+                    @foreach (var l in Model)
+                    {
+                        <td>@l.Len</td>
+                    }
+                    <td>@Model.Sum(b => b.Len)</td>
+                </tr>
+                <tr>
+                    <td>SÓ LƯỢNG KHÁCH @(nk == 0 ? "Cũ" : "MỚI") MUA</td>
+                    @foreach (var m in Model)
+                    {
+                        <td>@m.Mua</td>
+                    }
+                    <td>@Model.Sum(b => b.Mua)</td>
+                </tr>
+                <tr>
+                    <td>
+                        TỶ LỆ @(nk == 0 ? "Cũ" : "MỚI") LÊN TRÊN HẸN
+                    </td>
+                    @foreach (var tl in Model)
+                    {
+                        <td>@(tl.Hen != null ? (float)tl.Hen : 0 / tl.Len != null ? (float)tl.Len : 1)</td>
+                    }
+                    <td>@Model.Sum(b => (b.Hen != null ? (float)b.Hen : 0 / b.Len != null ? (float)b.Len : 1)) </td>
+                </tr>
+                <tr>
+                    <td>TỶ LỆ MUA TRÊN LÊN @(nk == 0 ? "Cũ" : "MỚI")</td>
+                    @foreach (var tl in Model)
+                    {
+                        <td>@(tl.Mua != null ? (float)tl.Mua : 0 / tl.Len != null ? (float)tl.Len : 1)</td>
+                    }
+                    <td>@Model.Sum(b => (b.Mua != null ? (float)b.Mua : 0 / b.Len != null ? (float)b.Len : 1))</td>
+                </tr>
+                <tr>
+                    <td>DOANH SỐ ẢO @(nk == 0 ? "Cũ" : "MỚI")</td>
+                    @foreach (var ao in Model)
+                    {
+                        <td>@ao.Ao</td>
+                    }
+                    <td>@Model.Sum(b => b.Ao)</td>
+                </tr>
+                <tr>
+                    <td>
+                        DOANH SỐ THỰC @(nk == 0 ? "Cũ" : "MỚI")
+                    </td>
+                    @foreach (var thuc in Model)
+                    {
+                        <td>@thuc.Thuc</td>
+                    }
+                    <td>@Model.Sum(b => b.Thuc)</td>
+                </tr>
+                <tr>
+                    <td>TB HĐ ẢO @(nk == 0 ? "Cũ" : "MỚI")</td>
+                    @foreach (var tbao in Model)
+                    {
+                        tbao.Ao = tbao.Ao != null ? tbao.Ao : 0;
+                        tbao.Mua = tbao.Mua != null ? tbao.Mua : 1;
+                        tbao.Mua = tbao.Mua == 0 ? 1 : tbao.Mua;
+                        <td>@(Math.Round((decimal)tbao.Ao / (decimal)tbao.Mua,2))</td>
+                    }
+                    <td>@Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Math.Round(Model.Sum(b => (decimal)b.Ao / (decimal)b.Mua), 2),null)</td>
+
+
+
+                </tr>
+                <tr>
+                    <td>TB HĐ THỰC @(nk == 0 ? "Cũ" : "MỚI")</td>
+                    @foreach (var tbthuc in Model)
+                    {
+                        tbthuc.Thuc = tbthuc.Thuc != null ? tbthuc.Thuc : 0;
+                        tbthuc.Mua = tbthuc.Mua != null ? tbthuc.Mua : 1;
+                        tbthuc.Mua = tbthuc.Mua == 0 ? 1 : tbthuc.Mua;
+                        <td>@(Math.Round((decimal)tbthuc.Thuc / (decimal)tbthuc.Mua,2))</td>
+                    }
+                    <td>@Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Math.Round(Model.Sum(b => (decimal)b.Thuc / (decimal)b.Mua), 2),null)</td>
+                </tr>
+                @if (nk == 0)
+                {
+                    <tr>
+                        <td>TỔNG ORLANE ẢO</td>
+
+                        @foreach (var tongorlaneao in Model)
+                        {
+                            <td>@tongorlaneao.AoOrlane</td>
+                        }
+                        <td>@Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Model.Sum(b => b.AoOrlane),null)</td>
+                    </tr>
+                    <tr>
+                        <td>TỔNG ORLANE THỰC</td>
+                        @foreach (var tongorlanethuc in Model)
+                        {
+                            <td>@tongorlanethuc.ThucOrlane</td>
+                        }
+                        <td>@Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Model.Sum(b => b.ThucOrlane),null)</td>
+                    </tr>
+                    <tr>
+                        <td>DS ẢO ANNAYAKE</td>
+                        @foreach (var dsaoAnalyke in Model)
+                        {
+                            <td>@dsaoAnalyke.AoAnna</td>
+                        }
+                        <td>@Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Model.Sum(b => b.AoAnna),null)</td>
+                    </tr>
+                    <tr>
+                        <td>DS THỰC ANNAYKE</td>
+                        @foreach (var dsthucanalyke in Model)
+                        {
+                            <td>@dsthucanalyke.ThucAnna</td>
+                        }
+                        <td>@Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Model.Sum(b => b.ThucAnna),null)</td>
+                    </tr>
+                    <tr>
+                        <td>DS ẢO LEONOR GREYL</td>
+                        @foreach (var dsAoLeo in Model)
+                        {
+                            <td>@dsAoLeo.AoLeo</td>
+                        }
+                        <td>@Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Model.Sum(b => b.AoLeo), null)</td>
+                    </tr>
+                    <tr>
+                        <td>DS Thực LEONOR GREYL</td>
+                        @foreach (var dsThucLeo in Model)
+                        {
+                            <td>@dsThucLeo.ThucLeo</td>
+                        }
+                            <td>@Erp.BackOffice.Helpers.CommonSatic.ToCurrencyStr(Model.Sum(b => b.ThucLeo), null)</td>
+                    </tr>
+                }
+            </tbody>
+            <thead>
+
+
+                <tr>
+                    @*<td colspan="5" style="text-align:right"><b>Tổng:</b></td>
+                        <td style="text-align:right"><b>@Model.Count()</b></td>*@
+                    @*<td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalAmount), null))</b></td>
+
+                        <td style="text-align:right"><b>@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.PaidAmount), null))</b></td>*@
+                </tr>
+            </thead>
+        </table>
+
+    </div>
+    @using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="tableToExcel('BC_ChiSoCacTuanTrongThang','BaoCaoChiSoCacTuanTrongThang')">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </button>
+    }
+    @section Scripts {
+        @*<script>
+                function ExportTrangThaiNgungTheoDoiKH() {
+                    var startDate = $('#startDate').val();
+                    var endDate = $('#endDate').val();
+
+                    OpenPopup('/SaleReport/Export_BC_SLKHACHVADSMOITHEOTUAN?startDate=' + startDate + '&endDate=' + endDate + '&IsPopup=true', '', 0, 900);
+                    setTimeout(function () {
+                        $("#myModal .modal-body .iframe-container").html("");
+                        $('#myModal').modal('hide');
+                    }, 200000);
+                    HideLoading();
+                }
+            </script>*@
+        <script type="text/javascript">
+
+            var tableToExcel = (function () {
+                var uri = 'data:application/vnd.ms-excel;base64,'
+                    , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+                    , base64 = function (s) { return window.btoa(unescape(encodeURIComponent(s))) }
+                    , format = function (s, c) { return s.replace(/{(\w+)}/g, function (m, p) { return c[p]; }) }
+
+                return function (table, name) {
+                    if (!table.nodeType) table = document.getElementById(table)
+                    var ctx = { worksheet: name || 'Worksheet', table: table.innerHTML }
+                    window.location.href = uri + base64(format(template, ctx))
+                }
+            })()
+        </script>
+    }
+

@@ -1,0 +1,7 @@
+{
+  "name": "http://14.161.27.13:199/",
+  "short_name": "trang ha",
+  "start_url": "/",
+  "display": "standalone",
+  "gcm_sender_id": "482941778795"
+}

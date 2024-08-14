@@ -1,0 +1,128 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Crm.Models
+
+@model TaskViewModel
+
+@{
+    ViewBag.Title = "Cập nhật công việc";
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Task",
+        ActionName = "UpdateTask",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = true,
+        DisplayBackButton = false
+    };
+}
+<style>
+    .edit-view .control-value {
+        width: 60% !important;
+    }
+</style>
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" name="UrlReferrer" value="@Request.UrlReferrer" />
+    @Html.HiddenFor(model => model.Id)
+    @Html.CustomTextboxFor(model => model.Subject, null, null, WidthType.span6, true)
+    @Html.CustomDropDownListFor(model => model.Status, SelectListHelper.GetSelectList_Category("task_status", Model.Status, "Value", Wording.Empty), null, true, null, DropdownListStyle.DropdownListStyleDefault)
+    @Html.DateTimePicker(model => model.StartDate, "dd/MM/yyyy H:mm", "00/00/0000 00:00:00", true, false)
+    @Html.DateTimePicker(model => model.DueDate, "dd/MM/yyyy H:mm", "00/00/0000 00:00:00", true, false)
+    @Html.CustomDropDownListFor(model => model.Priority, SelectListHelper.GetSelectList_Category("task_priority", Model.Priority, "Value", Wording.Empty), null, true, null, DropdownListStyle.DropdownListStyleDefault)
+    @Html.CustomTextAreaFor(model => model.Description, null, WidthType.span12, true)
+    @*@Html.CustomTextAreaFor(model => model.Note,null, WidthType.span12, true, null)*@
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save" id="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+        @*if(!string.IsNullOrEmpty(Model.ParentType))
+            {
+            <a class="btn btn-mini btn-primary btn-white" href="@Url.Action(Model.ParentType,"Detail", new { Id = Model.ParentId })" target="_blank">
+                <i class="ace-icon fa fa-send"></i>
+                Chuyển đến trang chi tiết
+            </a>
+            }*@
+    }
+}
+@Html.ScriptBottom_ValidationMvc()
+@Html.ScriptBottom_ChosenStyle()
+@Html.ScriptBottom_DatePicker("dd/mm/yyyy")
+@section Scripts {
+    <script type="text/javascript">
+        var urlRefer = '@ViewBag.urlRefer';
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            debugger
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.Id" >@Model.Subject</option>';
+                //nếu có url thì gọi hàm này để trang ngoài iframe nhảy trang
+                if (urlRefer != '') {
+                    window.parent.ClosePopupAndRedirectToURL(urlRefer);
+                }
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndDoSomething(option);
+            }
+
+
+        });
+        $(document).ready(function () {
+            $('[data-rel="tooltip"]').tooltip({ container: 'body' });
+            $("button[name='Submit']").click(function (e) {
+                    //kiem tra ngay thang
+                    //ngay bat dau;
+                    var startDate = $("#StartDate").val().split(" ");
+
+                    //cat thoi gian
+                    var catgio = startDate[1].split(":");
+                    var gio = catgio[0];
+                    var phut = catgio[1];
+                    //cat ngay
+                    var catthoigian = startDate[0].split("/");
+                    var catngay = catthoigian[0];
+                    var catthang = catthoigian[1];
+                    var catnam = catthoigian[2];
+                    //ngay ket thuc
+                    var endDate = $("#DueDate").val().split(" ");
+                    //cat thoi gian
+                    var catgio1 = endDate[1].split(":");
+                    var gio1 = catgio1[0];
+                    var phut1 = catgio1[1];
+                    //cat ngay
+                    var catthoigian1 = endDate[0].split("/");
+                    var catngay1 = catthoigian1[0];
+                    var catthang1 = catthoigian1[1];
+                    var catnam1 = catthoigian1[2];
+                    //so sanh
+                    //if (catngay > catngay1 || catthang > catthang1 || catnam > catnam1) {
+                    //    alertPopup("Lỗi", "Thời hạn phải lớn hơn ngày bắt đầu!!!", "warning");
+                    //    return false;
+                    //}
+                    if (catngay == catngay1 && catthang == catthang1 && catnam == catnam1) {
+                        if (gio > gio1) {
+                            alertPopup("Lỗi", "Thời hạn phải lớn hơn ngày bắt đầu!!!", "warning");
+                            return false;
+                        }
+                        if (gio == gio1) {
+                            if (phut > phut1) {
+                                alertPopup("Lỗi", "Thời hạn phải lớn hơn ngày bắt đầu!!!", "warning");
+                                return false;
+                            }
+                        }
+                    }
+                });
+            });
+        
+    </script>
+
+}

@@ -1,0 +1,300 @@
+﻿@model IEnumerable< CRM_BH_DOANHSOViewModel>
+
+@using PagedList;
+@using PagedList.Mvc;
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = "Kế hoạch chạy doanh số";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "BH_DOANHSO",
+        ActionName = "Index",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = true,
+        IsPopup = false,
+        DisplayBackButton = false
+    };
+    //int rowNumber = 0;
+    //int numberOfItem = 30;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.Month.ToString();
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel> user = (IEnumerable<Erp.BackOffice.Areas.Administration.Models.UserViewModel>)ViewBag.user;
+    IEnumerable<CategoryViewModel> Origin = (IEnumerable<CategoryViewModel>)ViewBag.Origin;
+    IEnumerable<CRM_BH_DOANHSO_CTViewModel> CRM_BH_DOANHSO_CT = (IEnumerable<CRM_BH_DOANHSO_CTViewModel>)ViewBag.CRM_BH_DOANHSO_CT;
+    //DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    //// Cộng thêm 1 tháng và trừ đi một ngày.
+    //DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    int index = 1;
+    int index1 = 1;
+}
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+<style>
+    .popover {
+        width: 100% !important;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 10px;
+    }
+</style>
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+    <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+    <p style="height:50px">
+        <label>Chi nhánh</label>
+        @Html.DropDownList("BranchId", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_Branch(Request["BranchId"], "Chi nhánh"))
+        <label>Tháng</label>
+        <select id="month" name="month">
+            @for (int i = 1; i <= 12; i++)
+            {
+                <option @(Month == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Năm</label>
+        <select id="year" name="year">
+            @for (int i = 2016; i <= DateTime.Now.Year; i++)
+            {
+                <option @(Year == i.ToString() ? "Selected" : "") value="@i">@i</option>
+            }
+        </select>
+        <label>Người Lập</label>
+        @*@Html.DropDownList("NGUOILAP", Erp.BackOffice.Helpers.SelectListHelper.GetSelectList_User(Request["NGUOILAP"], "Người Lập"))*@
+        <select>
+            <option value="all">-Người quản lý-</option>
+            @foreach (var item in user)
+            {
+                <option value="@item.Id">@item.FullName</option>
+            }
+        </select>
+    </p>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Create", pageSetting.ModuleName, "Crm"))
+        {
+            <a class="btn btn-mini btn-primary" onclick="OpenPopup('@Url.Action("Create", pageSetting.ModuleName,new { id=@ViewBag.NGUOILAP,month=Month,year=Year})','',0,0)">
+                <i class="ace-icon fa fa-plus"></i>
+                Lập kế hoạch mới
+            </a>
+        }
+    }
+}
+<div class="tabbable">
+    <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="myTab" style="height:30px">
+        <li>Kế hoạch chạy doanh số</li>
+    </ul>
+    <div class="tab-content clear-fix">
+
+        <div id="tab1" class="tab-pane active" style="margin-left:20px">
+        </div>
+        <div id="" class="table-responsive top-10 ">
+            <table id="CTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th rowspan="2" style="width:40px;text-align:center">STT</th>
+                        <th rowspan="2" style="text-align:center;width:200px">Nhân viên lập</th>
+                        <th rowspan="2" style="text-align:center">Tháng/Năm</th>
+                        <th colspan="5" style="text-align:center">Target </th>
+                        <th colspan="5" style="width:100px;text-align:center">Kế hoạch</th>
+                        <th colspan="5" style="text-align:center">Đạt(%)</th>
+                    </tr>
+
+                    <tr>
+                        @foreach (var a in Origin)
+                        {
+                            <th class="text-center" style="width:100px;">@a.Name</th>
+                        }
+                        @foreach (var a in Origin)
+                        {
+                            <th class="text-center" style="width:100px;">@a.Name</th>
+                        }
+                        @foreach (var a in Origin)
+                        {
+                            <th class="text-center" style="width:100px;">@a.Name</th>
+                        }
+                    </tr>
+
+
+
+
+                </thead>
+                <tbody>
+                 @if (Model.Count() > 0)
+                 {
+                     foreach (var item in user.OrderBy(x => x.UserName))
+                     {
+                        <tr id="@(index1++)" class="@(index % 2 == 0 ? "alert-warning" : "")">
+                            <td>
+                                <span>@(index++)</span>
+                            </td>
+
+                            <td>
+                                <a href="@Url.Action("Edit", "BH_DOANHSO", new { id = item.Id, month = Month, year = Year, FullName = item.FullName })">
+                                    @item.FullName
+                                </a>
+                            </td>
+                            <td>@Month/@Year</td>
+
+                            @foreach (var a in Origin)
+                            {
+                                var list = Model.Where(x => x.CountForBrand == a.Value && x.NGUOILAP_ID == item.Id && x.THANG.ToString() == Month);
+
+                                if (list.Count() > 0)
+                                {
+                                    <td id="Taget-@(index1 - 1)-@a.Value.Replace(" ", "")" class="text-right">
+                                        <a>
+                                            @(CommonSatic.ToCurrencyStr(list.Sum(b => b.TARGET_BRAND), null))
+                                        </a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td id="Taget-@(index1 - 1)-@a.Value.Replace(" ", "")" class="text-right">0</td>
+                                }
+                            }
+                            @foreach (var a in Origin)
+                            {
+                                var list = CRM_BH_DOANHSO_CT.Where(x => x.CountForBrand == a.Value && x.NGUOILAP_ID == item.Id);
+
+                                if (list.Count() > 0)
+                                {
+                                    <td id="THT-@(index1 - 1)-@a.Value.Replace(" ", "")" class="text-right">
+                                        <a>
+                                            @(CommonSatic.ToCurrencyStr(list.Sum(b => b.CON_NO), null))
+                                        </a>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td id="THT-@(index1 - 1)-@a.Value.Replace(" ", "")" class="text-right">0</td>
+                                }
+                            }
+                            @foreach (var a in Origin)
+                            {
+                                <td class="text-right" id="TD-@(index1 - 1)-@a.Value.Replace(" ", "")">
+                                    <a>
+                                    </a>
+                                </td>
+                            }
+                        </tr>
+                     }
+                 }
+
+                </tbody>
+                <thead>
+
+                </thead>
+            </table>
+            @*<div class="col-md=12 text-center">
+                    Page @(user.PageCount < user.PageNumber ? 0 : user.PageNumber) of @user.PageCount
+                    @Html.PagedListPager(user, page => Url.Action("Index", new { page }))
+                </div>*@
+
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script type="text/javascript">
+            $(function () {
+                var i;
+                for (i = 1; i < '@user.Count()' + 1; ++i) {
+
+                    var test = $("Taget-1-ORLANE").text();
+                    var test1 = $("Taget-1-ORLANE").val();
+                    var num1 = parseFloat(removeComma($('#Taget-' + i + '-ANNAYAKE').text()));
+                    var num2 = parseFloat(removeComma($('#THT-' + i + '-ANNAYAKE').text()));
+                    var num3 = parseFloat(removeComma($('#Taget-' + i + '-ORLANEPARIS').text()));
+                    var num4 = parseFloat(removeComma($('#THT-' + i + '-ORLANEPARIS').text()));
+                    var num5 = parseFloat(removeComma($('#Taget-' + i + '-LEONORGREYL').text()));
+                    var num6 = parseFloat(removeComma($('#THT-' + i + '-LEONORGREYL').text()));
+
+                    var num7 = parseFloat(removeComma($('#Taget-' + i + '-DICHVU').text()));
+                    var num8 = parseFloat(removeComma($('#THT-' + i + '-DICHVU').text()));
+
+
+                    var num9 = parseFloat(removeComma($('#Taget-' + i + '-CONGNGHECAO').text()));
+                    var num10 = parseFloat(removeComma($('#THT-' + i + '-CONGNGHECAO').text()));
+
+
+                    var total = parseFloat((num2 / num1) * 100);
+                    (num2 > num1 ? $('#TD-' + i + '-ANNAYAKE').text(total.toFixed(1)) : $('#TD-' + i + '-ANNAYAKE').text(total.toFixed(1)));
+                   
+                    (num2 == 0 && num1 == 0 ? $('#TD-' + i + '-ANNAYAKE').text(0) : 0);
+                    (num1 == 0 ? $('#TD-' + i + '-ANNAYAKE').text(0) : 0);
+
+                    var total1 = parseFloat((num4 / num3) * 100);
+                    (num4 > num3 ? $('#TD-' + i + '-ORLANEPARIS').text(total1.toFixed(1)) : $('#TD-' + i + '-ORLANEPARIS').text(total1.toFixed(1)));
+                    
+                    (num4 == 0 && num3 == 0 ? $('#TD-' + i + '-ORLANEPARIS').text(0) : 0);
+                    (num3 == 0 ? $('#TD-' + i + '-ORLANEPARIS').text(0) : 0);
+
+                    var total2 = parseFloat((num6 / num5) * 100);
+                    (num6 > num5 ? $('#TD-' + i + '-LEONORGREYL').text(total2.toFixed(1)) : $('#TD-' + i + '-LEONORGREYL').text(total2.toFixed(1)));
+                    
+                    (num6 == 0 && num5 == 0 ? $('#TD-' + i + '-LEONORGREYL').text(0) : 0);
+                    (num5 == 0 ? $('#TD-' + i + '-LEONORGREYL').text(0) : 0);
+
+
+
+                    var total3 = parseFloat((num8 / num7) * 100);
+                    (num8 > num7 ? $('#TD-' + i + '-DICHVU').text(total3.toFixed(1)) : $('#TD-' + i + '-DICHVU').text(total3.toFixed(1)));
+                   
+                    (num8 == 0 && num7 == 0 ? $('#TD-' + i + '-DICHVU').text(0) : 0);
+                    (num7 == 0 ? $('#TD-' + i + '-DICHVU').text(0) : 0);
+
+
+                    var total4 = parseFloat((num10 / num9) * 100);
+                    (num10 > num9 ? $('#TD-' + i + '-CONGNGHECAO').text(total4.toFixed(1)) : $('#TD-' + i + '-CONGNGHECAO').text(total4.toFixed(1)));
+                    (num10 == 0 && num9 == 0 ? $('#TD-' + i + '-CONGNGHECAO').text(0) : 0);
+                    (num9 == 0 ? $('#TD-' + i + '-CONGNGHECAO').text(0) : 0);
+                }
+            });
+    </script>
+}

@@ -1,0 +1,57 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.Domain.Sale.Entities
+@model IEnumerable<AdviseCardDetail>
+
+    @{
+        Layout = null;
+        var index = 1;
+        var Id = ViewBag.AdviseCardId;
+        var data = Erp.BackOffice.Helpers.SelectListHelper.GetAllProductAndService();
+        var productList = (List<ProductViewModel>)ViewBag.productList;
+        
+    }
+
+    <table class="table table-bordered grid-table">
+        <thead>
+            <tr>
+                <th class="grid-header" style="width: 5%">STT</th>
+                <th class="grid-header" style="width: 40%">Sản phẩm/Dịch vụ</th>
+                <th class="grid-header" style="width: 50%">Ghi chú</th>
+                <th class="grid-header" style="width: 5%">Xóa</th>
+            </tr>
+        </thead>
+        <tbody class="detailList">
+            @foreach (var item in Model)
+            {
+
+
+                <tr class="detail_item" @*role="@(item.OrderNo)" id="product_item_@item.OrderNo" data-id="@item.OrderNo"*@>
+                    <td class="text-center">
+                        @(index++)
+                    </td>
+
+                    @foreach (var ii in data.Where(x => x.Id == item.TargetId && (x.Type == "product" || x.Type == "service")))
+                    {
+                        <td>@ii.Name</td>
+                    }
+                    <td>
+                        <span hidden="hidden" id="AdviseCardId">@ViewBag.AdviseCardId</span>
+                        <span hidden="hidden" id="TargetId">@item.TargetId</span>
+                        <span hidden="hidden" id="TargetModule">@item.TargetModule</span>
+                        <span hidden="hidden" id="QuestionId">@item.QuestionId</span>
+                        <textarea class="noteDVSP" id="noteDVSP">@item.Note</textarea>
+                    </td>
+                    <td class="text-center">
+                        <p class="hide-details-btn" data-target="@*@Model.Index*@">
+                            <a class="btn-delete-item" id="delete-item-product">
+                                <i class="ace-icon fa fa-trash red bigger-120" style="cursor:pointer"></i>
+                            </a>
+                        </p>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>

@@ -1,0 +1,255 @@
+﻿@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@model CRM_BH_DOANHSOViewModel
+
+@{
+    ViewBag.Title = "Lập Kế hoạch mới";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "BH_DOANHSO",
+        ActionName = "Edit",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    int rowNumber = 0;
+    int numberOfItem = 30;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.ToString("MM/yyyy");
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    int index = 0;
+    IEnumerable<SelectListItem> BrandList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin", null, "value");
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.Origin;
+}
+
+
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+<style>
+    .popover {
+        width: 100% !important;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 10px;
+    }
+</style>
+
+@helper BuildCheckAll()
+    {
+        /**/
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+        /**/
+}
+
+@helper GridColumnCommand(int? id)
+    {
+        /**/
+        <p>
+            <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+                <i class="ace-icon fa fa-trash bigger-120"></i>
+            </button>
+        </p>
+        /**/
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Edit", "BH_DOANHSO", null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                    <div class="widget-header widget-header-small">
+                        <div class="widget-toolbar no-border pull-left">
+                            <ul class="nav nav-tabs" id="myTab">
+                                @if(origin != null && origin.Where(x=>x.Value == "ANNAYAKE").Count()>0)
+                                {
+                                    <li class="active">
+                                        <a data-toggle="tab" href="#ANNAYAKE" aria-expanded="true"><i class="fa"></i>ANNAYAKE</a>
+                                    </li>
+                                }
+                                @if (origin != null && origin.Where(x => x.Value == "ORLANEPARIS").Count() > 0)
+                                {
+                                    <li class="">
+                                        <a data-toggle="tab" href="#ORLANE" aria-expanded="false"><i class="fa"></i>ORLANE</a>
+                                    </li>
+                                }
+                                @if (origin != null && origin.Where(x => x.Value == "LEONORGREYL").Count() > 0)
+                                {
+                                    <li class="">
+                                        <a data-toggle="tab" href="#LEONOR" aria-expanded="false"><i class="fa"></i>LEONOR</a>
+                                    </li>
+                                }
+                                @if (origin != null && origin.Where(x => x.Value == "DICHVU").Count()>0)
+                                {
+                                    <li class="">
+                                        <a data-toggle="tab" href="#DICHVU" aria-expanded="false"><i class="fa"></i>Dịch vụ</a>
+                                    </li>
+                                }
+                                @if (origin != null && origin.Where(x => x.Value == "CONGNGHECAO").Count()>0)
+                                {
+                                    <li class="">
+                                        <a data-toggle="tab" href="#CNC" aria-expanded="false"><i class="fa"></i>Công nghệ cao</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="widget-body">
+                        <div class="widget-main padding-6">
+                            <div class="tab-content">
+                                <div id="ANNAYAKE" class="tab-pane active">
+                                    @Html.Partial("LoadDSDetail", Model)
+                                </div>
+                                <div id="ORLANE" class="tab-pane">
+                                    @Html.Partial("LoadTapORLANE", Model)
+                                </div>
+                                <div id="LEONOR" class="tab-pane">
+                                    @Html.Partial("LoadTapLEONOR", Model)
+                                </div>
+                                <div id="DICHVU" class="tab-pane">
+                                    @Html.Partial("LoadTapDV", Model)
+                                </div>
+                                <div id="CNC" class="tab-pane">
+                                    @Html.Partial("LoadTapCNC", Model)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" onclick="Check();">
+            <i class="ace-icon fa fa-save"></i>
+            Cập nhật
+        </a>
+        @*<a class="btn btn-mini btn-primary" onclick="OpenPopup('@Url.Action("Create", "BH_DOANHSO",new {id=@Model.NGUOILAP_ID,FullName=@Model.FullName})','',0,0)">
+            Tạo mới
+        </a>*@
+    }
+}
+
+
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script type="text/javascript">
+        $('#month3').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        $('#month').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        $('#month2').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        $('#monthCNC').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        $('#monthDV').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        function CheckIsval() {
+            if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                alert("Phải chọn ít nhất 1 item.");
+                return false;
+            }
+            else {
+                if (confirm('Bạn có chắc muốn xóa các item đã chọn ?')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+
+        $('[name="Delete"]').click(function () {
+            if (confirm('Bạn có chắc muốn xóa item ?')) {
+                $(this).closest('tr').children('td').each(function (i, e) {
+                    $(this).find("input.class-delete-all").prop("checked", true);
+                    return true;
+                })
+            }
+            else {
+                return false;
+            }
+
+        })
+
+        function Check() {
+            ShowLoading();
+            var TARGET_BRAND = $("#TARGET_BRAND").val();
+            var CountForBrand = $("#CountForBrand").val()
+            var messagge = "";
+            if (TARGET_BRAND == '') {
+                messagge += "Chưa nhập Taget<br>";
+            } if (CountForBrand == '') {
+                messagge += "Chưa chọn nhãn hàng";
+            }
+            if (messagge != '') {
+                alertPopup('Lỗi!', messagge, 'error');
+                HideLoading();
+            } else {
+                ClearFormatBeforeSubmit($("#SaleOrder"));
+                $("#SaleOrder").submit();
+            }
+        }
+    </script>
+}

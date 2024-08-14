@@ -1,0 +1,182 @@
+﻿<script src="https://unpkg.com/wavesurfer.js"></script>
+@model IEnumerable<Erp.BackOffice.Crm.Models.HistoryCallLogViewModel>
+
+    @{
+        ViewBag.Title = "History Call Log";
+    }
+
+    <h2>Call Logs</h2>
+
+    @if (Model != null && Model.Any(x => x.Id != null))
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Sự kiện</th>
+                    <th>Hướng gọi</th>
+                    <th>Số điện thoại</th>
+                    <th>Thời gian cuộc gọi</th>
+                    <th>Thời lượng</th>
+                    <th style="text-align:center">Máy nhánh</th>
+                    <th>Bản ghi âm</th> <!-- Thêm cột mới cho nút phát âm thanh -->
+                </tr>
+            </thead>
+            @foreach (var item in Model)
+            {
+                <tbody>
+                    <tr>
+                        <td>@item.Event</td>
+                        <td>@item.Direct</td>
+                        <td>@item.Numberphone</td>
+                        <td>@item.TimeCall</td>
+                        <td>@item.TimeExecute</td>
+                        <td style="text-align:center">@item.Ext</td>
+                        <td>
+                            <div id="waveform-@item.Id"></div>
+                            @if (!string.IsNullOrEmpty(item.RecordingURL))
+                            {
+                                <button class="play-button" onclick="playAudio('@item.RecordingURL', '@item.Id')">Play</button>
+                                <button class="stop-button" id="stop-button-@item.Id" style="display: none;">Stop</button>
+                                <button class="cancel-button" id="cancel-button-@item.Id" onclick="cancelAudio('@item.Id')" style="display: none;">Cancel</button>
+                                }
+                            else
+                            {
+                                <span class="no-recording"></span>
+                            }
+                        </td>
+
+                    </tr>
+                </tbody>
+            }
+        </table>
+    }
+    else
+    {
+        <p><strong class="no-history">Không có lịch sử nào được ghi lại.</strong></p>
+    }
+
+    <script>
+            var wavesurfers = {};
+
+            function playAudio(url, id) {
+                var container = document.getElementById('waveform-' + id);
+
+                if (!wavesurfers[id]) {
+                    // Tạo một đối tượng Wavesurfer mới nếu chưa tồn tại
+                    wavesurfers[id] = WaveSurfer.create({
+                        container: container,
+                        waveColor: 'violet',
+                        progressColor: 'purple'
+                    });
+
+                    // Tải âm thanh và phát nó khi sẵn sàng
+                    wavesurfers[id].load(url);
+                    wavesurfers[id].on('ready', function () {
+                        wavesurfers[id].play();
+                    });
+                } else {
+                    // Nếu đối tượng Wavesurfer đã tồn tại, phát lại nó
+                    wavesurfers[id].play();
+                }
+
+                var stopButton = document.getElementById('stop-button-' + id);
+
+                var cancelButton = document.getElementById('cancel-button-' + id);
+                var playButton = document.querySelector('button[data-playing="true"]');
+                if (playButton) {
+                    playButton.innerHTML = 'Play';
+                    playButton.dataset.playing = 'false';
+                }
+                stopButton.style.display = 'inline-block';
+                cancelButton.style.display = 'inline-block';
+                stopButton.addEventListener('click', function () {
+                    // Dừng âm thanh tại thời điểm hiện tại khi người dùng nhấn nút dừng
+                    wavesurfers[id].pause();
+                    stopButton.style.display = 'none';
+                });
+            }
+            $('.close-meetingModal').click(function () {
+                // Lặp qua tất cả các đối tượng Wavesurfer và dừng chúng
+                Object.values(wavesurfers).forEach(function (wavesurfer) {
+                    wavesurfer.pause();
+                });
+            });
+            function cancelAudio(id) {
+                var waveform = document.getElementById('waveform-' + id);
+                var stopButton = document.getElementById('stop-button-' + id);
+                var playButton = document.querySelector('button[data-playing="true"]');
+
+                // Xóa đối tượng WaveSurfer và ẩn nút "Hủy" khi người dùng bấm vào nút "Hủy"
+                if (wavesurfers[id]) {
+                    wavesurfers[id].destroy();
+                    delete wavesurfers[id];
+                }
+                waveform.innerHTML = ''; // Xóa nội dung đoạn âm thanh
+
+                // Ẩn nút "Dừng" nếu đang hiển thị
+                stopButton.style.display = 'none';
+
+                // Hiển thị lại nút "Play" nếu đang ẩn
+                if (playButton) {
+                    playButton.style.display = 'inline-block';
+                }
+                var cancelButton = document.getElementById('cancel-button-' + id);
+                cancelButton.style.display = 'none';
+            }
+        </script>
+
+    <style>
+        .no-history {
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .no-recording {
+            font-weight: bold;
+        }
+        /* CSS cho đoạn âm thanh */
+        .waveform {
+            width: 100%; /* Chiều rộng đầy đủ của đoạn âm thanh */
+            height: 30px; /* Chiều cao của đoạn âm thanh */
+            margin-bottom: 10px; /* Khoảng cách giữa các đoạn âm thanh */
+        }
+
+        /* CSS cho nút play */
+        .play-button,
+        .stop-button {
+            background-color: #3498db;
+            color: white; /* Màu chữ */
+            border: none; /* Loại bỏ đường viền */
+            padding: 5px 10px; /* Kích thước nút */
+            border-radius: 3px; /* Bo tròn viền nút */
+            cursor: pointer; /* Con trỏ chuột */
+            margin-right: 5px; /* Khoảng cách giữa nút play và stop */
+        }
+
+        /* CSS cho nút stop */
+        .stop-button {
+            background-color: #e74c3c; /* Màu nền */
+        }
+
+        /* CSS cho các nút bên trong đoạn âm thanh */
+        .waveform-controls {
+            margin-top: 5px; /* Khoảng cách từ nút xuống đoạn âm thanh */
+        }
+
+        /* CSS cho thông tin thời lượng */
+        .duration-info {
+            font-style: italic; /* Kiểu chữ nghiêng */
+            font-size: 12px; /* Kích thước chữ */
+            margin-left: 5px; /* Khoảng cách từ nút xuống đoạn âm thanh */
+        }
+
+        .modal-header .close {
+            margin-top: 2px;
+            margin-right: -5px;
+        }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            border-right: unset;
+            color: #333;
+        }
+    </style>

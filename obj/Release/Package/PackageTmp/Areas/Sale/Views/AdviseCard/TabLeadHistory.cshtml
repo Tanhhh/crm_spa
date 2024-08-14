@@ -1,0 +1,74 @@
+﻿@using Erp.BackOffice.Sale.Controllers
+@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+
+    @{
+        Layout = null;
+        IEnumerable<StatusLeadModel> status = ViewBag.status as IEnumerable<StatusLeadModel>;
+        IEnumerable<ItemLeadLog> itemLeadLogs = ViewBag.ItemLeadLog as IEnumerable<ItemLeadLog>;
+        IEnumerable<LeadLogsModel> dataList = ViewBag.SortedList as IEnumerable<LeadLogsModel>;
+        var user = ViewBag.Users as Erp.Domain.Repositories.UserRepository;
+        IEnumerable<Erp.Domain.Entities.User> users = user.GetAllUsers();
+    }
+    <style>
+        td {
+            vertical-align: middle !important;
+            border-right: unset !important;
+            border-left: unset !important;
+            color:black !important;
+        }
+
+        .table > thead > tr > th {
+            border-top: 1px solid #ddd !important;
+        }
+    </style>
+    @{
+        bool chknew = false;
+    }
+    <div id="listOrderDetail" class="table-responsive " style="padding: 20px; background: white; border-radius: 5px; margin: 10px 80px 0px 40px;">
+        <table class="table" id="productleadtable">
+            <thead>
+                <tr>
+                    <th width="12%">Hành động</th>
+                    <th width="12%">Thời gian</th>
+                    <th width="12%">Người thực hiện</th>
+                    <th>Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in dataList)
+                {
+                    <tr>
+                        <td style="text-transform: uppercase;">
+                            @itemLeadLogs.FirstOrDefault(x => x.Key == item.Action).Value
+                        </td>
+                        <td>
+                            @item.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+                        @if (item.CreatedUserId != 0)
+                        {
+                            Erp.Domain.Entities.User single = users.Where(x => x.Id == item.CreatedUserId).FirstOrDefault();
+                            <td>
+                                @single.FullName
+                            </td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        <td>
+                            @if (item.Action == "COMMENT")
+                            {
+                                @item.Content
+                            }
+                            else
+                            {
+                                @item.Logs
+                            }
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>

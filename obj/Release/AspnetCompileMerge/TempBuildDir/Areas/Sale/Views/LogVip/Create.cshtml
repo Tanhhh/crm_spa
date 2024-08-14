@@ -1,0 +1,96 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Sale.Models
+
+@model LogVipViewModel
+
+@{
+    ViewBag.Title = Wording.PageCreate_LogVip;
+
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    SelectList rating = SelectListHelper.GetSelectList_Rating(Model.Ratings, null);
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "LogVip",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+
+    <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+
+    @Html.CustomDropDownListFor(model => model.CustomerId, SelectListHelper.GetSelectList_Customer_byBrand(Erp.BackOffice.Helpers.Common.CurrentUser.BranchId.Value, Model.CustomerId, Wording.CustomerName), WidthType.span12, true, null, DropdownListStyle.DropdownListStyleChosen)
+
+    //1@Html.CustomTextboxFor(model => model.Status, null, null, WidthType.span12)
+
+
+    <div class="control-group form-group">
+        <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Đã sử dụng</label>
+        <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+            <label class="radio"><input type="radio" value="Đã sử dụng" class="group_choice ace" data-target="#group_choice_wrap1" checked name="group_choice" />  <span class="lbl"></span></label>
+        </div>
+    </div>
+    <div class="control-group form-group">
+        <label class="control-label col-lg-5 col-md-4 col-sm-4" for="">Đang sử dụng</label>
+        <div class="control-value col-lg-7 col-md-8 col-sm-8" style="line-height:0px!important">
+            <label class="radio"><input type="radio" value="Đang sử dụng" class="group_choice ace" data-target="#group_choice_wrap2" name="group_choice" /> <span class="lbl"></span></label>
+        </div>
+    </div>
+
+
+    @Html.CustomDropDownListFor(model => model.LoyaltyPointId, SelectListHelper.GetSelectList_Rating(Model.LoyaltyPointId, Wording.Ratings), null, null)
+    
+
+    @Html.DateInput(model => model.ApprovedDate, "dd/MM/yyyy", "99/99/9999", true, WidthType.span12)
+    @Html.CustomTextboxFor(model => model.TotalAmount, null, null, WidthType.span12)
+    @Html.CustomSwitchesFor(model => model.is_approved, SwitchesStyle.CheckboxStyle, true)
+
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    <script>
+        //truyền từ action create của controller qua khi thực hiện submit và return về lại view create, để nhận biết là được gọi theo dạng popup
+        var closePopup = '@ViewBag.closePopup';
+        $(document).ready(function () {
+            //nếu là được gọi theo dạng popup từ form khác thì chạy đoạn code bên dưới
+            if (closePopup != '') {
+                var option = '<option value="@Model.Id" >@Model.Status</option>';
+                //tên funtion có thể khác theo từng công việc riêng (đây chỉ là mẫu khi thêm mới sẽ gọi lại)
+                window.parent.ClosePopupAndAppendSelect(option);
+            }
+        });
+        $(function () {
+            $(".datetype").datepicker({ dateFormat: 'dd/MM/yyyy' });
+        });
+    </script>
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+}

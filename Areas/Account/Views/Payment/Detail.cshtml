@@ -1,0 +1,204 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Account.Models
+@using GridMvc.Html
+@model PaymentViewModel
+
+@{
+    ViewBag.Title = Wording.PageDetail_Payment;
+
+    bool IsPopup = Request["IsPopup"] == null ? false : true;
+    Layout = "~/Views/Shared/" + (IsPopup == false ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Payment",
+        ActionName = "Detail",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = IsPopup,
+        DisplayBackButton = true
+    };
+
+}
+
+<style type="text/css">
+    .mini-popup {
+        position: relative;
+        display: inline;
+    }
+
+    #popup_huy {
+        position: absolute;
+        bottom: 45px;
+        left: 0px;
+        width: 410px;
+        height: 160px;
+        max-width: inherit;
+        top: inherit;
+    }
+
+    #popup_archive {
+        position: absolute;
+        bottom: 45px;
+        left: 0px;
+        width: 410px;
+        height: 235px;
+        max-width: inherit;
+        top: inherit;
+    }
+
+    .popover {
+        max-width: 650px !important;
+    }
+</style>
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+
+@if (Model.IsDeleted == true)
+{
+    <div class="alert alert-danger">
+        <p><i class="ace-icon fa fa-warning red"></i> @Model.ModifiedUserName đã hủy bỏ chứng từ lúc @Model.ModifiedDate.Value.ToString("HH:mm dd/MM/yyyy").</p>
+        <p>Lý do hủy: @Model.CancelReason</p>
+    </div>
+}
+
+<div class="detail-view" style="margin-bottom:20px;">
+    <div class="row control-group">
+        @Html.DetailViewItem((Model.IsArchive == true ? "<span class=\"green\">Đã duyệt</span>" : "<span class=\"red\">Chưa duyệt</span>"), "IsArchive", "Trạng thái", null, null)
+    </div>
+    <div class="row control-group">
+        @Html.DetailViewItemFor2(model => model.Code)
+    </div>
+    <div class="row control-group">
+        @Html.DetailViewItemFor2(model => model.MaChungTuGoc)
+    </div>
+    <div class="row control-group">
+        @Html.DetailViewItemFor2(model => model.CreatedDate)
+    </div>
+    <div class="row control-group">
+        @Html.DetailViewItemFor2(model => model.Name)
+    </div>
+    <div class="row control-group">
+        @Html.DetailViewItem(Model.Amount.ToCurrencyStr(null), "Amount", Wording.Amount, null, "font-weight:bold;", "col-xs-2", "col-xs-10")
+    </div>
+    <div class="row control-group">
+        @Html.DetailViewItemFor2(model => model.Receiver)
+    </div>
+    <div class="row control-group">
+        @Html.DetailViewItemFor2(model => model.Address)
+    </div>
+    <div class="row control-group">
+        @Html.DetailViewItemFor2(model => model.PaymentMethod)
+    </div>
+    <div class="row control-group">
+        @Html.DetailViewItemFor2(model => model.Note)
+    </div>
+</div>
+
+@using (Html.BeginButtonContainer(pageSetting))
+{
+
+    if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Print", "Payment", "Account"))
+    {
+        <a href="@Url.Action("Print", new { Id = Model.Id })" target="_blank" class="btn btn-primary btn-mini"><i class="ace-icon fa fa-print"></i> In phiếu</a>
+
+    }
+    if (Model.IsArchive)
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Delete", "Payment", "Account"))
+        {
+
+            <div class="mini-popup">
+
+                <a class="btn btn-white btn-sm no-border" data-toggle="collapse" data-target="#popup_huy" style="color: red !important;">
+                    <i class="ace-icon fa fa-trash"></i>
+                    Hủy phiếu chi
+                </a>
+                <div id="popup_huy" class="popover fade top">
+                    <div class="arrow" style="left: 50%;"></div>
+                    <h3 class="popover-title"><i class="ace-icon fa fa-bolt red"></i> Hủy phiếu chi</h3>
+                    <div class="popover-content">
+                        @using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Delete", "Payment", null, FormMethod.Post, new { id = Model.Id, @class = "form-horizontal clearfix" }))
+                        {
+                        <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+                        @Html.HiddenFor(m => m.Id)
+                        @Html.CustomTextAreaFor(model => model.CancelReason, Wording.CancelReason, WidthType.span12)
+
+                        <p class="top-10">
+                            <button id="btnDelete" class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save" onclick="return submitDelete();">
+                                Đồng ý
+                            </button>
+                            <a class="btn btn-white btn-sm no-border" data-toggle="collapse" data-target="#popup_huy">Đóng</a>
+                        </p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    if (!Model.IsArchive)
+    {
+        if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("Archive", "Payment", "Account"))
+        {
+            <a onclick="Archive(@Model.Id)" class="btn btn-mini btn-primary">
+                <i class="fa fa-check-circle-o"></i>  Ghi sổ
+            </a>
+        }
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        function submitDelete() {
+            if (confirm('Bạn chắc chắn muốn thực hiện thao tác này?')) {
+                if ($("#CancelReason").val() == '') {
+                    alert("Vui lòng nhập lý do hủy!");
+                    $("#CancelReason").focus();
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
+        };
+        function Archive(id) {
+            if (confirm('Bạn có chắc muốn xác nhận ghi sổ ?')) {
+                ShowLoading();
+                $.post("@Url.Action("Archive", "Payment", new { area = "Account" })", { id: id })
+            .done(function (data) {
+                location.reload();
+            });
+            return false;
+        }
+        else {
+                return false;
+        }
+        }
+    </script>
+}

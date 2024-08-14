@@ -1,0 +1,82 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_BaoCaoNhapXuatTonVatTu_TuanViewModel>
+    @{
+        Layout = null;
+        int index = 1;
+    }
+    @if (Model.Count() > 0)
+    {
+        <table id="CTable" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:40px;text-align:center">STT</th>
+                    <th class="text-center">Mã danh mục</th>
+                    <th class="text-center">Mã vật tư</th>
+                    <th class="text-center">Tên vật tư</th>
+                    <th class="text-center">Kho</th>
+                    <th class="text-center">Số lô</th>
+                    <th class="text-center">Hạn dùng</th>
+                    <th class="text-center">Đơn vị</th>
+                    <th class="text-center">Tồn cũ</th>
+                    <th class="text-center">Nhập mới</th>
+                    <th class="text-center">Tổng tồn đầu</th>
+                    <th class="text-center">Tổng xuất</th>
+                    <th class="text-center">Tổng tồn cuối tuần</th>
+                    <th rowspan="2" style="width:80px;">Báo động < 30 sản phẩm </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="@(index % 2 == 0 ? " alert-warning" : "")">
+                        <td>
+                            <span>@(index++)</span>
+                        </td>
+
+                        <td>@item.CategoryCode</td>
+                        <td>@item.MaterialCode</td>
+                        <td>@item.MaterialName</td>
+                        <td>@item.WarehouseName</td>
+                        <td>@item.LoCode</td>
+                        <td style="width:100px;">@(item.ExpiryDate == null ? "" : item.ExpiryDate.Value.ToString("dd/MM/yyyy"))</td>
+                        <td>@item.MaterialUnit</td>
+                        <td style="width:80px;text-align:right;">@(Common.PhanCachHangNgan2(item.First_Remain))</td>
+                        <td style="width:80px;text-align:right;">@(Common.PhanCachHangNgan2(item.Last_InboundQuantity))</td>
+                        <td style="width:80px;text-align:right;">@(Common.PhanCachHangNgan2(item.Last_InboundQuantity + item.First_Remain))</td>
+                        <td class="text-right" data-name="" style="width:80px; font-weight:bold">@(Common.PhanCachHangNgan2(item.Last_OutboundQuantity))</td>
+                        <td class="text-right" data-name="" style="width:80px; font-weight:bold">@(Common.PhanCachHangNgan2(item.Remain))</td>
+                        <td class="text-right" data-name="" style="width:80px; font-weight:bold">
+                            @if (30 >= item.Remain)
+                            {<span style="color:red">BĐ</span>}
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right"></td>@*@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.MaterialMinInventory), null))*@
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    }
+    else
+    {
+        <div class="alert alert-block alert-info">
+            Không có dữ liệu
+        </div>
+    }

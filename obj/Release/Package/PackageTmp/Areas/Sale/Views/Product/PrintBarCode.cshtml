@@ -1,0 +1,1195 @@
+﻿@model ProductInboundViewModel
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    ViewBag.Title = "In mã vạch";
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Product",
+        ActionName = "PrintBarCode",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = false,
+        AdvancedSearch = false,
+        SearchOjectAttr = ViewBag.ListOjectAttrSearch
+    };
+
+    IEnumerable<ProductViewModel> productList = (IEnumerable<ProductViewModel>)ViewBag.productList;
+}
+
+
+
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+    <style>
+        .hideinput {
+            display: none;
+        }
+
+        .has_error {
+            border: 1px #f2a696 solid !important;
+            color: #D68273;
+        }
+
+        tr.scrollCode {
+            background-color: cornflowerblue;
+        }
+
+        .hideinput {
+            display: none;
+        }
+
+        #popup_archive2 {
+            position: center;
+            bottom: 30%;
+            left: 20%;
+            width: 60%;
+            height: 500px;
+            max-width: 500px;
+            /*top: 30%;*/
+            right: 30%;
+            /*max-height: 100%;*/
+            /* overflow-y:scroll;*/
+        }
+
+        #chitiet {
+            position: relative;
+            /* bottom: 50%; */
+            left: 80%;
+            /* right: 0%; */
+            top: auto;
+            margin-bottom: 10px;
+        }
+
+        #exceltable {
+            width: 100%;
+            overflow-y: scroll !important;
+            max-height: 300px !important;
+        }
+
+        #scrolltable {
+            margin-top: 20px;
+            height: 300px;
+            overflow: auto;
+        }
+
+            #scrolltable table {
+                border-collapse: collapse;
+            }
+
+            #scrolltable tr:nth-child(even) {
+                background: #EEE;
+            }
+
+            #scrolltable th div {
+                position: absolute;
+                margin-top: -20px;
+            }
+
+        #rcb_1_RadComboBox {
+            width: 500px !important;
+        }
+
+        .rcbSearch input {
+            width: 550px !important;
+            margin-top:20px;
+        }
+
+        #mauexcel {
+            border-radius: 5px;
+            padding: 15px 60px;
+            top: 30%;
+            position: relative;
+            left: 30%;
+            font-size: 16px;
+        }
+
+        .before {
+            page-break-before: always;
+        }
+
+        .rcb {
+            display: inline-table;
+            position: absolute;
+            margin: -20px 0px;
+        }
+
+        .text_data {
+            overflow: auto;
+        }
+
+
+
+
+        /*table {
+            margin: auto;
+            border-collapse: collapse;
+            border-spacing: 0;
+            width: 60%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            border: none;
+            text-align: left;
+            padding: 8px;
+        }
+
+        #listOrderDetail1 {
+            overflow-y: auto;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }*/
+
+
+        form .table-responsive {
+            overflow: auto !important;
+        }
+    </style>
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@if (TempData["Message"] != null && TempData["Message"] != "")
+{
+
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @TempData["Message"]
+    </div>
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, "Create", "ProductInBound", null, FormMethod.Post, new { id = "CreateProductInBound", @class = "form-horizontal clearfix" }))
+{
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-sm-7" style="height:500px">
+            <div class="product-search-box" style="z-index:1">
+                @*<input id="product_barcode" style="width:25%;" type="text" placeholder="Mã sản phẩm..." autocomplete="off" />*@
+                <select id="productSelectList" name="productSelectList" style="width:300px">
+                    <option value="">- Tìm sản phẩm -</option>
+                    @foreach (var item in productList.OrderBy(x => x.Name))
+                    {
+                        <option value="@item.Id" data-selected="0" data-value="@item.Id | @(Common.KiemTraTonTaiHinhAnh(item.Image_Name, "product-image-folder", "product"))  | @(item.Code + " - " + item.Name)|@item.Origin|@(item.PriceInbound.ToCurrencyStr(null))" data-code="@item.Code" data-barcode="@item.Barcode" data-product-type="@item.CategoryCode" data-price="@(item.PriceInbound)" data-unit="@item.Unit">@item.Code - @item.Name</option>
+                    }
+                </select>
+                <a class="btn btn-primary btn-mini btn-sm" data-toggle="collapse" data-target="#popup_archive2" id="chitiet" style="border-radius:5px;">
+                    <i class="ace-icon fa fa-cloud-upload"></i>
+                    Nhập excel
+                </a>
+            </div>
+
+            <div id="listOrderDetail" class="table-responsive top-10" style="max-height: 70%;margin-top: 0.4%; z-index: 2">
+
+                <table id="listOrderDetail1" class="table table-bordered Testing">
+                    <thead>
+                        <tr>
+                            <th style="width:7%">
+                                STT
+                                <p>
+                                    <input style="width:30px;" autocomplete="off" data-val="true" data-val-number="The field Sản phẩm đã chọn must be a number." data-val-required="Bắt buộc nhập" id="ProductItemCount" maskformat="" name="ProductItemCount" placeholder="" type="text" value="" readonly="readonly" />
+                                </p>
+                            </th>
+
+                            <th style="width:45%">Mã sản phẩm</th>
+                            <th style="width:15%;">
+                                Số lượng
+                                <p id="TongSoLuong" style="color: #ffc107; font-size:22px" value="0" readonly=""></p>
+                            </th>
+
+                            <th style="width:15%">Đơn giá</th>
+
+
+                            <th style="width:50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="detailList">
+                        @if (Model.DetailList.Count > 0)
+                        {
+                            foreach (var item in Model.DetailList)
+                            {
+                                @Html.Partial("LoadProductItem", item);
+                            }
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>
+                                @*<input style="width:30px;" autocomplete="off" data-val="true" data-val-number="The field Sản phẩm đã chọn must be a number." data-val-required="Bắt buộc nhập" id="ProductItemCount" maskformat="" name="ProductItemCount" placeholder="" type="text" value="" readonly="readonly" />*@
+                            </td>
+                            <td></td>
+                            <td id="TongSoLuong" align="right" style="font-weight:bold"></td>
+                            <td id="TongThanhTien" align="right" style="font-weight:bold"></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+
+                <div class="wrap" style="text-align:center; margin:0;width:100%">
+                    <div class="ListBarCode" style="text-align:center; display:none">
+                        <div id="seleted-rows" style="text-align:center">
+
+                        </div>
+                    </div>
+                </div>
+                <span style="color:red" class="field-validation-valid help-inline" data-valmsg-for="ProductItemCount" data-valmsg-replace="true"></span>
+            </div>
+        </div>
+        <div class="col-sm-5">
+            @*<div class="tabbable">
+                    <ul class="nav nav-tabs padding-12 tab-color-blue background-blue" id="tabCustomer">
+                        <li class="active">
+                            <a data-toggle="tab" href="#tab1">Phiếu nhập kho</a>
+                        </li>
+
+                        <li>
+                                <a data-toggle="tab" href="#tab2">Thông tin thêm</a>
+                            </li>
+                    </ul>
+
+
+                </div>*@
+
+
+            <div class="downloadFIle" style="padding-top:10px;height:30%">
+
+
+                <a class="btn btn-white btn-success btn-sm" id="mauexcel" href="@Url.Action("PrintExample","ProductInbound")">
+                    <i class="fa fa-cloud-download fa-1x" aria-hidden="true"></i>
+                    Tải file mẫu
+                </a>
+
+            </div>
+        </div>
+    </div>
+    @*Begin import excel*@
+    <div class="mini-popup">
+
+        <div id="popup_archive2" class="popover fade top">
+            <h3 class="popover-title"><i class="ace-icon fa fa-arrow-circle-right"></i> Import excel</h3>
+            <div class="popover-content">
+                <div class="row-1">
+                    <div class="col-sm-12">
+                        <label for="excelfile">Chọn File Excel</label>
+                        <input type="file" id="excelfile" style="border-radius:5px;" accept=".xls,.xlsx" />
+                        <input type="button" id="viewfile" value="Xem trước" style="border-radius:5px;" />                        
+                        <div id="scrolltable">
+                            <table id="exceltable" class="table table-bordered" style="border-radius:5px;">
+                                @*<thead>
+                                        <tr>
+
+                                            <th style="width:5%">STT</th>
+
+
+                                            <th style="width:20%">Mã Sản Phẩm</th>
+
+
+                                            <th style="width:15%">Số lượng</th>
+                                            <th style="width:15%">Đơn Giá</th>
+                                        </tr>
+                                    </thead>*@
+                            </table>
+                        </div>
+                        <p class="top-10" style="margin-top:-15px;">
+                            <input class="btn btn-white btn-success btn-sm hideinput" data-toggle="collapse" data-target="#popup_archive2" id="addproduct" value="Import" name="Save" type="button" style="border-radius:5px;" />
+                            <a class="btn btn-group btn-sm no-border" data-toggle="collapse" id="closepopup" data-target="#popup_archive2" style="border-radius:5px;margin-top:15px;" >Đóng</a>
+                        </p>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @*end  import excel*@
+    <div id="editor"></div>
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <a class="btn btn-mini btn-primary" id="Save" name="Save" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            In mã vạch
+        </a>
+        @*<a class="btn btn-white btn-success btn-sm" data-toggle="collapse" data-target="#popup_archive2" id="chitiet" style="border-radius:5px;">
+                <i class="ace-icon fa fa-file-excel-o"></i>
+                Nhập excel
+            </a>*@
+
+        @*<a class="btn btn-white btn-success btn-sm" id="mauexcel" style="border-radius:5px" href="@Url.Action("PrintExample","ProductInbound")">
+                Tải file mẫu
+            </a>*@
+    }
+
+}
+@*<script src="~/Scripts/jquery.freezeheader.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#listOrderDetail1").freezeHeader({ 'offset': '130px' });
+        })
+    </script>*@
+
+
+@section Scripts {
+
+
+
+
+
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+
+    <link href="/Scripts/RadCombobox_v1/RadComboBoxLite.css" rel="stylesheet" />
+    <script src="/Scripts/RadCombobox_v1/rabCombobox.js"></script>
+    <script src="~/assets/js/jQuery.print.min.js"></script>
+    <script src="~/assets/js/JsBarcode.all.min.js"></script>
+    @*<script src="~/Scripts/jquery.floatThead.js"></script>*@
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.5/xlsx.full.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.5/jszip.js"></script>
+
+    <script type="text/javascript">
+
+        $('#addproduct').click(function () {
+            if ($('#excelfile').get(0).files.length === 0) {
+                alert("Bạn chưa chọn file!");
+                return false;
+            }
+        });
+    </script>
+    <script type="text/javascript">
+        //$(document).ready(function () {
+        //    $(".Testing").floatThead({ top: 30 });
+        //});
+       
+        $("body").on("click", "#viewfile", function () {
+            //Reference the FileUpload element.
+            var fileUpload = $("#excelfile")[0];
+
+            //Validate whether File is valid Excel file.
+            var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+            if (regex.test(fileUpload.value.toLowerCase())) {
+                if (typeof (FileReader) != "undefined") {
+                    var reader = new FileReader();
+
+                    //For Browsers other than IE.
+                    if (reader.readAsBinaryString) {
+                        reader.onload = function (e) {
+                            ProcessExcel(e.target.result);
+                        };
+                        reader.readAsBinaryString(fileUpload.files[0]);
+                    } else {
+                        //For IE Browser.
+                        reader.onload = function (e) {
+                            var data = "";
+                            var bytes = new Uint8Array(e.target.result);
+                            for (var i = 0; i < bytes.byteLength; i++) {
+                                data += String.fromCharCode(bytes[i]);
+                            }
+                            ProcessExcel(data);
+                        };
+                        reader.readAsArrayBuffer(fileUpload.files[0]);
+                    }
+                } else {
+                    alert("This browser does not support HTML5.");
+                }
+            } else {
+                alert("Please upload a valid Excel file.");
+            }
+        });
+        function ProcessExcel(data) {
+            //Read the Excel File data.
+            var workbook = XLSX.read(data, {
+                type: 'binary'
+            });
+
+            //Fetch the name of First Sheet.
+            var firstSheet = workbook.SheetNames[0];
+
+            //Read all rows from First Sheet into an JSON array.
+            var excelRows = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[firstSheet]);
+
+            //Create a HTML Table element.
+            var table = $("<table/>");
+            table[0].border = "1";
+            table[0].id = "exceltable";
+            table[0].addClass = "table table-bordered";
+
+            //Add the header row.
+            var row = $(table[0].insertRow(-1));
+
+            //Add the header cells.
+            var headerCell = $("<th/>");
+            headerCell.html("STT");
+            headerCell.css("width", "20%");
+            row.append(headerCell);
+
+            var headerCell = $("<th/>");
+            headerCell.html("MaSanPham");
+            row.append(headerCell);
+
+            var headerCell = $("<th/>");
+            headerCell.html("SoLuong");
+            row.append(headerCell);
+
+            var headerCell = $("<th/>");
+            headerCell.html("DonGia");
+            row.append(headerCell);
+            //Add the data rows from Excel file.
+            for (var i = 0; i < excelRows.length; i++) {
+                debugger
+                //Add the data row.
+                var row = $(table[0].insertRow(-1));
+
+                //Add the data cells.
+                var cell = $("<td/> ");
+                cell.html(excelRows[i].STT);
+                cell.css("width", "20%");
+                row.append(cell);
+
+                cell = $("<td/> ");
+                cell.html(excelRows[i].MaSanPham);
+                cell.css("width", "40%");
+                row.append(cell);
+
+                cell = $("<td/> ");
+                cell.html(excelRows[i].SoLuong);
+                cell.css("width", "20%");
+                cell.css("text-align", "center");
+                row.append(cell);
+
+                cell = $("<td/>");
+                cell.html(excelRows[i].DonGia);
+                cell.css("width", "20%");
+                cell.css("text-align", "center");
+                row.append(cell);
+            }
+
+            var dvExcel = $("#scrolltable");
+            dvExcel.html("");
+            dvExcel.append(table);
+        };
+
+        
+    </script>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            LoadNumberInput();
+            $('#listOrderDetail').on('change', 'input', function () {
+                var value = $(this).val();
+                if (value == "") {
+                    $(this).addClass("valid_null");
+                }
+                else {
+                    $(this).removeClass("valid_null");
+                    $(this).removeClass("has_error");
+
+                }
+            });
+            //$('#Save').click(function () {
+            //    ShowLoading();
+            //    // parseValidatorForm("#CreateProductInBound");
+            //    var WarehouseDestinationId = $("#WarehouseDestinationId").val();
+            //    var SupplierId = $("#SupplierId option:selected").val();
+            //    var messagge = "";
+            //    var count_locode = $('.locode.valid_null').length;
+            //    //    var expiry_date_null = $('.expiry_date.valid_null').length;
+            //    $('.valid_null').addClass("has_error");
+
+            //    //if (expiry_date_null > 0) {
+            //    //    messagge += "Cần nhập đầy đủ hạn sử dụng <br>";
+            //    //}
+            //    if (WarehouseDestinationId == '') {
+            //        messagge += "Kho nhận chưa có <br>";
+            //    }
+            //    //if (SupplierId == '') {
+            //    //    messagge += "Nhà cung cấp chưa có <br>";
+            //    //}
+            //    if (messagge != '') {
+            //        alertPopup('Lỗi!', messagge, 'error');
+            //        HideLoading();
+            //    }
+            //    else {
+            //        ClearFormatBeforeSubmit($("#CreateProductInBound"));
+            //        $("#CreateProductInBound").submit();
+            //        // HideLoading();
+            //    }
+
+            //    //return false;
+            //});
+            $.mask.definitions['~'] = '[+-]';
+            $('.input-mask-date').mask('99/99/9999');
+            calcTotalAmount();
+            $('#ProductItemCount').val($('#listOrderDetail .detailList tr').length);
+            //init rcb chọn sản phẩm
+            $('#productSelectList').radComboBox({
+                colTitle: 'ID, Hình, Tên sản phẩm, Xuất xứ, Giá nhập',
+                colValue: 1,
+                colImage: 2,
+                colHide: '1',
+                colSize: '0px,70px,250px,100px,100px',
+                colClass: ',,',
+                //width: 600,
+                height: 300,
+                boxSearch: true,
+                colSearch: 2
+            });
+
+            //$('#TotalAmount').numberFormat();
+            //$('.detail_item_price').numberFormat('before');
+            //$('.detail_item_total').numberFormat('before');
+
+            //lấy danh sách sản phẩm theo đơn hàng
+            //Hiển thị giá và tính thành tiền khi chọn sản phẩm
+            $('#productSelectList').on('change', function () {
+                var $this = $(this);
+                var selected = $this.find("option:selected");
+
+                if (selected.val() == '' || $('#product_item_' + selected.val()).length > 0)
+                    return;
+
+                var OrderNo = $('.detailList tr').length;
+                var ProductId = selected.val();
+                var ProductName = selected.text();
+                var Unit = selected.data("unit");
+                var Quantity = 1;
+                var Price = selected.data("price");
+                var ProductType = selected.data("product-type");
+                var ProductCode = selected.data("code");
+                var LoCode = "";
+                var ExpiryDate = "";
+                var formdata = {
+                    OrderNo: OrderNo,
+                    ProductId: ProductId,
+                    ProductName: ProductName,
+                    Unit: Unit,
+                    Quantity: Quantity,
+                    Price: Price,
+                    ProductType: ProductType,
+                    ProductCode: ProductCode,
+                    LoCode: LoCode,
+                    ExpiryDate: ExpiryDate
+                };
+
+                $("#listOrderDetail1 TBODY TR").each(function () {
+                    debugger
+                    var row = $(this);
+                    var w = $(window);
+                    $(this).removeClass('selected_grey').addClass("text_data");
+
+                    var ProductCode1 = $(this).closest('tr').find("td:eq(1) input:nth-child(2)").val();
+
+                    // alert($('#product_barcode3').val());
+
+                    if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                        //alert(ProductCode);
+                        $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val(parseInt($(this).closest('tr').find("td:eq(2) input:nth-child(2)").val()) + 1);
+                        $(this).closest('tr').find("td:eq(2) input:nth-child(2)").trigger('change');
+                        $(this).addClass('selected_grey');
+                        var body = $("html,#listOrderDetail");
+                        body.stop().animate({ scrollTop: row.offset().top - (w.height() / 1.6) }, 500, 'swing', function () {
+                            row.addClass('scrollCode');
+                        });
+                        formdata = {};
+                        return;
+                    } else {
+                        $(this).removeClass("scrollCode");
+                    }
+                    //alert(ProductCode);
+
+                });
+                //Thêm dòng mới
+                ClickEventHandler(true, "/Product/LoadProductItem", ".detailList", formdata, function () {
+                    $('#ProductItemCount').val($('#listOrderDetail .detailList tr').length);
+                    $.mask.definitions['~'] = '[+-]';
+                    $('.input-mask-date').mask('99/99/9999');
+                    calcTotalAmount();
+                    $("#DetailList_" + formdata.OrderNo + "_Quantity").focus().select();
+
+                });
+
+                HideLoading();
+            });
+
+            // tính thành tiền và tổng cộng
+
+
+            $('#listOrderDetail').on('change', '.detail_item_qty', function () {
+                var $this = $(this);
+                var id = $this.closest('tr').data('id');
+                var $detail_item_id = $this.closest('tr').find('.detail_item_id');
+                var $qty = $detail_item_id.closest('tr').find('.detail_item_qty');
+                var qty = 1;
+                if ($qty.val() == '') {
+                    $qty.val(1);
+                } else {
+                    qty = parseInt(removeComma($qty.val())) < 0 ? parseInt(removeComma($qty.val())) * -1 : parseInt(removeComma($qty.val()));
+                }
+                var $qtyUsed = $detail_item_id.closest('tr').find('.detail_item_qtyUsed');
+                var qtyUsed = 1;
+                if ($qtyUsed.val() == '') {
+                    $qtyUsed.val(0);
+                } else {
+                    //qtyUsed = parseInt($qtyUsed.val()) < 0 ? parseInt($qtyUsed.val()) * -1 : parseInt($qtyUsed.val());
+                    qtyUsed = parseInt(removeComma($qtyUsed.val())) < 0 ? parseInt(removeComma($qtyUsed.val())) * -1 : parseInt(removeComma($qtyUsed.val()));
+                }
+                if (qty < qtyUsed) {
+                    $qty.val(numeral(qtyUsed).format('0,0'));
+                }
+                else {
+                    $qty.val(numeral(qty).format('0,0'));
+                }
+                calcAmountItem($detail_item_id, id, 'price');
+                calcTotalAmount();
+
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+            $('#listOrderDetail').on('change', '.detail_item_price:last-of-type', function () {
+                var $this = $(this);
+                var id = $this.closest('tr').data('id');
+                var $detail_item_id = $this.closest('tr').find('.detail_item_id');
+                calcAmountItem($detail_item_id, id, 'price');
+                calcTotalAmount();
+            });
+
+
+            $('#listOrderDetail').on('keypress', '.detail-product-price, .detail_item_qty', function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                }
+            });
+
+            $('#product_barcode').keypress(function (e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $('#product_barcode').trigger('change');
+                }
+            });
+
+            $('#listOrderDetail').on('keypress', '.detail_item_price', function (e) {
+                if (e.keyCode === 46) {
+                    e.preventDefault();
+                }
+            });
+
+            $('#listOrderDetail').on('keypress', '.detail_item_qty', function (e) {
+                if (e.keyCode === 46) {
+                    e.preventDefault();
+                }
+            });
+
+            //khi nhập barcode
+            $('#product_barcode').change(function () {
+                var $this = $(this);
+                if ($this.val() != '') {
+
+                    var barcode = $this.val();
+                    //đặt lại giá trị rỗng
+                    $this.val('').focus();
+
+                    var valueSearch = searchProductByBarCodeContain(barcode);
+                    if (valueSearch == undefined) {
+                        alert('Không tìm thấy sản phẩm với mã code trên!');
+                        return;
+                    }
+
+                    //console.log(valueSearch);
+                    //var $hasSelect = $('#productSelectList').filter(function () {
+                    //    return $(this).val() === valueSearch;
+                    //});
+
+
+
+                    //console.log($hasSelect);
+
+                    //$hasSelect.attr("selected", "selected").trigger("change");
+                    $('#productSelectList').val(valueSearch).trigger("change");
+
+                    //kết thúc các lệnh của sự kiện
+                }
+            });
+
+            // xóa sản phẩm
+            $('#listOrderDetail').on('click', '.btn-delete-item', function () {
+                //$(this).closest('tr').next('tr.template_location').remove();
+                //debugger
+                $(this).closest('tr').remove();
+                $('.rowbarcode').remove();
+                var countItem = $('.detailList tr').length;
+                $('#ProductItemCount').val(countItem);
+
+                if (countItem == 0) {
+                    $('#ProductItemCount').val('');
+                    $('#TongSoLuong').text('');
+                    $('#TongThanhTien').text('');
+                }
+                calcTotalAmount();
+
+                $('.detailList tr').each(function (index, tr) {
+                    $(tr).attr('role', index);
+                    $(tr).find('td:first-child').text(index + 1);
+                    $(tr).find('.detail_locode input').attr('name', 'DetailList[' + index + '].ExpiryDate').attr('id', 'DetailList_' + index + '__ExpiryDate');
+                    $(tr).find('.detail_locode input').attr('name', 'DetailList[' + index + '].LoCode').attr('id', 'DetailList_' + index + '__LoCode');
+                    $(tr).find('.detail_item_id input').attr('name', 'DetailList[' + index + '].ProductId').attr('id', 'DetailList_' + index + '_ProductId');
+                    $(tr).find('.detail_item_qty').attr('name', 'DetailList[' + index + '].Quantity').attr('id', 'DetailList_' + index + '_Quantity');
+                    $(tr).find('.detail_item_price').filter(':not(.mask-format-currency)').attr('name', 'DetailList[' + index + '].Price').attr('id', 'DetailList_' + index + '_Price');
+                    $(tr).find('.detail_item_unit').attr('name', 'DetailList[' + index + '].Unit');
+                });
+            });
+        });
+
+        function searchProductByBarCodeContain(barcode) {
+            barcode = barcode.toLowerCase();
+            //var $productSelect = $('.detail_item_id').first();
+
+            var $optionList = $("#productSelectList").find('option');
+
+            var arrResulft = [];
+            for (var i = 0; i < $optionList.length; i++) {
+                var data_code = $($optionList[i]).data('code') != undefined ? $($optionList[i]).data('code').toString().toLowerCase() : undefined;
+                if (barcode.indexOf(data_code) != -1)
+                    arrResulft.push($($optionList[i]).attr('value'));
+
+                if (arrResulft.length == 1) {
+                    return arrResulft[0];
+                }
+            }
+
+            return arrResulft[0];
+        };
+
+        function calcAmountItem($detail_item_id, id, priceFrom) {
+            //var price = 0;
+            //var $priceElem = $detail_item_id.closest('tr').find('.detail_item_price');
+            //if (priceFrom == 'item select') {
+            //    $priceElem.val($option.data('price')).trigger('change');
+            //    price = parseFloat($option.data('price'));
+            //} else {
+            //    price = parseFloat($priceElem.last().val().replace(/[^0-9\.]/g, ''));
+            //}
+            var input_price = $('#DetailList_' + id + '__Price');
+            var _price = input_price.val() != '' ? removeComma(input_price.val()) : 0;
+
+            var $qty = $detail_item_id.closest('tr').find('.detail_item_qty');
+            var qty = 1;
+            if ($qty.val() == '') {
+                $qty.val(1);
+            } else {
+                qty = parseInt(removeComma($qty.val())) < 0 ? parseInt(removeComma($qty.val())) * -1 : parseInt(removeComma($qty.val()));
+            }
+            var total = Math.round(_price * qty);
+            $detail_item_id.closest('tr').find('.detail_item_total').text(numeral(total).format('0,0'));
+        };
+
+        function calcTotalAmount() {
+            var total = 0;
+            var total1 = 0;
+
+            var selector = '.detailList tr';
+            $(selector).each(function (index, elem) {
+                if ($(elem).find('.detail_item_total').text() != '') { // la số thì mới tính
+                    total += parseFloat(removeComma($(elem).find('.detail_item_total').text()));
+                    $("#TongThanhTien").text(numeral(total).format('0,0'));
+                }
+
+                if ($(elem).find('.detail_item_qty').val() != '') { // la số thì mới tính
+                    total1 += parseInt(removeComma($(elem).find('.detail_item_qty').val()));
+                    $("#TongSoLuong").text(numeral(total1).format('0,0'));
+                }
+
+                if (index == $(selector).length - 1) {
+                    $('#mask-TotalAmount').val(numeral(total).format('0,0'));
+                    $('#TotalAmount').val(numeral(total).format('0,0'));
+                }
+            });
+        };
+
+        function checkChosenProductOnTable() {
+            var flag = true;
+            if ($('#PurchaseOrderId').val() == '') {
+                $('.detailList select.detail_item_id').each(function (index, elem) {
+                    if ($(elem).val() == '') {
+                        var message = $(elem).data('val-required') != undefined ? $(elem).data('val-required') : 'Chưa chọn sản phẩm!';
+                        $(elem).next('span').text(message);
+                        flag = false;
+                    }
+                });
+            }
+            return flag;
+        }
+
+        //hàm gọi lại từ form tạo mới phiếu nhập
+        function ClosePopupAndAppendSelectPurchaseOrder(optionSelect) {
+            ClosePopup(false);
+            $('#PurchaseOrderId').append($(optionSelect)).trigger("chosen:updated");
+        }
+
+        function parseValidatorForm(form) {
+            //jQuery.noConflict();
+
+            // if the form is in a dialog box {
+            var form = $(form);
+            form.removeData('validator').removeData('nobtrusiveValidation');
+            $.validator.unobtrusive.parse(form); // }
+
+            $.fn.extend({
+                // form validation {
+                isValid: function () {
+                    var self = $(this);
+                    $.validator.unobtrusive.parse(self);
+                    return self.data('unobtrusiveValidation').validate();
+                } // }
+            });
+        };
+
+        $(document).ready(function () {
+            $("#ProductItemCount").attr("readonly", "true");
+        });
+
+    </script>
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.10.1/xlsx.core.min.js"></script>*@
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/xls/0.7.4-a/xls.core.min.js"></script>*@
+    <script type="text/javascript">
+
+        //function ExportToTable() {
+        //    debugger
+        //    var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.xls|.xlsx)$/;
+        //    /*Checks whether the file is a valid excel file*/
+        //    if (regex.test($("#excelfile").val().toLowerCase())) {
+        //        var xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/
+        //        if ($("#excelfile").val().toLowerCase().indexOf(".xlsx") > 0) {
+        //            xlsxflag = true;
+        //        }
+        //        /*Checks whether the browser supports HTML5*/
+        //        if (typeof (FileReader) != "undefined") {
+        //            var reader = new FileReader();
+        //            reader.onload = function (e) {
+        //                var data = e.target.result;
+        //                /*Converts the excel data in to object*/
+        //                if (xlsxflag) {
+        //                    var workbook = XLSX.read(data, { type: 'binary' });
+        //                }
+        //                else {
+        //                    var workbook = XLS.read(data, { type: 'binary' });
+        //                }
+        //                /*Gets all the sheetnames of excel in to a variable*/
+        //                var sheet_name_list = workbook.SheetNames;
+
+        //                var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/
+        //                sheet_name_list.forEach(function (y) { /*Iterate through all sheets*/
+        //                    /*Convert the cell value to Json*/
+        //                    if (xlsxflag) {
+        //                        var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+        //                    }
+        //                    else {
+        //                        var exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y]);
+        //                    }
+        //                    if (exceljson.length > 0 && cnt == 0) {
+        //                        BindTable(exceljson, '#exceltable');
+        //                        cnt++;
+        //                    }
+        //                });
+        //                $('#exceltable').show();
+        //            }
+        //            if (xlsxflag) {/*If excel file is .xlsx extension than creates a Array Buffer from excel*/
+        //                reader.readAsArrayBuffer($("#excelfile")[0].files[0]);
+        //            }
+        //            else {
+        //                reader.readAsBinaryString($("#excelfile")[0].files[0]);
+        //            }
+        //        }
+        //        else {
+        //            alert("Sorry! Your browser does not support HTML5!");
+        //        }
+        //    }
+        //    else {
+        //        alert("Please upload a valid Excel file!");
+        //    }
+        //}
+
+        function BindTable(jsondata, tableid) {/*Function used to convert the JSON array to Html Table*/
+            var columns = BindTableHeader(jsondata, tableid); /*Gets all the column headings of Excel*/
+            for (var i = 0; i < jsondata.length; i++) {
+                var row$ = $('<tr/>');
+                for (var colIndex = 0; colIndex < columns.length; colIndex++) {
+                    var cellValue = jsondata[i][columns[colIndex]];
+                    if (cellValue == null)
+                        cellValue = "";
+                    row$.append($('<td/>').html(cellValue));
+                }
+                $(tableid).append(row$);
+            }
+        }
+        function BindTableHeader(jsondata, tableid) {/*Function used to get all column names from JSON and bind the html table header*/
+            var columnSet = [];
+            var headerTr$ = $('<tr/>');
+            for (var i = 0; i < jsondata.length; i++) {
+                var rowHash = jsondata[i];
+                for (var key in rowHash) {
+                    if (rowHash.hasOwnProperty(key)) {
+                        if ($.inArray(key, columnSet) == -1) {/*Adding each unique column names to a variable array*/
+                            columnSet.push(key);
+                            headerTr$.append($('<th/>').html(key));
+                        }
+                    }
+                }
+            }
+            $(tableid).append(headerTr$);
+            return columnSet;
+        }
+
+        $("body").on("click", "#addproduct", function (e) {
+            debugger
+            var a = $('.detailList').find("tr:eq(0)").find("td:eq(1)").html();
+            ShowLoading();
+            if (a == null) {
+                e.preventDefault();
+                var stt = 0;
+                // var customers = new Array();
+                document.getElementById("exceltable").deleteRow(0);
+                $("#exceltable TBODY TR").each(function () {
+                    debugger
+                    var row = $(this);
+                    var ListForm = Array();
+                    //var stt = 0;
+                    // var CommissionCusId = $("#Id").val();
+                    var OrderNo = row.find("TD").eq(0).html();
+                    var ProductCode = row.find("TD").eq(1).html();
+                    var Quantity = row.find("TD").eq(2).html();
+                    var price = row.find("TD").eq(3).html();
+                    //var ProductName = row.find("TD").eq(1).html();
+                    var formdata = {
+                        OrderNo: OrderNo,
+                        ProductId: 0,
+                        Quantity: Quantity,
+                        Price: price,
+                        // ProductType: ProductType,
+                        ProductCode: ProductCode,
+                        //CommissionValue: CommissionValue,
+                        //CommissionCusId: 0
+                    };
+
+                    ClickEventHandler(true, "/Product/LoadProductItem", ".detailList", formdata, function () {
+                        //if (a != null) {
+                        //     debugger
+                        //}
+                        //    $("#listOrderDetail1 TBODY TR").each(function () {
+                        //        debugger
+                        //        var row = $(this);
+                        //        var w = $(window);
+                        //        $(this).removeClass('selected_grey').addClass("text_data");
+
+                        //        var ProductCode1 = $(this).closest('tr').find("td:eq(1) input:nth-child(2)").val();
+
+                        //        // alert($('#product_barcode3').val());
+
+                        //        if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                        //            //alert(ProductCode);
+                        //            $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val(parseInt($(this).closest('tr').find("td:eq(2) input:nth-child(2)").val()) + parseInt(Quantity));
+                        //            $(this).closest('tr').find("td:eq(2) input:nth-child(2)").trigger('change');
+                        //            $(this).addClass('selected_grey');
+                        //            var body = $("html,#listOrderDetail");
+                        //            body.stop().animate({ scrollTop: row.offset().top - (w.height() / 1.6) }, 500, 'swing', function () {
+                        //                row.addClass('scrollCode');
+                        //            });
+                        //            formdata = {};
+                        //            return;
+                        //        } else {
+                        //            $(this).removeClass("scrollCode");
+                        //        }
+                        //        //alert(ProductCode);
+
+                        //    });
+
+                        var a = $('#ProductItemCount').val($('#listOrderDetail .detailList tr').length);
+                        console.log(a);
+                        $.mask.definitions['~'] = '[+-]';
+                        $('.input-mask-date').mask('99/99/9999');
+                        calcTotalAmount();
+                        $("#DetailList_" + formdata.OrderNo + "_Quantity").focus().select();
+
+                    })
+                    stt = stt++;
+
+                    $('.detailList').html("");
+                    //Thêm dòng mới
+                    //setTimeout(".detailList", 2000);
+                    //ClickEventHandler(true, "/ProductInBound/LoadProductItem", ".detailList", formdata);
+
+                    row.remove();
+                    //setTimeout(".detailList",2000);
+                    //document.getElementById("exceltable").deleteRow(OrderNo - 1);
+                });
+
+
+
+                $('#addproduct').addClass('hideinput');
+            }
+            else {
+
+                $("#exceltable TBODY TR").each(function () {
+                    var row = $(this);
+                    //var stt = 0;
+                    // var CommissionCusId = $("#Id").val();
+                    var OrderNo = row.find("TD").eq(0).html();
+                    var ProductCode = row.find("TD").eq(1).html();
+                    var Quantity = row.find("TD").eq(2).html();
+                    var price = row.find("TD").eq(3).html();
+                    //var ProductName = row.find("TD").eq(1).html();
+                    var formdata = {
+                        OrderNo: OrderNo,
+                        ProductId: 0,
+                        Quantity: Quantity,
+                        Price: price,
+                        // ProductType: ProductType,
+                        ProductCode: ProductCode,
+                        //CommissionValue: CommissionValue,
+                        //CommissionCusId: 0
+                    };
+
+                    $("#listOrderDetail1 TBODY TR").each(function () {
+                        debugger
+                        var row = $(this);
+                        var w = $(window);
+                        $(this).removeClass('selected_grey').addClass("text_data");
+
+                        var ProductCode1 = $(this).closest('tr').find("td:eq(1) input:nth-child(2)").val();
+
+                        // alert($('#product_barcode3').val());
+
+                        if (String(ProductCode).trim().localeCompare(String(ProductCode1).trim()) == 0) {
+                            //alert(ProductCode);
+                            $(this).closest('tr').find("td:eq(2) input:nth-child(2)").val(parseInt($(this).closest('tr').find("td:eq(2) input:nth-child(2)").val()) + parseInt(Quantity));
+                            $(this).closest('tr').find("td:eq(2) input:nth-child(2)").trigger('change');
+                            $(this).addClass('selected_grey');
+                            var body = $("html,#listOrderDetail");
+                            body.stop().animate({ scrollTop: row.offset().top - (w.height() / 1.6) }, 500, 'swing', function () {
+                                row.addClass('scrollCode');
+                            });
+                            formdata = {};
+                            return;
+                        } else {
+                            $(this).removeClass("scrollCode");
+                        }
+                        //alert(ProductCode);
+
+                    });
+                    //Thêm dòng mới
+                    ClickEventHandler(true, "/ProductInbound/LoadProductItem", ".detailList", formdata, function () {
+                        $('#ProductItemCount').val($('#listOrderDetail .detailList tr').length);
+                        $.mask.definitions['~'] = '[+-]';
+                        $('.input-mask-date').mask('99/99/9999');
+                        calcTotalAmount();
+                        $("#DetailList_" + formdata.OrderNo + "_Quantity").focus().select();
+
+                    });
+                    stt = stt++;
+                    row.remove();
+                })
+                //alert("Đã có sản phẩm trong danh sách ! Không thể import.");
+                $("#exceltable TBODY").remove();
+                document.getElementById("excelfile").value = "";
+            }
+
+            HideLoading();
+        });
+        $("#closepopup").click(function () {
+            $("#exceltable TBODY").remove();
+            document.getElementById("excelfile").value = "";
+        });
+        $("#viewfile").click(function () {
+            $("#addproduct").removeClass('hideinput');
+        });
+
+    </script>
+    <script src="~/assets/js/jspdf.min.js"></script>
+    @*<script src="https://unpkg.com/jspdf@latest/dist/jspdf.min.js"></script>*@
+    @*<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>*@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.1/html2pdf.bundle.min.js"></script>
+    <script>
+        $('#Save').click(function () {
+            var customers = new Array();
+            ShowLoading();
+            $("#listOrderDetail1 TBODY TR").each(function () {
+                //debugger
+
+                var row = $(this);
+                var code = row.closest('tr').find("td:eq(1) input:nth-child(2)").val();
+                var soluong = row.closest('tr').find("td:eq(2) input:nth-child(2)").val();
+                var gia = row.closest('tr').find("td:eq(3) input").val();
+                var name = row.closest('tr').find("td:eq(1) input:nth-child(3)").val();
+
+                var customer = {};
+                customer.MaSanPham = code;
+                customer.SoLuong = soluong;
+                customer.DonGia = gia;
+                customer.Ten = name;
+                customers.push(customer);
+            });
+            ShowLoading();
+            $.ajax({
+                type: "POST",
+                url: "/Product/Inmavachpdf",
+                data: JSON.stringify(customers),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+                    ShowLoading();
+                    if (data.fileName != "") {
+                        //use window.location.href for redirect to download action for download the file
+                        window.location.href = "@Url.RouteUrl(new
+                        { Controller = "Product", Action = "Download"})/?file=" + data.fileName;
+                        }
+                    //location.reload();
+                    HideLoading();
+                }
+            });
+
+
+
+        });
+
+
+        //function print() {
+        //    const filename = 'ThisIsYourPDFFilename.pdf';
+
+        //    html2canvas(document.querySelector('.ListBarCode')).then(canvas => {
+        //        let pdf = new jsPDF('p', 'mm', 'a4');
+        //        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 211, 298);
+        //        pdf.save(filename);
+        //    });
+        //}
+
+    </script>
+
+
+}

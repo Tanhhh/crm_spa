@@ -1,0 +1,951 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.Domain.Entities
+@using Erp.Domain.Staff.Entities
+
+@{
+    Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    var toDay = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
+    //Tuần này
+
+    var firstDayOfWeek = toDay;
+    if (firstDayOfWeek.DayOfWeek.ToString() != "Monday")
+    {
+        firstDayOfWeek = firstDayOfWeek.AddDays(-(int)(firstDayOfWeek.DayOfWeek - 1));
+    }
+    var lastDayOfWeek = firstDayOfWeek.AddDays(6);
+
+    //Tuần trước
+    var temp_firstDayOfLastWeek = firstDayOfWeek.AddDays(-6);
+    if (temp_firstDayOfLastWeek.DayOfWeek.ToString() != "Monday")
+    {
+        temp_firstDayOfLastWeek = temp_firstDayOfLastWeek.AddDays(-(int)(temp_firstDayOfLastWeek.DayOfWeek - 1));
+    }
+    var firstDayOfLastWeek = temp_firstDayOfLastWeek;
+    var lastDayOfLastWeek = firstDayOfLastWeek.AddDays(6);
+
+    //Tháng này
+    var firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+    var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+    //Tháng trước
+    var firstDayOfLastMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month == 1 ? 12 : (DateTime.Now.Month - 1), 1);
+    var lastDayOfLastMonth = firstDayOfLastMonth.AddMonths(1).AddDays(-1);
+
+    //Quý này
+    var firstDayOfQuarterVar = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1); // Đổi tên biến này thành firstDayOfQuarterVar
+
+
+    //quarter
+    //Quý trước
+    var firstDayOfLastQuarter = firstDayOfQuarterVar.AddMonths(-3);
+    var user = ViewBag.user as IEnumerable<User>;
+
+
+    // Chuỗi format ngày để hiển thị trên giao diện
+    var dateFormat = "yyyy-MM-dd";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/css/bootstrap-select.min.css" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.3/js/bootstrap-select.min.js"></script>
+
+
+<style>
+    #TableKPICongViec > div {
+        overflow: unset !important;
+    }
+
+    .page-content {
+        overflow-y: scroll;
+        height: 100vh;
+    }
+
+    thead {
+        position: sticky;
+        top: 0;
+    }
+
+    .table > thead > tr {
+        color: #b15959 !important;
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        background: #fff;
+    }
+
+    /*.table-bordered, .table-bordered > tbody > tr > td, .table-bordered > tbody > tr > th, .table-bordered > tfoot > tr > td, .table-bordered > tfoot > tr > th, .table-bordered > thead > tr > td, .table-bordered > thead > tr > th {
+        border: unset;
+    }*/
+
+    /*.table > thead > tr > th {
+        border: unset;
+    }*/
+
+    /* .table-bordered > thead > tr > th {
+        border: unset;
+    }*/
+
+    .nav-pills > li.active > a {
+        background-color: #00ace6 !important;
+    }
+
+    .tab-content {
+        border: unset !important;
+    }
+
+    .checkbox-inline > input {
+        margin-top: 5px;
+        padding: 0px 4px 6px;
+    }
+
+    .btn-group + .btn, .btn-group > .btn, .checkbox-inline > input {
+        border: 1px solid #809dc9 !important;
+    }
+
+    label {
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        font-size: 15px !important;
+        color: #262f58;
+    }
+
+    #cuoiThang, #dauThang {
+        width: 100%
+    }
+
+    body {
+        /*margin-top: 20px;*/
+        color: #1a202c;
+        text-align: left;
+        background-color: #e2e8f0;
+    }
+
+    .main-body {
+        padding: 15px;
+    }
+
+    .card {
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06);
+    }
+
+    .card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        word-wrap: break-word;
+        background-color: #fff;
+        background-clip: border-box;
+        border: 0 solid rgba(0,0,0,.125);
+        border-radius: .25rem;
+    }
+
+    .selectpicker {
+        background-color: #fff !important;
+        color: #333 !important;
+    }
+
+    .dropdown-toggle:hover {
+        background-color: #fff !important;
+    }
+
+    .btn.dropdown-toggle:active, .open {
+        background-color: #ffffff !important;
+        border-color: #bfc1c2;
+        border: 1px solid #bfc1c2 !important;
+    }
+
+    .btn-default, .btn-default.focus, .btn-default:focus, .btn.focus, .btn:focus {
+        background-color: #fff;
+    }
+
+    .btn-group > .btn > .caret {
+        border-top-color: #080808;
+    }
+
+    .gutters-sm {
+        margin-right: -8px;
+        margin-left: -8px;
+    }
+
+        .gutters-sm > .col, .gutters-sm > [class*=col-] {
+            padding-right: 8px;
+            padding-left: 8px;
+        }
+
+    .modal, .modal-backdrop {
+        right: 0;
+        bottom: auto;
+        left: 0;
+    }
+
+    .mb-3, .my-3 {
+        margin: 1rem 1rem !important;
+    }
+
+    .bg-gray-300 {
+        background-color: #e2e8f0;
+    }
+    /*
+    .h-100 {
+        height: 100% !important;
+    }*/
+
+    .custom-color-td {
+        text-align: left;
+    }
+
+    .ht_1sao {
+        text-align: right;
+    }
+
+    .custom-th1 {
+        text-align: center;
+    }
+
+    .custom-tbody {
+        text-align: right;
+        border-top: 1px solid #649ff0;
+    }
+
+    .bootstrap-select:not([class*=col-]):not([class*=form-control]):not(.input-group-btn) {
+        width: 100%;
+    }
+
+    .nav-list > li > a > .menu-icon {
+        filter: brightness(0) !important;
+        vertical-align: top;
+    }
+
+    .table-bordered {
+        border: 1px solid #004a9f;
+    }
+
+    .btn-statistical {
+        float: left;
+        padding: .6rem 1.5rem;
+        border-radius: 3px;
+        border: none;
+        outline: none;
+        margin-left: 32px;
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        background: #499ce4 !important;
+    }
+
+        .btn-statistical:hover {
+            transition: .3s linear;
+        }
+
+    .btn-custom {
+        padding: .4rem 1.5rem !important;
+        margin: 0 1rem;
+    }
+
+        .btn-custom:nth-child(1) {
+            margin-left: 0
+        }
+
+    .btnchart {
+        padding: .6rem 1.5rem !important;
+        text-decoration: underline;
+    }
+
+
+    /* ----- chart & table----------- */
+    .table > thead > tr {
+        color: #333;
+        font-family: 'Inter', sans-serif;
+        font-weight: bold !important;
+        background: #fff;
+        text-transform: capitalize;
+    }
+
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 9px 12px;
+        }
+
+    table {
+        margin-bottom: 0 !important;
+    }
+
+    .webkit::-webkit-scrollbar {
+        background: #dbdbdb;
+        border-radius: 10px;
+        display: none;
+    }
+
+    .webkit::-webkit-scrollbar-button {
+        width: 3px !important;
+    }
+
+    .webkit::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+        background: #999;
+    }
+
+    .table-bordered {
+        border: none;
+    }
+
+    .chart-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    .chart-item {
+        flex: 1;
+        max-width: 45%;
+        margin: 10px;
+    }
+    /* Áp dụng cho tất cả các bảng */
+    #data-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #ddd;
+        margin-bottom: 20px;
+        margin-top: 30px;
+    }
+
+        /* Định dạng tiêu đề cột */
+        #data-table th {
+            padding: 12px 15px;
+            text-align: center;
+            background-color: #f2f2f2;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* Định dạng dòng trong tbody */
+        #data-table tbody tr {
+            border-bottom: 1px solid #ddd;
+        }
+
+            /* Định dạng nền của các dòng chẵn */
+            #data-table tbody tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+
+            /* Định dạng nền của các dòng khi hover */
+            #data-table tbody tr:hover {
+                background-color: #f2f2f2;
+            }
+
+        /* Định dạng cột Tổng */
+        #data-table tbody td:last-child {
+            font-weight: bold;
+        }
+
+        /* Định dạng cột Tên trạng thái */
+        #data-table tbody td:first-child {
+            width: 25%;
+        }
+
+        /* Định dạng các ô trong tbody */
+        #data-table tbody td {
+            padding: 12px 15px;
+        }
+
+        /* Định dạng ô khi số lượng ký tự quá nhiều */
+        #data-table tbody td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Định dạng các ô trong tbody khi dòng dữ liệu đầu ra */
+        #data-table tbody td {
+            text-align: center;
+        }
+
+            /* Định dạng các ô trong tbody khi dòng dữ liệu đầu ra không phải ô cuối cùng */
+            #data-table tbody td:not(:last-child) {
+                text-align: center;
+            }
+
+    select#quanDropdown,
+    select#statusDropdown {
+        height: 31px;
+    }
+
+    ul#pills-tab {
+        margin: 1rem 3.6rem !important;
+    }
+
+</style>
+
+<div class="card">
+    <h2 class="card-title" style="background-color: white; color: #262f58; font-weight: bolder; margin-left: 1%"> <i class="menu-icon fa fa-bar-chart"></i>Thống kê số lượng chuyển đổi sau cuộc gọi</h2>
+    <div class="card-body">
+
+        <div class="container">
+            <div class="row">
+                <div style="margin-left:-5%" class="col-md-12">
+
+
+
+                    @{
+                        // Lấy ngày hiện tại
+                        var currentDate = DateTime.Now;
+
+                        // Xác định quý hiện tại
+                        int quarter = (currentDate.Month - 1) / 3 + 1;
+
+                        // Xác định ngày đầu tiên của quý
+                        var firstDayOfQuarter = new DateTime(currentDate.Year, (quarter - 1) * 3 + 1, 1);
+
+                        // Xác định ngày cuối cùng của quý
+                        var lastDayOfQuarter = firstDayOfQuarter.AddMonths(3).AddDays(-1);
+                    }
+
+                    <div class="col-sm-3 form-group">
+                        <label class="checkbox-inline">
+                            Từ ngày:
+                            <input type="date" value="@firstDayOfWeek.ToString(dateFormat)" id="dauThang" class="change-icon" />
+                        </label>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label class="checkbox-inline">
+                            Đến ngày:
+                            <input type="date" value="@lastDayOfWeek.ToString(dateFormat)" id="cuoiThang" class="change-icon" />
+                        </label>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label for="quanDropdown">Chọn quận:</label>
+                        <select id="quanDropdown" class="form-control custom-dropdown">
+                            <option value="0">Tất cả</option>
+                            @foreach (var item in ViewBag.Branch)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-sm-3 form-group">
+                        <label for="leadOrContact">Nguồn dữ liệu:</label>
+                        <select id="leadOrContact" class="form-control custom-dropdown" style="height: 30px">
+                            <option value="1">Lead</option>
+                            <option value="0">Contact</option>
+                            <option value="2">Tất cả</option>
+                        </select>
+                    </div>
+                    <div class=" form-group">
+                        <button id="btn_thongKe" class=" btn-primary btn-statistical"><i class="fa fa-search" style="filter:brightness(3);"></i> Thống kê</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+            <li class="nav-item active">
+                <a class="nav-link btn-custom" id="pills-tuannay" onclick="changeWeek()" data-toggle="pill" href="#pills-tuannay" role="tab" aria-controls="pills-tuannay" aria-selected="false"> <i class="fa fa-calendar"></i> Tuần này</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-custom" id="pills-tuantruoc" onclick="changeLastWeek()" data-toggle="pill" href="#pills-tuantruoc" role="tab" aria-controls="pills-tuantruoc" aria-selected="true"> <i class="fa fa-calendar"></i> Tuần trước</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link btn-custom" id="pills-thangnay" onclick="changeMonth()" data-toggle="pill" href="#pills-thangnay" role="tab" aria-controls="pills-thangnay" aria-selected="true"> <i class="fa fa-calendar"></i> Tháng này</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-custom" id="pills-thangtruoc" onclick="changeLastMonth()" data-toggle="pill" href="#pills-thangtruoc" role="tab" aria-controls="pills-thangtruoc" aria-selected="true"> <i class="fa fa-calendar"></i> Tháng trước</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-custom" id="pills-quynay" onclick="changeQuarter()" data-toggle="pill" href="#pills-quynay" role="tab" aria-controls="pills-quynay" aria-selected="true"> <i class="fa fa-calendar"></i> Quý này</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-custom" id="pills-quytruoc" onclick="changeLastQuarter()" data-toggle="pill" href="#pills-quytruoc" role="tab" aria-controls="pills-quytruoc" aria-selected="true"> <i class="fa fa-calendar"></i> Quý trước</a>
+            </li>
+
+
+        </ul>
+
+        <div class="tab-content soluong_chart" id="pills-tabContent">
+            <div class=" in chart-container" id="pills-tuannay" role="tabpanel" aria-labelledby="pills-bieudo-tab">
+                <div class="chart-item" style="  max-height: 600px; margin-bottom:30PX;">
+                    <canvas id="callChart"></canvas>
+                </div>
+
+            </div>
+            <table id="data-table" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Tên trạng thái</th>
+                        <th>Sai số</th>
+                        <th>Nam</th>
+                        <th>Tắt máy ngang/khó khai thác</th>
+                        <th>Tổng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Đề nghị hủy</td>
+                        <td id="saiSo"></td>
+                        <td id="nam"></td>
+                        <td id="tatMayNgang_KhoKhaiThac"></td>
+                        <td id="deNghiHuy"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+            <table id="data-table" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Tên trạng thái</th>
+                        <th>Không nhu cầu</th>
+                        <th>Không nghe máy/máy bận</th>
+                        <th>Sim đang có điện thoại/Tài khoản tạm khóa</th>
+                        <th>Gửi thông tin qua Zalo</th>
+                        <th>Tổng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Đặt hẹn không thành công</td>
+                        <td id="chuaCoNhuCau"></td>
+                        <td id="khongNgheMay"></td>
+                        <td id="simKhoa"></td>
+                        <td id="guiThongTinQuaZalo"></td>
+                        <td id="datHenKhongTC"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+            <table id="data-table" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Tên trạng thái</th>
+                        <th>Nhắc hẹn xa</th>
+                        <th>Nhắc hẹn gần</th>
+
+                        <th>Tổng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Đặt hẹn</td>
+                        <td id="nhacHenXa"></td>
+                        <td id="nhacHenGan"></td>
+                        <td id="datHen"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <table id="data-table" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Tên trạng thái</th>
+                        <th>Gọi lại sau</th>
+                        <th>Tổng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Theo lại</td>
+                        <td id="goiLaiSau"></td>
+                        <td id="theoLai"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+            <table id="data-table" class="table table-striped totalChangeOutBoundCallLead">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên Lead</th>
+                        <th>Số điện thoại</th>
+                        <th>Trạng thái</th>
+                        <th>Hạn chót</th>
+                        <th>Ngày sửa</th>
+                        <th>Người chịu trách nhiệm</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+<div style="display: none">
+
+    <input id="firstDayOfWeek" value="@firstDayOfWeek.ToString("yyyy-MM-dd")" />
+    <input id="lastDayOfWeek" value="@lastDayOfWeek.ToString("yyyy-MM-dd")" />
+
+    <input id="firstDayOfLastWeek" value="@firstDayOfLastWeek.ToString("yyyy-MM-dd")" />
+    <input id="lastDayOfLastWeek" value="@lastDayOfLastWeek.ToString("yyyy-MM-dd")" />
+
+    <input id="firstDayOfMonth" value="@firstDayOfMonth.ToString("yyyy-MM-dd")" />
+    <input id="lastDayOfMonth" value="@lastDayOfMonth.ToString("yyyy-MM-dd")" />
+
+    <input id="firstDayOfLastMonth" value="@firstDayOfLastMonth.ToString("yyyy-MM-dd")" />
+    <input id="lastDayOfLastMonth" value="@lastDayOfLastMonth.ToString("yyyy-MM-dd")" />
+
+    <input id="firstDayOfQuarter" value="@firstDayOfQuarter.ToString("yyyy-MM-dd")" />
+    <input id="lastDayOfQuarter" value="@lastDayOfQuarter.ToString("yyyy-MM-dd")" />
+
+    <input id="firstDayOfLastQuarter" value="@firstDayOfLastQuarter.ToString("yyyy-MM-dd")" />
+    <input id="today" value="@toDay.ToString("yyyy-MM-dd")" />
+
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-labels@1.1.0/dist/chartjs-plugin-labels.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-funnel"></script>
+<script>
+    $(document).ready(function () {
+        $("#dauThang").val($("#firstDayOfMonth").val());
+        $("#cuoiThang").val($("#today").val());
+        $("#btn_thongKe").click(function () {
+            debugger
+            var dauThangValue = $("#dauThang").val();
+            var cuoiThangValue = $("#cuoiThang").val();
+            var branchId = $("#quanDropdown").val();
+            var leadOrContact = $("#leadOrContact").val();
+
+            // Gửi yêu cầu AJAX về controller
+            $.ajax({
+                url: '/LeadMeeting/GetChartTotalChangeOutBoundCall',
+                type: 'POST',
+                data: {
+                    dauThang: dauThangValue,
+                    cuoiThang: cuoiThangValue,
+                    branchId: branchId,
+                    leadOrContact: leadOrContact
+                },
+                success: function (response) {
+                    var data = response.data;
+                    console.log(data);
+                    var labels = [
+                        'Đề nghị hủy',
+                        'Đặt hẹn không thành công',
+                        'Đặt hẹn',
+                        'Theo lại'
+                    ];
+                    var quantities = [data.deNghiHuy, data.datHenKhongTC, data.datHen, data.theoLai];
+
+                    ChartCall(labels, quantities);
+                    updateTableData(data.saiSo, data.nam, data.tatMayNgang_KhoKhaiThac, data.deNghiHuy, data.chuaCoNhuCau, data.simKhoa, data.guiThongTinQuaZalo,
+                        data.khongNgheMay, data.datHenKhongTC, data.nhacHenXa, data.nhacHenGan, data.datHen, data.goiLaiSau, data.theoLai);
+                    leadTable(data);
+                },
+
+
+                error: function (xhr, status, error) {
+                    // Xử lý lỗi nếu có
+                }
+            });
+        });
+    });
+    function AddConvert(outt) {
+        let data = [...outt]
+        for (let i = 0; i < outt.length; i++) {
+            data[i] = convert(data[i])
+        }
+        return data
+    }
+    function convert(n) {
+        debugger
+        var sign = +n < 0 ? "-" : "",
+            toStr = n.toString();
+        if (!/e/i.test(toStr)) {
+            return n;
+        }
+        var [lead, decimal, pow] = n.toString()
+            .replace(/^-/, "")
+            .replace(/^([0-9]+)(e.*)/, "$1.$2")
+            .split(/e|\./);
+        return +pow < 0 ?
+            sign + "0." + "0".repeat(Math.max(Math.abs(pow) - 1 || 0, 0)) + lead + decimal :
+            sign + lead + (+pow >= decimal.length ? (decimal + "0".repeat(Math.max(+pow - decimal.length || 0, 0))) : (decimal.slice(0, +pow) + "." + decimal.slice(+pow)))
+    }
+    function ChartCall(labels, quantities) {
+        // Dữ liệu giả định
+        //var labels = ['A', 'B', 'C', 'D', 'E']; // Nhãn cho các phần của biểu đồ
+        //var quantities = [20, 30, 10, 70, 50]; // Số lượng tương ứng với mỗi nhãn
+
+        // Tính tổng số lượng
+        var totalQuantity = quantities.reduce((a, b) => a + b, 0);
+
+        // Tính phần trăm của mỗi phần số liệu
+        var percentages = quantities.map(quantity => ((quantity / totalQuantity) * 100).toFixed(2));
+
+        // Tạo mảng chứa màu ngẫu nhiên cho từng nhãn
+        var backgroundColors = [];
+        var borderColors = [];
+        for (var i = 0; i < labels.length; i++) {
+            var randomColor = getRandomColor();
+            backgroundColors.push(randomColor);
+            borderColors.push(randomColor.replace('0.2', '1'));
+        }
+
+        // Kết hợp labels, quantities, percentages và colors vào một mảng duy nhất để sắp xếp
+        var data = labels.map((label, index) => ({
+            label: label,
+            quantity: quantities[index],
+            percentage: percentages[index],
+            backgroundColor: backgroundColors[index],
+            borderColor: borderColors[index]
+        }));
+
+        // Sắp xếp mảng data theo quantity tăng dần
+        data.sort((a, b) => a.quantity - b.quantity);
+
+        // Tách lại các mảng đã sắp xếp
+        labels = data.map(d => d.label);
+        quantities = data.map(d => d.quantity);
+        percentages = data.map(d => d.percentage);
+        backgroundColors = data.map(d => d.backgroundColor);
+        borderColors = data.map(d => d.borderColor);
+
+        // Tạo nhãn mới chứa cả phần trăm
+        var labelsWithPercentage = labels.map((label, index) => `${label}: ${percentages[index]}%`);
+
+        // Lấy canvas và context để vẽ biểu đồ
+        var ctx = document.getElementById('callChart').getContext('2d');
+        if (window.funnelChart) {
+            // Nếu có, hủy biểu đồ hiện tại trước khi vẽ biểu đồ mới
+            window.funnelChart.destroy();
+        }
+        window.funnelChart = new Chart(ctx, {
+            type: 'funnel', // Đặt loại biểu đồ là 'funnel'
+            data: {
+                labels: labelsWithPercentage,
+                datasets: [{
+                    label: 'Số lượng',
+                    data: quantities,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y', // Đặt trục x là trục y để có biểu đồ phễu dọc
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        labels: {
+                            generateLabels: function (chart) {
+                                var data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map(function (label, i) {
+                                        var backgroundColor = data.datasets[0].backgroundColor[i];
+                                        var borderColor = data.datasets[0].borderColor[i];
+                                        return {
+                                            text: label,
+                                            fillStyle: backgroundColor,
+                                            strokeStyle: borderColor,
+                                            lineWidth: 1,
+                                            hidden: false,
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Biểu đồ thống kê số lượng chuyển đổi sau cuộc gọi',
+                        font: {
+                            size: 16,
+                            weight: 'bold'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+
+    function getRandomColor() {
+        var r = Math.floor(Math.random() * 256); // Giá trị màu đỏ (0 - 255)
+        var g = Math.floor(Math.random() * 256); // Giá trị màu xanh lá (0 - 255)
+        var b = Math.floor(Math.random() * 256); // Giá trị màu xanh dương (0 - 255)
+        return 'rgb(' + r + ',' + g + ',' + b + ', 0.2)';
+    }
+
+    function updateTableData(saiSo, nam, tatMayNgang_KhoKhaiThac, deNghiHuy, chuaCoNhuCau, simKhoa, guiThongTinQuaZalo, khongNgheMay
+        , datHenKhongTC, nhacHenXa, nhacHenGan, datHen, goiLaiSau, theoLai) {
+        $('#saiSo').text(saiSo + ' SL');
+        $('#nam').text(nam + ' SL');
+        $('#tatMayNgang_KhoKhaiThac').text(tatMayNgang_KhoKhaiThac + ' SL');
+        $('#deNghiHuy').text(deNghiHuy + ' SL');
+
+        $('#chuaCoNhuCau').text(chuaCoNhuCau + ' SL');
+        $('#simKhoa').text(simKhoa + ' SL');
+        $('#guiThongTinQuaZalo').text(guiThongTinQuaZalo + ' SL');
+        $('#khongNgheMay').text(khongNgheMay + ' SL');
+        $('#datHenKhongTC').text(datHenKhongTC + ' SL');
+        $('#nhacHenXa').text(nhacHenXa + ' SL');
+        $('#nhacHenGan').text(nhacHenGan + ' SL');
+        $('#datHen').text(datHen + ' SL');
+        $('#goiLaiSau').text(goiLaiSau + ' SL');
+        $('#theoLai').text(theoLai + ' SL');
+    }
+    function leadTable(data) {
+        $('.totalChangeOutBoundCallLead tbody').empty();
+
+        data.totalChangeOutBoundCallLead.forEach((lead, index) => {
+            let row = `
+            <tr>
+                <td style="width: auto;">${index + 1}</td>
+                <td>${lead.LeadName}</td>
+                <td>${lead.Mobile}</td>
+                <td>${lead.StatusName}</td>
+                <td>${lead.Deadline}</td>
+                <td>${lead.ModifiedDate}</td>
+                <td>${lead.ResponsibleUserName}</td>
+            </tr>
+        `;
+            $('.totalChangeOutBoundCallLead tbody').append(row);
+        });
+    }
+</script>
+@section Scripts {
+
+    <script>
+
+        // function to calculate the first and last day of the previous quarter
+        function calculatePreviousQuarter() {
+            var currentDate = new Date(); // Ngày hiện tại
+            var currentMonth = currentDate.getMonth() + 1; // Tháng hiện tại (1-12)
+            var currentYear = currentDate.getFullYear(); // Năm hiện tại
+            var quarters = [1, 4, 7, 10]; // Tháng đầu tiên của các quý
+            var currentQuarter;
+
+            // Xác định quý hiện tại
+            for (var i = 0; i < quarters.length; i++) {
+                if (currentMonth < quarters[i]) {
+                    currentQuarter = i;
+                    break;
+                }
+            }
+            if (currentQuarter === undefined) {
+                currentQuarter = 4; // Nếu tháng hiện tại lớn hơn 10 (tháng cuối cùng của quý 4)
+            }
+
+            var previousQuarter = currentQuarter === 1 ? 4 : currentQuarter - 1; // Quý trước đó
+            var firstMonthOfPreviousQuarter = quarters[previousQuarter - 1]; // Tháng đầu tiên của quý trước
+            var lastMonthOfPreviousQuarter = quarters[currentQuarter - 1] - 1; // Tháng cuối cùng của quý trước
+
+            var firstDayOfPreviousQuarter = new Date(currentYear, firstMonthOfPreviousQuarter - 1, 1); // Ngày đầu tiên của quý trước
+            var lastDayOfPreviousQuarter = new Date(currentYear, lastMonthOfPreviousQuarter, 0); // Ngày cuối cùng của quý trước
+
+            return {
+                firstDay: formatDate(firstDayOfPreviousQuarter),
+                lastDay: formatDate(lastDayOfPreviousQuarter)
+            };
+        }
+
+        // Hàm chuyển đổi ngày thành chuỗi yyyy-mm-dd
+        function formatDate(date) {
+            var year = date.getFullYear();
+            var month = (date.getMonth() + 1).toString().padStart(2, '0');
+            var day = date.getDate().toString().padStart(2, '0');
+            return year + '-' + month + '-' + day;
+        }
+
+        // Gắn sự kiện cho nút "Quý trước"
+        document.getElementById('pills-quytruoc').addEventListener('click', function () {
+            var previousQuarterDates = calculatePreviousQuarter();
+            // Cập nhật giá trị của input ẩn chứa ngày đầu tiên và ngày cuối cùng của quý trước
+            document.getElementById('dauThang').value = previousQuarterDates.firstDay;
+            document.getElementById('cuoiThang').value = previousQuarterDates.lastDay;
+        });
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Đặt giá trị mặc định là tuần này
+            $("#dauThang").val($("#firstDayOfWeek").val());
+            $("#cuoiThang").val($("#lastDayOfWeek").val());
+
+            $("#btn_thongKe").click(function () {
+                var dauThangValue = $("#dauThang").val();
+                var cuoiThangValue = $("#cuoiThang").val();
+
+                // Gửi yêu cầu AJAX về controller
+                $.ajax({
+                    url: '/LeadMeeting/GetQuantityOutboundCall',
+                    type: 'POST',
+                    data: {
+                        dauThang: dauThangValue,
+                        cuoiThang: cuoiThangValue
+                    },
+                    success: function (response) {
+                        var data = response.data;
+                        console.log(data);
+                        var labels = data.userNames;
+                        var quantities = data.totalCalls;
+                        var completionRates = data.completes;
+                        var unCompletionRates = data.unCompletes;
+
+                        ChartCall(labels, quantities, completionRates, unCompletionRates);
+                    },
+                    error: function (xhr, status, error) {
+                        // Xử lý lỗi nếu có
+                    }
+                });
+            });
+        });
+
+        // Các hàm thay đổi giá trị của các input khi nhấn vào các tab khác nhau
+        function changeWeek() {
+            $("#dauThang").val($("#firstDayOfWeek").val());
+            $("#cuoiThang").val($("#lastDayOfWeek").val());
+        }
+        function changeLastWeek() {
+            $("#dauThang").val($("#firstDayOfLastWeek").val());
+            $("#cuoiThang").val($("#lastDayOfLastWeek").val());
+        }
+        function changeMonth() {
+            $("#dauThang").val($("#firstDayOfMonth").val());
+            $("#cuoiThang").val($("#lastDayOfMonth").val());
+        }
+        function changeLastMonth() {
+            $("#dauThang").val($("#firstDayOfLastMonth").val());
+            $("#cuoiThang").val($("#lastDayOfLastMonth").val());
+        }
+        function changeQuarter() {
+            $("#dauThang").val($("#firstDayOfQuarter").val());
+            $("#cuoiThang").val($("#lastDayOfQuarter").val());
+        }
+        function changeLastQuarter() {
+            $("#dauThang").val($("#firstDayOfLastQuarter").val());
+            $("#cuoiThang").val($("#lastDayOfLastQuarter").val());
+        }
+
+        function getFromToDate() {
+            var result = true;
+            var strFromDate = "";
+            var strToDate = "";
+
+            if ($("#dauThang").val() > $("#cuoiThang").val()) {
+                alert("Không thể lấy dữ liệu.\nNgày bắt đầu không được lớn hơn ngày kết thúc.");
+                return false;
+            }
+            strFromDate = $("#dauThang").datepicker({ dateFormat: 'yyyy-mm-dd' }).val();
+            strToDate = $("#cuoiThang").datepicker({ dateFormat: 'yyyy-mm-dd' }).val();
+
+            return {
+                result: result,
+                strFromDate: strFromDate,
+                strToDate: strToDate,
+            };
+        }
+    </script>
+
+}
+
+
+

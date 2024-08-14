@@ -1,0 +1,2465 @@
+﻿@using Erp.BackOffice.Sale.Controllers
+@using System.ComponentModel
+@using Erp.BackOffice.Sale.Models
+@using PagedList.Mvc;
+@using PagedList;
+@model IEnumerable<LeadModel>
+
+
+
+@{
+    Layout = null;
+    var tuple = ViewData["section"] as Tuple<IEnumerable<LeadSectionModel>, IEnumerable<LeadSection_FieldModel>>;
+    var user = ViewBag.user as Erp.Domain.Repositories.UserRepository;
+    var lsstatus = ViewBag.lsstatus as IEnumerable<StatusLeadModel>;
+    int stt = 1;
+    var pagelist = ViewBag.pagelist as IPagedList<LeadModel>;
+    //var category = ViewBag.category as Erp.Domain.Interfaces.ICategoryRepository;
+    IEnumerable<Erp.Domain.Entities.User> users = user.GetAllUsers();
+}
+    <style>
+        .modal-content {
+            box-shadow: 0 23px 10px 1000px rgba(0,0,0,0.5);
+        }
+        /*  .dropdown-menu.dropdown-close.dropdown-menu-right {
+            left: 10% !important;
+            right: 100% !important;
+        }*/
+
+        .sub {
+            background-color: #f4faff !important;
+        }
+
+        .table-hover > tbody > tr:hover .sub {
+            background-color: #eaf4fd !important;
+        }
+
+        .edit-iput {
+            /*width: calc(100% + 5px);*/
+            border-radius: .5rem !important;
+            font-size: 13px !important;
+            height: 33px;
+        }
+
+
+        .text-name:hover {
+            text-decoration: underline !important;
+        }
+
+        #pageSize {
+            height: 100%;
+        }
+
+        .quickedit {
+            border: none;
+            outline: none;
+        }
+
+        .pagination-container {
+            height: 32px;
+            display: flex;
+            margin-left: 15px;
+        }
+
+        .quickedit {
+            border: none;
+            outline: none;
+        }
+
+        td:nth-child(2), th:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            color: white;
+        }
+
+        td:nth-child(3), th:nth-child(2) {
+            position: sticky;
+            left: 21px;
+            z-index: 1;
+            color: white;
+        }
+        /*thanh*/
+        .status-chart {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+            .status-chart span {
+                width: 10px;
+                height: 10px;
+                border-top: 1px solid #ccc;
+                border-bottom: 1px solid #ccc;
+                border-left: 1px solid #ccc;
+            }
+
+                .status-chart span:last-child {
+                    border-right: 1px solid #ccc;
+                }
+
+        .setHeighEmail {
+            height: 45rem;
+            overflow: auto;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+            .header-title .modal-title {
+                text-transform: uppercase;
+                font-size: 1.5rem;
+            }
+
+            .header-title #modalEmailHangfireTotalLead,
+            .header-title #modalSmsHangfireTotalLead,
+            .header-title #modalZnsHangfireTotalLead {
+                padding: 0 !important;
+                margin: 0;
+                font-size: 1.4rem;
+            }
+
+        #myModal .modal-header .modal-title {
+            font-size: 14px;
+            color: #fff !important;
+            line-height: 24px;
+        }
+
+        th {
+            text-transform: capitalize;
+            text-align: center;
+        }
+        .clSortable:hover {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+    </style>
+    <form id="QuickEditLeadForm" action="/AdviseCard/QuickEditLead">
+        <table id="LeadTblR" class="table table-hover" style="display: block; width:100% !important; overflow-x: auto; white-space: nowrap;">
+            <thead>
+                @{
+                    var properties = typeof(LeadModel).GetProperties();
+                    int outchk;
+                    string[] dont = new string[] { "IsDeleted", "CreatedDate", "CreatedUserId", "ModifiedDate", "ModifiedUserId", "AssignedUserId" };
+                    var prop = properties.Where(x => !x.Name.StartsWith("F") && !int.TryParse(x.Name.Remove(0, 1).ToString(), out outchk) && x.Name != "Id" && !dont.Contains(x.Name));
+                    string thele = "";
+                    string trele = "";
+                    string tdele = "";
+                }
+                @foreach (var item1 in prop)
+                {
+                    var display = item1.GetCustomAttributes(typeof(DisplayNameAttribute), true).FirstOrDefault() as DisplayNameAttribute;
+                    string displayname = display != null ? display.DisplayName : "";
+                    if (ViewBag.ColumnSort != null && ViewBag.ColumnSort == item1.Name)
+                    {
+                        if (ViewBag.SortDir == 1)
+                        {
+                            thele += "<th class=\"clSortable\" data-id=" + item1.Name + ">" + displayname + "<i class=\"fa fa-sort-down\" style=\"vertical-align: text-top; margin-left: 4px;\"></i>";
+
+                        } else
+                        {
+                            thele += "<th class=\"clSortable\" data-id=" + item1.Name + ">" + displayname + "<i class=\"fa fa-sort-up\" style=\"vertical-align: bottom; margin-left: 4px;\"></i> </th>";
+                        }
+
+                    } else
+                    {
+                        thele += "<th class=\"clSortable\" data-id=" + item1.Name + ">" + displayname + "</th>";
+                    }
+                }
+
+                @foreach (var item in tuple.Item1)
+                {
+                    var itemField = tuple.Item2.Where(x => x.LeadSectionId == item.Id);
+
+                    foreach (var item1 in itemField)
+                    {
+                        if (item1.IsHiden != true)
+                        {
+                            if (ViewBag.ColumnSort != null && ViewBag.ColumnSort == item1.FieldName)
+                            {
+                                if (ViewBag.SortDir == 1)
+                                {
+                                    thele += "<th class=\"clSortable\" data-id=" + item1.FieldName + ">" + item1.NameLabel + "<i class=\"fa fa-sort-down\" style=\"vertical-align: text-top; margin-left: 4px;\"></i>";
+
+                                }
+                                else
+                                {
+                                    thele += "<th class=\"clSortable\" data-id=" + item1.FieldName + ">" + item1.NameLabel + "<i class=\"fa fa-sort-up\" style=\"vertical-align: bottom; margin-left: 4px;\"></i> </th>";
+                                }
+
+                            }
+                            else
+                            {
+                                thele += "<th class=\"clSortable\" data-id=" + item1.FieldName + ">" + item1.NameLabel + "</th>";
+                            }
+                        }
+                    }
+                }
+                <tr>
+                    <th><input type="checkbox" class="checkbox chkall" /></th>
+                    <th>STT</th>
+                    @Html.Raw(@thele)
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    foreach (var item1 in prop)
+                    {
+                        object dsplay = item1.GetValue(item);
+                        string dsplay1 = dsplay != null ? dsplay.ToString().Trim() : "";
+                        string dsplay2 = dsplay1 == "1" ? "Có" : dsplay1 == "0" ? "Không" : dsplay1;
+                        Type dsplayType = dsplay != null ? dsplay.GetType() : null;
+                        if (item1.Name == "ReceptionStaffId")
+                        {
+                            Erp.Domain.Entities.User single = users.Where(x => x.Id == (!string.IsNullOrEmpty(dsplay1) ? int.Parse(dsplay1) : 0)).FirstOrDefault();
+                            tdele += "<td><span class='txt'>" + (single != null ? single.FullName : "") + "</span></td>";
+                        }
+                        else if (item1.Name == "StatusId")
+                        {
+                            string inpuchart;
+                            var statusval = lsstatus.Where(x => x.Id == (!string.IsNullOrEmpty(dsplay1) ? int.Parse(dsplay1) : 0)).FirstOrDefault();
+                            var flag = true;
+                            string stchart = "";
+                            if (statusval != null)
+                            {
+                                foreach (var status in lsstatus)
+                                {
+                                    if (status.Name == statusval.Name)
+                                    {
+                                        if (flag)
+                                        {
+                                            stchart += "<span style='background-color:" + statusval.ColorStatus + "'></span>";
+                                        }
+                                        else
+                                        {
+                                            stchart += "<span></span>";
+                                        }
+                                        flag = false;
+                                    }
+                                    else
+                                    {
+                                        if (flag)
+                                        {
+                                            stchart += "<span style='background-color:" + statusval.ColorStatus + "'></span>";
+                                        }
+                                        else
+                                        {
+                                            stchart += "<span></span>";
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (var status in lsstatus)
+                                {
+                                    stchart += "<span></span>";
+                                }
+                            }
+                            inpuchart = "<div class=\"status-chart\" >" + stchart + " </div>";
+                            tdele += "<td>" + inpuchart + "<span class='txt'>" + (statusval != null ? statusval.Name : "") + "</span></td>";
+                        }
+                        else if (item1.Name == "LeadName")
+                        {
+                            tdele += "<td style='' name='Link'><span style='color:#576297; text-decoration:none; cursor:pointer; font-weight:bold;text-transform: uppercase;' class='txt text-name "+ item1.Name + "' name='Link'>" + dsplay1 + "</span></td>";
+                        }
+                        else if(dsplayType == typeof(string))
+                        {
+                            tdele += "<td><span class='txt "+ item1.Name + "'>" + dsplay1 + "</span></td>";
+                        }
+                        else
+                        {
+                            tdele += "<td><span class='txt "+ item1.Name + "'>" + dsplay2 + "</span></td>";
+                        }
+                    }
+                    foreach (var item2 in tuple.Item1)
+                    {
+                        var itemField = tuple.Item2.Where(x => x.LeadSectionId == item2.Id);
+
+                        foreach (var item13 in itemField)
+                        {
+                            if (item13.IsHiden != true)
+                            {
+                                object dsplay = typeof(LeadModel).GetProperty(item13.FieldName).GetValue(item);
+                                string dsplay1 = dsplay != null ? dsplay.ToString().Trim() : "";
+                                string dsplay2 = dsplay1 == "1" ? "Có" : dsplay1 == "0" ? "Không" : dsplay1;
+                                if (true)
+                                {
+                                    switch (item13.TypeField)
+                                    {
+                                        case "Date":
+                                            DateTime dateValue;
+                                            string dateText = DateTime.TryParse(dsplay2, out dateValue) ? dateValue.ToString("dd/MM/yyyy") : dsplay2;
+                                            tdele += "<td><span class='txt'>" + dateText + "</span></td>";
+                                            break;
+                                        case "Datetime":
+                                            DateTime datetimeValue;
+                                            string dateTime = DateTime.TryParse(dsplay2, out datetimeValue) ? datetimeValue.ToString("dd/MM/yyyy hh:mm tt").Replace("AM", "SA").Replace("PM", "CH") : dsplay2;
+                                            tdele += "<td><span class='txt'>" + dateTime + "</span></td>";
+                                            break;
+                                        default:
+                                            tdele += "<td><span class='txt'>" + dsplay2 + "</span></td>";
+                                            break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    trele += "<tr><td hidden><input data-id='1' name=LeadModel[" + (stt - 1) + "].Id value='" + item.Id + "'/>" + item.Id + "</td><td><input type=\"checkbox\" class=\"checkbox child\"/></td><td id=\"IdSTTListLead\">" + (stt++) + "</td>" + tdele + "</tr>";
+                    tdele = "";
+                }
+                @Html.Raw(trele)
+            </tbody>
+        </table>
+
+    </form>
+
+    <div style="display:flex; justify-content:space-between; align-items:center">
+
+        <div style="display: flex; width: 15rem; justify-content: space-between; align-items: center;">
+            <div style="visibility:hidden;" id="editEnableShow">
+                <button id="QuickEditLeadEnable" type="button" class="btn btn-primary" style="margin-right:0;">Chỉnh sửa</button>
+                <div hidden id="editDisableShow">
+                    <button id="QuickEditLead" type="button" class="btn btn-primary" style="margin-right:0% !important;">Lưu</button>
+                    <button id="QuickEditLeadDisable" type="button" class="btn btn-default">Hủy</button>
+                </div>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <div style="visibility: hidden; position: relative" id="assignResponsi" class="dropdown-modal">
+                    <a data-toggle="dropdown" href="#" class="dropdown-toggle" aria-expanded="false" style="padding: 5px 5px 0px 5px; background-color: #fff;">
+                        <i class="fa fa-ellipsis-v" style="cursor: pointer; color: #3f51b5; font-size: 20px" aria-hidden="true"></i>
+                    </a>
+                    <ul style="position: absolute; top: -16rem; left: 2rem; width: 2rem;" class=" dropdown-menu-right dropdown-menu dropdown-yellow dropdown-close">
+                        <li style="background:white">
+                            <a id="btnShowEmailModalHangfire">Gửi Email</a>
+                        </li>
+                        <li style="background:white">
+                            <a id="btnShowSMSlModalHangfire">Gửi SMS</a>
+                        </li>
+                        <li style="background:white">
+                            <a id="btnShowZNSModalHangfire">Gửi ZNS</a>
+                        </li>
+                        <li style="background:white">
+                            <a id="btnLeadOpenPpAssign">Phân công</a>
+                        </li>
+                        <li style="background:white">
+                            <a id="btnLeadOpenPpExportEx">Export to Excel</a>
+                        </li>
+                        <li style="background:white">
+                            <a id="btnShowGopLeadModal">Gộp trùng Lead</a>
+                        </li>
+                    </ul>
+                </div>
+            </ul>
+        </div>
+        <div style="display: flex; width: 100%; justify-content: flex-end; align-items: center;">
+            <div style="visibility:hidden;" id="editshow">
+                <button id="btnLeadDelete" type="button" class="btn btn-default">Xóa</button>
+            </div>
+            <div id="editshowLeadRecover" style="visibility:hidden;">
+                <button id="btnLeadRecover" type="button" style="border: 1px solid black; background-color: #28a745; color: #fff; padding: 10px 15px;">Phục hồi</button>
+            </div>
+            <div class="pagination-container">
+                <ul class="pagination">
+                    <li><a>&laquo;&laquo;</a></li>
+                    <li><a>&laquo;</a></li>
+                    @if (pagelist.PageNumber > 1)
+                    {
+                        if (pagelist.PageNumber < 5)
+                        {
+                            for (int i = 1; i < pagelist.PageNumber; i++)
+                            {
+                                <li><a>@i</a></li>
+                            }
+                        }
+                        else
+                        {
+                            <li><a>1</a></li>
+                            <li><a>...</a></li>
+                            <li><a>@(pagelist.PageNumber - 2)</a></li>
+                            <li><a>@(pagelist.PageNumber - 1)</a></li>
+                        }
+                    }
+                    @for (int i = pagelist.PageNumber; i < (pagelist.PageNumber + 10 < pagelist.PageCount + 1 ? pagelist.PageNumber + 10 : pagelist.PageCount + 1); i++) //pagelist.PageCount + 1
+                    {
+                        <li @(pagelist.PageNumber == i ? "class=active" : "")><a>@i</a></li>
+                    }
+                    @if (pagelist.PageNumber + 10 < pagelist.PageCount + 1)
+                    {
+                        <li><a>...</a></li>
+                        <li><a>»</a></li>
+                        <li><a>»»</a></li>
+                    }
+                    else
+                    {
+                        <li><a>»</a></li>
+                        <li><a>»»</a></li>
+                    }
+                </ul>  <select id="pageSize">
+                    <option value="15">15</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="150">150</option>
+                    <option value="200">200</option>
+                    <option value="500">500</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    @* Email Modal Hangfire*@
+    <div class="modal fade emailModal" id="EmailModalHangfire" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 9999;">
+        <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseEmailModalHangfire"></div>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close btnCloseEmailModalHangfire" aria-hidden="true">×</button>
+                    <div class="header-title">
+                        <h5 class="modal-title">Soạn Email</h5>
+                        <span style="font-size: 2rem;">-</span>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4 id="modalEmailHangfireTotalLead"></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="container-fluid setHeighEmail">
+                            <div class="row" style="display:none;">
+                                <div class="col-md-12">
+                                    <h4 id="modalEmailHangfireTotalLead"></h4>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6 ">
+                                    <div class="mb-3">
+                                        <label for="emailSender" class="form-label">Người gửi</label>
+                                        <input disabled type="email" class="form-control" id="emailSenderHangfire">
+                                    </div>
+                                    <div class="mb-3" hidden>
+                                        <label for="emailReceiver" class="form-label">Người nhận</label>
+                                        <input disabled type="email" class="form-control" id="emailReceiverHangfire">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="emailTitle" class="form-label">Tiêu đề</label>
+                                        <input type="text" class="form-control" id="emailTitleHangfire">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="emailTemplate" class="form-label">Chọn Template</label>
+                                        <select class="form-select" id="emailTemplateHangfire" style="height:34px;"></select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="mb-3">
+                                        <label for="emailCampaign" class="form-label">Chọn chiến dịch</label>
+                                        <select class="form-select" id="emailCampaignHangfire" style="height:34px;"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-lg-12">
+                                    <textarea id="emailInputHangfire" class="ckeditor"></textarea>
+                                </div>
+                            </div>
+                            <div id="validateDivHangfire" class="row text-danger" style="display:none;">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer text-center" style="display:flex;">
+                    <div style="margin-right:auto;display:flex;align-items:center;">
+                        <div>
+                            <input type="radio" id="sendMailNow" name="nowOrScheduled" value="now" checked>
+                            <label for="sendMailNow">Gửi ngay</label><br>
+                        </div>
+                        <div style="margin-left:5px;">
+                            <input type="radio" id="sendMailScheduled" name="nowOrScheduled" value="scheduled">
+                            <label for="sendMailScheduled">Gửi theo lịch</label><br>
+                        </div>
+                    </div>
+                    <div style="margin:auto;" id="dateToSendEmail" hidden>
+                        <label>Ngày gửi: </label>
+                        <input type="date" id="DateAction">
+                        <label>Giờ gửi: </label>
+                        <input type="time" id="TimeAction">
+                    </div>
+                    <div style="margin-left:auto;">
+                        <button class="btn btn-primary" style="margin-right:0%;" type="button" id="btnSendEmailHangfire">Gửi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* End Email Modal *@
+    @* SMS Modal  *@
+    <div class="fade modal" id="SMSModalHangfire" tabindex="-1" role="dialog" aria-labelledby="modalConLabel" aria-hidden="true" style="z-index: 9999">
+        <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseSMSModalHangfire"></div>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <div class="header-title">
+                            <h3 class="modal-title" id="modalConLabelHangfire">Gửi SMS</h3>
+                            <span style="font-size: 2rem;">-</span>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4 id="modalSmsHangfireTotalLead"></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="close btnCloseSMSModalHangfire" aria-hidden="true">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <span hidden id="smsReceiverHangfire"></span>
+
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <h4 id="modalSmsHangfireTotalLead" style="display:none;"></h4>
+                        </div>
+                        <div class="row">
+                            <label>Chọn chiến dịch :</label>
+                            <select id="smsCampaignHangfire" style="width:20%;">
+                            </select>
+                        </div>
+                        <div class="row" id="sms-dropdown-row">
+                            <label>Chọn mẫu SMS :</label>
+                            <select id="smsTemplateHangfire" style="width:100%;">
+                            </select>
+                        </div>
+                        <div class="row">
+                            <textarea id="idContentSMSHangfire" style="width:100%;" rows="10"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer text-center" style="display:flex;">
+                    <div style="margin-right:auto;display:flex;align-items:center;">
+                        <div>
+                            <input type="radio" id="sendSMSNow" name="nowOrScheduledSMS" value="now" checked>
+                            <label for="sendSMSNow">Gửi ngay</label><br>
+                        </div>
+                        <div style="margin-left:5px;">
+                            <input type="radio" id="sendSMSScheduled" name="nowOrScheduledSMS" value="scheduled">
+                            <label for="sendSMSScheduled">Gửi theo lịch</label><br>
+                        </div>
+                    </div>
+                    <div style="margin:auto;" id="dateToSendSMS" hidden>
+                        <label>Ngày gửi: </label>
+                        <input type="date" id="DateActionSMS">
+                        <label>Giờ gửi: </label>
+                        <input type="time" id="TimeActionSMS">
+                    </div>
+                    <div style="margin-left:auto;">
+                        <button style="margin-right:0%;" type="button" id="btnSendSMSHangfire"><i class="fa fa-send-o" id="icon-sendsms"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* End SMS Modal *@
+
+    @*ZNS modal*@
+    <div class="fade modal" id="ZNSModalHangfire" tabindex="-1" role="dialog" aria-labelledby="modalConLabel" aria-hidden="true" style="z-index: 9999">
+        <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="btnCloseZNSModalHangfire"></div>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <div class="header-title">
+                            <h3 class="modal-title" id="modalConLabelHangfire">Gửi ZNS</h3>
+                            <span style="font-size: 2rem;">-</span>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h4 id="modalZnsHangfireTotalLead"></h4>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="close btnCloseZNSModalHangfire" aria-hidden="true">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <span hidden id="znsReceiverHangfire"></span>
+
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <h4 id="modalZnsHangfireTotalLead" style="display: none;"></h4>
+                        </div>
+                        <div class="row">
+                            <label>Chọn chiến dịch :</label>
+                            <select id="znsCampaignHangfire" style="width:20%;">
+                            </select>
+                        </div>
+                        <div class="row" id="zns-dropdown-row">
+                            <label>Chọn mẫu ZNS :</label>
+                            <select id="znsTemplateHangfire" style="width:100%;">
+                            </select>
+                        </div>
+                        <div class="row">
+                            <textarea id="idContentZNSHangfire" style="width:100%;" rows="10"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer text-center" style="display:flex;">
+                    <div style="margin-right:auto;display:flex;align-items:center;">
+                        <div>
+                            <input type="radio" id="sendZNSNow" name="nowOrScheduledZNS" value="now" checked>
+                            <label for="sendZNSNow">Gửi ngay</label><br>
+                        </div>
+                        <div style="margin-left:5px;">
+                            <input type="radio" id="sendZNSScheduled" name="nowOrScheduledZNS" value="scheduled">
+                            <label for="sendZNSScheduled">Gửi theo lịch</label><br>
+                        </div>
+                    </div>
+                    <div style="margin:auto;" id="dateToSendZNS" hidden>
+                        <label>Ngày gửi: </label>
+                        <input type="date" id="DateActionZNS">
+                        <label>Giờ gửi: </label>
+                        <input type="time" id="TimeActionZNS">
+                    </div>
+                    <div style="margin-left:auto;">
+                        <button style="margin-right:0%;" type="button" id="btnSendZNSHangfire"><i class="fa fa-send-o" id="icon-sendzns"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*end ZNS modal*@
+
+    @* Gộp Lead Select Modal *@
+    <div class="fade modal" id="modalGopLead" tabindex="-1" role="dialog" aria-labelledby="modalConLabel" aria-hidden="true" style="z-index: 9999">
+        <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="closeModalGopLead" id="CloseModalGopLead"></div>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h3 class="modal-title">Gộp trùng Lead</h3>
+                        <button type="button" class="close closeModalGopLead" aria-hidden="true">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <span><strong>Chọn trường</strong></span> <br />
+                        <span>Chọn các trường bạn muốn xác định gộp trùng Lead với nhau.</span>
+                    </div>
+                    <ul>
+                        <li>Hệ thống sẽ kiểm tra các giá trị ở bản ghi chính, nếu trường thông tin ở bản ghi chính không có, hệ thống sẽ lấy thông tin ở các bản ghi còn lại trong tập các bản ghi trùng với bản ghi chính.</li>
+                    </ul>
+                    <input type="checkbox" value="LeadName" name="LeadName" checked id="gopLeadLeadName" />
+                    <label for="LeadName">Tên Lead</label> <br />
+
+                    <input type="checkbox" value="Mobile" name="Mobile" checked id="gopLeadMobile" />
+                    <label for="Mobile">Số Điện Thoại</label> <br />
+
+                    <input type="checkbox" value="TaxCode" name="TaxCode" id="gopLeadTaxCode" />
+                    <label for="TaxCode">Mã Số Thuế</label><br />
+
+                    <input type="checkbox" value="Email" name="Email" id="gopLeadEmail" />
+                    <label for="TaxCode">Email</label>
+                </div>
+                <div class="modal-footer text-center" style="display:flex;">
+                    <button type="button" class="closeModalGopLead">Hủy Bỏ</button>
+                    <button type="button" id="btnShowGopLeadCheck">Kiểm tra và gộp trùng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* End Gộp Lead Select Modal *@
+    @* Gộp Lead Check Modal *@
+    <div class="fade modal" id="modalGopLeadCheck" tabindex="-1" role="dialog" aria-labelledby="modalConLabel" aria-hidden="true" style="z-index: 9999">
+        <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="closeModalGopLeadCheck"></div>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h3 class="modal-title">Gộp trùng Lead</h3>
+                        <button type="button" class="close closeModalGopLeadCheck" aria-hidden="true">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid" id="tblGopLeadCheck" style="overflow:auto;max-height:60vh;">
+
+                    </div>
+                </div>
+                <div class="modal-footer text-center" style="display:flex;">
+                    <button type="button" class="closeModalGopLeadCheck">Hủy Bỏ</button>
+                    <button type="button" id="btnGopLeadExe">Gộp Trùng Lead</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* End Gộp Lead Check Modal *@
+    @* Gộp Lead Detail Modal*@
+    <div class="fade modal" id="modalGopLeadDetail" tabindex="-1" role="dialog" aria-labelledby="modalConLabel" aria-hidden="true" style="z-index: 9999">
+        <div style="position: absolute; height: 100%; width: 100%; background-color: rgba(0,0,0,0.5); z-index: 2; top: 0; left: 0; right: 0; bottom: 0;" class="closeModalGopLeadDetail"></div>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h3 class="modal-title">Gộp trùng Lead chi tiết</h3>
+                        <button type="button" class="close closeModalGopLeadDetail" aria-hidden="true">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid" id="tblGopLeadDetail">
+
+                    </div>
+                </div>
+                <div class="modal-footer text-center" style="display:flex;">
+                    <button type="button" class="closeModalGopLeadDetail">Đóng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*End Gộp Lead Detail Modal*@
+
+    <script>
+        var editEnable = false;
+        var table = document.getElementById("LeadTblR");
+        var rows = table.getElementsByTagName("tr");
+
+        // Gắn sự kiện click vào bảng
+        table.addEventListener('click', function (e) {
+            if (e.target !== this && $(e.target).attr('name') != 'Link') {
+                if ($(e.target).hasClass('clSortable')) {
+                    let pageSize = $('#pageSize').val();
+                    let pag = $('ul.pagination li.active').text();
+                    let columnsort = $(e.target).data('id');
+                    if ($(e.target).find('i.fa-sort-down').length > 0) {
+                        SearchLeadFuncs(pag, pageSize, columnsort, 0)
+                    } else {
+                        SearchLeadFuncs(pag, pageSize, columnsort, 1)
+                    }
+                } else if ($(e.target).is('.checkbox.child')) {
+                    var ele = $('#LeadTblR').find('.checkbox.child:checked');
+                    var currentURL = window.location.href;
+                    if (currentURL.includes("/AdviseCard/LeadRecover") && ele.length > 0) {
+                        $('#editshowLeadRecover').css('visibility', 'visible');
+                    }
+                    else {
+                        $('#editshowLeadRecover').css('visibility', 'hidden');
+                    }
+                    if (ele.length > 0 && !currentURL.includes("/AdviseCard/LeadRecover")) {
+                        $('#editshow').css('visibility', 'visible');
+                        $('#editEnableShow').css('visibility', 'visible');
+                        $('#assignResponsi').css('visibility', 'visible');
+                        $('#exitoption').css('visibility', 'visible');
+                    } else {
+                        $('#editshow').css('visibility', 'hidden');
+                        $('#editEnableShow').css('visibility', 'hidden');
+                        $('#assignResponsi').css('visibility', 'hidden');
+                        $('#exitoption').css('visibility', 'hidden');
+                    }
+                    if (editEnable) {
+                        debugger;
+                        if ($(e.target).is(':checked')) {
+                            if ($(e.target).closest('tr').css('display') !== 'none') {
+                                var requestData = [];
+                                var currentRow = $(e.target).closest('tr');
+                                var stts = currentRow.find('#IdSTTListLead').text();
+                                var leadIds = currentRow.find('input[name="LeadModel[' + (stts - 1) + '].Id"]').val();
+                                requestData.push({ leadId: leadIds, stt: stts });
+                                ShowLoading();
+                                $.ajax({
+                                    type: "POST",
+                                    url: '/AdviseCard/CurrentEditLead',
+                                    data: { requestData: JSON.stringify(requestData) },
+                                    async: true,
+                                    success: function (response) {
+                                        var currentRow = $(e.target).closest('tr');
+                                        var newHTML = response[0];
+                                        currentRow.css('display', 'none');
+                                        currentRow[0].insertAdjacentHTML('afterend', newHTML);
+                                        var newRow = currentRow.next();
+                                        newRow.find('.js-example-basic-singleq').select2();
+                                    },
+                                    error: function () {
+                                        console.log('Lỗi khi nhận dữ liệu từ máy chủ.');
+                                    },
+                                    complete: function () {
+                                        HideLoading();
+                                    }
+                                });
+                            }
+                        } else {
+                            debugger;
+                            if ($(e.target).attr('role') === '1') {
+                                debugger;
+                                var currentRow = $(e.target).closest('tr');
+                                currentRow.prev().css('display', '');
+                                currentRow.prev().find('.checkbox.child').prop('checked', false);
+                                currentRow.remove();
+                            }
+                        }
+                    }
+                }
+                makeColumnSticky();
+                return; // Clicked on a child element, do nothing
+            }
+
+        })
+        for (i = 0; i < rows.length; i++) {
+            let currentRow = table.rows[i];
+            var createClickHandler = function (row) {
+                return function () {
+                    debugger
+                    var cell = row.getElementsByTagName("td")[0];
+                    var id = cell.innerText;
+                    DetailLead(id)
+                };
+            };
+            currentRow.onclick = function(e){
+                debugger
+                if ($(e.target).attr('name') == 'Link') {
+                    let func = createClickHandler(currentRow);
+                    func()
+                }
+            }
+        }
+        $(function () {
+            debugger
+            $('ul.pagination li').click(function () {
+                debugger
+                pagination(this)
+            })
+            $('#pageSize').change(function () {
+                debugger
+                document.cookie ='pageSize='+ $(this).val();
+                pagination(this)
+            })
+            $('#pageSize').val(@pagelist.PageSize)
+            $('.checkbox.chkall').change(function () {
+                debugger
+                var ele = $('#LeadTblR').find('.checkbox.child')
+                let chkall=$(this).prop('checked')
+                $.each(ele, function (idx,item) {
+                    if (chkall == true) {
+                        $(item).prop('checked', true);
+                    } else {
+                        $(item).prop('checked', false)
+                    }
+                })
+                var ele = $('#LeadTblR').find('.checkbox.child:checked')
+                var currentURL = window.location.href;
+                if (currentURL.includes("/AdviseCard/LeadRecover") && ele.length > 0) {
+                    $('#editshowLeadRecover').css('visibility', 'visible');
+                }
+                else {
+                    $('#editshowLeadRecover').css('visibility', 'hidden');
+                }
+                if (ele.length > 0 &&  !currentURL.includes("/AdviseCard/LeadRecover") ) {
+                    $('#editshow').css('visibility', 'visible');
+                    $('#editEnableShow').css('visibility', 'visible');
+                    $('#assignResponsi').css('visibility', 'visible');
+                    $('#exitoption').css('visibility', 'visible');
+                } else {
+                    $('#editshow').css('visibility', 'hidden');
+                    $('#editEnableShow').css('visibility', 'hidden');
+                    $('#assignResponsi').css('visibility', 'hidden');
+                    $('#exitoption').css('visibility', 'hidden');
+                }
+                if (chkall == true && editEnable) {
+                    if (!$('.js-example-basic-singleq').is('.select2-hidden-accessible')) {
+                        $('.js-example-basic-singleq').select2();
+                        $('#editshow').css('visibility', 'visible');
+                    }
+                    let chkq=$('#QuickEditLeadForm').find('select, input')
+                    $.each(chkq, function () {
+                        if (!$(this).is('.checkbox') && !$(this).data('id')) {
+                            $(this).attr('disabled', false)
+                            $(this).attr('hidden', false)
+                            $('span.txt').attr('hidden', true)
+                        }
+                    })
+                } else {
+                    if ($('.js-example-basic-singleq').is('.select2-hidden-accessible')) {
+                        $('.js-example-basic-singleq').select2('destroy');
+                        $('#editshow').css('visibility', 'visible');
+                    }
+                    let chkq = $('#QuickEditLeadForm').find('select, input')
+                    $.each(chkq, function () {
+                        if (!$(this).is('.checkbox') && !$(this).data('id')) {
+                            $(this).attr('disabled', true)
+                            $(this).attr('hidden', true)
+                            $('span.txt').attr('hidden', false)
+                        }
+                    })
+                }
+                makeColumnSticky();
+            })
+        })
+        function pagination(a) {
+            debugger
+            if ($(a).attr('class') == 'active') {
+                return
+            }
+            if ($(a).is('select')) {
+            } else {
+                let ele = $('ul.pagination').find('li.active')
+                if (!['»', '»»', '«', '««'].includes($(a).text())) {
+                    $.each(ele, function (idx, item) {
+                        $(item).removeClass('active')
+                    })
+                    $(a).attr('class', 'active')
+                }
+            }
+            let pageSize = $('#pageSize').val()
+            let pagcurr = $(a).text()
+            let pag = $('ul.pagination li.active').text()
+            let pageNumber;
+            switch (pagcurr) {
+                case '»': pageNumber = (parseInt(pag) + 1) < pagelist.PageCount ? (parseInt(pag) + 1).toString() :'@pagelist.PageCount'
+                    break
+                case '«': pageNumber = parseInt(pag)>1?(parseInt(pag) - 1).toString():'1'
+                    break
+                case '»»': pageNumber = '@pagelist.PageCount'
+                    break
+                case '««': pageNumber = '1'
+                    break
+                default: pageNumber= pag
+                break
+            }
+            SearchLeadFunc(pageNumber, pageSize)
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#QuickEditLeadEnable').click(function () {
+                $('#editDisableShow').prop('hidden', false);
+                $('#QuickEditLeadEnable').prop('style', 'display:none;');
+                editEnable = true;
+                var chkele = $('#LeadTblR').find('.checkbox.child').filter(':checked').filter(function () {
+                    return $(this).closest('tr').css('display') !== 'none';
+                });
+                var rowlen = chkele.length;
+                let pageSize = $('#pageSize').val()
+                if (pageSize == 15 || pageSize == 50) {
+                    var requestData = [];
+                    chkele.each(function (index) {
+                        var currentRow = $(this).closest('tr');
+                        var stts = currentRow.find('#IdSTTListLead').text();
+                        var leadIds = currentRow.find('input[name="LeadModel[' + (stts - 1) + '].Id"]').val();
+                        requestData.push({ leadId: leadIds, stt: stts });
+                    });
+                    ShowLoading();
+                    $.ajax({
+                        type: "POST",
+                        url: '/AdviseCard/CurrentEditLead',
+                        data: { requestData: JSON.stringify(requestData) },
+                        async: true,
+                        success: function (response) {
+                            debugger;
+                            chkele.each(function (index) {
+                                var currentRow = $(this).closest('tr');
+                                var newHTML = response[index];
+                                currentRow.css('display', 'none');
+                                currentRow[0].insertAdjacentHTML('afterend', newHTML);
+                                var newRow = currentRow.next();
+                                newRow.find('.js-example-basic-singleq').select2();
+                            });
+                        },
+                        error: function () {
+                            console.log('Lỗi khi nhận dữ liệu từ máy chủ.');
+                        },
+                        complete: function () {
+                            HideLoading();
+                        }
+                    });
+                } else {
+                    if (rowlen < 50) {
+                        var requestData = [];
+                        chkele.each(function (index) {
+                            var currentRow = $(this).closest('tr');
+                            var stts = currentRow.find('#IdSTTListLead').text();
+                            var leadIds = currentRow.find('input[name="LeadModel[' + (stts - 1) + '].Id"]').val();
+                            requestData.push({ leadId: leadIds, stt: stts });
+                        });
+                        ShowLoading();
+                        $.ajax({
+                            type: "POST",
+                            url: '/AdviseCard/CurrentEditLead',
+                            data: { requestData: JSON.stringify(requestData) },
+                            async: true,
+                            success: function (response) {
+                                debugger;
+                                chkele.each(function (index) {
+                                    var currentRow = $(this).closest('tr');
+                                    var newHTML = response[index];
+                                    currentRow.css('display', 'none');
+                                    currentRow[0].insertAdjacentHTML('afterend', newHTML);
+                                    var newRow = currentRow.next();
+                                    newRow.find('.js-example-basic-singleq').select2();
+                                });
+                            },
+                            error: function () {
+                                console.log('Lỗi khi nhận dữ liệu từ máy chủ.');
+                            },
+                            complete: function () {
+                                HideLoading();
+                            }
+                        });
+                    } else {
+                        toastr.warning('Vui lòng chọn số lượng dưới 50 dòng để thực hiện sửa!','Thông báo');
+                    }
+                }
+                
+                        //if ($(this).is(':checked')) {
+                        //$(this).parent().parent().find('select,input').prop('hidden', false)
+                        //$(this).parent().parent().find('span.txt').prop('hidden', true)
+                        //let chkq = $(this).parent().parent().find('select, input')
+                        //$.each(chkq, function () {
+                        //    if (!$(this).is('.checkbox') && !$(this).data('id')) {
+                        //        $(this).attr('disabled', false)
+                        //    }
+                        //})
+                        //if (!$(this).parent().parent().find('.js-example-basic-singleq').is('.select2-hidden-accessible')) {
+                        //    $(this).parent().parent().find('.js-example-basic-singleq').select2();
+                        //}
+                        //} else {
+                        //$(this).parent().parent().find('select,input').prop('hidden', true)
+                        //$(this).parent().parent().find('span.txt').prop('hidden', false)
+                        //let chkq = $(this).parent().parent().find('select, input')
+                        //$.each(chkq, function () {
+                        //    if (!$(this).is('.checkbox') && !$(this).data('id')) {
+                        //        $(this).attr('disabled', true)
+                        //    }
+                        //})
+                        //if ($(this).parent().parent().find('.js-example-basic-singleq').is('.select2-hidden-accessible')) {
+                        //    $(this).parent().parent().find('.js-example-basic-singleq').select2('destroy');
+                        //}
+                        //}
+               
+                makeColumnSticky();
+            })
+
+            $('#QuickEditLeadDisable').click(function () {
+                editEnable = false;
+                $('#editDisableShow').prop('hidden', true);
+                $('#QuickEditLeadEnable').prop('style', 'display:inline-block;');
+                $('#editEnableShow').css('visibility', 'hidden');
+                $('#editshow').css('visibility', 'hidden');
+                $('#assignResponsi').css('visibility', 'hidden');
+                $('#exitoption').css('visibility', 'hidden');
+                $('.chkall').prop('checked', false);
+                var chkele = $('#LeadTblR').find('.checkbox.child').filter(':checked');
+                $.each(chkele, function () {
+                    var currentRow = $(this).closest('tr');
+                    currentRow.css('display', '');
+                    currentRow.next().remove();
+                    $(this).prop('checked', false);
+                    //$(this).parent().parent().find('select,input').prop('hidden', true)
+                    //$(this).parent().parent().find('span.txt').prop('hidden', false)
+                    //let chkq = $(this).parent().parent().find('select, input')
+                    //$.each(chkq, function () {
+                    //    if (!$(this).is('.checkbox') && !$(this).data('id')) {
+                    //        $(this).attr('disabled', true)
+                    //    }
+                    //})
+                    //if ($(this).parent().parent().find('.js-example-basic-singleq').is('.select2-hidden-accessible')) {
+                    //    $(this).parent().parent().find('.js-example-basic-singleq').select2('destroy');
+                    //}
+
+                })
+                makeColumnSticky();
+            })
+            //thanh
+            $('#exitoption').click(function () {
+                $('#editshow').css('visibility', 'hidden');
+                $('#editEnableShow').css('visibility', 'hidden');
+                $('#assignResponsi').css('visibility', 'hidden');
+                $('#exitoption').css('visibility', 'hidden');
+                $('.chkall').prop('checked', false);
+                var chkele = $('#LeadTblR').find('.checkbox.child')
+                $.each(chkele, function () {
+                    $(this).prop('checked', false);
+                });
+            });
+            $('#btnLeadOpenPpAssign').click(function () {
+                var chkele = $('#LeadTblR').find('.checkbox.child');
+                var total = 0;
+                var stt = 0;
+                var listData = [];
+                $.each(chkele, function () {
+                    if ($(this).prop('checked')) {
+                        var dataId = $(this).closest('tr').find('input[name="LeadModel[' + stt + '].Id"]').val();
+                        //var dataId = $('#LeadTblR').siblings('input[name="LeadModel[' + stt + '].Id"]').val();
+                        listData.push(dataId);
+                        total++;
+                    }
+                    stt++;
+                });
+                var url = '/AssignedToU/Index?total=' + total + '&listData=' + listData.join(',');
+                OpenPopup(url, 'Phân công', 300, 400);
+            });
+            $('#btnLeadOpenPpExportEx').click(function () {
+                var chkele = $('#LeadTblR').find('.checkbox.child');
+                var stt = 0;
+                var listData = [];
+                $.each(chkele, function () {
+                    if ($(this).prop('checked')) {
+                        var dataId = $(this).closest('tr').find('input[name="LeadModel[' + stt + '].Id"]').val();
+                        listData.push(dataId);
+                    }
+                    stt++;
+                });
+                var url = '/ImportExcel/ExportExIndex?listid=' + listData.join(',');
+                window.location.href = url;
+                $('#editshow').css('visibility', 'hidden');
+                $('#editEnableShow').css('visibility', 'hidden');
+                $('#assignResponsi').css('visibility', 'hidden');
+                $('#exitoption').css('visibility', 'hidden');
+                $('.chkall').prop('checked', false);
+                var chkele = $('#LeadTblR').find('.checkbox.child')
+                $.each(chkele, function () {
+                    $(this).prop('checked', false);
+                });
+            });
+
+        });
+
+        window.addEventListener('message', handleReloadData);
+        function handleReloadData(event) {
+            if (event.data === 'reloadDataLeadPartialView') {
+                toastr.success('Phân bố thành công!', 'Thông báo');
+                let cookie = getCookieLeadIndex('pageSize');
+                SearchLeadFunc(1, cookie);
+                 window.removeEventListener('message', handleReloadData);
+            }
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            try {
+                makeColumnSticky();
+
+            } catch {
+
+            }
+        });
+
+        function makeColumnSticky() {
+            let chkColumn = document.querySelector('#LeadTblR tbody tr td:nth-child(2)').offsetWidth;
+            let SttColumn = document.querySelector('#LeadTblR tbody tr td:nth-child(3)').offsetWidth;
+            let srcColumn = document.querySelector('#LeadTblR tbody tr td:nth-child(4)').offsetWidth;
+            let typeColumn = document.querySelector('#LeadTblR tbody tr td:nth-child(5)').offsetWidth;
+            let topicColumn = document.querySelector('#LeadTblR tbody tr td:nth-child(6)').offsetWidth;
+            let leadNameColumn = document.querySelector('#LeadTblR tbody tr td:nth-child(7)').offsetWidth;
+            let NameColumn = document.querySelector('#LeadTblR tbody tr td:nth-child(8)').offsetWidth;
+
+            // Lặp qua từng hàng trong bảng
+            let rows = document.querySelectorAll('#LeadTblR tbody tr');
+            rows.forEach(function (row) {
+                // Lặp qua từng ô trong hàng
+                let cells = row.querySelectorAll('td:nth-child(n):nth-child(-n+4)');
+                cells.forEach(function (cell) {
+                    cell.classList.add('sub');
+                });
+            });
+
+            console.log(srcColumn);
+
+            $('#LeadTblR tbody tr td:nth-child(2)').css({
+                'left': 0,
+                'position': 'sticky',
+                'z-index': '1',
+                'background-color': 'rgba(255, 255, 255, 1) !important',
+                'color': 'black'
+            });
+            $('#LeadTblR thead tr th:first-child').css({
+                'left': 0,
+                'position': 'sticky',
+                'z-index': '1',
+                'background-color': 'rgba(255, 255, 255, 1) !important',
+                'color': 'black'
+            });
+
+            $('#LeadTblR tbody tr td:nth-child(3)').css({
+                'left': chkColumn,
+                'position': 'sticky',
+                'z-index': '1',
+                'background-color': 'rgba(255, 255, 255, 1) !important',
+                'color': 'black'
+            });
+            $('#LeadTblR thead tr th:nth-child(2)').css({
+                'left': chkColumn,
+                'position': 'sticky',
+                'z-index': '1',
+                'background-color': 'rgba(255, 255, 255, 1) !important',
+                'color': 'black'
+            });
+
+            $('#LeadTblR tbody tr td:nth-child(4)').css({
+                'left': SttColumn + chkColumn,
+                'position': 'sticky',
+                'z-index': '1',
+                'background-color': 'rgba(255, 255, 255, 1) !important',
+                'color': 'black'
+            });
+            $('#LeadTblR thead tr th:nth-child(3)').css({
+                'left': SttColumn + chkColumn,
+                'position': 'sticky',
+                'z-index': '1',
+                'background-color': 'rgba(255, 255, 255, 1) !important',
+                'color': 'black'
+            });
+
+            //$('#LeadTblR tbody tr td:nth-child(5)').css({
+            //    'left': srcColumn + SttColumn + chkColumn,
+            //    'position': 'sticky',
+            //    'z-index': '1',
+            //    'background-color': 'rgba(255, 255, 255, 1) !important',
+            //    'color': 'black'
+            //});
+            //$('#LeadTblR thead tr th:nth-child(4)').css({
+            //    'left': srcColumn + SttColumn + chkColumn,
+            //    'position': 'sticky',
+            //    'z-index': '1',
+            //    'background-color': 'rgba(255, 255, 255, 1) !important',
+            //    'color': 'black'
+            //});
+
+            //$('#LeadTblR tbody tr td:nth-child(6)').css({
+            //    'left': typeColumn + srcColumn + SttColumn + chkColumn,
+            //    'position': 'sticky',
+            //    'z-index': '1',
+            //    'background-color': 'rgba(255, 255, 255, 1) !important',
+            //    'color': 'black'
+            //});
+            //$('#LeadTblR thead tr th:nth-child(5)').css({
+            //    'left': typeColumn + srcColumn + SttColumn + chkColumn,
+            //    'position': 'sticky',
+            //    'z-index': '1',
+            //    'background-color': 'rgba(255, 255, 255, 1) !important',
+            //    'color': 'black'
+            //});
+
+            //$('#LeadTblR tbody tr td:nth-child(7)').css({
+            //    'left': typeColumn + srcColumn + SttColumn + chkColumn + topicColumn,
+            //    'position': 'sticky',
+            //    'z-index': '1',
+            //    'background-color': 'rgba(255, 255, 255, 1) !important',
+            //    'color': 'black'
+            //});
+            //$('#LeadTblR thead tr th:nth-child(6)').css({
+            //    'left': typeColumn + srcColumn + SttColumn + chkColumn + topicColumn,
+            //    'position': 'sticky',
+            //    'z-index': '1',
+            //    'background-color': 'rgba(255, 255, 255, 1) !important',
+            //    'color': 'black'
+            //});
+
+            //$('#LeadTblR tbody tr td:nth-child(8)').css({
+            //    'left': typeColumn + srcColumn + SttColumn + chkColumn + leadNameColumn + topicColumn,
+            //    'position': 'sticky',
+            //    'z-index': '1',
+            //    'background-color': 'rgba(255, 255, 255, 1) !important',
+            //    'color': 'black'
+            //});
+            //$('#LeadTblR thead tr th:nth-child(7)').css({
+            //    'left': typeColumn + srcColumn + SttColumn + chkColumn + leadNameColumn + topicColumn,
+            //    'position': 'sticky',
+            //    'z-index': '1',
+            //    'background-color': 'rgba(255, 255, 255, 1) !important',
+            //    'color': 'black'
+            //});
+            /*
+                        $('#LeadTblR tbody tr td:nth-child(9)').css({
+                            'left': typeColumn + srcColumn + SttColumn + chkColumn + leadNameColumn + topicColumn + NameColumn,
+                            'position': 'sticky',
+                            'z-index': '1',
+                            'background-color': 'rgba(255, 255, 255, 1) !important',
+                            'color': 'black'
+                        });*/
+            /* $('#LeadTblR thead tr th:nth-child(8)').css({
+                 'left': typeColumn + srcColumn + SttColumn + chkColumn + leadNameColumn + topicColumn + NameColumn,
+                 'position': 'sticky',
+                 'z-index': '1',
+                 'background-color': 'rgba(255, 255, 255, 1) !important',
+                 'color': 'black'
+             });*/
+        }
+
+    </script>
+    <script src="/Scripts/ckeditor/ckeditor.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Configure CKEditor with custom toolbar for email composition
+            CKEDITOR.replace('emailInputHangfire', {
+                toolbar: [
+                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat'] },
+                    { name: 'styles', items: ['Format', 'FontSize'] },
+                    { name: 'colors', items: ['TextColor', 'BGColor'] },
+                    { name: 'paragraph', items: ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock'] },
+                    { name: 'links', items: ['Link', 'Unlink'] },
+                    { name: 'insert', items: ['Image', 'Table', 'HorizontalRule'] }
+                ],
+                // Remove unwanted plugins
+                removePlugins: 'elementspath',
+                // Set default CKEditor height
+                height: 300,
+            });
+        });
+    </script>
+
+    <script>
+        //show Email Modal
+        var selectedId = [];
+        $(document).ready(function () {
+            $('#btnShowEmailModalHangfire').click(ShowEmailModalHangfire);
+            //  var emailSelecction = $("input[name='nowOrScheduled']:checked").val();
+
+            $('#sendMailNow').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#dateToSendEmail').prop('hidden', true);
+                }
+            });
+            $('#sendMailScheduled').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#dateToSendEmail').prop('hidden', false);
+                }
+            });
+
+            $('.btnCloseEmailModalHangfire').click(CloseEmailModalHangfire);
+
+            $('body').on('hidden.bs.modal', function () {
+                // This function is for handling the problem of disabling the scrolling bar when any modal is closed.
+                // It checks if there is any modal still open, and if so, adds back the 'modal-open' class to the body of the document.
+                if ($('.modal.in').length > 0) {
+                    $('body').addClass('modal-open');
+                }
+            });
+
+            $('#emailTemplateHangfire').on('change', function () {
+                var selectedValue = JSON.parse($('#emailTemplateHangfire').val());
+                CKEDITOR.instances['emailInputHangfire'].setData(selectedValue.ContentEmail);
+
+                $('#emailTitleHangfire').val(selectedValue.TileEmail);
+            });
+        });
+
+        function ShowEmailModalHangfire() {
+            let proceedWithAjax = true;
+            let selectedEmail = [];
+            selectedId = [];
+            var ele = $('#LeadTblR').find('.checkbox.child:checked');
+            $.each(ele, function () {
+                var leadEmail = $(this).parent().parent().find('td:nth-child(10)').text();
+                var leadId = $(this).parent().parent().find('td:first-child').text();
+                if (leadEmail != "") {
+                    selectedEmail.push(leadEmail);
+                    selectedId.push(leadId);
+                }
+                else {
+                    proceedWithAjax = false;
+                    return;
+                }
+            })
+            if (selectedEmail.length <= 0) {
+                toastr.warning('Chỉ có thể gửi mail cho những lead có thông tin Email!');
+                return false;
+            }
+            if (!proceedWithAjax) { // Check the flag
+                toastr.warning('Chỉ có thể gửi mail cho những lead có thông tin Email!');
+                return false; // Exit the function
+            }
+            $.ajax({
+                url: "/AdviseCard/ShowEmailModalHangfire",
+                method: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data != null) {
+                        if (data.errorMessageEmail === "") {
+                            populateDropdownEmailHangfire(data, selectedEmail); // Corrected function name
+                            $('#modalEmailHangfireTotalLead').text('Tổng số Lead: ' + selectedEmail.length);
+                            $('#emailTitleHangfire').val("");
+                            CKEDITOR.instances['emailInputHangfire'].setData("");
+                            $('#emailTemplateHangfire').val(JSON.stringify({ 'TileEmail': '', 'ContentEmail': '' }));
+                            $('#sendMailNow').prop('checked', true);
+                            $('#dateToSendEmail').prop('hidden', true);
+                            $('#DateAction').val("");
+                            $('#TimeAction').val("");
+                            $("#EmailModalHangfire").modal("show");
+                        } else {
+                            toastr.warning(data.errorMessageEmail);
+                        }
+                    } else {
+                        toastr.warning('Có lỗi xảy ra');
+                    }
+                }
+            });
+        }
+        function CloseEmailModalHangfire() {
+            $("#EmailModalHangfire").modal("hide");
+        }
+        function populateDropdownEmailHangfire(data, selectedEmail) {
+            $('#emailSenderHangfire').val(data.EmailSender);
+            $('#emailReceiverHangfire').val(selectedEmail.join(';'));
+            $('#emailTemplateHangfire').empty().append($('<option>').val(JSON.stringify({ 'TileEmail': '', 'ContentEmail': '' })).text('Chọn tiêu đề')).prop('selected', true);
+            data.EmailTemplate.forEach(x => {
+                $('#emailTemplateHangfire').append($('<option>').val(JSON.stringify(x)).text(x.TileEmail));
+            });
+            $('#emailCampaignHangfire').empty();//.append($('<option>').val(JSON.stringify({ 'Id': '0', 'Name': '' })).text('Không chiến dịch')).prop('selected', true);
+            data.Campaign.forEach(x => {
+                if (x.Id == 3) {
+                    $('#emailCampaignHangfire').append($('<option>').val(JSON.stringify(x)).text(x.Name)).prop('selected', true);
+                }
+                else {
+                    $('#emailCampaignHangfire').append($('<option>').val(JSON.stringify(x)).text(x.Name));
+                }
+
+
+            });
+        }
+
+
+
+    </script>
+    <script>
+        //Handle Send Email
+        $(document).ready(function () {
+            $('#btnSendEmailHangfire').click(SendEmailHangfire)
+        });
+
+        function SendEmailHangfire() {
+            var DateAction = "";
+            var TimeAction = "";
+            const date = new Date(); //get current date
+            var successMessage = "";
+            // var myDate = date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear();
+            if ($('#sendMailNow').is(':checked')) {
+                DateAction = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                TimeAction = date.getHours() + ':' + (date.getMinutes());
+                successMessage = 'Gửi Email thành công!'
+            }
+            if ($('#sendMailScheduled').is(':checked')) {
+                DateAction = $('#DateAction').val();
+                TimeAction = $('#TimeAction').val();
+                var testDateAction = DateAction.split('-');
+                var testTimeAction = TimeAction.split(':');
+                var selectedDate = new Date(testDateAction[0], testDateAction[1] - 1, testDateAction[2], testTimeAction[0], testTimeAction[1])
+                if (selectedDate < date) {
+                    toastr.warning('Thời điểm gửi Email không hợp lệ!');
+                    return;
+                }
+                successMessage = 'Lên lịch gửi Email thành công!'
+            }
+            var EmailSender = $('#emailSenderHangfire').val();
+            var EmailTitle = $('#emailTitleHangfire').val();
+            var EmailBody = CKEDITOR.instances['emailInputHangfire'].getData();
+            var EmailReceiver = $('#emailReceiverHangfire').val();
+            var Campaign = JSON.parse($('#emailCampaignHangfire').val());
+            if (!DateAction || !TimeAction || !EmailSender || !EmailTitle || !EmailBody || !EmailReceiver) {
+                toastr.warning('Vui lòng điền đủ các thông tin cần thiết để gửi Email');
+                return;
+            }
+
+            console.log(Campaign);
+            console.log(Campaign.Id);
+            console.log(Campaign.Name);
+            $.ajax({
+                url: "/AdviseCard/SendEmailHangfire",
+                method: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    DateAction: DateAction,
+                    TimeAction: TimeAction,
+                    EmailSender: EmailSender,
+                    EmailTitle: EmailTitle,
+                    EmailBody: EmailBody,
+                    EmailReceiver: EmailReceiver,
+                    EmailId: selectedId.join(';'),
+                    CampaignId: Campaign.Id,
+                    CampaignName: Campaign.Name,
+                }),
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success) {
+                        toastr.success(successMessage);
+                        CloseEmailModalHangfire();
+                    } else {
+                        toastr.warning('Có lỗi xảy ra khi gửi Email!');
+                    }
+                }
+            });
+        }
+
+
+    </script>
+
+    <script>
+        //Show SMS Hangfire Modal
+        var selectedPhoneNumber = [];
+        $(document).ready(function () {
+
+            $('#smsTemplateHangfire').select2({
+                dropdownParent: $('#sms-dropdown-row')
+            });
+            $('#btnShowSMSlModalHangfire').click(ShowSMSModalHangfire);
+
+            $('#sendSMSNow').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#dateToSendSMS').prop('hidden', true);
+                }
+            });
+
+            $('#sendSMSScheduled').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#dateToSendSMS').prop('hidden', false);
+                }
+            });
+
+            $('.btnCloseSMSModalHangfire').click(CloseSMSModalHangfire);
+
+
+
+            $('#smsTemplateHangfire').on('select2:select', function (e) {
+                var selectedOption = e.params.data;
+                var contentSMS = selectedOption.text;
+                if (contentSMS) {
+                    $('#idContentSMSHangfire').val(contentSMS);
+                }
+            });
+        });
+
+
+        function ShowSMSModalHangfire() {
+            let proceedWithAjax = true;
+            selectedPhoneNumber = [];
+            let selectedLeadName = [];
+            selectedId = [];
+            var ele = $('#LeadTblR').find('.checkbox.child:checked');
+            $.each(ele, function () {
+                var leadPhoneNumber = $(this).parent().parent().find('td:nth-child(9)').text();
+                var leadId = $(this).parent().parent().find('td:first-child').text();
+                var leadName = $(this).parent().parent().find('td:nth-child(8)').text();
+                if (leadPhoneNumber != "") {
+                    selectedPhoneNumber.push(leadPhoneNumber); // Corrected variable name
+                    selectedId.push(leadId);
+                    selectedLeadName.push(leadName);
+                }
+                else {
+                    proceedWithAjax = false;
+                    return;
+                }
+            });
+            if (selectedPhoneNumber.length <= 0) {
+                toastr.warning('Chỉ có thể gửi SMS cho những lead có thông tin số điện thoại!');
+                return false;
+            }
+            if (!proceedWithAjax) {
+                toastr.warning('Chỉ có thể gửi SMS cho những lead có thông tin số điện thoại!');
+                return false;
+            }
+            $.ajax({
+                url: "/AdviseCard/GetSMSListHangfire",
+                method: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data != null) {
+                        if (!data.errorMessageSendSMS) {
+                            populateDropdownSMSHangfire(data, selectedPhoneNumber, selectedLeadName);
+                            $('#modalSmsHangfireTotalLead').text('Tổng số Lead: ' + selectedPhoneNumber.length);
+                            $('#idContentSMSHangfire').val("");
+                            $('#sendSMSNow').prop('checked', true);
+                            $('#dateToSendSMS').prop('hidden', true);
+                            $('#DateActionSMSHangfire').val("");
+                            $('#TimeActionSMSHangfire').val("");
+                            $("#SMSModalHangfire").modal("show");
+                        } else {
+                            toastr.warning(data.errorMessageSendSMS);
+
+                        }
+                    } else {
+                        toastr.warning('Có lỗi xảy ra');
+                    }
+                }
+            });
+        }
+
+        function populateDropdownSMSHangfire(data, selectedPhoneNumber, selectedLeadName) {
+            let receiverInfos = [];
+            for (let i = 0; i < selectedPhoneNumber.length; i++) {
+                receiverInfos.push(selectedLeadName[i] + ': ' + selectedPhoneNumber[i]);
+            }
+            $('#smsReceiverHangfire').text('Người nhận: ' + receiverInfos.join(';'));
+
+
+            //$('#smsTemplateHangfire').empty().append($('<option></option>').val("").text('Chọn mẫu tin nhắn')).prop('selected', true);
+            //data.smsMessages.forEach(x => {
+            //    $('#smsTemplateHangfire').append($('<option></option>').val(x.ContentRule).text(x.ContentRule));
+            var dropdown = $('#smsTemplateHangfire');
+            dropdown.empty();
+            dropdown.append($('<option></option>').val("").text("Chọn mẫu SMS")).prop('selected', true);
+            $.each(data.smsMessages, function (index, item) {
+                dropdown.append($('<option></option>').val(item.ContentRule).text(item.ContentRule));
+            });
+
+            var dropdownCampaign = $('#smsCampaignHangfire');
+            dropdownCampaign.empty();
+            $.each(data.Campaign, function (index, item) {
+                if (item.Id == 3) {
+                    dropdownCampaign.append($('<option></option>').val(JSON.stringify(item)).text(item.Name)).prop('selected', true);
+                }
+                else {
+                    dropdownCampaign.append($('<option></option>').val(JSON.stringify(item)).text(item.Name));
+                }
+
+            });
+
+        }
+
+        function CloseSMSModalHangfire() {
+            $("#SMSModalHangfire").modal("hide");
+        }
+    </script>
+
+    <script>
+        //Handle Send SMS
+        $(document).ready(function () {
+            $('#btnSendSMSHangfire').click(SendSMSHangfire)
+        });
+
+        function SendSMSHangfire() {
+            var DateAction = "";
+            var TimeAction = "";
+            const date = new Date(); //get current date
+            var successMessage = "";
+            //   var myDate = date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear();
+            if ($('#sendSMSNow').is(':checked')) {
+                DateAction = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                TimeAction = date.getHours() + ':' + (date.getMinutes());
+                successMessage = 'Gửi SMS thành công!'
+            }
+            if ($('#sendSMSScheduled').is(':checked')) {
+                DateAction = $('#DateActionSMS').val();
+                TimeAction = $('#TimeActionSMS').val();
+                var testDateAction = DateAction.split('-');
+                var testTimeAction = TimeAction.split(':');
+                var selectedDate = new Date(testDateAction[0], testDateAction[1] - 1, testDateAction[2], testTimeAction[0], testTimeAction[1])
+                if (selectedDate < date) {
+                    toastr.warning('Thời điểm gửi SMS không hợp lệ!');
+                    return;
+                }
+                successMessage = 'Lên lịch gửi SMS thành công!'
+            }
+            // var EmailSender = $('#emailSenderHangfire').val();
+            // var EmailTitle = $('#emailTitleHangfire').val();
+            var smsBody = $('#idContentSMSHangfire').val();
+            var smsReceiver = selectedPhoneNumber.join(';');
+            var Campaign = JSON.parse($('#smsCampaignHangfire').val());
+
+            if (!DateAction || !TimeAction || !smsBody || !smsReceiver) {
+                toastr.warning('Vui lòng điền đủ các thông tin cần thiết để gửi SMS');
+                return;
+            }
+            if (!selectedPhoneNumber.every(x => isValidPhoneNumberHangfire(x))) {
+                toastr.warning('Số điện thoại không hợp lệ');
+                return;
+            }
+            $.ajax({
+                url: "/AdviseCard/SendApiSMSHangfire",
+                method: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    DateAction: DateAction,
+                    TimeAction: TimeAction,
+                    ContentSMS: smsBody,
+                    Phones: smsReceiver,
+                    Ids: selectedId.join(';'),
+                    CampaignId: Campaign.Id,
+                    CampaignName: Campaign.Name,
+                }),
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success) {
+                        toastr.success(successMessage);
+                        CloseSMSModalHangfire();
+                    } else {
+                        toastr.warning('Có lỗi xảy ra khi gửi SMS!');
+                    }
+                }
+            });
+        }
+
+        function isValidPhoneNumberHangfire(phoneNumber) {
+            const patternVN = /(((\+|)84)|0)(3|5|7|8|9)+([0-9]{8})\b/;
+            const pattern = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+            if (!phoneNumber) {
+                return false;
+            } else if (patternVN.test(phoneNumber)) {
+                return true;
+            } else if (pattern.test(phoneNumber)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    </script>
+    <script>
+        //Hiển thị Modal Gộp Lead
+        $(document).ready(function () {
+
+
+            $('#btnShowGopLeadModal').click(ShowModalGopLead);
+
+            $('.closeModalGopLead').click(CloseModelGopLead);
+
+            $('#btnShowGopLeadCheck').click(ShowGopLeadCheck)
+
+            $('.closeModalGopLeadCheck').click(CloseModelGopLeadCheck);
+
+        });
+        function ShowModalGopLead() {
+            $("#modalGopLead").modal("show");
+        }
+        function CloseModelGopLead() {
+            $("#modalGopLead").modal("hide");
+        }
+        function CloseModelGopLeadCheck() {
+            $("#modalGopLeadCheck").modal("hide");
+        }
+        function ShowGopLeadCheck() {
+            var leadName = false;
+            var mobile = false;
+            var taxCode = false;
+            var email = false;
+            var leadNameIn = "";
+            var mobileIn = "";
+            var taxCodeIn = "";
+            var emailIn = ""
+            if ($('#gopLeadLeadName').prop('checked')) {
+                leadName = true;
+            }
+            if ($('#gopLeadMobile').prop('checked')) {
+                mobile = true;
+            }
+            if ($('#gopLeadTaxCode').prop('checked')) {
+                taxCode = true;
+            }
+            if ($('#gopLeadEmail').prop('checked')) {
+                email = true;
+            }
+            var $leadTbl = $('#LeadTblR');
+            var listInputs = $('#LeadTblR').find('input[type=checkbox],checkbox.child');
+            $.each(listInputs, function () {
+                if ($(this).prop('checked')) {
+                    let $inputLeadName = $(this).parent().parent().find('span.LeadName');
+                    let $inputMobile = $(this).parent().parent().find('span.Mobile');
+                    let $inputEmail = $(this).parent().parent().find('span.Email');
+                    let $inputTaxCode = $(this).parent().parent().find('span.Taxcode');
+                    console.log($inputLeadName.val());
+                    if ($inputLeadName) {
+                        leadNameIn = leadNameIn + "upper(trim(N'" + $inputLeadName.text() + " ')),";
+                    }
+                    if ($inputMobile) {
+                        mobileIn = mobileIn + "upper(trim(N'" + $inputMobile.text() + " ')),";
+                    }
+                    if ($inputEmail) {
+                        emailIn = emailIn + "upper(trim(N'" + $inputEmail.text() + " ')),";
+                    }
+                    if ($inputTaxCode) {
+                        ;
+                        taxCodeIn = taxCodeIn + "upper(trim(N'" + $inputTaxCode.text() + " ')),";
+                    }
+                }
+            })
+
+            if ((!leadName && !mobile && !taxCode && !email)) {
+
+                toastr.warning('Vui lòng chọn ít nhất 1 trường để tiến hành gộp Lead!');
+                return;
+            }
+            else {
+                // console.log("'(" + leadNameIn.slice(0, -1) + ")'");
+                //$('#modalGopLeadWait').modal('show');
+                $.ajax({
+                    url: "/AdviseCard/ShowGopLeadCheck", //+ "leadName=" + leadName + "&mobile=" + mobile + "&taxCode=" + taxCode + "&email=" + email,
+                    method: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        leadNameIn: JSON.stringify("'(" + leadNameIn.slice(0, -1) + ")'"),
+                        mobileIn: JSON.stringify("'(" + mobileIn.slice(0, -1) + ")'"),
+                        taxCodeIn: JSON.stringify("'(" + taxCodeIn.slice(0, -1) + ")'"),
+                        emailIn: JSON.stringify("'(" + emailIn.slice(0, -1) + ")'"),
+                        leadName: leadName,
+                        mobile: mobile,
+                        taxCode: taxCode,
+                        email: email
+                    }),
+                    dataType: 'html',
+                    success: function (data) {
+                        CloseModelGopLead();
+                        $('#tblGopLeadCheck').html(data);
+                        $('#modalGopLeadCheck').modal("show");
+
+                    }
+                });
+                // $('#modalGopLeadWait').modal('hide');
+            }
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('.closeModalGopLeadDetail').click(CloseModelGopLeadDetail);
+
+        });
+        function ShowModalGopLeadDetail() {
+            $("#modalGopLeadDetail").modal("show");
+        }
+        function CloseModelGopLeadDetail() {
+            $("#modalGopLeadDetail").modal("hide");
+        }
+    </script>
+    <script>
+        //Gộp Lead
+        $(document).ready(function () {
+            $('#btnGopLeadExe').click(function () {
+                var $gopLeadCheckTbl = $('#GopLeadCheckTbl')
+                var $selectedGopLead = $gopLeadCheckTbl.find('input[type=checkbox][class=checkboxGopLead]');
+                var data = [];
+                $.each($selectedGopLead, function (index, item) {
+                    if ($(this).prop('checked')) {
+                        var mainId = $(this).parent().parent().find('td[name="MainId"]').find('input[name="MainId"]').val();
+                        var leadName = $(this).parent().parent().find('td[name="LeadName"]').find('input[name="LeadName"]').val();
+                        var mobile = $(this).parent().parent().find('td[name="Mobile"]').find('input[name="Mobile"]').val();
+                        var taxCode = $(this).parent().parent().find('td[name="TaxCode"]').find('input[name="TaxCode"]').val();
+                        var email = $(this).parent().parent().find('td[name="Email"]').find('input[name="Email"]').val();
+                        data.push({
+                            MainId: Number(mainId),
+                            LeadName: (leadName != undefined && leadName != null ? leadName.trim() : ""),//check undefine
+                            Mobile: (mobile != undefined && mobile != null ? mobile.trim() : ""),
+                            TaxCode: (taxCode != undefined && taxCode != null ? taxCode.trim() : ""),
+                            Email: (email != undefined && email != null ? email.trim() : ""),
+                        })
+                    }
+                });
+
+                if (data.length <= 0) {
+                    toastr.warning('Vui lòng chọn ít nhất 1 để tiến hành gộp Lead!');
+                }
+                else {
+                    ShowLoading();
+                    
+                    $.ajax({
+                        url: "/AdviseCard/GopLeadHandle",
+                        method: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(
+                            data
+                        ),
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.success) {
+                                toastr.success('Gộp Lead thành công!');
+                                CloseModelGopLeadCheck();
+                                let cookie = getCookieLeadIndex('pageSize')
+                                SearchLeadFunc(1, cookie)
+                            }
+                            else {
+                                toastr.warning('Có lỗi khi gộp Lead!');
+                                CloseModelGopLeadCheck();
+                            }
+                            HideLoading();
+                        }
+                    });
+                }
+
+
+                console.log(data);
+
+            })
+        })
+    </script>
+
+    <script>
+        var template_dataZNS = {};
+
+        var selectedPhoneNumber = [];
+        $(document).ready(function () {
+
+            $('#znsTemplateHangfire').select2({
+                dropdownParent: $('#zns-dropdown-row')
+            });
+
+            $('#btnShowZNSModalHangfire').click(ShowZNSModalHangfire);
+
+            $('#sendZNSNow').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#dateToSendZNS').prop('hidden', true);
+                }
+            });
+
+            $('#sendZNSScheduled').change(function () {
+                if ($(this).is(':checked')) {
+                    $('#dateToSendZNS').prop('hidden', false);
+                }
+            });
+
+            $('.btnCloseZNSModalHangfire').click(CloseZNSModalHangfire);
+            $('#btnSendZNSHangfire').click(function () {
+                if ($('#sendZNSNow').is(':checked')) {
+                    // Nếu người dùng chọn gửi ngay
+                    sendZNSQuick(); // Gọi hàm gửi nhanh
+                } else if ($('#sendZNSScheduled').is(':checked')) {
+                    // Nếu người dùng chọn gửi theo lịch
+                    scheduleZNS(); // Gọi hàm gửi theo lịch
+                }
+            });
+
+            $('#znsTemplateHangfire').on('select2:select', function (e) {
+                var selectedOption = e.params.data;
+                var contentZNS = selectedOption.text;
+                var isFirstOption = $('#znsTemplateHangfire option:first-child').is(':selected');
+
+                if (contentZNS && !isFirstOption) {
+                    $('#idContentZNSHangfire').val(contentZNS).prop('readonly', true);
+                }
+            });
+        });
+        function sendZNSQuick() {
+            var idContentZNSHangfire = $('#idContentZNSHangfire').val();
+            var campaignId = JSON.parse($('#znsCampaignHangfire').val());
+            if (idContentZNSHangfire.trim() === '') {
+                toastr.warning('Vui lòng chọn mẫu ZNS');
+                return;
+            }
+            console.log("znsContent: " + idContentZNSHangfire);
+            console.log(selectedId);
+            $.ajax({
+                url: "/AdviseCard/GetZNSListForMultipleUsers",
+                method: "POST",
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ userIds: selectedId, znsContent: idContentZNSHangfire}),
+                success: function (response) {
+                    if (response != null && response.success) {
+                        console.log('UserData:', response.userData);
+                        var selectedId = $('#znsTemplateHangfire').find(':selected').data('id');
+                        var selectedZNSId = $('#znsTemplateHangfire').find(':selected').data('znsId');
+                        console.log(selectedZNSId);
+
+                        console.log(selectedId);
+
+                        var users = Object.keys(response.userData); // Lấy danh sách user IDs
+
+                        // Hàm đệ qui để xử lý từng user một
+                        var processUser = function (index) {
+                            if (index < users.length) {
+                                var userId = users[index];
+                                var userTemplates = response.userData[userId];
+                                var contentRule = userTemplates[0].ContentRule;
+                                var leadName = userTemplates[0].LeadName;
+                                var leadPhone = userTemplates[0].LeadPhone;
+                                var convertedPhone = convertPhoneNumberLead(leadPhone);
+
+                                console.log(leadName);
+                                console.log(convertedPhone);
+
+                                console.log(contentRule);
+                                // Lấy danh sách giá trị thực đã được thay thế cho từng người dùng
+                                var realValues = response.userRealValues[userId];
+                                var formattedRealValues = realValues.join(',');
+                                updateZNSTemplate(selectedId, formattedRealValues, function () {
+                                    sendZNS(convertedPhone, selectedZNSId, template_dataZNS, userId, contentRule, leadPhone, campaignId);
+                                    // Gọi đệ qui để xử lý user tiếp theo
+                                    processUser(index + 1);
+                                });
+                            }
+                        };
+                        if (response.errorCode === -133) {
+                            toastr.error('Mẫu ZNS không thể gửi vào lúc (10PM-6AM)');
+                        }
+                        else {
+                            toastr.success('Thành công');
+                            CloseZNSModalHangfire();
+                        }
+                        processUser(0);
+                    } else {
+                        toastr.warning('Có lỗi xảy ra');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log('Error:', errorThrown);
+                    // Xử lý khi có lỗi xảy ra trong quá trình gọi API
+                }
+            });
+        }
+        function scheduleZNS() {
+            var idContentZNSHangfire = $('#idContentZNSHangfire').val();
+            var campaignId = JSON.parse($('#znsCampaignHangfire').val());
+            if (idContentZNSHangfire.trim() === '') {
+                toastr.warning('Vui lòng chọn mẫu ZNS');
+                return;
+            }
+            console.log("znsContent: " + idContentZNSHangfire);
+            console.log(selectedId);
+            $.ajax({
+                url: "/AdviseCard/GetZNSListForMultipleUsers",
+                method: "POST",
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({ userIds: selectedId, znsContent: idContentZNSHangfire}),
+                success: function (response) {
+                    if (response != null && response.success) {
+                        console.log('UserData:', response.userData);
+                        var selectedId = $('#znsTemplateHangfire').find(':selected').data('id');
+                        var selectedZNSId = $('#znsTemplateHangfire').find(':selected').data('znsId');
+                        console.log(selectedZNSId);
+
+                        console.log(selectedId);
+
+                        var users = Object.keys(response.userData); // Lấy danh sách user IDs
+                        var scheduleDate = $('#DateActionZNS').val();
+                        var scheduleTime = $('#TimeActionZNS').val();
+
+                        // Kiểm tra nếu ngày hoặc giờ không được chọn
+                        if (!scheduleDate || !scheduleTime) {
+                            toastr.warning('Vui lòng chọn cả ngày và giờ để đặt lịch gửi ZNS');
+                            return;
+                        }
+
+                        var scheduleDateTime = scheduleDate + ' ' + scheduleTime;
+                        // Lấy giờ từ thời gian đặt lịch
+                        var scheduleHour = parseInt(scheduleTime.split(':')[0]);
+
+                        // Lấy ngày hiện tại
+                        var currentDate = new Date();
+                        // Kiểm tra nếu thời gian đặt lịch nhỏ hơn thời gian hiện tại thì hiển thị thông báo lỗi
+                        var selectedDate = new Date(scheduleDateTime);
+                        if (selectedDate < currentDate) {
+                            toastr.warning('Không thể đặt lịch vào thời gian của quá khứ ');
+                            return;
+                        }
+                        // Kiểm tra nếu giờ đặt lịch từ 10pm đến 6am thì hiển thị thông báo lỗi
+                        if (scheduleHour >= 22 || scheduleHour < 6) {
+                            toastr.warning('Không thể gửi vào khung giờ từ 10PM đến 6AM');
+                            return;
+                        }
+
+
+
+                        // Hàm đệ qui để xử lý từng user một
+                        var processUser = function (index) {
+                            if (index < users.length) {
+                                var userId = users[index];
+                                var userTemplates = response.userData[userId];
+                                var contentRule = userTemplates[0].ContentRule;
+                                var leadName = userTemplates[0].LeadName;
+                                var leadPhone = userTemplates[0].LeadPhone;
+                                var convertedPhone = convertPhoneNumberLead(leadPhone);
+
+                                console.log(leadName);
+                                console.log(convertedPhone);
+
+                                console.log(contentRule);
+                                // Lấy danh sách giá trị thực đã được thay thế cho từng người dùng
+                                var realValues = response.userRealValues[userId];
+                                var formattedRealValues = realValues.join(',');
+                                updateZNSTemplate(selectedId, formattedRealValues, function () {
+                                    sendZNSSchedule(convertedPhone, selectedZNSId, template_dataZNS, userId, contentRule, leadPhone, scheduleDateTime, campaignId)
+                                    processUser(index + 1);
+                                });
+                            }
+                        };
+                        if (response.success) {
+                            toastr.success('Thành công');
+                            CloseZNSModalHangfire();
+
+                        }
+                        else {
+                            toastr.error('Lên lịch không thành công');
+
+                        }
+                        processUser(0);
+                    } else {
+                        toastr.warning('Có lỗi xảy ra');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log('Error:', errorThrown);
+                    // Xử lý khi có lỗi xảy ra trong quá trình gọi API
+                }
+            });
+        }
+        function updateZNSTemplate(id, realValues, callback) {
+            $.ajax({
+                url: '/AdviseCard/GetZNSTemplate',
+                type: 'GET',
+                data: {
+                    id: id
+                },
+                dataType: 'json',
+                success: function (response) {
+                    var fieldZnsList = response.fieldZnsList;
+                    var extractedData = extractDataAndFormatTime(fieldZnsList, realValues);
+                    template_dataZNS = extractedData;
+                    console.log("Mẫu nè", template_dataZNS);
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching ZNS template:', error);
+                }
+            });
+        }
+
+
+        function convertPhoneNumberLead(phone) {
+            // Kiểm tra xem số điện thoại đã có đầu số 84 (Việt Nam) chưa
+            if (phone.startsWith("0")) {
+                // Nếu chưa có, thêm đầu số 84 vào trước số điện thoại
+                return "84" + phone.slice(1);
+            } else {
+                // Nếu đã có đầu số 84, không cần thay đổi
+                return phone;
+            }
+        }
+        function sendZNS(convertedPhone, selectedZNSId, template_data, userId, contentRule, leadPhone, CampaignId) {
+    $.ajax({
+        type: 'POST',
+        url: '@Url.Action("SendZNS", "AdviseCard")',
+        data: JSON.stringify({
+            phoneNumber: convertedPhone,
+            templateId: selectedZNSId,
+            templateData: template_data
+        }),
+        dataType: 'json',
+        contentType: 'application/json',
+        success: function (response) {
+
+            // Xử lý kết quả trả về từ controller
+            if (response.error === 0) {
+                createZNSLeadLogs(userId, contentRule, 1, leadPhone, CampaignId.Id, "");
+            } else {
+                createZNSLeadLogs(userId, contentRule, 0, leadPhone, CampaignId.Id, response.error);
+
+            }
+        },
+        error: function(xhr, status, error) {
+            // Xử lý lỗi khi gửi request
+            toastr.error('Có lỗi xảy ra');
+            // Đóng modal
+            CloseZNSModalHangfire();
+        }
+    });
+
+        }
+        function sendZNSSchedule(convertedPhone, selectedZNSId, template_data, userId, contentRule, leadPhone, scheduleDateTime, CampaignId) {
+    if (!checkTemplateData(template_data)) {
+        createZNSLeadLogs(userId, contentRule, 0, leadPhone, CampaignId.Id, 'Thiếu thông tin Template');
+        return;
+    } else {
+        // Nếu tất cả các giá trị đều đã được cung cấp, gửi request AJAX
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ScheduleZNS", "AdviseCard")',
+            data: JSON.stringify({
+                phoneNumber: convertedPhone,
+                templateId: selectedZNSId,
+                templateData: template_data,
+                scheduleTime: scheduleDateTime // Thêm dữ liệu thời gian lên lịch
+            }),
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function(response) {
+                // Xử lý kết quả trả về từ controller
+                if (response.success) {
+                    createZNSLeadLogs(userId, contentRule, 1, leadPhone, CampaignId.Id, '');
+                } else {
+                    createZNSLeadLogs(userId, contentRule, 0, leadPhone, CampaignId.Id, response.error);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // Xử lý lỗi khi gửi request
+                toastr.error('Có lỗi xảy ra');
+                // Đóng modal
+                CloseZNSModalHangfire();
+            }
+        });
+    }
+}
+
+        function checkTemplateData(template_data) {
+            for (var key in template_data) {
+                if (template_data.hasOwnProperty(key)) {
+                    if (!template_data[key] || template_data[key].trim() === "") {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+
+
+        function ShowZNSModalHangfire() {
+            let proceedWithAjax = true;
+            selectedPhoneNumber = [];
+            let selectedLeadName = [];
+            selectedId = [];
+            var ele = $('#LeadTblR').find('.checkbox.child:checked');
+            $.each(ele, function () {
+                var leadPhoneNumber = $(this).parent().parent().find('td:nth-child(9)').text();
+                var leadId = $(this).parent().parent().find('td:first-child').text();
+                var leadName = $(this).parent().parent().find('td:nth-child(8)').text();
+                if (leadPhoneNumber != "") {
+                    selectedPhoneNumber.push(leadPhoneNumber);
+                    selectedId.push(leadId);
+                    selectedLeadName.push(leadName);
+                }
+                else {
+                    proceedWithAjax = false;
+                    return;
+                }
+            });
+            if (selectedPhoneNumber.length <= 0) {
+                toastr.warning('Chỉ có thể gửi ZNS cho những lead có thông tin số điện thoại!');
+                return false;
+            }
+            if (!proceedWithAjax) {
+                toastr.warning('Chỉ có thể gửi ZNS cho những lead có thông tin số điện thoại!');
+                return false;
+            }
+
+            $.ajax({
+                url: "/AdviseCard/GetZNSListHangfire",
+                method: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data != null) {
+                        if (!data.errorMessageSendZNS) {
+                            populateDropdownZNSHangfire(data, selectedPhoneNumber, selectedLeadName);
+                            $('#modalZnsHangfireTotalLead').text('Tổng số Lead: ' + selectedPhoneNumber.length);
+                            $('#idContentZNSHangfire').val("");
+                            $('#sendZNSNow').prop('checked', true);
+                            $('#dateToSendZNS').prop('hidden', true);
+                            $('#DateActionZNSHangfire').val("");
+                            $('#TimeActionZNSHangfire').val("");
+                            $("#ZNSModalHangfire").modal("show");
+                        } else {
+                            toastr.warning(data.errorMessageSendZNS);
+
+                        }
+                    } else {
+                        toastr.warning('Có lỗi xảy ra');
+                    }
+                }
+            });
+        }
+        function populateDropdownZNSHangfire(data, selectedPhoneNumber, selectedLeadName) {
+            let receiverInfos = [];
+            for (let i = 0; i < selectedPhoneNumber.length; i++) {
+                receiverInfos.push(selectedLeadName[i] + ': ' + selectedPhoneNumber[i]);
+            }
+            $('#znsReceiverHangfire').text('Người nhận: ' + receiverInfos.join(';'));
+
+            var dropdown = $('#znsTemplateHangfire');
+            dropdown.empty();
+            dropdown.append($('<option></option>').val("").text("Chọn mẫu ZNS")).prop('selected', true);
+            $.each(data.znsMessages, function (index, item) { // Sửa từ smsMessages thành znsMessages
+                var option = $('<option></option>'); // Khai báo biến option ở đây
+                option.val(item.ContentRule).text(item.ContentRule).val(item.ZNSId).val(item.Id);
+                option.data('znsId', item.ZNSId);
+                option.data('id', item.Id);
+                dropdown.append(option);
+            });
+            var dropdownCampaign = $('#znsCampaignHangfire');
+            dropdownCampaign.empty();
+            $.each(data.Campaign, function (index, item) {
+                if (item.Id == 3) {
+                    dropdownCampaign.append($('<option></option>').val(JSON.stringify(item)).text(item.Name)).prop('selected', true);
+                }
+                else {
+                    dropdownCampaign.append($('<option></option>').val(JSON.stringify(item)).text(item.Name));
+                }
+
+            });
+
+            // Lọc và log Id của mẫu được chọn
+            dropdown.on('change', function () {
+                var selectedOption = $(this).find(':selected');
+                var selectedZNSId = selectedOption.data('znsId');
+                var selectedId = selectedOption.data('id'); // Lấy giá trị của thuộc tính data-id
+                console.log('Template Id:', selectedId);
+                console.log('ZNS Id:', selectedZNSId);
+
+
+
+            });
+        }
+        function extractDataAndFormatTime(fieldZnsList, dataString) {
+            // Tạo một mảng từ chuỗi dữ liệu
+            var dataArray = dataString.split(',');
+
+            // Tạo một đối tượng JSON trống
+            var extractedData = {};
+
+            // Lặp qua từng trường fieldZns và gán giá trị tương ứng từ mảng dữ liệu
+            var fieldZns = fieldZnsList.split(',');
+            for (var i = 0; i < fieldZns.length; i++) {
+                extractedData[fieldZns[i]] = dataArray[i];
+            }
+
+            // Tìm trường có giá trị giống định dạng ngày tháng
+            var timeFieldName = findDateTimeField(extractedData);
+
+            // Chuyển đổi định dạng thời gian nếu trường thời gian được phát hiện
+            if (timeFieldName) {
+                var dateTime = extractedData[timeFieldName];
+                var formattedDateTime = formatDateTime(dateTime);
+                extractedData[timeFieldName] = formattedDateTime;
+            }
+
+            return extractedData;
+        }
+
+        function formatDateTime(dateTime) {
+            if (!(dateTime instanceof Date)) {
+                dateTime = new Date(dateTime);
+            }
+
+            if (isNaN(dateTime.getTime())) {
+                return null; // Trả về null nếu không thể chuyển đổi thành ngày tháng
+            }
+
+            var hours = dateTime.getHours();
+            var minutes = dateTime.getMinutes();
+            var day = dateTime.getDate();
+            var month = dateTime.getMonth() + 1;
+            var year = dateTime.getFullYear();
+
+            // Chuyển đổi giờ và phút thành chuỗi có dạng hh:mm
+            var timeString = (hours < 10 ? '0' : '') + hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+
+            // Chuyển đổi ngày và tháng thành chuỗi có dạng dd/MM/yyyy
+            var dateString = (day < 10 ? '0' : '') + day + '/' + (month < 10 ? '0' : '') + month + '/' + year;
+
+            // Trả về chuỗi kết quả
+            return timeString + ' ' + dateString;
+        }
+
+
+        // Hàm kiểm tra xem trường nào trong đối tượng chứa giá trị có dạng ngày tháng
+        function findDateTimeField(dataObject) {
+            for (var key in dataObject) {
+                if (isDateTime(dataObject[key])) {
+                    return key;
+                }
+            }
+            return null;
+        }
+
+        // Hàm kiểm tra xem một chuỗi có định dạng ngày tháng hợp lệ không
+        function isDateTime(value) {
+            var regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+            return regex.test(value);
+        }
+        function convertPhoneNumber(phone) {
+            // Kiểm tra xem số điện thoại đã có đầu số 84 (Việt Nam) chưa
+            if (phone.startsWith("0")) {
+                // Nếu chưa có, thêm đầu số 84 vào trước số điện thoại
+                return "84" + phone.slice(1);
+            } else {
+                // Nếu đã có đầu số 84, không cần thay đổi
+                return phone;
+            }
+        }
+        function convertISOToDateTime(isoString) {
+            // Tạo một đối tượng Date từ chuỗi ISO 8601
+            var date = new Date(isoString);
+
+            // Lấy thông tin ngày, tháng, năm, giờ và phút
+            var day = date.getDate();
+            var month = date.getMonth() + 1; // Tháng bắt đầu từ 0 nên cần cộng thêm 1
+            var year = date.getFullYear();
+            var hours = date.getHours();
+            var minutes = date.getMinutes();
+
+            // Định dạng lại các giá trị thành chuỗi
+            var formattedDateTime = hours + ':' + minutes + ' ' + day + '/' + month + '/' + year;
+
+            // Trả về chuỗi đã được định dạng
+            return formattedDateTime;
+        }
+
+        function formatDateTimeInText(text) {
+            // Biểu thức chính quy để tìm kiếm các chuỗi thời gian có định dạng ISO 8601 trong văn bản
+            var isoRegex = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/g;
+
+            // Tìm tất cả các chuỗi thời gian trong văn bản
+            var isoMatches = text.match(isoRegex);
+
+            // Nếu có các chuỗi thời gian được tìm thấy, chuyển đổi và thay thế chúng
+            if (isoMatches) {
+                isoMatches.forEach(function (match) {
+                    var formattedDateTime = convertISOToDateTime(match);
+                    text = text.replace(match, formattedDateTime);
+                });
+            }
+
+            // Trả về văn bản đã được định dạng
+            return text;
+        }
+        function createZNSLeadLogs(Id, Content, Status, Mobile, CampaignId,ErrorCode) {
+            debugger
+            var formattedText = formatDateTimeInText(Content);
+
+            $.ajax({
+                type: 'POST',
+                url: '/AdviseCard/CreateZNSLeadLogs',
+                data: JSON.stringify({
+                    Id: Id,
+                    Content: formattedText,
+                    Status: Status,
+                    Mobile: Mobile,
+                    CampaignId: CampaignId,
+                    ErrorCode: ErrorCode
+                }),
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (response) {
+                    if (response.success) {
+                        // Xử lý thành công (nếu cần)
+                        console.log('CreateZNSLeadLogs success');
+                    } else {
+                        // Xử lý khi có lỗi (nếu cần)
+                        console.error('CreateZNSLeadLogs error');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Xử lý khi gặp lỗi request
+                    console.error('Error sending CreateZNSLeadLogs request:', error);
+                }
+            });
+        }
+
+                    function CloseZNSModalHangfire() {
+
+            $("#ZNSModalHangfire").modal("hide");
+        }
+    </script>
+
+
+
+
+

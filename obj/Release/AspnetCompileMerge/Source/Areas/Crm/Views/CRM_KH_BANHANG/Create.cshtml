@@ -1,0 +1,264 @@
+﻿@*@model IEnumerable<CRM_KH_BANHANGViewModel>*@
+
+@using Erp.BackOffice.Account.Models
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Areas.Cms.Models
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+@model CRM_KH_BANHANGViewModel
+
+@{
+    ViewBag.Title = "Lập Kế hoạch mới";
+    bool isPopup = Request["IsPopup"] != null && Request["IsPopup"].ToString().ToLower() == "true" ? true : false;
+    if (isPopup)
+    {
+        Layout = "~/Views/Shared/_PopupLayout.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+    }
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "CRM_KH_BANHANG",
+        ActionName = "Create",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+    int rowNumber = 0;
+    int numberOfItem = 30;
+    int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+    string Month = Request["month"] != null ? Request["month"] : DateTime.Now.ToString("MM/yyyy");
+    string Year = Request["year"] != null ? Request["year"] : DateTime.Now.Year.ToString();
+    int index = 0;
+    IEnumerable<SelectListItem> BrandList = Erp.BackOffice.Helpers.Common.GetSelectList_Category("Origin", null, "value");
+    IEnumerable<CRM_KH_BANHANGViewModel> CRM_KH_BANHANG = (IEnumerable<CRM_KH_BANHANGViewModel>)ViewBag.CRM_KH_BANHANG;
+    IEnumerable<ProductInvoiceViewModel> ProductInvoice = (IEnumerable<ProductInvoiceViewModel>)ViewBag.ProductInvoice;
+    IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.Origin;
+
+}
+
+<link href="/assets/css/combojax.css" rel="stylesheet" />
+<link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+
+
+<style>
+    .popover {
+        width: 100% !important;
+    }
+
+    .itemdiv > .body > .text {
+        padding-bottom: 0px !important;
+    }
+
+    .itemdiv {
+        padding-right: 3px;
+        min-height: 10px;
+    }
+
+    .add:active {
+        background-color: #428BCA !important;
+        border-color: #428BCA;
+    }
+
+    .add:hover {
+        outline: 0;
+        color: #23527c;
+        background-color: #428BCA !important;
+        border-color: #428BCA;
+    }
+
+    .add {
+        background-color: #428BCA !important;
+        border-color: #428BCA;
+    }
+</style>
+@helper CheckDeleteColumns(int? KH_GIOITHIEU_ID)
+{
+    /**/
+    <label>
+        <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@KH_GIOITHIEU_ID">
+        <span class="lbl"></span>
+    </label>
+}
+@helper BuildCheckAll()
+{
+    /**/
+    <label>
+        <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+        <span class="lbl"></span>
+    </label>
+    /**/
+}
+
+@helper GridColumnCommand(int? id)
+{
+    /**/
+    <p>
+        <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+            <i class="ace-icon fa fa-trash bigger-120"></i>
+        </button>
+    </p>
+    /**/
+}
+
+@if (ViewBag.SuccessMessage != null && ViewBag.SuccessMessage != "")
+{
+    <div class="alert alert-block alert-success">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-check green"></i>
+        @ViewBag.SuccessMessage
+    </div>
+}
+
+@if (ViewBag.FailedMessage != null && ViewBag.FailedMessage != "")
+{
+    <div class="alert alert-block alert-danger">
+        <button class="close" data-dismiss="alert" type="button">
+            <i class="ace-icon fa fa-times"></i>
+        </button>
+        <i class="ace-icon fa fa-warning red"></i>
+        @ViewBag.FailedMessage
+    </div>
+}
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { id = "SaleOrder", @class = "form-horizontal clearfix" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+        <div class="row" style="height:530px;width:1130px ; overflow:scroll">
+            <div class="col-sm-12">
+                <div class="widget-container-col ui-sortable" id="widget-container-col-10" style="min-height: 108px;">
+                    <div class="widget-box ui-sortable-handle" id="widget-box-10" style="opacity: 1;">
+                        <div class="widget-header widget-header-small">
+                            <div class="widget-toolbar no-border pull-left">
+                                <ul class="nav nav-tabs" id="myTab">
+                                    @if (origin.Where(x => x.Value == "ANNAYAKE").Count() > 0)
+                                    {
+                                        <li class="active">
+                                            <a data-toggle="tab" href="#ANNAYAKE" aria-expanded="true"><i class="fa"></i>ANNAYAKE</a>
+                                        </li>
+                                    }
+                                    @if (origin.Where(x => x.Value == "ORLANE PARIS").Count() > 0)
+                                    {
+                                        <li class="">
+                                            <a data-toggle="tab" href="#ORLANE" aria-expanded="false"><i class="fa"></i>ORLANE</a>
+                                        </li>
+                                    }
+                                    @if (origin.Where(x => x.Value == "LEONOR GREYL").Count() > 0)
+                                    {
+                                        <li class="">
+                                            <a data-toggle="tab" href="#LEONOR" aria-expanded="false"><i class="fa"></i>LEONOR</a>
+                                        </li>
+                                    }
+                                    @if (origin.Where(x => x.Value == "DICHVU").Count() > 0)
+                                    {
+                                        <li class="">
+                                            <a data-toggle="tab" href="#DICHVU" aria-expanded="false"><i class="fa"></i>Dịch vụ</a>
+                                        </li>
+                                    }
+                                    @if (origin.Where(x => x.Value == "CONGNGHECAO").Count() > 0)
+                                    {
+                                        <li class="">
+                                            <a data-toggle="tab" href="#CNC" aria-expanded="false"><i class="fa"></i>Công nghệ cao</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="widget-body">
+                            <div class="widget-main padding-6">
+                                <div class="tab-content">
+                                    <div id="ANNAYAKE" class="tab-pane active">
+                                        @Html.Partial("LoadDetail", Model)
+                                    </div>
+                                    <div id="ORLANE" class="tab-pane">
+
+                                        @Html.Partial("LoadTapORLANE", Model)
+                                    </div>
+                                    <div id="LEONOR" class="tab-pane">
+                                        @Html.Partial("LoadTapLEONOR", Model)
+                                    </div>
+                                    <div id="DICHVU" class="tab-pane">
+                                        @Html.Partial("LoadTapDV", Model)
+                                    </div>
+                                    <div id="CNC" class="tab-pane">
+                                        @Html.Partial("LoadTapCONGNGHECAO", Model)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <a class="btn btn-mini btn-primary" onclick="Check();">
+            <i class="ace-icon fa fa-save"></i>
+            Cập nhật
+        </a>
+        @*<a class="btn btn-mini btn-primary" onclick="OpenPopup('@Url.Action("CreateKH_BANHANG", "CRM_KH_BANHANG",new { id=@Model.NGUOILAP_ID})','',0,0)">
+                Tạo mới
+            </a>*@
+
+        <a id="export-excel" class="btn btn-white btn-success btn-sm" onclick="OpenPopup('@Url.Action("Print_KH_BH", "CRM_KH_BANHANG",new {area="Crm", id=Model.NGUOILAP_ID, month=Month, year = Year})')">
+            <i class="ace-icon fa fa-file-excel-o"></i>
+            Xuất excel
+        </a>
+
+    }
+}
+
+
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    <script type="text/javascript">
+        $('#month3').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        $('#month').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        $('#month1').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        $('#monthCNC').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        $('#monthDV').datetimepicker({
+            format: 'MM/YYYY'
+        });
+        function Check() {
+            ShowLoading();
+            var TARGET_BRAND = $("#TARGET_BRAND").val();
+            var messagge = "";
+            HideLoading();
+            if (TARGET_BRAND == '') {
+                messagge += "Chưa nhập Taget<br>";
+            }
+            if (messagge != '') {
+                alertPopup('Lỗi!', messagge, 'error');
+                HideLoading();
+            } else {
+                ClearFormatBeforeSubmit($("#SaleOrder"));
+                $("#SaleOrder").submit();
+            }
+        }
+    </script>
+}

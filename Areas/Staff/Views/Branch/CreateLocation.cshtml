@@ -1,0 +1,143 @@
+﻿@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Helpers
+@using Erp.BackOffice.Staff.Models
+
+@model LocationViewModel
+
+@{
+    ViewBag.Title = Model.Setting == "update" ? "Cập nhật" : "Thêm mới";
+    Layout = "~/Views/Shared/" + (Request["IsPopup"] == null ? "ACE_AdminLayout.cshtml" : "_PopupLayout.cshtml");
+
+    Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+    {
+        ModuleName = "Branch",
+        ActionName = "CreateLocation",
+        PageTitle = ViewBag.Title,
+        DisplaySearchPanel = false,
+        IsPopup = false,
+        DisplayBackButton = true
+    };
+}
+
+@section HeadOfPage {
+    @Html.ScriptTop_ChosenStyle()
+}
+
+@using (Html.BeginPageHeaderContainer(pageSetting))
+{
+
+}
+
+@using (Html.BeginForm_AceStyle((string)ViewBag.Title, pageSetting.ActionName, pageSetting.ModuleName, null, FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Setting)
+    @Html.HiddenFor(model => model.Group)
+    <input type="hidden" name="IsPopup" value="@Request["IsPopup"]" />
+
+    if (Model.Group == "Province")
+    {
+        @Html.CustomTextboxFor(model => model.ProvinceId, null, null, WidthType.span12, true)
+        @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span4, true)
+        @Html.CustomTextboxFor(model => model.Type, null, null, WidthType.span12, true)
+        @Html.CustomTextboxFor(model => model.PHISHIP, null, null, WidthType.span4, true)
+        @Html.CustomTextboxFor(model => model.STT, null, null, WidthType.span4, true)
+    }
+    if (Model.Group == "District")
+    {
+        @Html.HiddenFor(model => model.ProvinceId)
+        @Html.CustomTextboxFor(model => model.DistrictId, null, null, WidthType.span12, true)
+        @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span4, true)
+        @Html.CustomTextboxFor(model => model.Type, null, null, WidthType.span12, true)
+        @Html.CustomTextboxFor(model => model.Location, null, null, WidthType.span4, true)
+        @Html.CustomTextboxFor(model => model.PHISHIP, null, null, WidthType.span4, true)
+        @Html.CustomTextboxFor(model => model.STT, null, null, WidthType.span4, true)
+    }
+    if (Model.Group == "Ward")
+    {
+        @Html.HiddenFor(model => model.DistrictId)
+        @Html.CustomTextboxFor(model => model.WardId, null, null, WidthType.span12, true)
+        @Html.CustomTextboxFor(model => model.Name, null, null, WidthType.span4, true)
+        @Html.CustomTextboxFor(model => model.Type, null, null, WidthType.span12, true)
+        @Html.CustomTextboxFor(model => model.Location, null, null, WidthType.span4, true)
+        @Html.CustomTextboxFor(model => model.STT, null, null, WidthType.span4, true)
+    }
+
+    using (Html.BeginButtonContainer(pageSetting))
+    {
+        <button class="btn btn-mini btn-primary" type="submit" name="Submit" value="Save">
+            <i class="ace-icon fa fa-save"></i>
+            @Wording.Save
+        </button>
+    }
+}
+
+@section Scripts {
+    @Html.ScriptBottom_ValidationMvc()
+    @Html.ScriptBottom_ChosenStyle()
+    <script>
+        $(document).ready(function () {
+            var group = $("#Group").val();
+            if (group == 'Province') {
+                SetTextForId($('#ProvinceId'), "Mã tỉnh/thành phố");
+                SetTextForId($('#Name'), "Tên tỉnh/thành phố");
+                SetTextForId($('#Type'), "Loại(Tỉnh/Thành phố)");
+                SetTextForId($('#PHISHIP'), "Phí vận chuyển");
+                SetTextForId($('#STT'), "Số thứ tự");
+            }
+            if (group == 'District') {
+                SetTextForId($('#DistrictId'), "Mã quận/huyện");
+                SetTextForId($('#Name'), "Tên quận/huyện");
+                SetTextForId($('#Type'), "Loại(Quận/Huyện)");
+                SetTextForId($('#Location'), "Vị trí(Kinh độ, vĩ độ)");
+                SetTextForId($('#STT'), "Số thứ tự");
+            }
+            if (group == 'Ward') {
+                SetTextForId($('#WardId'), "Mã phường/xã");
+                SetTextForId($('#Name'), "Tên phường/xã");
+                SetTextForId($('#Type'), "Loại(Phường/Xã/Thị trấn)");
+                SetTextForId($('#Location'), "Vị trí(Kinh độ, vĩ độ)");
+                SetTextForId($('#STT'), "Số thứ tự");
+            }
+
+            $("#ProvinceId").change(function () {
+                var setting = $("#Setting").val();
+                $.get('/SaleReport/CheckIDLocation?id=' + $(this).val() + '&setting=' + setting, function (rs) {
+                    if (rs != '') {
+                        alert(rs);
+                    }
+                });
+            });
+            $("#DistrictId").change(function () {
+                var setting = $("#Setting").val();
+                $.get('/SaleReport/CheckIDLocation?id=' + $(this).val() + '&setting=' + setting, function (rs) {
+                    if (rs != '') {
+                        alert(rs);
+                    }
+                });
+            });
+            $("#WardId").change(function () {
+                var setting = $("#Setting").val();
+                $.get('/SaleReport/CheckIDLocation?id=' + $(this).val() + '&setting=' + setting, function (rs) {
+                    if (rs != '') {
+                        alert(rs);
+                    }
+                });
+            });
+        });
+        function SetTextForId(ele, strName) {
+            var a = $(ele).closest('div .control-group');
+            a.find('label').html(strName);
+        }
+    </script>
+}
+
+<style>
+    #Name {
+        width: 100%;
+    }
+
+    #PHISHIP {
+        width: 100%;
+    }
+</style>

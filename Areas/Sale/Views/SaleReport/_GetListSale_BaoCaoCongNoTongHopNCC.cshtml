@@ -1,0 +1,56 @@
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Sale.Models
+@using Erp.BackOffice.Helpers
+@model List<Sale_BaoCaoCongNoTongHopNCCViewModel>
+@{
+    Layout = null;
+    int index = 1;
+}
+
+<table id="CTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th style="width:40px;text-align:center">STT</th>
+            <th class="text-center">Ngày hóa đơn</th>
+            <th class="text-center">Số hóa đơn</th>
+            <th class="text-center">Mã nhà cung cấp</th>
+            <th class="text-center">Tên nhà cung cấp</th>
+            <th class="text-center">Trị giá công nợ gốc</th>
+            <th class="text-center">Trị giá còn phải trả</th>
+            <th class="text-center">Ngày phải trả</th>
+            <th class="text-center">Số ngày quá hạn</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class="@(index%2==0?" alert-warning":"")">
+                <td>
+                    <span>@(index++)</span>
+                </td>
+
+                <td>@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                <td>@item.MaChungTuGoc</td>
+                <td>@item.SupplierCode</td>
+                <td>@item.SupplierName</td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(item.TotalAmount, null))</td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(item.cnt, null))</td>
+                <td>@(item.NextPaymentDate.HasValue ? item.NextPaymentDate.Value.ToString("dd/MM/yyyy HH:mm") : "")</td>
+                <td class="text-right">@(CommonSatic.ToCurrencyStr(item.daytra, null))</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td class="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.TotalAmount), null))</td>
+            <td class="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.cnt), null))</td>
+            <td></td>
+            <td class="text-right">@(CommonSatic.ToCurrencyStr(Model.Sum(x => x.daytra), null))</td>
+        </tr>
+    </tfoot>
+</table>

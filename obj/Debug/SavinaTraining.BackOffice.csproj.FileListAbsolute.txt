@@ -1,0 +1,515 @@
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.pdb
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\Antlr3.Runtime.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\EntityFramework.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\GridMvc.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\Microsoft.Web.Infrastructure.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\Newtonsoft.Json.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Helpers.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Http.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Mvc.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Optimization.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Razor.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\WebActivator.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\WebGrease.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\WebMatrix.Data.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\WebMatrix.WebData.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.pdb
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\EntityFramework.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\Newtonsoft.Json.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Helpers.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Http.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Mvc.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Razor.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\WebMatrix.Data.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\WebMatrix.WebData.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.xml
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.csprojResolveAssemblyReference.cache
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.pdb
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\AutoMapper.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\AutoMapper.Net4.dll
+E:\LocalProjects\SavinaTraining\SavinaTraining\SavinaTraining.BackOffice\bin\AutoMapper.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.pdb
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\Antlr3.Runtime.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\AutoMapper.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\AutoMapper.Net4.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\EntityFramework.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\GridMvc.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\Microsoft.Web.Infrastructure.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\Newtonsoft.Json.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Helpers.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Http.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Mvc.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Optimization.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Razor.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\WebActivator.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\WebGrease.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\WebMatrix.Data.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\WebMatrix.WebData.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.pdb
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\AutoMapper.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\EntityFramework.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\Newtonsoft.Json.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Helpers.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Http.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Mvc.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.Razor.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\WebMatrix.Data.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\WebMatrix.WebData.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.xml
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.csprojResolveAssemblyReference.cache
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.dll
+d:\Working\SM\SavinaTraining\SavinaTraining-20130722\SavinaTraining\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.pdb
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.resx
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.resx
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.en-us.resx
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.en-us.resx
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.Designer.cs
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.en-us.designer.cs
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.Designer.cs
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.en-us.designer.cs
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.pdb
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\en-us\SavinaTraining.BackOffice.resources.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Antlr3.Runtime.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\AutoMapper.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\AutoMapper.Net4.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Elmah.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Elmah.Mvc.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\EntityFramework.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\EPPlus.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\GridMvc.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Microsoft.Office.Interop.Excel.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Microsoft.Office.Interop.PowerPoint.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Microsoft.Web.Infrastructure.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\MiniProfiler.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\MiniProfiler.EntityFramework.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\MiniProfiler.Mvc.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Newtonsoft.Json.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SavinaTraining.MailHelper.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SavinaTraining.Utilities.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SimpleInjector.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Helpers.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Http.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Mvc.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Optimization.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Razor.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\WebActivator.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\WebGrease.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\WebMatrix.Data.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\WebMatrix.WebData.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Microsoft.Vbe.Interop.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.pdb
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SavinaTraining.MailHelper.pdb
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SavinaTraining.Utilities.pdb
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\AutoMapper.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\EntityFramework.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\EPPlus.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Microsoft.Office.Interop.Excel.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\MiniProfiler.pdb
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\MiniProfiler.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\MiniProfiler.EntityFramework.pdb
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\MiniProfiler.Mvc.pdb
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Newtonsoft.Json.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SimpleInjector.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Http.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Mvc.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Helpers.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.Razor.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\WebMatrix.Data.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\WebMatrix.WebData.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.xml
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.csprojResolveAssemblyReference.cache
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Wording.resources
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Error.resources
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Wording.en-us.resources
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Error.en-us.resources
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.csproj.GenerateResource.Cache
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\obj\Debug\en-us\SavinaTraining.BackOffice.resources.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.pdb
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\ImageResizer.dll
+D:\FooVN\SamsungPlus\trunk\src\SavinaTraining.BackOffice\bin\ImageResizer.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.resx
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.resx
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.en-us.resx
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.en-us.resx
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.Designer.cs
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.en-us.designer.cs
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.Designer.cs
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.en-us.designer.cs
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.dll.config
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.pdb
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\en-us\SavinaTraining.BackOffice.resources.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Antlr3.Runtime.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\AutoMapper.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\AutoMapper.Net4.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Elmah.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Elmah.Mvc.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\EntityFramework.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\EPPlus.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\GridMvc.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\ImageResizer.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Microsoft.Office.Interop.Excel.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Microsoft.Office.Interop.PowerPoint.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Microsoft.Web.Infrastructure.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\MiniProfiler.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\MiniProfiler.EntityFramework.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\MiniProfiler.Mvc.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Newtonsoft.Json.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SavinaTraining.MailHelper.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SavinaTraining.Utilities.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SimpleInjector.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Helpers.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Http.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Mvc.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Optimization.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Razor.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\WebActivator.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\WebGrease.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\WebMatrix.Data.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\WebMatrix.WebData.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Microsoft.Vbe.Interop.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.pdb
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SavinaTraining.MailHelper.pdb
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SavinaTraining.Utilities.pdb
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\AutoMapper.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\EntityFramework.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\EPPlus.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\ImageResizer.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Microsoft.Office.Interop.Excel.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\MiniProfiler.pdb
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\MiniProfiler.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\MiniProfiler.EntityFramework.pdb
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\MiniProfiler.Mvc.pdb
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Newtonsoft.Json.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SimpleInjector.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Http.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Mvc.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Helpers.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.Razor.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\WebMatrix.Data.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\WebMatrix.WebData.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.xml
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.csprojResolveAssemblyReference.cache
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Wording.resources
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Error.resources
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Wording.en-us.resources
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Error.en-us.resources
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.csproj.GenerateResource.Cache
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\obj\Debug\en-us\SavinaTraining.BackOffice.resources.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.dll
+C:\Users\vienp_000\Documents\Visual Studio 2013\SamSung\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.pdb
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.csprojResolveAssemblyReference.cache
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Wording.resources
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Error.resources
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Wording.en-us.resources
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Error.en-us.resources
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.csproj.GenerateResource.Cache
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.pdb
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.resx
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.resx
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.en-us.resx
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.en-us.resx
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.Designer.cs
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.en-us.designer.cs
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.Designer.cs
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.en-us.designer.cs
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.dll.config
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.pdb
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\en-us\SavinaTraining.BackOffice.resources.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\Antlr3.Runtime.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\AutoMapper.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\AutoMapper.Net4.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\Elmah.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\Elmah.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\EntityFramework.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\EPPlus.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\GridMvc.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\ImageResizer.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\Microsoft.Office.Interop.PowerPoint.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\Microsoft.Web.Infrastructure.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\MiniProfiler.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\MiniProfiler.EntityFramework.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\MiniProfiler.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\Newtonsoft.Json.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SavinaTraining.MailHelper.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SavinaTraining.Utilities.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SimpleInjector.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Helpers.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Http.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Optimization.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Razor.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.WebPages.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\WebActivator.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\WebGrease.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\WebMatrix.Data.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\WebMatrix.WebData.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\Microsoft.Vbe.Interop.dll
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.pdb
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SavinaTraining.MailHelper.pdb
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SavinaTraining.Utilities.pdb
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\AutoMapper.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\EntityFramework.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\EPPlus.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\ImageResizer.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\MiniProfiler.pdb
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\MiniProfiler.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\MiniProfiler.EntityFramework.pdb
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\MiniProfiler.Mvc.pdb
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\Newtonsoft.Json.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SimpleInjector.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Http.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Mvc.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Helpers.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.Razor.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.WebPages.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\WebMatrix.Data.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\WebMatrix.WebData.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.xml
+D:\02. Solutions\Z. Company\07.QTS\06.Samsung\SavinaTraining.BackOffice\obj\Debug\en-us\SavinaTraining.BackOffice.resources.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.resx
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.resx
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.en-us.resx
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.en-us.resx
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.Designer.cs
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Error.en-us.designer.cs
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.Designer.cs
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\App_GlobalResources\Wording.en-us.designer.cs
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.dll.config
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SavinaTraining.BackOffice.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\en-us\SavinaTraining.BackOffice.resources.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\Antlr3.Runtime.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\AutoMapper.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\AutoMapper.Net4.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\Elmah.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\Elmah.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\EntityFramework.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\EPPlus.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\GridMvc.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\ImageResizer.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\Microsoft.Office.Interop.PowerPoint.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\Microsoft.Web.Infrastructure.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\MiniProfiler.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\MiniProfiler.EntityFramework.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\MiniProfiler.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\Newtonsoft.Json.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SavinaTraining.MailHelper.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SavinaTraining.Utilities.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SimpleInjector.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Helpers.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Http.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Optimization.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Razor.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\WebActivator.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\WebGrease.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\WebMatrix.Data.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\WebMatrix.WebData.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\Microsoft.Vbe.Interop.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SavinaTraining.Domain.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SavinaTraining.MailHelper.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SavinaTraining.Utilities.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\AutoMapper.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\EntityFramework.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\EPPlus.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\ImageResizer.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\MiniProfiler.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\MiniProfiler.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\MiniProfiler.EntityFramework.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\MiniProfiler.Mvc.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\Newtonsoft.Json.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SimpleInjector.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Net.Http.Formatting.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Http.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Http.WebHost.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Mvc.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Helpers.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.Razor.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Deployment.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\System.Web.WebPages.Razor.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\WebMatrix.Data.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\Microsoft.Web.WebPages.OAuth.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\WebMatrix.WebData.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.AspNet.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.Core.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OAuth.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.csprojResolveAssemblyReference.cache
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Wording.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Error.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Wording.en-us.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.App_GlobalResources.Error.en-us.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.csproj.GenerateResource.Cache
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\obj\Debug\en-us\SavinaTraining.BackOffice.resources.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\SavinaTraining.BackOffice\obj\Debug\SavinaTraining.BackOffice.pdb

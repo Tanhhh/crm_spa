@@ -1,0 +1,399 @@
+﻿@model List<ProductInvoiceViewModel>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+    @using Erp.BackOffice.App_GlobalResources
+    @using Erp.BackOffice.Sale.Models
+    @using Erp.BackOffice.Helpers
+    @using GridMvc.Html
+    @using Erp.BackOffice.Areas.Cms.Models
+
+    @{
+        ViewBag.Title = "Doanh số theo nhãn hàng";
+        Layout = "~/Views/Shared/ACE_AdminLayout.cshtml";
+
+        var jsCallback = Request["jsCallback"] == null ? "" : Request["jsCallback"].ToString();
+        Erp.BackOffice.Models.PageSetting pageSetting = new Erp.BackOffice.Models.PageSetting
+        {
+            ModuleName = "SaleReport",
+            ActionName = "DoanhSoTheoNhanHang",
+            PageTitle = ViewBag.Title,
+            DisplaySearchPanel = true,
+            IsPopup = false,
+            DisplayBackButton = false
+        };
+        int rowNumber = 0;
+        int numberOfItem = 100;
+        int currentPage = Request["grid-page"] != null ? Convert.ToInt32(Request["grid-page"]) : 1;
+        string Status = Request["Status"] != null ? Request["Status"] : "";
+        var url = Request.Url;
+        int Year = Request["Year"] != null ? Convert.ToInt32(Request["Year"]) : DateTime.Now.Year;
+        string countForBrand = Request["countForBrand"];
+        IEnumerable<CategoryViewModel> origin = (IEnumerable<CategoryViewModel>)ViewBag.category;
+        var Message = Request["Message"];
+
+        string branchId = Request["BranchId"] != null ? Request["BranchId"] : Common.CurrentUser.BranchId.ToString();
+        string GDNDT = Request["GDNDT"];
+        DateTime aDateTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+        // Cộng thêm 1 tháng và trừ đi một ngày.
+        DateTime retDateTime = aDateTime.AddMonths(1).AddDays(-1);
+    }
+
+    @section HeadOfPage {
+        <style type="text/css">
+            .cell-center {
+                text-align: center;
+            }
+
+            .tr-bold {
+                font-weight: 700;
+            }
+
+            .ctl {
+                position: relative;
+                /*float: left;*/
+                margin-right: 3px;
+            }
+
+                .ctl .error {
+                    position: absolute;
+                    background: #de2a2a;
+                    left: 0px;
+                    top: 28px;
+                    padding: 2px 5px;
+                    color: #fff;
+                    z-index: 999;
+                }
+
+                    .ctl .error:before {
+                        border-bottom: 7px solid #de2a2a;
+                        border-left: 7px solid transparent;
+                        border-right: 7px solid transparent;
+                        left: 9px;
+                        top: -6px;
+                        content: "";
+                        display: inline-block;
+                        position: absolute;
+                    }
+
+            .icon-add {
+                margin-top: 0px !important;
+            }
+
+            .combojax {
+                display: inline-block;
+                position: initial !important;
+                float: none !important;
+            }
+        </style>
+
+    }
+
+    <link href="@Url.Content("~/assets/css/Gridmvc.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/gridmvc.min.js")" type="text/javascript"></script>
+    @helper GridColumnCommand(int id)
+    {
+        @*<a onclick="printInvoice(@id)" class="btn btn-primary btn-mini"><i class="fa fa-print"></i></a>*@
+
+        <button name="Delete" value="Delete" type="submit" class="btn btn-mini btn-danger">
+            <i class="ace-icon fa fa-trash"></i>
+        </button>
+    }
+
+    @helper GridColumnName(int? customerid, string customername, string name, int id, string note, string reason, bool isPopup = false, string jsCallback = null)
+    {
+        if (isPopup)
+        {
+            <a onclick="parent.selectItemCustomer(@id, '@name','@customername','@customerid')">@name</a>
+        }
+        else
+        {
+            name = string.IsNullOrEmpty(name) ? "No Title" : name;
+            <a href="@Url.Action("Detail", "ProductInvoice", new { Id = id })">@name</a>
+
+            if (!string.IsNullOrEmpty(note) || !string.IsNullOrEmpty(reason))
+            {
+                note = note + "; " + reason;
+                <span class="help-button" data-rel="tooltip" data-placement="bottom" data-html="true" data-original-title="@note">?</span>
+            }
+        }
+
+    }
+
+    @helper CheckDeleteColumns(int Id)
+    {
+        <label>
+            <input class="ace class-delete-all" type="checkbox" name="DeleteId-checkbox" value="@Id">
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper BuildCheckAll()
+    {
+        <label>
+            <input class="ace" type="checkbox" name="checkAll" id="checkAll" />
+            <span class="lbl"></span>
+        </label>
+    }
+
+    @helper GridColumnStatusName(string status)
+    {
+        switch (status)
+        {
+            case "pending":
+                <span class="label label-info">@Wording.OrderStatusDisplay_pending</span>
+                break;
+            case "inprogress":
+                <span class="label label-warning">@Wording.OrderStatusDisplay_inprogress</span>
+                break;
+            case "shipping":
+                <span class="label label-warning">@Wording.OrderStatusDisplay_shipping</span>
+                break;
+            case "complete":
+                <span class="label label-success">@Wording.OrderStatusDisplay_complete</span>
+                break;
+            case "delete":
+                <span class="label label-guide-search">Hủy chuyển</span>
+                break;
+            case "Đặt cọc":
+                <span class="label label-warning">Đặt cọc</span>
+                break;
+            case "dachot":
+                <span class="label label-danger">Đã chốt</span>
+                break;
+
+        }
+    }
+    @helper renderCusstomer(int? CustomerId, string CustomerName)
+    {
+        @CustomerName
+        @*<a onclick="OpenPopup('@Url.Action("Detail", "Customer", new { area = "Account", Id = CustomerId, IsPopup = true })', '', 0, 0)">
+                @CusromerName
+            </a>*@
+    }
+    @helper DoanhsothucNVKD(decimal? total, double? tyle)
+    {
+        var realtotal = total * (decimal)(tyle) / 100;
+        <a>@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(realtotal)</a>
+    }
+    @helper GDNDTTH(int code, string gd)
+    {
+        <select class="form-control" id="@code" name="selectgd_@code">
+            <option @(gd == "Y" ? "selected" : "") value="Y">Y</option>
+            <option @(gd == "N" ? "selected" : "") value="N">N</option>
+        </select>
+    }
+    @{
+        if (Message != null)
+        {
+            <script type = "text/javascript" >
+            $(document).ready(function() {
+            alert("@Message");
+            });
+            </script>
+        }
+    }
+
+    @using (Html.BeginPageHeaderContainer(pageSetting))
+    {
+        <p>
+            @Html.TextBox("txtCode", Request["txtCode"], new { @class = "", autocomplete = "off", placeholder = "Mã đơn hàng..." })
+            @Html.TextBox("txtCustomerCode", Request["txtCustomerCode"], new { @class = "", autocomplete = "off", placeholder = "Mã khách hàng..." })
+            @Html.TextBox("txtCusName", Request["txtCusName"], new { @class = "", autocomplete = "off", placeholder = "Tên khách hàng..." })
+            @*@Html.DropDownList("BranchId", SelectListHelper.GetSelectList_Branch(Request["BranchId"], Wording.BranchName))*@
+
+
+            <span class="input-daterange input-group">
+                @Html.TextBox("StartDate", Request["StartDate"] != null ? Request["StartDate"] : aDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Từ ngày" })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("EndDate", Request["EndDate"] != null ? Request["EndDate"] : retDateTime.ToString("dd/MM/yyyy"), new { autocomplete = "off", placeholder = "Đến ngày" })
+            </span>
+            <span class="input-group">
+                @Html.TextBox("txtMinAmount", Request["txtMinAmount"] != null ? Request["txtMinAmount"] : "", new { @class = "input-price text-right", autocomplete = "off", placeholder = "Tổng tiền từ..." })
+                <span class="input-group-addon">
+                    <i class="fa fa-exchange"></i>
+                </span>
+                @Html.TextBox("txtMaxAmount", Request["txtMaxAmount"] != null ? Request["txtMaxAmount"] : "", new { @class = "input-price text-right", autocomplete = "off", placeholder = "đến..." })
+                @*<select id="Year" name="Year">
+                        @for (int i = 2016; i <= (DateTime.Now.Year + 1); i++)
+                        {
+                            <option @(Year == i ? "Selected" : "") value="@i">
+                                @i
+                            </option>
+                        }
+
+                    </select>*@
+            </span>
+            <select style="text-align-last:center;width:125px" class="item_countForBrand" id="countForBrand" name="countForBrand">
+                <option value=""> Chọn nhãn hàng</option>
+
+
+
+                @foreach (var item in origin)
+                {
+
+                    <option @(countForBrand == item.Value ? "Selected" : "") value="@item.Value"> @item.Name </option>
+
+
+                }
+                <option @(countForBrand == "TongOrlane" ? "Selected" : "") value="TongOrlane">Tổng Orlane </option>
+            </select>
+
+            @Html.DropDownList("userTypeId", SelectListHelper.GetSelectList_User_kd(Request["userTypeId"], branchId))
+
+            <select class="form-control" id="GDNDT" name="GDNDT">
+                <option value="">GDNDT</option>
+                <option @(GDNDT == "Y" ? "selected" : "") value="Y">Y</option>
+                <option @(GDNDT == "N" ? "selected" : "") value="N">N</option>
+            </select>
+
+
+
+            <input type="hidden" value="@Request["IsPopup"]" name="IsPopup" />
+            <input type="hidden" value="@Request["jsCallback"]" name="jsCallback" />
+        </p>
+    }
+
+    @using (Html.BeginForm("DaChot", "SaleReport", FormMethod.Post))
+    {
+        <div class="row" style="padding-top: 5px;">
+            <div class="col-xs-12">
+                <div id="react_report" class="table-responsive">
+                    @Html.Grid(Model).Columns(columns =>
+               {
+               columns.Add().Titled(BuildCheckAll().ToHtmlString()).SetWidth(50).Sanitized(false).Encoded(false).RenderValueAs(u => CheckDeleteColumns(u.Id));
+               columns.Add().Titled("#").SetWidth(50).RenderValueAs(o =>
+               {
+               rowNumber++;
+
+               return @<text> @(rowNumber + ((currentPage - 1) * numberOfItem)) </text>;
+});
+columns.Add().Titled(Wording.Status).SetWidth(100).Sanitized(false).Encoded(false).RenderValueAs(n => GridColumnStatusName(n.Status));
+columns.Add(u => u.CreatedDate).Titled(Wording.CreatedDate).SetWidth(130).Format("{0:dd/MM/yyyy}");
+columns.Add(u => u.CountForBrand).Titled("Nhãn hàng").Sanitized(false).Encoded(false).RenderValueAs(n => n.CountForBrand).SetWidth(90).Sortable(true);
+
+columns.Add().Titled("Mã đơn hàng").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GridColumnName(u.CustomerId, u.CustomerName, u.Code, u.Id, u.Note, u.CancelReason)).SetWidth(140);
+
+columns.Add(u => u.TotalAmount).Titled(Wording.TotalAmount).Sortable(true).SetWidth(100).RenderValueAs(n => CommonSatic.ToCurrencyStr(n.TotalAmount, null)).Css("text-right");
+columns.Add().Titled("GD NĐT").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(n => n.GDNgayDauTienThanhToanHet);
+//columns.Add().Titled("GD NĐT").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(u => GDNDTTH(u.Id, u.GDNgayDauTienThanhToanHet));
+
+columns.Add(u => u.TyleHuong).Titled("Tỷ lệ hưởng").Sanitized(false).Encoded(false).RenderValueAs(n => n.TyleHuong.ToString()).SetWidth(90).Sortable(true);
+columns.Add().Titled("Doanh số thực NVKD").Sanitized(false).Encoded(false).RenderValueAs(n => DoanhsothucNVKD(n.TotalAmount, n.TyleHuong)).SetWidth(90).Sortable(true);
+//
+columns.Add(u => u.TotalDebit).Titled("Tổng thu").Sortable(true).SetWidth(100).RenderValueAs(n => CommonSatic.ToCurrencyStr(n.TotalDebit, null)).Css("text-right");
+columns.Add(u => u.TotalCredit).Titled("Đã thanh toán").Sortable(true).SetWidth(100).RenderValueAs(n => CommonSatic.ToCurrencyStr(n.TotalCredit, null)).Css("text-right");
+columns.Add(u => u.TongConNo).Titled("Còn nợ").Sortable(true).SetWidth(100).RenderValueAs(n => CommonSatic.ToCurrencyStr(n.TongConNo, null)).Css("text-right");
+columns.Add().Titled(Wording.Customer).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(n => renderCusstomer(n.CustomerId, n.CustomerName));
+columns.Add().Titled(Wording.CustomerCode).Sortable(true).Sanitized(false).Encoded(false).RenderValueAs(n => n.CustomerCode);
+columns.Add().Titled(Wording.ManagerStaff).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(n => n.ManagerStaffName);
+
+columns.Add().Titled("Nhóm quản lý").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(n => n.UserTypeName);
+
+//columns.Add().Titled(Wording.BranchName).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(n => n.BranchName);
+columns.Add(u => u.VoucherDate).Titled("Ngày kết toán ").SetWidth(130).Sortable(true).Format("{0:dd/MM/yyyy}");
+//columns.Add(u => u.IsArchive).Titled("TT ghi sổ").Sanitized(false).Encoded(false).RenderValueAs(n => (n.IsArchive ? "<span style=\"color:green\"><b>Đã ghi sổ</b></span>" : "<span style=\"color:red\"><b>Chưa ghi sổ</b></span>")).SetWidth(90).Sortable(true);
+
+columns.Add(u => u.Discount_VIP).Titled("Giảm giá VIP").Sanitized(false).Encoded(false).RenderValueAs(n => n.Discount_VIP.ToString()).SetWidth(40).Sortable(true);
+columns.Add(u => u.Discount_KM).Titled("Giảm giá KM").Sanitized(false).Encoded(false).RenderValueAs(n => n.Discount_KM.ToString()).SetWidth(40).Sortable(true);
+columns.Add(u => u.Discount_DB).Titled("Giảm giá ĐB").Sanitized(false).Encoded(false).RenderValueAs(n => n.Discount_DB.ToString()).SetWidth(40).Sortable(true);
+
+
+columns.Add(u => u.Hangduoctang).Titled("Hàng tặng").Sanitized(false).Encoded(false).RenderValueAs(n => n.Hangduoctang).SetWidth(90).Sortable(true);
+//columns.Add().Titled("GD ĐT").Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(n => n.GDDauTienThanhToanHet);
+columns.Add(u => u.SPHangHoa).Titled("SP HH").Sanitized(false).Encoded(false).RenderValueAs(n => n.SPHangHoa).SetWidth(90).Sortable(true);
+columns.Add(u => u.SPDichvu).Titled("SP DV").Sanitized(false).Encoded(false).RenderValueAs(n => n.SPDichvu).SetWidth(90).Sortable(true);
+
+columns.Add().Titled(Wording.Note).Sortable(false).Sanitized(false).Encoded(false).RenderValueAs(n => n.Note);
+
+}).WithPaging(100).SetRowCssClasses(item => (item.IsDeleted.HasValue && item.IsDeleted.Value ? "product-invoice-isdeleted" : ""))
+
+                </div>
+            </div>
+        </div>
+
+        using (Html.BeginButtonContainer(pageSetting))
+        {
+
+            <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(true)">
+                <i class="ace-icon fa fa-file-excel-o"></i>
+                Xuất excel
+            </button>
+            <button class="btn btn-white btn-success btn-sm" type="button" value="Export" onclick="GetPrint(false)">
+                <i class="ace-icon fa fa-print"></i>
+                In báo cáo
+            </button>
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("DaChot", "SaleReport", "Sale"))
+            {
+                <button class="btn btn-white btn-sm btn-danger" type="submit" name="DeleteAll" value="DeleteAll" onclick="return CheckIsval();">
+                    <i class="ace-icon fa fa-lock"></i>
+                    Chốt Đơn Hàng
+                </button>
+            }
+
+            if (Erp.BackOffice.Filters.SecurityFilter.AccessRight("BranchCommision", "Commision", "Sale"))
+            {
+                <a class="btn btn-white btn-sm btn-file" name="DeleteAll2" value="" href="@Url.Action("BranchCommision", "Commision")">
+                    <i class="ace-icon fa fa-credit-card"></i>
+                    Tỷ lệ đạt Target
+                </a>
+            }
+            <a>Tổng tiền:</a> <input type="text" readonly align="right" size="10" id="tongtien" style="color:red" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.tongtien)" name="tongtien" />
+            @*<a>Tổng thu:</a> <input type="text" readonly align="right" size="10" id="tongthu" style="color:lightseagreen" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.tongthu)" name="tongthu" />
+                <a>Thanh toán:</a> <input type="text" readonly align="right" size="10" id="thanhtoan" style="color:dodgerblue" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.dathanhtoan)" name="thanhtoan" />
+
+                <a>Tổng nợ:</a><input type="text" readonly align="right" size="10" id="tienconno" style="color:blue" value="@Erp.BackOffice.Helpers.Common.PhanCachHangNgan2(ViewBag.tienconno)" name="tienconno" />*@
+
+        }
+
+    }
+    @section Scripts {
+        <script type="text/javascript">
+            function CheckIsval() {
+                if ($('[name="DeleteId-checkbox"]').is(':checked') == false) {
+                    alert("Phải chọn ít nhất 1 item.");
+                    return false;
+                }
+                else {
+                    if (confirm('Bạn có chắc muốn chốt các item đã chọn ?')) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+            function GetPrint(type) {
+                var Year = $('#Year').val();
+                var txtCode = $('#txtCode').val();
+                var txtMinAmount = $('#txtMinAmount').val();
+                var txtMaxAmount = $('#txtMaxAmount').val();
+                var txtCusName = $('#txtCusName').val();
+                var startDate = $('#StartDate').val();
+                var endDate = $('#EndDate').val();
+                var BranchId = $('#BranchId').val();
+                var Status = $('#Status').val();
+                var txtCustomerCode = $('#txtCustomerCode').val();
+                var countForBrand = $('#countForBrand').val();
+                OpenPopup('/SaleReport/PrintDoanhSoTheoNhanHang?startDate=' + startDate + '&txtCustomerCode=' + txtCustomerCode + '&Status=' + Status + '&txtCusName=' + txtCusName + '&txtMaxAmount=' + txtMaxAmount + '&txtCode=' + txtCode + '&txtMinAmount=' + txtMinAmount + '&endDate=' + endDate + '&BranchId=' + BranchId + '&ExportExcel=' + type + '&Year=' + Year + '&countForBrand=' + countForBrand + '&IsPopup=true', '', 0, 900);
+
+                setTimeout(function () {
+                    $("#myModal .modal-body .iframe-container").html("");
+                    $('#myModal').modal('hide');
+                }, 200000);
+                HideLoading();
+            };
+        </script>
+        <script>
+
+            $('.input-daterange').datepicker({ format: 'dd/mm/yyyy' }).on('changeDate', function (e) {
+
+            });
+        </script>
+
+
+
+        @Html.ScriptBottom_ValidationMvc()
+        @Html.ScriptBottom_DatePicker("dd/MM/yyyy")
+    }
+ 

@@ -1,0 +1,91 @@
+﻿@model List<ImageViewModel>
+
+@using Erp.BackOffice.App_GlobalResources
+@using Erp.BackOffice.Crm.Models
+@using Erp.BackOffice.Helpers
+@using GridMvc.Html
+
+@{
+    Layout = null;
+}
+@*<link href="~/assets/css/colorbox.min.css" rel="stylesheet" />*@
+<!-- PAGE CONTENT BEGINS -->
+<div>
+    <ul class="ace-thumbnails clearfix">
+        @foreach (var i in Model)
+        {
+            <li id="li_product_image_@i.Id">
+                <div>
+                    <img width="150" height="150" alt="150x150" src="@Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(i.Images,"upload_path_Image","product",i.TargetModule)">
+                    @*<video autoplay="autoplay" width="150" height="150" alt="150x150" src="@Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(i.Image,"upload_path_REProduct","product")"></video>*@
+                    <div class="text">
+                        <div class="inner">
+                            <span>Chức năng</span>
+                            <br>
+                            <a href="@Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(i.Images, "upload_path_Image", "product",i.TargetModule)" data-rel="colorbox" class="cboxElement" title="Xem toàn màn hình">
+                                <i class="ace-icon fa fa-search-plus"></i>
+                            </a>
+                            <a download href="@Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(i.Images, "upload_path_Image", "product",i.TargetModule)" title="Tải hình về máy">
+                                <i class="ace-icon fa fa-download"></i>
+                            </a>
+                            <a onclick="OpenPopup('@Url.Action("Edit", "Image", new { area = "Crm", Id = i.Id, IsPopup = "true" })', 'Cập nhật hình ảnh', 500, 500)" title="Chỉnh sửa hình ảnh">
+                                <i class="ace-icon fa fa-pencil"></i>
+                            </a>
+                            <a onclick="ImageDelete(@i.Id)" title="Xóa hình ảnh">
+                                <i class="ace-icon fa fa-times red"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="tags">
+                        <span class="label-holder">
+                            <span class="label label-info">@i.Name</span>
+                        </span>
+                    </div>
+
+                    @*<div class="tools">
+                        <a download href="@Erp.BackOffice.Helpers.Common.KiemTraTonTaiHinhAnh(i.Image,"upload_path_REProduct","product")" title="Tải hình về máy">
+                            <i class="ace-icon fa fa-download"></i>
+                        </a>
+
+                        @*<a href="#">
+                                <i class="ace-icon fa fa-paperclip"></i>
+                            </a>
+
+                        @*<a onclick="OpenPopup('@Url.Action("Edit", "REProductImage", new { area = "RealEstate", Id = i.Id, IsPopup = "true" })', 'Cập nhật hình ảnh', 0, 360)" title="Chỉnh sửa hình ảnh">
+                            <i class="ace-icon fa fa-pencil"></i>
+                        </a>*@
+
+                    @*<a onclick="REProductImageDelete(@i.Id)" title="Xóa hình ảnh">
+                            <i class="ace-icon fa fa-times red"></i>
+                        </a>*@
+                    @*</div>*@
+                </div>
+            </li>
+        }
+    </ul>
+</div><!-- PAGE CONTENT ENDS -->
+<script type="text/javascript">
+    //    1.4 Xóa nhà
+    function ImageDelete(id) {
+        if (confirm('Bạn có chắc muốn xóa hình ảnh đã chọn ?')) {
+            ShowLoading();
+            $.post("@Url.Action("Delete", "Image", new { area = "Crm" })", { Id: id })
+        .done(function (data) {
+            if (data == "success") {
+                $("#li_product_image_" + id).remove();
+                //location.reload();
+                HideLoading();
+            }
+            else {
+                alert("Lỗi! Hình ảnh không thể xóa được");
+                HideLoading();
+            }
+        });
+            return false;
+        }
+        else {
+            return false;
+        }
+    }
+</script>

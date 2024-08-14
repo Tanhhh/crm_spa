@@ -1,0 +1,241 @@
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\App_GlobalResources\Wording.resx
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\App_GlobalResources\Error.resx
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\App_GlobalResources\Wording.en-us.resx
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\App_GlobalResources\Error.en-us.resx
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\App_GlobalResources\Error.Designer.cs
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\App_GlobalResources\Error.en-us.designer.cs
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\App_GlobalResources\Wording.Designer.cs
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\App_GlobalResources\Wording.en-us.designer.cs
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Dormitory.BackOffice.dll.config
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Dormitory.BackOffice.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Dormitory.BackOffice.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\en-us\Dormitory.BackOffice.resources.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Antlr3.Runtime.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\AutoMapper.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\AutoMapper.Net4.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Dormitory.Domain.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Dormitory.MailHelper.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Dormitory.Utilities.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.AspNet.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.Core.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OAuth.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OpenId.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Elmah.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Elmah.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\EntityFramework.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\EPPlus.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\GridMvc.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\ImageResizer.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Microsoft.Office.Interop.PowerPoint.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Microsoft.Web.Infrastructure.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Microsoft.Web.WebPages.OAuth.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\MiniProfiler.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\MiniProfiler.EntityFramework.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\MiniProfiler.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Newtonsoft.Json.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\SimpleInjector.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\SimpleInjector.Integration.Web.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Net.Http.Formatting.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Helpers.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Http.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Http.WebHost.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Mvc.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Optimization.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Razor.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.WebPages.Deployment.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.WebPages.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.WebPages.Razor.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\WebActivator.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\WebGrease.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\WebMatrix.Data.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\WebMatrix.WebData.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Microsoft.Vbe.Interop.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Dormitory.Domain.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Dormitory.MailHelper.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Dormitory.Utilities.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\AutoMapper.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\EntityFramework.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\EPPlus.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\ImageResizer.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\MiniProfiler.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\MiniProfiler.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\MiniProfiler.EntityFramework.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\MiniProfiler.Mvc.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Newtonsoft.Json.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\SimpleInjector.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\SimpleInjector.Integration.Web.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Net.Http.Formatting.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Http.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Http.WebHost.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Mvc.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Helpers.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.Razor.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.WebPages.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.WebPages.Deployment.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\System.Web.WebPages.Razor.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\WebMatrix.Data.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\Microsoft.Web.WebPages.OAuth.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\WebMatrix.WebData.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.AspNet.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.Core.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OAuth.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OpenId.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.xml
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.csprojResolveAssemblyReference.cache
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.App_GlobalResources.Wording.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.App_GlobalResources.Error.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.App_GlobalResources.Wording.en-us.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.App_GlobalResources.Error.en-us.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.csproj.GenerateResource.Cache
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\en-us\Dormitory.BackOffice.resources.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.dll
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.pdb
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Reports.BienLai.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Reports.InvoiceEW.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Reports.InvoiceEW2.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Reports.InvoiceEWDetails.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Invoice.InvoiceList.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Invoice.Insurrance.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.DormitoryManager.AggregatingStudent.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.DormitoryManager.AggregatingStudentProvince.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.DormitoryManager.HouseSeat.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Invoice.InsurranceFee.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Aggregating.StudentDeposit.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Aggregating.InvoiceInsurrance.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.MedicalExamination.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.MedicalExamination_Detail.resources
+D:\02. Solutions\Z. Company\07.QTS\05.KTX\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Washing.WashingLog.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\App_GlobalResources\Wording.resx
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\App_GlobalResources\Error.resx
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\App_GlobalResources\Wording.en-us.resx
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\App_GlobalResources\Error.en-us.resx
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\App_GlobalResources\Error.Designer.cs
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\App_GlobalResources\Error.en-us.designer.cs
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\App_GlobalResources\Wording.Designer.cs
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\App_GlobalResources\Wording.en-us.designer.cs
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Dormitory.BackOffice.dll.config
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Dormitory.BackOffice.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Dormitory.BackOffice.pdb
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\en-us\Dormitory.BackOffice.resources.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Antlr3.Runtime.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\AutoMapper.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\AutoMapper.Net4.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Dormitory.Domain.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Dormitory.MailHelper.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Dormitory.Utilities.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.AspNet.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.Core.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OAuth.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OpenId.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Elmah.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Elmah.Mvc.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\EntityFramework.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\EPPlus.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\GridMvc.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\ImageResizer.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Microsoft.Office.Interop.PowerPoint.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Microsoft.Web.Infrastructure.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Microsoft.Web.WebPages.OAuth.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\MiniProfiler.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\MiniProfiler.EntityFramework.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\MiniProfiler.Mvc.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Newtonsoft.Json.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\SimpleInjector.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\SimpleInjector.Integration.Web.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Net.Http.Formatting.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Helpers.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Http.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Http.WebHost.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Mvc.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Optimization.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Razor.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.WebPages.Deployment.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.WebPages.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.WebPages.Razor.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\WebActivator.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\WebGrease.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\WebMatrix.Data.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\WebMatrix.WebData.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Microsoft.Vbe.Interop.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Dormitory.Domain.pdb
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Dormitory.MailHelper.pdb
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Dormitory.Utilities.pdb
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\AutoMapper.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\EntityFramework.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\EPPlus.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\ImageResizer.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\MiniProfiler.pdb
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\MiniProfiler.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\MiniProfiler.EntityFramework.pdb
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\MiniProfiler.Mvc.pdb
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Newtonsoft.Json.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\SimpleInjector.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\SimpleInjector.Integration.Web.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\SimpleInjector.Integration.Web.Mvc.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Net.Http.Formatting.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Http.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Http.WebHost.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Mvc.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Helpers.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.Razor.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.WebPages.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.WebPages.Deployment.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\System.Web.WebPages.Razor.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\WebMatrix.Data.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\Microsoft.Web.WebPages.OAuth.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\WebMatrix.WebData.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.AspNet.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.Core.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OAuth.Consumer.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OAuth.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OpenId.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\bin\DotNetOpenAuth.OpenId.RelyingParty.xml
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.csprojResolveAssemblyReference.cache
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.App_GlobalResources.Wording.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Aggregating.InvoiceInsurrance.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Aggregating.StudentDeposit.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.DormitoryManager.AggregatingStudent.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.DormitoryManager.AggregatingStudentProvince.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.DormitoryManager.HouseSeat.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Reports.InvoiceEW.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Reports.InvoiceEW2.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Reports.InvoiceEWDetails.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Reports.BienLai.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Invoice.Insurrance.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Invoice.InsurranceFee.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Invoice.InvoiceList.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.MedicalExamination.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.MedicalExamination_Detail.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Washing.WashingLog.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.App_GlobalResources.Error.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.App_GlobalResources.Wording.en-us.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.App_GlobalResources.Error.en-us.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.csproj.GenerateResource.Cache
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\en-us\Dormitory.BackOffice.resources.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.dll
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.pdb
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Repay.RepayByArea.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Repay.RepayByStudent.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Washing.WashingQuantity.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Repay.RepayInsurance.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Aggregating.AggregatingInvoiceEW.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Aggregating.DepositByRoomTypeAndFeeType.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.DormitoryManager.DormitoryCardCode.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.MItemReceived.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.MItemsUsed.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.MInventory.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.DrugIssuedByMonth.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.MedicalService.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.DrusCategoryInStation.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.KCB_79a.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.TreeList.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.QuarterSummary.resources
+D:\00.Solutions\01.Dormitory\src\Dormitory.BackOffice\obj\Release\Dormitory.BackOffice.Areas.Report.Design.Medical.DrugUsed.resources
